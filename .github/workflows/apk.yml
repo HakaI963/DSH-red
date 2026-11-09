@@ -79,6 +79,11 @@ jobs:
           # minutes ahead of the pool sync and 404 fresh deb revisions.
           UBUNTU_ARCHIVE_AMD64: https://archive.ubuntu.com/ubuntu
           UBUNTU_ARCHIVE_ARM64: https://ports.ubuntu.com/ubuntu-ports
+          # npmmirror/tuna/npmjs: use whichever answers — the China mirrors had
+          # a multi-hour database outage (E500) that killed CI and runtime builds.
+          UBUNTU_MIRROR: https://cdimage.ubuntu.com/ubuntu-base/releases/24.04/release
+          NODE_MIRROR: https://nodejs.org/dist
+          NPM_REGISTRY: https://registry.npmjs.org
         run: |
           flavor="${{ github.event_name == 'workflow_dispatch' && inputs.flavor || 'arm64' }}"
           case "$flavor" in
