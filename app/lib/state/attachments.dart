@@ -48,21 +48,23 @@ class PickedAttachments {
 /// DSH's inline image limit (`SessionProjections.imageLimits` default).
 const maxImageBytes = 20 * 1024 * 1024;
 
-/// Files stream to the engine (`/api/session/uploadFileBinary`), so the
-/// transfer holds about one copy of the file; the picker still keeps the
-/// staged bytes (about two while assembling), so one message also has
-/// [maxMessageBytes]. On a host without that route the client falls back to
-/// base64 and refuses what one RPC frame can't hold.
-const maxFileBytes = 200 * 1024 * 1024;
+/// Files stream to the engine (`/api/session/uploadFileBinary`) and, like the
+/// DSH harness web, the app puts no size cap on them: this is an effective
+/// infinity, not a limit. The picker still stages bytes in memory, so truly
+/// enormous files are bounded by device memory, not by a number here. Hosts
+/// without the streamed route fall back to base64 and keep their own small
+/// RPC bound (dsh_client `_maxInlineUploadBytes`).
+const maxFileBytes = 1 << 62;
 
 /// At most this many attachments per message (DSH allows 20 images).
 const maxAttachments = 9;
 
-/// Bytes one message's attachments may hold. The picker and the tray keep
-/// every file in memory until the message is sent, so the ceiling is the
-/// phone's heap rather than the Host; the share path's Kotlin budget
-/// (`MAX_TOTAL_BYTES`) matches this.
-const maxMessageBytes = 400 * 1024 * 1024;
+/// Bytes one message's attachments may hold: unlimited, same effective
+/// infinity as [maxFileBytes]. The picker keeps staged bytes in memory until
+/// the message is sent, so the real ceiling is the phone's heap. The share
+/// path's Kotlin budget (`MAX_TOTAL_BYTES`) is its own bound for share cards
+/// and is deliberately kept.
+const maxMessageBytes = 1 << 62;
 
 /// Media type when [bytes] is an image DSH accepts inline, else null.
 String? inlineImageType(Uint8List bytes) {

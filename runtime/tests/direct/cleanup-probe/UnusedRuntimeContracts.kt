@@ -1,4 +1,4 @@
-package io.github.ccch1mneyyy.dsh_app.runtime
+package dev.nolyf.dsh_red.runtime
 
 import java.io.File
 

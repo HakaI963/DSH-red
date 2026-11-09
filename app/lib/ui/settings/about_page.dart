@@ -87,6 +87,27 @@ class AboutPage extends ConsumerWidget {
             ),
           ],
         ),
+        SettingsSection(
+          // Fork credits are hardcoded English: DSH red ships English-only.
+          children: [
+            _authorLink(
+              context,
+              ref,
+              'about-fork',
+              'DSH red — this fork',
+              'maintained by ${AppInfo.forkMaintainer}',
+              AppInfo.forkProjectUrl,
+            ),
+            _authorLink(
+              context,
+              ref,
+              'about-upstream',
+              'Original DSH Go project',
+              '${AppInfo.author}/dsh-Go',
+              AppInfo.originalProjectUrl,
+            ),
+          ],
+        ),
         Padding(
           padding: const EdgeInsets.fromLTRB(24, 8, 24, 0),
           child: Column(

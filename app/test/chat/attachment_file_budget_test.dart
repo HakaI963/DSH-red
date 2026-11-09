@@ -217,8 +217,8 @@ void main() {
   });
 
   test('known oversize is rejected before opening, while later valid files survive', () async {
-    // 500 MiB is metadata only. The fixture would yield at most 1 MiB.
-    final large = _File('video.mp4', _megabytes(1), reportedLength: 500 * _mib);
+    // The claim is metadata only. The fixture would yield at most 1 MiB.
+    final large = _File('video.mp4', _megabytes(1), reportedLength: maxFileBytes + 1);
     final good = _small('notes.txt');
     picker.selected = [large, good];
     final result = await device.pickFiles();
@@ -228,21 +228,27 @@ void main() {
     expect(large.wholeReads, 0);
   });
 
-  for (final reported in <int?>[null, 0, 1, maxFileBytes]) {
+  for (final reported in <int?>[null, 0, 1, maxImageBytes]) {
     test('unknown or stale size $reported still stops at the first oversized chunk', () async {
-      final file = _File('export.zip', _megabytes(maxFileBytes ~/ _mib + 1), reportedLength: reported);
+      // Plain files are uncapped now: this covers the inline IMAGE bound, which
+      // is decided from the streamed signature, not the name.
+      final file = _File('export.png', [
+        Uint8List.fromList(_png),
+        ..._megabytes(maxImageBytes ~/ _mib + 4),
+      ], reportedLength: reported);
       picker.selected = [file];
       final result = await device.pickFiles();
       expect(result.attachments, isEmpty);
-      expect(result.problem, appL10n.stateAttachmentFileLimit(file.name));
-      expect(file.consumed, maxFileBytes + _mib);
+      expect(result.problem, appL10n.stateAttachmentImageLimit(file.name));
+      expect(file.consumed, _png.length + maxImageBytes + _mib);
       expect(file.closed, isTrue);
       expect(file.wholeReads, 0);
     });
   }
 
   test('one oversized upstream chunk is rejected and the tail is never requested', () async {
-    final file = _File('single.bin', [Uint8List(maxFileBytes + 1), Uint8List(1)]);
+    final oversizedPng = Uint8List(maxImageBytes + 1)..setRange(0, 8, _png);
+    final file = _File('single.png', [oversizedPng, Uint8List(1)]);
     picker.selected = [file];
     final result = await device.pickFiles();
     expect(result.attachments, isEmpty);
@@ -250,16 +256,16 @@ void main() {
     expect(file.closed, isTrue);
   });
 
-  test('a multi-file pick stops at the message byte budget', () async {
-    // 150 MiB each with known sizes: two fit (300 MiB), the third would pass 400 MiB.
+  test('a multi-file pick streams every file: no message byte budget any more', () async {
+    // 15 MiB each with known sizes: all three go in (plain files are uncapped).
     final files = [
-      for (var i = 0; i < 3; i++) _File('part$i.bin', _megabytes(150), reportedLength: 150 * _mib),
+      for (var i = 0; i < 3; i++) _File('part$i.bin', _megabytes(15), reportedLength: 15 * _mib),
     ];
     picker.selected = files;
     final result = await device.pickFiles();
-    expect(result.attachments.map((a) => a.name), ['part0.bin', 'part1.bin']);
-    expect(result.problem, appL10n.stateAttachmentTotalLimit);
-    expect(files[2].streams, 0);
+    expect(result.attachments.map((a) => a.name), ['part0.bin', 'part1.bin', 'part2.bin']);
+    expect(result.problem, isNull);
+    expect(files.map((f) => f.consumed), [15 * _mib, 15 * _mib, 15 * _mib]);
   });
 
   test('bytes already in the tray count before another file is opened', () async {
@@ -359,7 +365,7 @@ void main() {
   });
 
   testWidgets('composer keeps a good pick and shows the first pre-read rejection', (tester) async {
-    final large = _File('video.mp4', const [], reportedLength: 500 * _mib);
+    final large = _File('video.mp4', const [], reportedLength: maxFileBytes + 1);
     picker.selected = [large, _small('small.txt')];
     await _screen(tester, ChatHarness(session: 's1'));
     await _choose(tester);
@@ -369,7 +375,7 @@ void main() {
   });
 
   testWidgets('composer shows rejection even when no attachments were accepted', (tester) async {
-    final large = _File('video.mp4', const [], reportedLength: 500 * _mib);
+    final large = _File('video.mp4', const [], reportedLength: maxFileBytes + 1);
     picker.selected = [large];
     await _screen(tester, ChatHarness(session: 's1'));
     await _choose(tester);

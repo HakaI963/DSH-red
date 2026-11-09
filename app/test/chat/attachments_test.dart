@@ -50,12 +50,13 @@ void main() {
       expect(formatBytes(42 * 1024 * 1024), '42 MB');
     });
 
-    test('empty and oversized attachments are refused with a reason', () {
+    test('empty attachments are refused; files are uncapped, images are not', () {
       expect(attachmentProblem(textFile('a.txt', '')), contains('空文件'));
-      expect(
-        attachmentProblem(DraftAttachment(name: 'big.zip', bytes: Uint8List(maxFileBytes + 1))),
-        contains('200 MB'),
-      );
+      // Like the harness: plain files have no size cap any more.
+      expect(attachmentProblem(DraftAttachment(name: 'big.zip', bytes: Uint8List(21 * 1024 * 1024))), isNull);
+      // DSH's inline image limit still stands.
+      final png = Uint8List(maxImageBytes + 16)..setRange(0, 8, [0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]);
+      expect(attachmentProblem(DraftAttachment.sniff('big.png', png)), contains('20 MB'));
       expect(attachmentProblem(textFile('ok.txt')), isNull);
     });
   });
@@ -127,14 +128,16 @@ void main() {
       expect(controller.sent, ['/compact']);
     });
 
-    testWidgets('oversized picks are refused with a note, the rest kept', (tester) async {
+    testWidgets('oversized image picks are refused with a note, the rest kept', (tester) async {
+      final bigPng = Uint8List(maxImageBytes + 16)
+        ..setRange(0, 8, [0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]);
       final harness = ChatHarness(session: 's1')
-        ..picker.files = [DraftAttachment(name: 'huge.bin', bytes: Uint8List(maxFileBytes + 1)), textFile('small.txt')];
+        ..picker.files = [DraftAttachment.sniff('huge.png', bigPng), textFile('small.txt')];
       await pumpScreen(tester, harness);
       await attachFrom(tester, '文件');
       expect(find.text('small.txt'), findsOneWidget);
-      expect(find.text('huge.bin'), findsNothing);
-      expect(find.textContaining('超过 200 MB'), findsOneWidget);
+      expect(find.text('huge.png'), findsNothing);
+      expect(find.textContaining('超过 20 MB'), findsOneWidget);
     });
 
     testWidgets('a cancelled camera adds nothing', (tester) async {

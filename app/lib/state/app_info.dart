@@ -16,7 +16,7 @@ abstract final class AppInfo {
 
   /// The app's name as the phone shows it: launcher, Recents, notifications, system
   /// settings, the licence page. Matches `android:label` in AndroidManifest.xml.
-  static const name = 'DSH Go';
+  static const name = 'DSH red';
 
   /// The in-app wordmark: the drawer's lockup, the welcome page and the brand mark's
   /// spoken label.
@@ -30,12 +30,19 @@ abstract final class AppInfo {
   static String get slogan => appL10n.appSlogan;
 
   /// The original DSH Go author and their personal profiles, not project pages.
+  /// DSH red is a fork: the upstream author and the original project keep their
+  /// credit on the About page.
   static const author = 'ccch1mneyyy';
   static const authorBilibiliName = 'ccchimneyyy';
   static const authorBilibiliUrl = 'https://b23.tv/9WBns6Y';
   static const authorXHandle = '@cccch1mneyyyy';
   static const authorXUrl = 'https://x.com/cccch1mneyyyy';
   static const authorGithubUrl = 'https://github.com/ccch1mneyyy';
+
+  /// This fork: maintained by no_lyf as DSH red (English build of dsh-Go).
+  static const forkMaintainer = 'no_lyf';
+  static const forkProjectUrl = 'https://github.com/HakaI963/DSH-red';
+  static const originalProjectUrl = 'https://github.com/ccch1mneyyy/dsh-Go';
 
   static const deepseekPlatform = 'https://platform.deepseek.com/api_keys';
   static const remoteConsole = 'https://dsh.r2049.cn/app';
