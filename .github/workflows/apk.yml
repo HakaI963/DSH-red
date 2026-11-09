@@ -40,7 +40,7 @@ jobs:
   build:
     name: Release APK (${{ github.event_name == 'workflow_dispatch' && inputs.flavor || 'arm64' }})
     runs-on: ubuntu-24.04
-    timeout-minutes: 60
+    timeout-minutes: 90
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
@@ -67,6 +67,21 @@ jobs:
       - name: Generate the Gradle wrapper
         working-directory: app/android
         run: gradle wrapper --gradle-version "$GRADLE_VERSION" --no-daemon
+      # The APK must contain the PRoot Linux runtime (runtime/build-runtime.sh
+      # writes runtime/out/<abi>/assets+jniLibs, which the gradle flavors pick
+      # up). Without this step the app boots with "bundled runtime is
+      # incomplete". Downloads are hash-pinned; single ABI per run.
+      - name: Build bundled runtime
+        timeout-minutes: 45
+        run: |
+          flavor="${{ github.event_name == 'workflow_dispatch' && inputs.flavor || 'arm64' }}"
+          case "$flavor" in
+            arm64) runtime_abis=(arm64-v8a) ;;
+            x64) runtime_abis=(x86_64) ;;
+            all) runtime_abis=(x86_64 arm64-v8a) ;;
+            *) echo "bad flavor $flavor" >&2; exit 1 ;;
+          esac
+          runtime/build-runtime.sh "${runtime_abis[@]}"
       - name: Build release APK
         run: tooling/build-apk.sh -f "${{ github.event_name == 'workflow_dispatch' && inputs.flavor || 'arm64' }}"
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
