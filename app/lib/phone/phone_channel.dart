@@ -1,7 +1,7 @@
 // Dart side of the `dsh/phone` method channel and `dsh/phone/events` event
 // channel (the native side is PhonePlugin.kt). The native module is
 // built separately; every call here tolerates it being absent
-// (MissingPluginException → "未就绪") or failing (PlatformException → a reason).
+// (MissingPluginException → "not ready") or failing (PlatformException → a reason).
 
 import 'dart:async';
 
@@ -38,7 +38,7 @@ String get phoneNotReadyReason => appL10n.statePhoneNotReady;
 
 // ── Status ───────────────────────────────────────────────────────────────────
 
-/// Where 不打扰模式 gets its shell identity from.
+/// Where the "Non-disruptive mode" toggle gets its shell identity from.
 enum PhoneBackgroundMode {
   off,
   shizuku,
@@ -490,11 +490,11 @@ class PhoneTaskStatus {
   final String? app;
   final bool paused;
 
-  /// The person pressed 停止 (overlay or notification); native refuses phone
+  /// The person pressed "Stop" (overlay or notification); native refuses phone
   /// actions for a short while after. The app cancels the running turn.
   final bool stopped;
 
-  /// 本任务免确认 was granted: the rest of this task asks nothing.
+  /// "This task" (skip confirmations) was granted: the rest of this task asks nothing.
   final bool waived;
 }
 
@@ -512,14 +512,14 @@ PhoneTaskStatus _selectedPhoneTask(Map<Object?, Object?> m) {
   return PhoneTaskStatus.fromMap(_map(m['task']));
 }
 
-/// Where Android 13+'s 「受限制的设置」 stands for this app (native
+/// Where Android 13+'s "Restricted setting" stands for this app (native
 /// `RestrictedSettings.kt`).
 enum RestrictedSettingsState {
   /// The accessibility switch is greyed out, and App info's ⋮ has nothing yet:
-  /// a tap on the switch comes first (it shows the 「受限制的设置」 dialog).
+  /// a tap on the switch comes first (it shows the "Restricted setting" dialog).
   guarded,
 
-  /// The dialog was seen: App info's ⋮ offers 「允许受限制的设置」.
+  /// The dialog was seen: App info's ⋮ offers "Allow restricted settings".
   acknowledged,
 
   /// Not restricted (a store install, an older Android, or allowed already).
@@ -649,7 +649,7 @@ class PhoneStatus {
     this.taskInterruption = const PhoneTaskInterruption(),
   });
 
-  /// The native module isn't there (or failed to answer): "未就绪".
+  /// The native module isn't there (or failed to answer): "not ready".
   const PhoneStatus.notReady([this.error])
     : ready = false,
       statusRevision = null,
@@ -704,14 +704,14 @@ class PhoneStatus {
   /// Why it didn't, when it said.
   final String? error;
 
-  /// The master switch 「手机操控」.
+  /// The master switch "Phone control".
   final bool enabled;
   final bool bridgeListening;
   final PhoneA11yStatus a11y;
   final A11yKeeperStatus a11yKeeper;
   final bool overlay;
 
-  /// The app may post notifications (confirmations, 停止, ADB pairing code).
+  /// The app may post notifications (confirmations, "Stop", ADB pairing code).
   final bool notifications;
 
   /// Dedicated phone-confirmation channel is available at high importance.
@@ -728,7 +728,7 @@ class PhoneStatus {
   final PhoneTaskInterruption taskInterruption;
 
   /// Some task may still act, the selected one or any other conversation's: active, a call
-  /// waiting to start, or one still draining. Mirrors the native refusal of 解除限制.
+  /// waiting to start, or one still draining. Mirrors the native refusal of "Lift limits".
   bool get anyTaskBusy => task.active || tasks.any((t) => t.active || t.pendingCalls > 0 || t.draining);
 
   PhoneStatus copyWith({bool? enabled, bool? ready, Object? error = _keepError}) => PhoneStatus(
@@ -755,9 +755,9 @@ class PhoneStatus {
   );
 }
 
-// ── 悬浮条 ───────────────────────────────────────────────────────────────────
+// ── Floating bar ─────────────────────────────────────────────────────────────
 
-/// 设置 → 手机操控 → 悬浮条 (`overlayPrefs` / `setOverlayPrefs`): how opaque the
+/// Settings → Phone control → Floating bar (`overlayPrefs` / `setOverlayPrefs`): how opaque the
 /// pill is when idle, and whether it folds into the ball by itself. A showing
 /// overlay follows changes at once.
 class PhoneOverlayPrefs {
@@ -777,10 +777,10 @@ class PhoneOverlayPrefs {
   static double clampOpacity(double v) =>
       v.isNaN ? defaultOpacity : (v.clamp(minOpacity, maxOpacity) * 100).round() / 100;
 
-  /// 闲置时不透明度, 0.3–1 (1: never fades).
+  /// Idle opacity, 0.3–1 (1: never fades).
   final double idleOpacity;
 
-  /// 闲置时自动收起.
+  /// Collapse when idle.
   final bool autoCollapse;
 
   int get percent => (idleOpacity * 100).round();
@@ -956,16 +956,16 @@ const _knownAppLabelsEn = <String, String>{
   'com.yitong.mbank.psbc': 'Postal Savings Bank of China',
   'com.jd.jrapp': 'JD Finance',
   'com.taobao.taobao': 'Taobao',
-  'com.jingdong.app.mall': 'JD',
+  'com.jingdong.app.mall': 'JD.com',
   'com.xunmeng.pinduoduo': 'Pinduoduo',
   'com.sankuai.meituan': 'Meituan',
   'com.autonavi.minimap': 'Amap',
   'com.ss.android.ugc.aweme': 'Douyin',
-  'com.xingin.xhs': 'Xiaohongshu',
-  'com.MobileTicket': 'China Railway 12306',
+  'com.xingin.xhs': 'REDnote',
+  'com.MobileTicket': 'Railway 12306',
 };
 
-/// A hard rule the person may lift (解除限制, `unlocks` in the policies; the
+/// A hard rule the person may lift ("Lift limits", `unlocks` in the policies; the
 /// wire key is the name). All are off until turned on behind the
 /// confirmation page; the native side reads anything else as off.
 enum PhoneUnlock {
@@ -984,13 +984,13 @@ enum PhoneUnlock {
 /// value is the name). The hard rules refuse in every mode, unless lifted
 /// ([PhoneUnlock]).
 enum PhoneConfirmMode {
-  /// 每次都询问: a new app, sending, deleting, paying… ask first.
+  /// "Always ask": a new app, sending, deleting, paying… ask first.
   ask,
 
-  /// 本任务免确认: the first question of a task can waive the rest of it.
+  /// "This task": the first question of a task can waive the rest of it.
   task,
 
-  /// 始终免确认: nothing is asked.
+  /// "Always skip": nothing is asked.
   always;
 
   /// Unknown or missing values read as [ask], the strictest.
@@ -1158,7 +1158,7 @@ enum PhoneDecision {
 
   /// Native vocabulary (PhoneCore / SafetyGate): `ok`, `allowed` (no question
   /// needed), `continue` (handoff resumed), `confirmed`, `confirmed-app`,
-  /// `confirmed-task` (本任务免确认 granted), `denied` (said no or 30 s without a choice), `stopped`, `paused`,
+  /// `confirmed-task` (task-level waiver granted), `denied` (said no or 30 s without a choice), `stopped`, `paused`,
   /// `refused:<rule>`, `unavailable`, `stale`, `timeout` (the tool ran out of
   /// time), `error`. Older or future words fall back to [unknown].
   static PhoneDecision parse(Object? wire) {
@@ -1469,7 +1469,7 @@ class PhoneChannel {
 
   Future<bool> requestShizukuPermission() => _bool('requestShizukuPermission');
 
-  /// Posts the notification with a code field for 「使用配对码配对设备」.
+  /// Posts the notification with a code field for "Pair device using pairing code".
   Future<PhoneResult> adbStartPairing() => _result('adbStartPairing');
 
   /// The in-app fallback: the six-digit code (and port) typed here.
@@ -1581,7 +1581,7 @@ class PhoneChannel {
     }
   }
 
-  /// The 悬浮条 settings; null without the native side.
+  /// The "Floating bar" settings; null without the native side.
   Future<PhoneOverlayPrefs?> overlayPrefs() => _overlay('overlayPrefs');
 
   /// Writes what is given (the rest stays); the stored result, null without the native side.

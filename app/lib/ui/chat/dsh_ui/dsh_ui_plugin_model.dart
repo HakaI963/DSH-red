@@ -6,7 +6,7 @@
 
 part of 'dsh_ui_model.dart';
 
-/// 解析档案：模型卡（```` ```dsh-ui ```` 围栏）或三档插件视图。
+/// Parse profile: model cards (```` ```dsh-ui ```` fences) or the three plugin-view tiers.
 final class DshUiProfile {
   const DshUiProfile._({
     required this.name,
@@ -20,18 +20,18 @@ final class DshUiProfile {
 
   final String name;
 
-  /// 插件视图：16 种组件、绑定、受限文字、点按走 invoke。
+  /// Plugin views: 16 component kinds, bindings, capped text, taps go through invoke.
   final bool plugin;
 
-  /// 视图（不含数据）编成 JSON 的字节上限；超了整块降级。
+  /// Byte cap for the view (without data) encoded as JSON; over it the whole block degrades.
   final int bytes;
   final int nodes;
   final int depth;
 
-  /// 每个 stack / row 的子节点。
+  /// Children per stack / row.
   final int children;
 
-  /// text / callout 的字数。
+  /// Character cap for text / callout.
   final int text;
 
   static const listItems = 50;
@@ -40,13 +40,13 @@ final class DshUiProfile {
   static const keyValues = 24;
   static const actions = 4;
 
-  /// 原始 JSON 的嵌套层数（含数组）。
+  /// Nesting depth of the raw JSON (arrays included).
   static const jsonNesting = 64;
 
-  /// 动作参数（求值后）的字节上限。
+  /// Byte cap for action arguments (after evaluation).
   static const actionArgsBytes = 1024;
 
-  /// `data:` 图片的字符数上限，以及解码后的尺寸上限。
+  /// Character cap for `data:` images, plus the decoded size caps.
   static const imageDataBytes = 65536;
   static const imageSide = 4096;
   static const imagePixels = 4000000;
@@ -87,12 +87,12 @@ final class DshUiProfile {
 
 const _pluginTypes = [..._types, 'list', 'keyValue', 'progress', 'table', 'actions', 'image'];
 
-/// 插件视图里能用的组件名（能力声明 `caps.components`）。
+/// Component names allowed in plugin views (capability declaration `caps.components`).
 const dshUiPluginComponents = [..._pluginTypes, ..._pluginControlTypes];
 
-// ───────────────────────── 节点 ─────────────────────────
+// ───────────────────────── Nodes ─────────────────────────
 
-/// 一次点按要发的 invoke：动作 id + 参数（已求值）。
+/// The invoke one tap sends: action id + arguments (already evaluated).
 final class DshUiAction {
   const DshUiAction(this.id, [this.args = const {}]);
 
@@ -106,16 +106,16 @@ final class DshUiListItem {
   final String title;
   final String? subtitle;
 
-  /// 行尾的值或状态。
+  /// The value or status at the row's end.
   final String? trailing;
 
-  /// ui.json 图标名（不认识的画默认图标）。
+  /// ui.json icon name (unknown ones draw the default icon).
   final String? icon;
   final DshUiTone? tone;
   final DshUiAction? action;
 }
 
-/// `list`：一组行。
+/// `list`: a group of rows.
 final class DshUiList extends DshUiNode {
   const DshUiList({required super.path, required this.items, super.truncation});
 
@@ -130,14 +130,14 @@ final class DshUiKeyValueItem {
   final DshUiTone? tone;
 }
 
-/// `keyValue`：「名称 …… 值」。
+/// `keyValue`: "name …… value" pairs.
 final class DshUiKeyValue extends DshUiNode {
   const DshUiKeyValue({required super.path, required this.items, super.truncation});
 
   final List<DshUiKeyValueItem> items;
 }
 
-/// `progress`：一条进度。
+/// `progress`: one progress bar.
 final class DshUiProgress extends DshUiNode {
   const DshUiProgress({
     required super.path,
@@ -152,17 +152,17 @@ final class DshUiProgress extends DshUiNode {
   /// v2 `shape: "ring"`: a 64 dp ring instead of a bar.
   final bool ring;
 
-  /// null：取不到（画空条，显示「—」）。
+  /// null: unavailable (draws an empty bar and shows "—").
   final double? value;
   final double max;
   final String? label;
   final String? caption;
   final DshUiTone? tone;
 
-  /// 0–1；取不到为 null。
+  /// 0–1; null when unavailable.
   double? get fraction => value == null ? null : (value! / max).clamp(0.0, 1.0);
 
-  /// 行尾显示的字：[caption]，缺省是百分比。
+  /// The text shown at the row's end: [caption], defaulting to the percentage.
   String get shown {
     if (caption case final c?) return c;
     final f = fraction;
@@ -180,13 +180,13 @@ final class DshUiColumn {
   final DshUiAlign align;
 }
 
-/// `table`：表格。
+/// `table`: a table.
 final class DshUiTable extends DshUiNode {
   const DshUiTable({required super.path, required this.columns, required this.rows, super.truncation});
 
   final List<DshUiColumn> columns;
 
-  /// 每行的格数等于列数（短的补空，长的截掉）。
+  /// Every row has exactly as many cells as columns (short rows padded, long ones cut).
   final List<List<String>> rows;
 }
 
@@ -199,14 +199,14 @@ final class DshUiButton {
   final bool primary;
 }
 
-/// `actions`：按钮组。
+/// `actions`: a button group.
 final class DshUiActions extends DshUiNode {
   const DshUiActions({required super.path, required this.items, super.truncation});
 
   final List<DshUiButton> items;
 }
 
-/// 图片的来源：校验过的 `data:` 字节，或插件自己的资源（`asset:`）。
+/// Where an image comes from: validated `data:` bytes, or the plugin's own asset (`asset:`).
 sealed class DshUiImageSource {
   const DshUiImageSource();
 }
@@ -222,37 +222,39 @@ final class DshUiDataImage extends DshUiImageSource {
 final class DshUiAssetImage extends DshUiImageSource {
   const DshUiAssetImage(this.path);
 
-  /// 插件资源目录里的相对路径（`icons/a.png`）。App 的图片解析器收到的是
-  /// `asset:` 加这个路径，拼成桥接的资源地址、带凭据去取。
+  /// Relative path inside the plugin's assets directory (`icons/a.png`). The app's
+  /// image resolver gets `asset:` plus this path, builds the bridge asset URL and
+  /// fetches it with credentials.
   final String path;
 
   String get src => 'asset:$path';
 }
 
-/// `image`：图片。[source] 为 null 时画「图片无法显示」。
+/// `image`: a picture. When [source] is null, draws "image cannot be displayed".
 final class DshUiImage extends DshUiNode {
   const DshUiImage({required super.path, required this.source, this.alt, this.aspect, this.caption});
 
   final DshUiImageSource? source;
   final String? alt;
 
-  /// 宽 / 高（0.25–4）。
+  /// Width / height (0.25–4).
   final double? aspect;
   final String? caption;
 }
 
-/// 插件视图里需要数组的组件拿到空数组或取不到：一行「暂无数据」，不算错。
+/// Plugin-view components that need an array: an empty or missing value shows one
+/// "no data" row; it is not an error.
 final class DshUiEmpty extends DshUiNode {
   const DshUiEmpty({required super.path, required this.type});
 
   final String type;
 }
 
-// ───────────────────────── 校验 ─────────────────────────
+// ───────────────────────── Validation ─────────────────────────
 
 bool _isEmpty(Object? value) => value is DshUiMissing || (value is List && value.isEmpty);
 
-/// 新增的 6 种；其余返回 null，交给共用的校验。
+/// The 6 new kinds; everything else returns null for the shared validation.
 DshUiNode? _pluginNode(String type, Map<String, Object?> raw, String path, int depth, _Ctx ctx) => switch (type) {
   'list' => _list(raw, path, ctx),
   'keyValue' => _keyValue(raw, path, ctx),
@@ -264,7 +266,7 @@ DshUiNode? _pluginNode(String type, Map<String, Object?> raw, String path, int d
   _ => _pluginControlNode(type, raw, path, depth, ctx),
 };
 
-/// confirm 的确认键是实心主色：之后的 primary 按钮按普通画。
+/// confirm's accept button is solid primary; later primary buttons draw normally.
 DshUiNode? _markPrimary(_Ctx ctx) {
   ctx.primaryUsed = true;
   return null;
@@ -294,7 +296,7 @@ String? _pluginActionId(Object? raw, String path, _Ctx ctx) {
   return null;
 }
 
-/// `"action": "id"` 或 `{id, args?}`；没写为 null（不记问题），写坏了记一条。
+/// `"action": "id"` or `{id, args?}`; absent reads as null (no note), a broken one gets a note.
 DshUiAction? _pluginAction(Object? raw, String path, _Ctx ctx) {
   if (raw == null || raw is DshUiMissing) return null;
   if (raw is String) {
@@ -321,7 +323,7 @@ DshUiAction? _pluginAction(Object? raw, String path, _Ctx ctx) {
   return DshUiAction(id, Map.unmodifiable(_plainJson(args) as Map));
 }
 
-/// 求值后的 JSON 里把「取不到」换成 null（发给插件的参数是纯 JSON）。
+/// In the evaluated JSON, replaces "missing" with null (parameters sent to the plugin are plain JSON).
 Object? _plainJson(Object? value) => switch (value) {
   DshUiMissing() => null,
   final Map<Object?, Object?> map => <String, Object?>{for (final e in map.entries) '${e.key}': _plainJson(e.value)},
@@ -447,7 +449,8 @@ DshUiNode _keyValue(Map<String, Object?> raw, String path, _Ctx ctx) {
   return DshUiKeyValue(path: path, items: List.unmodifiable(items), truncation: truncation);
 }
 
-/// 数字：有限数，或能读成数的字符串（千分位、末尾 % 都认）。取不到为 null。
+/// Numbers: finite numbers, or strings that read as one (thousands separators and a
+/// trailing % both count). Missing reads as null.
 double? _number(Object? raw, String path, _Ctx ctx) {
   if (raw == null || raw is DshUiMissing) return null;
   var bad = false;
@@ -488,7 +491,7 @@ bool _progressShape(Object? raw, String path, _Ctx ctx) {
   return false;
 }
 
-/// 「¥1,234」「12%」「3.5 万」「-8」这类：整列都是它就右对齐。
+/// "¥1,234", "12%", "3.5 万", "-8" and the like: a column of only these is right-aligned.
 final _numericCell = RegExp(r'^\s*[¥$€£+\-−]?\s*\d[\d,]*(\.\d+)?\s*(%|‰|[A-Za-z]{1,3}|[一-鿿]{1,2})?\s*$');
 
 DshUiNode _table(Map<String, Object?> raw, String path, _Ctx ctx) {
@@ -619,9 +622,9 @@ DshUiNode _actions(Map<String, Object?> raw, String path, _Ctx ctx) {
 
 final _dataImage = RegExp(r'^data:image/(png|jpeg|jpg|webp|gif);base64,', caseSensitive: false);
 
-/// `asset:icons/a.png`：插件 `dshGo.assets` 目录里的图片
-/// （docs/design/native-plugins-protocol.md §4.6），
-/// App 拼成 `/dsh-go/v1/assets/<包名>/<路径>` 并带凭据去取。
+/// `asset:icons/a.png`: a picture inside the plugin's `dshGo.assets` directory
+/// (docs/design/native-plugins-protocol.md §4.6); the app builds
+/// `/dsh-go/v1/assets/<package>/<path>` and fetches it with credentials.
 final _assetRef = RegExp(r'^asset:([A-Za-z0-9_~-][A-Za-z0-9._~-]*(/[A-Za-z0-9_~-][A-Za-z0-9._~-]*)*)$');
 final _assetExtension = RegExp(r'\.(png|jpe?g|webp|gif)$', caseSensitive: false);
 
@@ -685,8 +688,9 @@ DshUiDataImage? _dataSource(String src, String path, _Ctx ctx) {
   return DshUiDataImage(bytes, w, h);
 }
 
-/// PNG / GIF / JPEG / WebP 的宽高（只读文件头）；不认识或坏了为 null。
-/// 解码前先量，防止一张很小的压缩图解出巨大的位图。
+/// PNG / GIF / JPEG / WebP width and height (reads only the file header); null when
+/// unrecognized or corrupt. Measured before decoding, so a tiny compressed image
+/// can't blow up into a huge bitmap.
 (int, int)? dshUiImageSize(Uint8List b) {
   int u16be(int i) => (b[i] << 8) | b[i + 1];
   int u16le(int i) => b[i] | (b[i + 1] << 8);
@@ -700,17 +704,17 @@ DshUiDataImage? _dataSource(String src, String path, _Ctx ctx) {
     return true;
   }
 
-  // PNG：签名 + IHDR。
+  // PNG: signature + IHDR.
   if (at(0, const [0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A])) {
     if (b.length < 24 || !at(12, 'IHDR'.codeUnits)) return null;
     return (u32be(16), u32be(20));
   }
-  // GIF：逻辑屏幕尺寸。
+  // GIF: logical screen size.
   if (at(0, 'GIF87a'.codeUnits) || at(0, 'GIF89a'.codeUnits)) {
     if (b.length < 10) return null;
     return (u16le(6), u16le(8));
   }
-  // JPEG：找第一个 SOF 段。
+  // JPEG: find the first SOF segment.
   if (at(0, const [0xFF, 0xD8])) {
     var i = 2;
     while (i + 9 < b.length) {
@@ -732,7 +736,7 @@ DshUiDataImage? _dataSource(String src, String path, _Ctx ctx) {
     }
     return null;
   }
-  // WebP：RIFF 容器里的 VP8 / VP8L / VP8X。
+  // WebP: VP8 / VP8L / VP8X inside the RIFF container.
   if (at(0, 'RIFF'.codeUnits) && at(8, 'WEBP'.codeUnits) && b.length >= 30) {
     if (at(12, 'VP8 '.codeUnits)) {
       if (!at(23, const [0x9D, 0x01, 0x2A])) return null;
@@ -750,12 +754,12 @@ DshUiDataImage? _dataSource(String src, String path, _Ctx ctx) {
   return null;
 }
 
-// ───────────────────────── 插件视图入口 ─────────────────────────
+// ───────────────────────── Plugin-view entry point ─────────────────────────
 
-/// 解析一份插件视图：大小与嵌套 → 求值绑定 → 按档案校验。
-/// 不走缓存（缓存在 `dsh_ui_plugin.dart` 的 `parsePluginView`）。
+/// Parses one plugin view: size and nesting → evaluate bindings → validate by profile.
+/// No caching here (the cache lives in `parsePluginView` in `dsh_ui_plugin.dart`).
 ///
-/// [view] 是已解码的 JSON，或一段 JSON 文本（严格 JSON，不容忍注释）。
+/// [view] is decoded JSON, or a JSON string (strict JSON; comments not tolerated).
 DshUiParse parseDshUiPluginUncached(Object? view, {Object? data, DshUiProfile profile = DshUiProfile.panel}) {
   assert(profile.plugin);
   Object? json = view;
@@ -779,7 +783,7 @@ DshUiParse parseDshUiPluginUncached(Object? view, {Object? data, DshUiProfile pr
   if (size.overBytes) {
     return DshUiInvalid(DshUiIssue('view', appL10n.viewUiBytesLimit(size.bytes, profile.bytes)));
   }
-  // 插件写的是严格 JSON：不做模型卡那套规范化（数字字符串会被改成数）。
+  // Plugins write strict JSON: no model-card normalization (numeric strings would be converted).
   final issues = <DshUiIssue>[];
   final template = json['v'] == 2
       ? resolveDshUiFormulas(

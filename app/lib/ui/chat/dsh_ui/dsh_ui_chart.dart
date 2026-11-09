@@ -12,8 +12,8 @@ import 'dsh_ui_model.dart';
 import 'dsh_ui_plugin_styles.dart';
 import 'dsh_ui_style.dart';
 
-/// 约四段的整齐刻度（1、2、2.5、5 × 10ⁿ），覆盖 [low]..[high]。
-/// 非有限数、零跨度、极端量级都不会死循环或抛异常。
+/// About four even-step ticks (1, 2, 2.5, 5 × 10ⁿ) covering [low]..[high].
+/// Non-finite inputs, a zero span and extreme magnitudes never loop forever or throw.
 List<double> dshUiNiceTicks(double low, double high) {
   if (!low.isFinite || !high.isFinite) return const [0, 1];
   var lo = low;
@@ -47,7 +47,7 @@ List<double> dshUiNiceTicks(double low, double high) {
   return ticks.length < 2 ? [lo, hi] : ticks;
 }
 
-/// 数值轴：柱状图从 0 起；折线图上下各留 10%。
+/// Numeric axis: bar charts start at 0; line charts keep 10% padding on both ends.
 List<double> dshUiValueAxis(Iterable<double> values, {required bool zero}) {
   final finite = values.where((v) => v.isFinite).toList();
   if (finite.isEmpty) return dshUiNiceTicks(0, 1);
@@ -60,7 +60,7 @@ List<double> dshUiValueAxis(Iterable<double> values, {required bool zero}) {
   return dshUiNiceTicks(low - pad, high + pad);
 }
 
-/// 「3,800 元」「38%」。
+/// A number with its unit attached: `3,800 元`, `38%`.
 String dshUiWithUnit(double? value, String? unit) {
   if (value == null) return '—';
   final n = formatDshUiNumber(value);
@@ -68,13 +68,13 @@ String dshUiWithUnit(double? value, String? unit) {
   return unit == '%' ? '$n%' : '$n $unit';
 }
 
-/// `chart` 组件。
+/// The `chart` component.
 class DshUiChartView extends StatefulWidget {
   const DshUiChartView({super.key, required this.chart, this.animate = false});
 
   final DshUiChart chart;
 
-  /// 首次绘制时轻轻生长（只给刚生成完的视图；翻历史时直接到位）。
+  /// Grows gently on first paint (only for freshly built views; history playback lands at full size directly).
   final bool animate;
 
   @override
@@ -145,14 +145,14 @@ class _DshUiChartViewState extends State<DshUiChartView> with SingleTickerProvid
     );
   }
 
-  /// 图例（≥ 2 组）+ 单位。环形图的图例在图旁边。
+  /// Legend (≥ 2 series) + unit. The donut's legend sits beside the chart.
   Widget? _header(BuildContext context) {
     final chart = widget.chart;
     final theme = Theme.of(context);
     final dsh = DshColors.of(context);
     final palette = DshUiPalette.of(context);
     final legend = chart.kind != DshUiChartKind.donut && chart.series.length > 1;
-    // 环形图和单组横向柱状图的每个数都带着单位，不再单独写一行。
+    // The donut and single-series horizontal bars already carry the unit on every value; no separate line.
     final unitWithValues =
         chart.kind == DshUiChartKind.donut || (chart.kind == DshUiChartKind.hbar && chart.series.length == 1);
     final unit = unitWithValues ? null : chart.unit;
@@ -206,7 +206,7 @@ class _DshUiChartViewState extends State<DshUiChartView> with SingleTickerProvid
     );
   }
 
-  // ── 柱状 / 折线 ────────────────────────────────────────
+  // ── Bar / line ─────────────────────────────────────────
 
   Widget _xy(BuildContext context) {
     final styles = _styles(context);
@@ -245,7 +245,7 @@ class _DshUiChartViewState extends State<DshUiChartView> with SingleTickerProvid
     );
   }
 
-  // ── 横向柱状 ──────────────────────────────────────────
+  // ── Horizontal bars ────────────────────────────────────
 
   Widget _hbar(BuildContext context) {
     final styles = _styles(context);
@@ -283,7 +283,7 @@ class _DshUiChartViewState extends State<DshUiChartView> with SingleTickerProvid
     );
   }
 
-  // ── 环形 ──────────────────────────────────────────────
+  // ── Donut ──────────────────────────────────────────────
 
   Widget _donut(BuildContext context) {
     final theme = Theme.of(context);
@@ -380,7 +380,7 @@ class _DshUiChartViewState extends State<DshUiChartView> with SingleTickerProvid
     );
   }
 
-  // ── 提示框 ────────────────────────────────────────────
+  // ── Tooltip ────────────────────────────────────────────
 
   Widget _tooltip(
     BuildContext context, {
@@ -474,7 +474,7 @@ class _DshUiChartViewState extends State<DshUiChartView> with SingleTickerProvid
   }
 }
 
-/// 图例 / 提示里的系列标记：柱用小方块，线用短线。
+/// The series marker in legends / tooltips: a small square for bars, a short stroke for lines.
 class _Key extends StatelessWidget {
   const _Key({required this.color, this.line = false});
 
@@ -491,9 +491,9 @@ class _Key extends StatelessWidget {
   }
 }
 
-/// 提示框的位置：水平以 [anchor] 为中心、夹在图内；竖直放在 [below] 之下，
-/// 放不下就放到 [above] 之上；会盖住被点的那个点（[avoid]）时挪到它下面
-/// （下面放不下就放上面）。
+/// Tooltip placement: horizontally centred on [anchor] and clamped inside the chart;
+/// vertically below [below], or above [above] when there is no room; when it would
+/// cover the tapped point ([avoid]), move under it (or above when there is no room below).
 class _TooltipLayout extends SingleChildLayoutDelegate {
   _TooltipLayout(this.anchor, {required this.below, required this.above, this.avoid});
 
@@ -562,7 +562,7 @@ class _Styles {
       TextPainter(text: span, textDirection: TextDirection.ltr, textScaler: scaler, maxLines: 1, ellipsis: '…')
         ..layout(maxWidth: maxWidth ?? double.infinity);
 
-  /// 「68.4%」：数字等宽，单位小一号、淡一档。
+  /// `68.4%`: tabular figures; the unit renders smaller and lighter.
   TextPainter number(String text) => span(
     dshUiNumberSpan(
       text,
@@ -572,7 +572,7 @@ class _Styles {
   );
 }
 
-// ───────────────────────── 柱状 / 折线 ─────────────────────────
+// ───────────────────────── Bar / line ─────────────────────────
 
 class _XYGeometry {
   _XYGeometry(this.chart, Size size, _Styles styles) {
@@ -589,7 +589,7 @@ class _XYGeometry {
     final categoryHeight = styles.text('国', styles.category).height;
     plot = Rect.fromLTRB(labelWidth + 8, 8, size.width, size.height - categoryHeight - 8);
     band = plot.width / chart.categories.length;
-    // 类别标签放不下就隔几个画一个。
+    // Category labels that can't all fit: draw every n-th one.
     final widest = chart.categories.fold<double>(0, (w, c) => math.max(w, styles.text(c, styles.category).width));
     final every = math.max(1, ((math.min(widest, 72) + 8) / band).ceil());
     categoryLabels = [
@@ -620,7 +620,7 @@ class _XYGeometry {
 
   double get zeroY => y(math.max(lo, math.min(0, hi)));
 
-  /// 这一类里最高的那个值的 y（提示框别盖住它）；没有值时为 null。
+  /// The y of the highest value in this category (so the tooltip doesn't cover it); null when there are no values.
   double? topAt(int index) {
     double? top;
     for (final s in chart.series) {
@@ -660,7 +660,7 @@ class _XYPainter extends CustomPainter {
       final label = geo.tickLabels[i];
       label.paint(canvas, Offset(plot.left - 8 - label.width, y - label.height / 2));
     }
-    // 零线 / 底线稍重一点。
+    // The zero / bottom line is slightly heavier.
     final zero = geo.zeroY;
     canvas.drawLine(
       Offset(plot.left, zero),
@@ -758,8 +758,8 @@ class _XYPainter extends CustomPainter {
           ..strokeCap = StrokeCap.round
           ..strokeJoin = StrokeJoin.round,
       );
-      // 点少时每点一个小圆；点多时只画选中的和孤立的点（前后都断开，
-      // 否则这一点在线上看不见）。
+      // Few points: a small dot on each. Many points: only the selected and isolated ones
+      // (gapped on both sides, otherwise the dot is invisible on the line).
       for (var i = 0; i < n; i++) {
         final v = series[s].values[i];
         if (v == null) continue;
@@ -778,7 +778,7 @@ class _XYPainter extends CustomPainter {
   bool shouldRepaint(_XYPainter old) => old.geo != geo || old.active != active || old.styles != styles;
 }
 
-// ───────────────────────── 横向柱状 ─────────────────────────
+// ───────────────────────── Horizontal bars ────────────────────
 
 class _HBarGeometry {
   _HBarGeometry(this.chart, Size size, this.rowHeight, _Styles styles) {
@@ -881,7 +881,7 @@ class _HBarPainter extends CustomPainter {
   bool shouldRepaint(_HBarPainter old) => old.geo != geo || old.active != active || old.styles != styles;
 }
 
-// ───────────────────────── 环形 ─────────────────────────
+// ───────────────────────── Donut ──────────────────────────────
 
 class _Slice {
   const _Slice(this.label, this.value, this.color);
@@ -890,14 +890,14 @@ class _Slice {
   final double? value;
   final Color color;
 
-  /// 画进环里的量（≤ 0 和空值不画）。
+  /// The amount drawn into the ring (≤ 0 and empty values are not drawn).
   double get drawn => value != null && value! > 0 ? value! : 0;
 }
 
 class _DonutSlices {
   _DonutSlices(this.items) : total = items.fold(0, (sum, s) => sum + s.drawn);
 
-  /// 超过 6 类：前 5 类照画，其余合成「其他」。
+  /// More than 6 categories: draw the first 5 as-is and merge the rest into "Other".
   factory _DonutSlices.of(DshUiChart chart, List<Color> palette, Color other) {
     final values = chart.series.first.values;
     final n = chart.categories.length;
@@ -964,7 +964,7 @@ class _DonutPainter extends CustomPainter {
       return;
     }
     final drawn = slices.items.where((s) => s.drawn > 0).length;
-    // 2dp 的表面缝（按弧长换成角度）；只有一块时不留缝。
+    // The 2 dp surface gap (converted to an angle by arc length); no gap when there is a single slice.
     final gap = drawn > 1 ? 2 / radius : 0.0;
     final sweepTotal = 2 * math.pi * t.value;
     var start = -math.pi / 2;
@@ -1015,7 +1015,7 @@ class _DonutLegendRow extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final dsh = DshColors.of(context);
-    // 百分比统一一位小数，一列对得齐。
+    // Percentages all take one decimal so the column lines up.
     final percent = total > 0 && slice.value != null && slice.value! > 0
         ? '${(slice.value! / total * 100).toStringAsFixed(1)}%'
         : '—';

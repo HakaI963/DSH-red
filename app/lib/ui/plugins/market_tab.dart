@@ -18,10 +18,10 @@ import 'plugin_detail_sheet.dart';
 import 'plugin_widgets.dart';
 import 'plugins_screen.dart';
 
-/// 「插件市场」: search, then three sections (docs/design/plugin-market.md
-/// §2) — 官方 and 适配 DSH Go from the official index, 全部 (dshfind's
+/// The "Plugin market": search, then three sections (docs/design/plugin-market.md
+/// §2) — Official and Made for DSH Go from the official index, All (dshfind's
 /// catalogue with the official entries in place, category chips) as cards —
-/// and 提交插件 at the bottom.
+/// and "Submit a plugin" at the bottom.
 class MarketSliver extends ConsumerStatefulWidget {
   const MarketSliver({super.key});
 
@@ -68,8 +68,8 @@ class _MarketSliverState extends ConsumerState<MarketSliver> {
       child: SearchCapsule(controller: _search, hint: l10n.pluginsSearch, onChanged: _onQuery, onClear: _clear),
     );
 
-    // 官方 and 适配 DSH Go: the official index. Searching hides a section with
-    // nothing to show; otherwise it says 暂无, or that it didn't load.
+    // Official and Made for DSH Go: the official index. Searching hides a section with
+    // nothing to show; otherwise it says "None yet", or that it didn't load.
     List<Widget> section(MarketSection which, String title) {
       final entries = official.whenOrNull(data: (c) => marketSection(c, which, filter));
       if (searching && (entries == null || entries.isEmpty)) return const [];
@@ -237,9 +237,9 @@ class _SectionTitle extends StatelessWidget {
   );
 }
 
-/// What an official section says instead of cards: 暂无, still loading, or
-/// that it didn't load (with 重试). One quiet line, not an empty-state block:
-/// 全部 below still works.
+/// What an official section says instead of cards: "None yet", still loading, or
+/// that it didn't load (with "Retry"). One quiet line, not an empty-state block:
+/// All below still works.
 class _SectionNote extends StatelessWidget {
   const _SectionNote(this.text, {this.action, this.onAction});
 
@@ -278,7 +278,7 @@ class _SectionNote extends StatelessWidget {
 }
 
 /// The market repository's submission guide (GitHub), at the bottom.
-const marketSubmitUrl = 'https://github.com/ccch1mneyyy/dsh-go-market#提交插件';
+const marketSubmitUrl = 'https://github.com/ccch1mneyyy/dsh-go-market';
 
 class _SubmitPlugin extends StatelessWidget {
   const _SubmitPlugin();
@@ -327,7 +327,7 @@ class _CategoryChip extends StatelessWidget {
 }
 
 /// One market entry, app-store style: icon · name / author · one line ·
-/// the 获取 capsule, inside the lazily built segmented card.
+/// the Get capsule, inside the lazily built segmented card.
 class MarketCard extends ConsumerWidget {
   const MarketCard({super.key, required this.entry});
 

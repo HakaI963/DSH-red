@@ -1,5 +1,5 @@
 // The card a generated batch gets in the chat (docs/design/media-generation.md
-// §5.1–§5.3): the pictures in their grid, 「AI 生成 · 模型 · 比例 · 约 ¥x」 under
+// §5.1–§5.3): the pictures in their grid, "AI-generated · model · ratio · about ¥x" under
 // them, then save · share · regenerate · ⋯. The files are the host's; they are
 // read like reply images (in place on this phone's engine, downloaded once
 // from a remote host), drawn at their shown size, and saved and shared from
@@ -7,9 +7,9 @@
 //
 // ```
 //  ╭────────────────────────────────────╮
-//  │               （图片）             │   H = min(480, 0.6 × window)
+//  │             (picture)              │   H = min(480, 0.6 × window)
 //  ╰────────────────────────────────────╯
-//  AI 生成 · Seedream 5.0 · 1:1 · 约 ¥0.30   8 below, 13, tertiary
+//  AI-generated · Seedream 5.0 · 1:1 · About ¥0.30   8 below, 13, tertiary
 //  ⤓    ⇪    ↻    ⋯                          4 below, 20 icons 16 apart
 // ```
 //
@@ -56,14 +56,14 @@ class MediaCardActions extends InheritedWidget {
   /// ↻: the same request again.
   final void Function(MediaMeta meta)? regenerate;
 
-  /// 修改 on a refused description: it goes back into the composer, in
+  /// "Revise" on a refused description: it goes back into the composer, in
   /// generation mode.
   final void Function(MediaMeta meta)? revise;
 
-  /// ⋯ › 编辑: into generation mode with [MediaItem] in the tray.
+  /// ⋯ › Edit: into generation mode with [MediaItem] in the tray.
   final void Function(MediaMeta meta, MediaItem item)? edit;
 
-  /// ⋯ › 做成视频: video mode, the picture as its first frame.
+  /// ⋯ › Make a video: video mode, the picture as its first frame.
   final void Function(MediaMeta meta, MediaItem item)? makeVideo;
 
   static MediaCardActions? maybeOf(BuildContext context) =>
@@ -370,7 +370,7 @@ class _MediaCellState extends ConsumerState<MediaCell> {
       );
     }
     final semantics = count > 1
-        ? '${l10n.mediaImageOf(widget.index + 1, count)}，${widget.meta.prompt ?? ''}'
+        ? '${l10n.mediaImageOf(widget.index + 1, count)}, ${widget.meta.prompt ?? ''}'
         : (widget.meta.prompt ?? l10n.chatImage);
     return Semantics(
       image: true,
@@ -468,7 +468,7 @@ Future<String?> showAppSheetMenu(
   ),
 );
 
-/// 「视频 · 0:05」.
+/// `Video · 0:05`.
 String videoBadgeText(MediaItem item) {
   final duration = item.duration;
   return duration == null ? appL10n.mediaKindVideo : '${appL10n.mediaKindVideo} · ${formatClip(duration)}';
@@ -540,7 +540,7 @@ class _StateBox extends StatelessWidget {
     final failed = meta.status == MediaStatus.failed;
     final cancelled = failed && meta.error?.code == 'cancelled';
     final text = switch (meta.status) {
-      // The job's own line (「排队中」, 「生成中 · 42%」) when the host has one.
+      // The job's own line ("Queued", "Generating · 42%") when the host has one.
       MediaStatus.running => switch (progress?.trim()) {
         final p? when p.isNotEmpty => p,
         _ => context.l10n.mediaGenerating,
@@ -585,8 +585,8 @@ class _StateBox extends StatelessWidget {
     );
   }
 
-  /// The way on from a failure (§5.3): 修改 for a refused description,
-  /// 去设置 for a key or a limit. Elsewhere ↻ below the card is the way.
+  /// The way on from a failure (§5.3): "Revise" for a refused description,
+  /// "Open settings" for a key or a limit. Elsewhere ↻ below the card is the way.
   Widget? _failureAction(BuildContext context) {
     final l10n = context.l10n;
     final (String label, VoidCallback onPressed) action;
@@ -619,9 +619,9 @@ class _StateBox extends StatelessWidget {
   }
 }
 
-/// 「AI 生成 · Seedream 5.0 · 1:1 · 约 ¥0.30」: one line; the model's name gives
-/// way first when it doesn't fit. 「AI 生成」 is always on what was made; a
-/// batch still coming, or refused, says what was asked: 「Seedream 5.0 · 2 张」.
+/// "AI-generated · Seedream 5.0 · 1:1 · About ¥0.30": one line; the model's name gives
+/// way first when it doesn't fit. "AI-generated" is always on what was made; a
+/// batch still coming, or refused, says what was asked: "Seedream 5.0 · 2 images".
 class MediaMetaLine extends StatelessWidget {
   const MediaMetaLine({super.key, required this.meta});
 
@@ -644,7 +644,7 @@ class MediaMetaLine extends StatelessWidget {
             model: model,
             tail: tail,
             // Measured as the Text draws it: the inherited style and the
-            // locale (which picks the 「·」 glyph).
+            // locale (which picks the "·" glyph).
             style: DefaultTextStyle.of(context).style.merge(style),
             textScaler: MediaQuery.textScalerOf(context),
             locale: Localizations.maybeLocaleOf(context),
@@ -657,9 +657,9 @@ class MediaMetaLine extends StatelessWidget {
   }
 }
 
-/// The metadata line in one paragraph (one look for every 「·」): whole when it
+/// The metadata line in one paragraph (one look for every "·"): whole when it
 /// fits, else with the model's name cut short in its place mid-line —
-/// [lead] (「AI 生成」) and what follows the model always show.
+/// [lead] ("AI-generated") and what follows the model always show.
 String fitMediaMetaLine({
   required String? lead,
   required String? model,
@@ -687,7 +687,7 @@ String fitMediaMetaLine({
   final full = compose(model);
   if (model == null || model.isEmpty || width(full) <= maxWidth) return full;
   final chars = model.characters.toList();
-  // The longest start of the name that still fits with 「…」.
+  // The longest start of the name that still fits with "…".
   var lo = 0;
   var hi = chars.length - 1;
   var best = -1;
@@ -834,7 +834,7 @@ Future<Uint8List> mediaItemBytes(
   };
 }
 
-/// 「保存到相册」 for a batch: one says 「已保存到相册」 as usual; several say
+/// "Save to Photos" for a batch: one says "Saved to Photos" as usual; several say
 /// how many. Videos stream from local materialized files into the gallery.
 Future<void> saveMediaItems(BuildContext context, WidgetRef ref, String sessionId, List<MediaItem> items) async {
   final pictures = items.where((i) => !i.isVideo).toList();
@@ -886,7 +886,7 @@ Future<void> saveMediaItems(BuildContext context, WidgetRef ref, String sessionI
   }
 }
 
-/// 「分享」 a batch: the share sheet with every file of it, as stored.
+/// "Share" a batch: the share sheet with every file of it, as stored.
 Future<void> shareMediaItems(BuildContext context, WidgetRef ref, String sessionId, List<MediaItem> items) async {
   final l10n = context.l10n;
   final messenger = ScaffoldMessenger.maybeOf(context);
@@ -914,7 +914,7 @@ Future<void> shareMediaItems(BuildContext context, WidgetRef ref, String session
   }
 }
 
-/// 「在其他应用中打开」: a video until the app plays them itself.
+/// "Open in another app": a video until the app plays them itself.
 Future<void> openMediaElsewhere(BuildContext context, WidgetRef ref, String sessionId, MediaItem item) async {
   final messenger = ScaffoldMessenger.maybeOf(context);
   try {

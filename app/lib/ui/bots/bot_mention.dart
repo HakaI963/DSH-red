@@ -1,7 +1,7 @@
 // Portions derived from DS Bot (https://github.com/Fei2411/DeepSeek-Bot), Apache-2.0, Copyright 2026 Fei2411 and the DS Bot contributors. See THIRD_PARTY_NOTICES.md.
 // Modified: the mention rules of `ds-bot/src/shared/mentions.js` (the everyone word, no
 // mention right after an address character) applied to a Flutter `@` picker.
-// The `@` picker of a group chat: the group's members (and 「所有人」) above
+// The `@` picker of a group chat: the group's members (and "Everyone") above
 // the composer while the caret is in an `@` word; a pick writes `@Name ` the
 // way DS Bot reads a mention. Self-contained: it only listens to a
 // TextEditingController, so any composer can host it.
@@ -124,7 +124,7 @@ class BotMentionController extends ChangeNotifier {
     );
   }
 
-  /// The 「@」 key: starts a mention at the caret (after a space when the
+  /// The "@" key: starts a mention at the caret (after a space when the
   /// caret follows a word), which opens the picker.
   void start() {
     HapticFeedback.selectionClick();
@@ -186,10 +186,10 @@ class BotMentionController extends ChangeNotifier {
 ///
 /// ```
 /// ╭──────────────────────────────────╮
-/// │  成员                            │
-/// │  ◉  Chief            管理员      │
+/// │  Members                         │
+/// │  ◉  Chief             Admin      │
 /// │  ◉  Writer                       │
-/// │  ◎  所有人                       │
+/// │  ◎  Everyone                     │
 /// ╰──────────────────────────────────╯
 /// ```
 class BotMentionPicker extends StatelessWidget {

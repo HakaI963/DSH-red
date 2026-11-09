@@ -1,7 +1,7 @@
 // Pictures a media card already shows: a reply naming the same file
 // (`![](generated/…/cat-1.png)`, which the plugin asks the model to write for
 // clients without media cards) is not drawn a second time
-// (docs/design/media-generation.md §2.5, 「网页版与旧 App」).
+// (docs/design/media-generation.md §2.5, "the web version and older apps").
 
 import 'package:dsh_client/dsh_client.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';

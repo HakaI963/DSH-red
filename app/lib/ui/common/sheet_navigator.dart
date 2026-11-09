@@ -5,10 +5,12 @@ import 'package:flutter/material.dart';
 import '../theme/motion.dart';
 import 'smooth_size.dart';
 
-/// 底部弹层内部的页面栈。
+/// The page stack inside a bottom sheet.
 ///
-/// 弹层自己持有页面栈:进二级页是 push,选完是 pop,弹层本身不动。避免
-/// "用一个正在卸载的 context 开新弹层、选完整摞关掉、回不到上一层"。
+/// The sheet owns its page stack: entering a second-level page is a push,
+/// finishing a choice is a pop, the sheet itself stays put. This avoids
+/// "opening a new sheet with a context that is unmounting, closing the whole
+/// stack after a choice, and being unable to get back to the previous level".
 class SheetNavigator extends StatefulWidget {
   const SheetNavigator({super.key, required this.root});
 
@@ -21,7 +23,8 @@ class SheetNavigator extends StatefulWidget {
     return state!;
   }
 
-  /// 不在 `SheetNavigator` 里时返回 null —— `SheetHeader` 据此决定画返回还是关闭。
+  /// Returns null when not inside a `SheetNavigator` — `SheetHeader` draws a
+  /// back key or a close key accordingly.
   static SheetNavigatorState? maybeOf(BuildContext context) => context.findAncestorStateOfType<SheetNavigatorState>();
 
   @override
@@ -31,7 +34,8 @@ class SheetNavigator extends StatefulWidget {
 class SheetNavigatorState extends State<SheetNavigator> {
   final List<WidgetBuilder> _stack = [];
 
-  /// 最近一次是 push(true)还是 pop(false):决定两页各往哪边走。
+  /// Whether the last change was a push (true) or a pop (false): decides which
+  /// way each page travels.
   bool _forward = true;
 
   bool get canPop => _stack.isNotEmpty;
@@ -54,7 +58,8 @@ class SheetNavigatorState extends State<SheetNavigator> {
     final builder = _stack.isEmpty ? widget.root : _stack.last;
     final duration = AppMotion.of(context, AppMotion.standard);
     final current = ValueKey(_stack.length);
-    // 与整页路由同一方向感:push 时新页从右进、旧页往左退;pop 反过来。
+    // Same sense of direction as full-page routes: on push the new page enters
+    // from the right while the old one retreats left; on pop it's reversed.
     const travel = 0.12;
     final incomingFrom = Offset(_forward ? travel : -travel, 0);
     final outgoingTo = Offset(_forward ? -travel : travel, 0);
@@ -67,7 +72,8 @@ class SheetNavigatorState extends State<SheetNavigator> {
         switchInCurve: AppMotion.enter,
         switchOutCurve: AppMotion.exit,
         transitionBuilder: (child, animation) {
-          // 退场的那页动画从 1 倒放到 0:begin 写它要去的位置。
+          // The leaving page's animation plays from 1 back to 0: begin names
+          // where it is heading.
           final incoming = child.key == current;
           return SlideTransition(
             position: Tween<Offset>(begin: incoming ? incomingFrom : outgoingTo, end: Offset.zero).animate(animation),

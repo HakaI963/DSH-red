@@ -49,7 +49,7 @@ typedef FeaturePageBuilder = Widget Function(String? sessionId);
 /// Does something other than pushing a page (a sheet, back to the chat).
 typedef FeatureAction = FutureOr<void> Function(BuildContext context, WidgetRef ref, String? sessionId);
 
-/// One entry of 全部功能.
+/// One entry of the All features page.
 class FeatureItem {
   const FeatureItem({
     required this.id,
@@ -147,7 +147,7 @@ class FeatureSection {
 
 String _session(String? id) => id ?? '';
 
-/// 社区, with the forum card at its top opening the forum's home.
+/// The Community page, with the forum card at its top opening the forum's home.
 Widget communityPage() =>
     Builder(builder: (context) => CommunityPage(onOpenForum: () => Navigator.of(context).push(ForumHomePage.route())));
 
@@ -180,10 +180,10 @@ Future<void> _bundleSheet(BuildContext context, WidgetRef ref, String name) asyn
 const cotTranslationBundle = '@deepseek-ai/dsh-experimental-cot-translation-bundle';
 
 /// The last section: shortcuts to settings pages (the same pages, by the same
-/// names), followed by 全部设置.
+/// names), followed by All settings.
 const settingsFeatureSection = 'settings';
 
-/// What 全部功能 holds: things to do now. Settings live in 设置; the last
+/// What All features holds: things to do now. Settings live in Settings; the last
 /// group is a few shortcuts there (docs/design/settings-ia.md §4.6).
 final featureSections = <FeatureSection>[
   FeatureSection.localized((l10n) => l10n.catalogCurrentChat, [
@@ -380,8 +380,8 @@ final featureSections = <FeatureSection>[
       web: const DshWebTarget(),
     ),
   ]),
-  // The same pages as in 设置 (one home, one name), for people who look
-  // here first; 全部设置 follows them (AllFeaturesPage).
+  // The same pages as in Settings (one home, one name), for people who look
+  // here first; All settings follows them (AllFeaturesPage).
   FeatureSection.localized((l10n) => l10n.commonSettings, [
     FeatureItem.localized(
       id: 'models',
@@ -419,8 +419,8 @@ final featureSections = <FeatureSection>[
 /// The section the host's plugin panels join.
 String get pluginFeatureSection => appL10n.catalogPlugins;
 
-/// 全部功能's sections, with an entry per plugin panel the host has (`main`)
-/// at the end of 插件. Exactly [featureSections] without one.
+/// The All features page's sections, with an entry per plugin panel the host has (`main`)
+/// at the end of the Plugins section. Exactly [featureSections] without one.
 final featureSectionsProvider = Provider.autoDispose<List<FeatureSection>>((ref) {
   final plan = ref.watch(seatPlanProvider(const SeatRequest(slot: Slots.main, placement: SeatPlacement.page)));
   final items = plan.visible;
@@ -451,9 +451,9 @@ final featureSectionsProvider = Provider.autoDispose<List<FeatureSection>>((ref)
 });
 
 /// One plugin panel as an entry: its native or island page, or DSH Web (the
-/// card then says 「网页版」) when neither can come up. [owner] is the
+/// card then says "Web") when neither can come up. [owner] is the
 /// plugin's name for people (its declared title); a package name is never
-/// shown: then the card just says 「插件面板」.
+/// shown: then the card just says "Plugin panel".
 FeatureItem pluginPanelFeature(SeatItem item, {List<PluginBundle>? bundles, SeatInventory? inventory, String? owner}) {
   final o = item.occupant;
   final bundle = seatBundleOf(bundles, o.package);

@@ -14,9 +14,9 @@ import 'tool_view.dart';
 import 'turn_summary.dart';
 
 // -----------------------------------------------------------------------------
-// 时长与金额
+// Durations and amounts
 
-/// 静态时长:`0.3 秒`、`4.2 秒`、`47 秒`、`1 分 05 秒`、`1 小时 02 分`。
+/// Static spans: `0.3s`, `4.2s`, `47s`, `1m 05s`, `1h 02m`.
 String formatSpan(Duration d) {
   final ms = d.inMilliseconds;
   if (ms < 0) return appL10n.activitySpanZero;
@@ -34,7 +34,7 @@ String formatSpan(Duration d) {
   return appL10n.activitySpanHoursMinutes(minutes ~/ 60, (minutes % 60).toString().padLeft(2, '0'));
 }
 
-/// 走动的计时:`0:07`、`12:45`、`1:02:05`。
+/// A ticking clock: `0:07`, `12:45`, `1:02:05`.
 String formatClock(Duration d) {
   final total = d.isNegative ? 0 : d.inSeconds;
   final h = total ~/ 3600;
@@ -43,27 +43,29 @@ String formatClock(Duration d) {
   return h > 0 ? '$h:${m.toString().padLeft(2, '0')}:$s' : '$m:$s';
 }
 
-/// 已知单价的路由;没有就是 null(界面不显示金额,见 [knownPricing])。
+/// Routing through the known pricing table; null when there is none (the UI
+/// then shows no amount, see [knownPricing]).
 TokenPricing? pricingFor(String? provider, String? model) {
   if (provider == null || model == null) return null;
   return knownPricing['$provider/$model'];
 }
 
-/// 一轮的估算花费:未命中缓存的输入与写入缓存按输入价,命中按命中价。
+/// A turn's estimated cost: uncached input and cache writes at the input
+/// price, cache hits at the hit price.
 double estimateTraceCost(TraceUsage usage, TokenPricing pricing) =>
     ((usage.uncachedInput + usage.cacheWrite) * pricing.inputPerMillion +
         usage.cacheRead * pricing.cacheHitPerMillion +
         usage.output * pricing.outputPerMillion) /
     1e6;
 
-/// `约 ¥0.03`;不到一分写 `不到 ¥0.01`。
+/// `≈ ¥0.03`; under a cent shows `under ¥0.01`.
 String formatCost(double amount, String currency) {
   final symbol = currency == 'USD' ? r'$' : '¥';
   if (amount < 0.01) return appL10n.activityCostUnderCent(symbol);
   return appL10n.activityCostApprox(symbol, amount.toStringAsFixed(2));
 }
 
-/// 一轮的花费估算;模型单价未知时为 null。
+/// A turn's cost estimate; null when the model's price is unknown.
 String? turnCostLabel(TurnTrace trace) {
   final model = trace.lastModel;
   final pricing = pricingFor(model.provider, model.model);
@@ -72,13 +74,14 @@ String? turnCostLabel(TurnTrace trace) {
 }
 
 // -----------------------------------------------------------------------------
-// 一段轨迹叫什么
+// What a trace span is called
 
-/// 轨迹行的文字:标题("思考"/"运行"),可选的摘要(命令、路径)。
+/// The trajectory row's text: a title ("Thinking" / "Running") and an
+/// optional summary (command, path).
 typedef SpanLabel = ({String title, String detail, bool detailIsCode});
 
-/// 工具调用的展示视图:优先用列表里真实的那一项(带结果、状态),
-/// 没有就按参数现拼一个。
+/// The display view of a tool call: prefer the real item in the list (with
+/// result and status); otherwise assemble one from the arguments on the spot.
 ToolView viewOfSpan(TraceSpan span, [ToolChatItem? item]) {
   final callId = span.callId ?? 'span${span.seq}';
   final tool =
@@ -129,7 +132,8 @@ SpanLabel spanLabel(TraceSpan span, [ToolChatItem? item]) {
   }
 }
 
-/// 轨迹表的一行:一段,或同一步里 ≥ 3 次连续工具调用折成的一组。
+/// One row of the trajectory table: a span, or a group folded from ≥ 3
+/// consecutive tool calls within the same step.
 sealed class TrajectoryRow {
   const TrajectoryRow();
   DateTime get start;
@@ -157,7 +161,8 @@ final class SpanGroupRow extends TrajectoryRow {
   final DateTime end;
 }
 
-/// 轨迹行:同一步里连续 ≥ [toolGroupThreshold] 次、都已结束的工具调用折成一组。
+/// Trajectory rows: runs of ≥ [toolGroupThreshold] finished tool calls in the
+/// same step fold into one group.
 List<TrajectoryRow> trajectoryRows(TurnTrace trace) {
   final rows = <TrajectoryRow>[];
   var run = <TraceSpan>[];
@@ -187,52 +192,52 @@ List<TrajectoryRow> trajectoryRows(TurnTrace trace) {
   return rows;
 }
 
-/// 一组工具调用的摘要("执行 2 条命令 · 读了 3 个文件")。
+/// A summary of a group of tool calls ("Ran 2 commands · Read 3 files").
 String groupLabel(List<TraceSpan> spans, Map<String, ToolChatItem> tools) =>
     summarizeTools([for (final span in spans) viewOfSpan(span, tools[span.callId]).item]).label;
 
-/// 列表里的工具调用,按 callId。
+/// The tool calls in the list, keyed by callId.
 Map<String, ToolChatItem> toolsById(List<ChatItem> items) => {
   for (final item in items)
     if (item is ToolChatItem) item.callId: item,
 };
 
 // -----------------------------------------------------------------------------
-// 此刻在做什么
+// What is happening right now
 
 enum ActivityKind {
-  /// 正在停止本轮。
+  /// The turn is being stopped.
   stopping,
 
-  /// 请求发出去了,还没有一个字回来(或两步之间)。
+  /// The request is out and not one word is back (or the gap between two steps).
   waiting,
 
-  /// 推理在流。
+  /// Reasoning is streaming.
   thinking,
 
-  /// 回复正文在流。
+  /// The reply body is streaming.
   writing,
 
-  /// 工具在跑(或模型正在写它的参数)。
+  /// A tool is running (or the model is still writing its arguments).
   tool,
 
-  /// 等你确认。
+  /// Waiting for your approval.
   approval,
 
-  /// 等你回答。
+  /// Waiting for your answer.
   question,
 
-  /// 服务方让重试,正在退避。
+  /// The service asked for a retry and we are backing off.
   retry,
 
-  /// 正在压缩上下文。
+  /// The context is being compacted.
   compaction,
 }
 
-/// 刚结束、紧挨着当前这次模型请求的那个工具(彩蛋看它)。
+/// The tool that finished just before the current model request (easter eggs watch it).
 typedef AfterTool = ({String name, String? command, bool failed});
 
-/// 输入条上方活动条的内容。值相等即不必重建。
+/// What the activity bar above the composer shows. Equal values mean no rebuild.
 class RunActivity {
   const RunActivity({
     required this.kind,
@@ -258,33 +263,33 @@ class RunActivity {
   final bool detailIsCode;
   final String? toolName;
 
-  /// 这件事从什么时候开始(Host 时间);不知道时为 null。
+  /// When this began (host time); null when it isn't known.
   final DateTime? since;
   final Duration skew;
   final int todoDone;
   final int todoTotal;
 
-  /// 这一轮从什么时候开始(Host 时间);胶囊上的计时和文案种子都看它。
+  /// When this turn began (host time); the capsule's timer and copy seed both read it.
   final DateTime? turnStart;
 
-  /// 模型这一轮写的最新一行 `⏵ 在做什么`(见 [extractNarration])。
+  /// The latest `⏵ what I'm doing now` line the model wrote this turn (see [extractNarration]).
   final String? narration;
 
-  /// 这是一轮里的第一次模型请求(节日、周末、稀有彩蛋只在这里出)。
+  /// The first model request of the turn (holidays, weekends, rare easter eggs only appear here).
   final bool firstStep;
 
-  /// 紧挨着这次模型请求之前结束的工具。
+  /// The tool that ended just before this model request.
   final AfterTool? after;
 
-  /// 这一轮已经跑完的工具数。
+  /// How many tools this turn has already run to completion.
   final int toolsDone;
 
-  /// 重试是因为限流(429 / rate limit)。
+  /// The retry is because of rate limiting (429 / rate limit).
   final bool rateLimited;
 
   bool get waiting => kind == ActivityKind.approval || kind == ActivityKind.question;
 
-  /// 模型在出字或准备出字(鲸尾可能在游)。
+  /// The model is emitting text or about to (the whale's tail may be swimming).
   bool get modelPhase => kind == ActivityKind.waiting || kind == ActivityKind.thinking || kind == ActivityKind.writing;
 
   @override
@@ -326,8 +331,9 @@ class RunActivity {
   );
 }
 
-/// 生成中的这一刻在做什么:正在停止 > 等你 > 正在跑的工具 > 正在流的回复 /
-/// 推理 > 重试 > 等首字。
+/// What is happening at this moment of generation: stopping > waiting for you
+/// > a running tool > a streaming reply / reasoning > retry > waiting for the
+/// first token.
 RunActivity? runActivityOf(ChatState s) {
   if (!s.running) return null;
   if (s.stopping) {
@@ -483,7 +489,8 @@ RunActivity? runActivityOf(ChatState s) {
   return make(ActivityKind.waiting, appL10n.activityThinkingNow, since: model?.start ?? trace?.start);
 }
 
-/// 正在压缩上下文时活动条的内容(轮次外手动 `/compact` 也算)。
+/// What the activity bar shows while the context is compacting (a manual
+/// `/compact` outside a turn counts too).
 RunActivity compactionActivity(ChatState s, DateTime since) {
   final todos = s.running ? s.todos ?? const <TodoItem>[] : const <TodoItem>[];
   return RunActivity(
@@ -497,7 +504,8 @@ RunActivity compactionActivity(ChatState s, DateTime since) {
   );
 }
 
-/// 这一轮最新的那条有正文的回复里写的 `⏵` 自述;那条没写就是没有。
+/// The `⏵` self-report in the turn's newest reply that has body text; if that
+/// one didn't write it, there is none.
 String? narrationOf(List<ChatItem> items) {
   for (final item in items.reversed) {
     if (item is UserChatItem) return null;
@@ -508,7 +516,7 @@ String? narrationOf(List<ChatItem> items) {
   return null;
 }
 
-/// 最近结束的一段如果是工具,就是它(模型请求紧跟在它后面)。
+/// The most recently finished span, if it was a tool (the model request followed it).
 AfterTool? _afterTool(List<TraceSpan> spans, List<ChatItem> items) {
   TraceSpan? last;
   for (final span in spans) {
@@ -528,7 +536,7 @@ AfterTool? _afterTool(List<TraceSpan> spans, List<ChatItem> items) {
   return (name: last.toolName ?? '', command: view.command, failed: last.failed);
 }
 
-/// 活动条用的短动词:跑 / 读 / 改 / 写 / 搜 / 找……
+/// Short verbs for the activity bar: run / read / edit / write / search / find…
 String toolVerb(ToolChatItem tool, ToolView view) {
   return switch (toolKindOf(tool)) {
     ToolKind.command => appL10n.activityVerbRun,

@@ -480,7 +480,7 @@ void main() {
       await tester.tap(find.text('提交插件'));
       await tester.pumpAndSettle();
       expect(launched, [Uri.parse(marketSubmitUrl).toString()]);
-      expect(Uri.decodeComponent(Uri.parse(launched.single! as String).fragment), '提交插件');
+      expect(Uri.decodeComponent(Uri.parse(launched.single! as String).fragment), '');
     });
 
     group('updates and withdrawn versions', () {

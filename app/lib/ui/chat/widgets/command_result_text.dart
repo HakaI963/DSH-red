@@ -9,8 +9,8 @@ import '../../../state/chat_state.dart';
 import '../../features/feature_format.dart' show permissionName;
 import '../usage_sheet.dart' show formatTokens;
 
-/// 内置斜杠指令执行结果的中文说法;认不出的(插件、新版本的措辞)返回 null,
-/// 照原文显示。
+/// Localized phrasing for built-in slash command results; anything unrecognized
+/// (plugin commands, newer engine wording) returns null and is shown as-is.
 String? commandResultCopy(CommandNotice notice) {
   final text = notice.text?.trim();
   if (text == null) return null;

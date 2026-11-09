@@ -27,10 +27,10 @@ class SheetTitleBar extends StatelessWidget {
   /// up with the first line.
   final int? maxLines;
 
-  /// 弹层内容的左右内缩。
+  /// The content's left/right inset in a sheet.
   static const inset = 20.0;
 
-  /// 圆键看得见的直径与可点范围。
+  /// The round key's visible diameter and its tappable range.
   static const keySize = 32.0;
   static const _hit = 44.0;
   static const _slack = (_hit - keySize) / 2;
@@ -115,7 +115,7 @@ extension on Widget {
         );
 }
 
-/// 弹层标题行里的圆钮:32 的淡色圆 + 18 的图标,点击区 44。
+/// The round button in a sheet's title row: a 32 tinted circle + an 18 icon, 44 hit area.
 class SheetIconButton extends StatelessWidget {
   const SheetIconButton({super.key, required this.icon, required this.tooltip, required this.onPressed});
 
@@ -159,12 +159,13 @@ class SheetIconButton extends StatelessWidget {
   }
 }
 
-/// 弹层里的分组小标题:**小而淡**,与页面、[SheetGroup] 的组标题同一种字
-/// ([groupTitleStyle]),比内容边再进 8,离下面的内容 8。
+/// A sheet's small group heading: **small and faint**, the same type as the
+/// page's and [SheetGroup]'s group titles ([groupTitleStyle]), 8 further in
+/// from the content edge, 8 above the content below.
 ///
 /// ```
-///   思考深度              ← inset + 8
-///   ((  不思考 ) 低  高  最高 )   ← inset
+///   Reasoning depth              ← inset + 8
+///   (( No thinking ) Low  High  Max )   ← inset
 /// ```
 class SheetSectionLabel extends StatelessWidget {
   const SheetSectionLabel(this.text, {super.key, this.inset = SheetTitleBar.inset});

@@ -1,9 +1,9 @@
 // The parameter sheet of generation mode (docs/design/media-generation.md
-// §4.2–§4.3): [图像 | 视频], the model (a page of its own in the sheet,
+// §4.2–§4.3): [Image | Video], the model (a page of its own in the sheet,
 // grouped by service), then the choices the model allows — aspect, number and
-// quality (「自动」 first: the host's) for pictures; length and resolution for
-// video — and 「约 ¥0.60」 when the catalogue has a price. A set the catalogue
-// leaves empty doesn't show. No 声音: header v1 has no sound field (§4.6.4).
+// quality ("Auto" first: the host's) for pictures; length and resolution for
+// video — and "About ¥0.60" when the catalogue has a price. A set the catalogue
+// leaves empty doesn't show. No sound: header v1 has no sound field (§4.6.4).
 // A choice applies at once; the sheet has no done key.
 
 import 'dart:async';
@@ -103,7 +103,7 @@ class GenerateSheet extends ConsumerWidget {
         controller.switchKind(kind, ref.read(mediaCatalogProvider), ref.read(generateModeProvider).startOf(kind));
     final l10n = context.l10n;
     final catalog = ref.watch(mediaCatalogProvider);
-    // Null while the mode names a model this host can't pin: 「请选择」.
+    // Null while the mode names a model this host can't pin: "Choose".
     final entry = catalog.resolve(params.model, params.kind);
     final model = entry?.model;
     final cost = estimateCost(params, model);
@@ -136,7 +136,7 @@ class GenerateSheet extends ConsumerWidget {
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        // [图像 | 视频] only where the host has models of both.
+        // [Image | Video] only where the host has models of both.
         if (catalog.kinds.length == 1)
           const SizedBox(height: 4)
         else
@@ -213,8 +213,8 @@ class GenerateSheet extends ConsumerWidget {
   }
 }
 
-/// A catalogue quality in words: 「标准」 · 「高清」 · 「4K」, 「低」 · 「中」 ·
-/// 「高」; any other value as it is. The header carries the value itself.
+/// A catalogue quality in words: Standard · HD · 4K, Low · Medium ·
+/// High; any other value as it is. The header carries the value itself.
 String qualityWord(String id) => switch (id) {
   '1k' => appL10n.mediaQualityStandard,
   '2k' => appL10n.mediaQualityHigh,
@@ -225,7 +225,7 @@ String qualityWord(String id) => switch (id) {
   _ => id,
 };
 
-/// 「约 ¥0.60」: 13, tertiary, centred, tabular figures; a new value fades in.
+/// "About ¥0.60": 13, tertiary, centred, tabular figures; a new value fades in.
 /// Nothing when the model has no price.
 class _CostLine extends StatelessWidget {
   const _CostLine({required this.text});
@@ -248,8 +248,8 @@ class _CostLine extends StatelessWidget {
   }
 }
 
-/// 模型: grouped by service (one model on two services is a row under each),
-/// each with its unit price; 管理 › at the end.
+/// The Model page: grouped by service (one model on two services is a row under each),
+/// each with its unit price; "Manage ›" at the end.
 class _ModelPage extends ConsumerWidget {
   const _ModelPage({required this.kind, required this.selected, required this.onPick});
 

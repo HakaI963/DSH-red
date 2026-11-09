@@ -1,4 +1,4 @@
-// 订阅登录 (a sheet): ChatGPT / Claude sign-in through the engine's bridge. One
+// Subscription sign-in (a sheet): ChatGPT / Claude sign-in through the engine's bridge. One
 // body per step of the attempt: preparing, finish in the browser, enter a code,
 // paste a code, signed in, not completed.
 
@@ -44,7 +44,7 @@ class SubscriptionLoginSheet extends ConsumerStatefulWidget {
   /// Poll interval (tests shorten it).
   final Duration interval;
 
-  /// How long 「已登录」 stays before the sheet closes.
+  /// How long "Signed in" stays before the sheet closes.
   static const doneDwell = Duration(milliseconds: 900);
 
   @override
@@ -59,7 +59,7 @@ class _SubscriptionLoginSheetState extends ConsumerState<SubscriptionLoginSheet>
   String? _opened;
   bool _browserFailed = false;
 
-  /// Which button just copied (its label reads 「已复制」 for a moment).
+  /// Which button just copied (its label reads "Copied" for a moment).
   String? _copied;
   Timer? _copiedTimer;
   Timer? _doneTimer;

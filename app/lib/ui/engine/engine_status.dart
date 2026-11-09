@@ -116,7 +116,7 @@ String? humanizeRuntimeError(String? raw) {
   return null;
 }
 
-/// Compact status chip: `● 本机 · 运行中`.
+/// Compact status chip: `● Local engine · Running`.
 class EngineStatusChip extends StatelessWidget {
   const EngineStatusChip({super.key, required this.state, this.onTap, this.prefix});
 

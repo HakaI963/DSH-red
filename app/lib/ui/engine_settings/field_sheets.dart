@@ -149,7 +149,7 @@ Future<T?> showFieldSheet<T>(
   SheetDismissal dismissal = SheetDismissal.button,
 }) => showAppSheet<T>(context, isScrollControlled: true, dismissal: dismissal, builder: builder);
 
-/// The action row of a sheet that edits one value: 完成, with 恢复默认 on
+/// The action row of a sheet that edits one value: Done, with Restore defaults on
 /// its left while the value is the user's own ([onRestore]). Both wait while
 /// a save is in flight.
 class EditorSheetActions extends StatelessWidget {

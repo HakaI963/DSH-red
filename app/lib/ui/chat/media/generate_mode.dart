@@ -1,15 +1,15 @@
 // Generation mode on the composer (docs/design/media-generation.md §4.2): the
 // mode capsule on the composer's top-left edge — where the permission pill
-// sits, and beside it (as a 34 round ⚠) when both show — and the 首帧 / 尾帧
+// sits, and beside it (as a 34 round ⚠) when both show — and the First / Last
 // labels on a video's reference pictures.
 //
 // ```
 //  ╭──────────────────────────╮
-//  │ ◧  视频 · 5 秒 · 720p  × │   34 high, 12 in on both sides
+//  │ ◧  Video · 5 s · 720p  × │   34 high, 12 in on both sides
 //  ╰──────────────────────────╯
-//  ╭────────────────────────────────────╮
-//  │ (＋)  描述画面和镜头…          (↑) │
-//  ╰────────────────────────────────────╯
+//  ╭────────────────────────────────────────────╮
+//  │ (＋)  Describe the scene and the shot… (↑) │
+//  ╰────────────────────────────────────────────╯
 // ```
 
 import 'package:flutter/material.dart';
@@ -33,7 +33,7 @@ abstract final class GenerateCapsuleMetrics {
   static const gap = 8.0;
 }
 
-/// 「图像 · 3:4 · 2 张」: what the capsule says (no model: it lives in the
+/// `Image · 3:4 · 2 images`: what the capsule says (no model: it lives in the
 /// sheet).
 String generateSummary(GenerateParams params) => mediaParamsLine(
   video: params.isVideo,
@@ -138,7 +138,7 @@ class GenerateCapsule extends StatelessWidget {
   }
 }
 
-/// 「首帧」 / 「尾帧」 on a reference picture: a small label, radius 8, 6 in
+/// "First" / "Last" on a reference picture: a small label, radius 8, 6 in
 /// from the bottom-left corner. [dimmed]: the model takes no such frame.
 class FrameLabel extends StatelessWidget {
   const FrameLabel({super.key, required this.text, this.dimmed = false});
@@ -164,7 +164,7 @@ class FrameLabel extends StatelessWidget {
   }
 }
 
-/// The labels a video's tray shows, by position: 首帧, 尾帧, then none.
+/// The labels a video's tray shows, by position: First, Last, then none.
 List<FrameLabel?> frameLabels(GenerateParams? params, MediaModel? model, int count) {
   if (params == null || !params.isVideo) return List.filled(count, null);
   return [

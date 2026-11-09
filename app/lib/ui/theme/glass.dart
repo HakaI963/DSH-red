@@ -9,7 +9,8 @@ import 'motion.dart';
 import 'shapes.dart';
 import 'surfaces.dart';
 
-/// 玻璃表面:**模糊背后的内容 → 叠半透明填充 → 发丝描边 + 顶边高光 → 外投影**。
+/// Glass surface: **blur what's behind → overlay a translucent fill → hairline stroke +
+/// top rim highlight → drop shadow outside**.
 ///
 /// ```dart
 /// GlassSurface(
@@ -17,26 +18,29 @@ import 'surfaces.dart';
 ///   stadium: true,
 ///   onTap: openSessions,
 ///   padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-///   child: Text('修复登录重复提交'),
+///   child: Text('Fix duplicate login submits'),
 /// )
 /// ```
 ///
-/// ## 性能约定
+/// ## Performance rules
 ///
-/// - 只有 [GlassTier.chrome] / [GlassTier.sheet] 默认真模糊;同屏真模糊的
-///   元素控制在 3 个以内(顶栏、输入条、弹层)。
-/// - 同屏多个**互不重叠**的模糊件(顶栏左圆钮 + 标题胶囊 + 右圆钮)放进同一个
-///   `BackdropGroup`,并传 [grouped] = true,引擎只采一次背景。
-/// - 模糊用 `ImageFilterConfig.blur(bounded: true)`:采样不越出形状边界,
-///   边缘不会被外面的颜色"渗"进来(iOS 同款)。
-/// - 降级:主题里 `DshSurfaces.blurEnabled == false`(设置"减少透明效果"/
-///   低端机)或系统高对比度时,不创建 `BackdropFilter`,改用近乎不透明的
-///   `fallbackFill` —— 观感是"磨砂纸",可读性不降。
+/// - Only [GlassTier.chrome] / [GlassTier.sheet] really blur by default; keep the
+///   genuinely blurred elements on screen to at most 3 (top bar, composer, sheet).
+/// - Several **non-overlapping** blurred pieces on one screen (top bar's left round
+///   key + title capsule + right round key) go into one `BackdropGroup` with
+///   [grouped] = true, so the engine samples the backdrop only once.
+/// - Blurring uses `ImageFilterConfig.blur(bounded: true)`: sampling never crosses the
+///   shape's edge, so outside colors can't "bleed" into the border (same as iOS).
+/// - Degradation: when the theme has `DshSurfaces.blurEnabled == false` (the
+///   "reduce transparency" setting / low-end devices) or system high contrast is on,
+///   no `BackdropFilter` is created and a nearly opaque `fallbackFill` is used
+///   instead — the look is "frosted paper", readability unchanged.
 ///
-/// ## 为什么阴影要单独画
+/// ## Why the shadow is painted separately
 ///
-/// 玻璃内部是半透明的,普通 `BoxShadow` 画在形状下方会透过玻璃、又被模糊
-/// 一次,玻璃中间发灰。这里用 even-odd 裁剪,只在形状**外部**画投影。
+/// The glass interior is translucent: a plain `BoxShadow` drawn under the shape
+/// would show through the glass and get blurred again, greying out the middle.
+/// Here an even-odd clip draws the shadow only **outside** the shape.
 class GlassSurface extends StatelessWidget {
   const GlassSurface({
     super.key,
@@ -54,34 +58,35 @@ class GlassSurface extends StatelessWidget {
     this.child,
   }) : assert(!(circle && stadium), 'circle 与 stadium 只能二选一' /* l10n:keep developer-only assertion */);
 
-  /// 材质层级,决定默认的填充 / 模糊 / 阴影 / 圆角。
+  /// Material tier; decides the default fill / blur / shadow / corner radius.
   final GlassTier tier;
 
-  /// 连续圆角半径。缺省按层级:chrome / sheet 用 xl(28)、card 用 md(14)、
-  /// pill 用胶囊。
+  /// Continuous corner radius. Defaults by tier: chrome / sheet use xl (28), card uses md (14),
+  /// pill uses a capsule.
   final BorderRadiusGeometry? borderRadius;
 
-  /// 圆形(顶栏圆钮、发送键底座)。
+  /// Circle (top-bar round keys, the send key's base).
   final bool circle;
 
-  /// 胶囊(半径永远等于高度一半)。
+  /// Capsule (the radius always equals half the height).
   final bool stadium;
 
   final EdgeInsetsGeometry? padding;
 
-  /// 强制开 / 关模糊。null = 跟随层级默认值与主题总开关。
+  /// Force blur on / off. null = follow the tier default and the theme master switch.
   final bool? blur;
 
-  /// 与同一 `BackdropGroup` 下的其他玻璃共享一次背景采样。
+  /// Shares one backdrop sample with other glass under the same `BackdropGroup`.
   final bool grouped;
 
-  /// 会动的玻璃(升起、被拖动的弹层)。0 = 在动:不采样背景,用不透明填充。
-  /// 停稳后走向 1:模糊立刻开,藏在近乎不透明的填充后面,填充渐变回玻璃,所以
-  /// 模糊出现时不跳。和 `blur: false` 不同,切换时模糊层留在树里,子树不重建。
-  /// null = 一直是玻璃。
+  /// Glass that moves (a sheet rising or being dragged). 0 = moving: no backdrop sampling,
+  /// opaque fill. As it settles toward 1: blur turns on immediately, hidden behind a nearly
+  /// opaque fill, and the fill fades back into glass, so the blur doesn't pop in. Unlike
+  /// `blur: false`, the blur layer stays in the tree during the switch and the subtree is
+  /// not rebuilt. null = always glass.
   final double? settled;
 
-  /// 覆盖主题给的材质(极少用;例如审批卡要换警示色描边)。
+  /// Overrides the theme's material (rare; e.g. an approval card swaps in a warning-tinted stroke).
   final GlassStyle? style;
 
   final VoidCallback? onTap;
@@ -182,7 +187,7 @@ class GlassSurface extends StatelessWidget {
     return ImageFilterConfig.compose(outer: ImageFilterConfig(ColorFilter.matrix(_saturate(saturation))), inner: blur);
   }
 
-  /// 保亮度的饱和度矩阵(Rec. 709 权重)。
+  /// Saturation matrix that preserves luminance (Rec. 709 weights).
   static List<double> _saturate(double s) {
     final r = 0.2126 * (1 - s);
     final g = 0.7152 * (1 - s);
@@ -196,7 +201,8 @@ class GlassSurface extends StatelessWidget {
   }
 }
 
-/// 发丝描边 + 顶边高光。描边画在形状内侧,裁剪时不会被切掉一半。
+/// Hairline stroke + top rim highlight. The stroke is drawn inside the shape, so clipping
+/// never cuts it in half.
 class _GlassEdgePainter extends CustomPainter {
   _GlassEdgePainter({
     required this.shape,
@@ -250,7 +256,7 @@ class _GlassEdgePainter extends CustomPainter {
       old.textDirection != textDirection;
 }
 
-/// 只在形状外部画的投影。
+/// The drop shadow, drawn only outside the shape.
 class _GlassShadowPainter extends CustomPainter {
   _GlassShadowPainter({required this.shape, required this.shadows, required this.textDirection});
 

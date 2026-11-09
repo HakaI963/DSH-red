@@ -1,13 +1,13 @@
 // Generated pictures full screen (docs/design/media-generation.md §5.4), and a
 // plugin gallery's pictures (MediaViewerPage.pictures, plugin-ui-v3 §4.2): black
 // in both themes, the batch side by side (swipe; not while zoomed), pinch to
-// 8×, double-tap to 2.5×. Top: back and 「2 / 4」 (one picture: its name),
+// 8×, double-tap to 2.5×. Top: back and "2 / 4" (one picture: its name),
 // save and share mirrored on the right, 44 glass keys 12 from the edges. At
 // the bottom a glass capsule (52 high, 12 in, at most 400, centred) with the
-// actions that apply, all equally wide, and 「AI 生成」 8 above it. A tap on
+// actions that apply, all equally wide, and "AI-generated" 8 above it. A tap on
 // the picture hides and shows all of it. Saving and sharing use the file's
 // own bytes. A plugin's pictures have no capsule: the plugin's name sits where
-// 「AI 生成」 does, and save / share appear only when the bytes are at hand.
+// "AI-generated" does, and save / share appear only when the bytes are at hand.
 
 import 'dart:async';
 import 'dart:math' as math;
@@ -44,7 +44,7 @@ abstract final class MediaViewerMetrics {
   static const capsuleHeight = 52.0;
   static const capsuleMaxWidth = 400.0;
 
-  /// Capsule → 「AI 生成」.
+  /// Capsule → "AI-generated".
   static const labelGap = 8.0;
   static const maxScale = ZoomableImage.maxScale;
   static const doubleTapScale = ZoomableImage.doubleTapScale;
@@ -76,7 +76,7 @@ void openGalleryPictures(BuildContext context, List<ViewerPicture> pictures, int
   unawaited(openPictureViewer(context, pictures: pictures, index: index, source: source));
 }
 
-/// Opens [meta]'s pictures at [index]; the chat's [MediaCardActions] add 编辑.
+/// Opens [meta]'s pictures at [index]; the chat's [MediaCardActions] add "Edit".
 Future<void> openMediaViewer(
   BuildContext context, {
   required String sessionId,
@@ -121,7 +121,7 @@ class MediaViewerPage extends ConsumerStatefulWidget {
   final MediaMeta? meta;
   final List<ViewerPicture>? pictures;
 
-  /// Where [pictures] come from (a plugin's name), in place of 「AI 生成」.
+  /// Where [pictures] come from (a plugin's name), in place of "AI-generated".
   final String? source;
   final int initial;
   final void Function(MediaMeta meta, MediaItem item)? onEdit;
@@ -543,7 +543,7 @@ class _ActionCapsule extends StatelessWidget {
   }
 }
 
-/// 详情: the description (copyable), then model, size, cost, provenance and
+/// "Details": the description (copyable), then model, size, cost, provenance and
 /// the file.
 Future<void> showMediaDetails(
   BuildContext context, {

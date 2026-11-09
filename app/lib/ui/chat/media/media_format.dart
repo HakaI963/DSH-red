@@ -35,13 +35,13 @@ String formatMoney(double amount, String currency) {
   return '$symbol${whole ? amount.toStringAsFixed(0) : amount.toStringAsFixed(2)}';
 }
 
-/// 「约 ¥0.30」; null when the plugin gave no reliable price.
+/// `About ¥0.30`; null when the plugin gave no reliable price.
 String? mediaCostText(MediaCost? cost) =>
     cost == null ? null : appL10n.mediaCostEstimate(formatMoney(cost.estimate, cost.currency));
 
 /// What follows the model on the metadata line: the aspect (or the video's
 /// resolution), and the cost when it is known. Before a result, and after a
-/// failure, what was asked for: 「2 张」, 「5 秒 · 720p」 (§5.3).
+/// failure, what was asked for: "2 images", "5 s · 720p" (§5.3).
 List<String> mediaMetaTail(MediaMeta meta) {
   final request = meta.request;
   final made = meta.items.length;
@@ -68,7 +68,7 @@ List<String> mediaMetaTail(MediaMeta meta) {
   ];
 }
 
-/// One sentence for a failure (§5.3); the code stays in 详情.
+/// One sentence for a failure (§5.3); the code stays in the details sheet.
 String mediaErrorText(MediaFailure? error) {
   final code = error?.code ?? '';
   final stage = error?.text ?? '';
@@ -87,7 +87,7 @@ String mediaErrorText(MediaFailure? error) {
   };
 }
 
-/// 「图像 · 3:4 · 2 张」 / 「视频 · 5 秒 · 720p」: the small line under a
+/// `Image · 3:4 · 2 images` / `Video · 5 s · 720p`: the small line under a
 /// generation request and in the mode capsule.
 String mediaParamsLine({required bool video, String? aspect, int? count, int? seconds, String? resolution}) => [
   video ? appL10n.mediaKindVideo : appL10n.mediaKindImage,
@@ -101,7 +101,7 @@ String mediaParamsLine({required bool video, String? aspect, int? count, int? se
 ].join(' · ');
 
 /// A conversation title as shown: one that begins with a generation
-/// request's header shows what follows it, or 「生成图像」 / 「生成视频」 when
+/// request's header shows what follows it, or "New image" / "New video" when
 /// nothing does.
 String chatTitleShown(String title) => switch (GenerateHeader.splitTitle(title)) {
   null => title,
