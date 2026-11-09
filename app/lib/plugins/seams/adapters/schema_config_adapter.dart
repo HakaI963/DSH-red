@@ -13,7 +13,7 @@ import '../../../state/engine_settings_state.dart';
 import '../../../state/plugins_state.dart';
 import '../../../ui/common/list_page_row.dart';
 import '../../../ui/engine_settings/engine_settings_page.dart' show namespaceTitle, openSettingsPage;
-import '../../../ui/engine_settings/namespace_copy.dart' show namespaceTitles;
+import '../../../ui/engine_settings/namespace_copy.dart';
 import '../../../ui/engine_settings/schema_form.dart';
 import '../../../ui/theme/app_icons.dart';
 import '../seat_models.dart';
