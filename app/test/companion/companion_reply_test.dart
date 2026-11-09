@@ -56,8 +56,8 @@ void main() {
   group('companionAside', () {
     test('says the time and what just happened', () {
       expect(
-        companionAside(now: DateTime(2026, 11, 6, 9, 5), notes: const ['对方刚才摸了摸你的头']),
-        '〔11月6日 周五 09:05，对方刚才摸了摸你的头〕',
+        companionAside(now: DateTime(2026, 11, 6, 9, 5), notes: const ['They just patted your head']),
+        '〔11月6日 周五 09:05，They just patted your head〕',
       );
     });
 
@@ -67,13 +67,13 @@ void main() {
   });
 
   group('companionSaidText', () {
-    final aside = companionAside(now: DateTime(2026, 11, 8, 13, 20), notes: const ['对方刚才摸了摸你的头'])!;
+    final aside = companionAside(now: DateTime(2026, 11, 8, 13, 20), notes: const ['They just patted your head'])!;
 
     test('what the person typed, without what the page put in front', () {
       expect(companionSaidText('$aside\n今天好累'), '今天好累');
       expect(
         companionSaidText(
-          ['（你现在的名字是「小鲸」，是对方给你起的。自称时用这个名字。）', '（对方给你改了设定。从现在起按下面这份来：\n多说点话）', aside, '第一行\n第二行'].join('\n'),
+          ['(Your name now is 「小鲸」, chosen for you by the person. Use this name when speaking of yourself.)', '(The person changed your setup. From now on follow the text below:\n多说点话)', aside, '第一行\n第二行'].join('\n'),
         ),
         '第一行\n第二行',
       );

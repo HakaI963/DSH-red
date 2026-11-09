@@ -117,7 +117,7 @@ void main() {
     expect(input['userFeedback'], '摸头没反应');
     expect(input['current'], {'adapter': 1});
     expect(input['currentDropped'], ['zones']);
-    expect(companionAdaptSystem, contains('只输出一个 JSON 对象'));
+    expect(companionAdaptSystem, contains('Output exactly one JSON object'));
   });
 
   test('the JSON out of whatever the model wrapped it in', () {

@@ -1,4 +1,4 @@
-// 她的设定: her name, what she calls the person, and who she is: the persona
+// About her: her name, what she calls the person, and who she is: the persona
 // text itself, the default one to start from. The app's own rules (the mark
 // format her stage reads, the safety lines) are added after it and not shown
 // here (companion_state.dart). Everything saves as it is typed.

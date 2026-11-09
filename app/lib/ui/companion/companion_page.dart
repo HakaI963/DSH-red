@@ -1,4 +1,4 @@
-// 伙伴小屋: a whole page for the companion (docs/design/companion.md). She fills
+// The Companion room: a whole page for the companion (docs/design/companion.md). She fills
 // the screen in a WebView; on top of it, in Flutter, her words and a small input.
 // Touches are answered on the spot without a model call. Talking goes, in full
 // mode, through an ordinary session on the active host (companion_state.dart);
@@ -475,7 +475,7 @@ class _CompanionPageState extends ConsumerState<CompanionPage> implements Compan
   void _closer(int step) {
     _stage.command('emotion', {'name': 'happy', 'hold': 3200});
     _stage.command('action', {'name': 'hop'});
-    _remember('pet', '你觉得和对方又亲近了一些');
+    _remember('pet', 'You feel a little closer to them now');
     if (!mounted || _running || _sending) return;
     final l10n = context.l10n;
     _say(switch (step) {
@@ -566,11 +566,11 @@ class _CompanionPageState extends ConsumerState<CompanionPage> implements Compan
     // A hug is affection the way a pat is: the same event for her state.
     if (kind == 'pat' || kind == 'hug') _event('pet');
     _remember('pet', switch ((zone, kind)) {
-      (_, 'hug') => '对方刚才抱了抱你',
-      (_, 'tease') => '对方刚才连着戳你',
-      (_, 'pat') => '对方刚才摸了摸你的头',
-      ('tail', _) => '对方刚才碰了你的尾巴',
-      ('face', _) => '对方刚才戳了戳你的脸',
+      (_, 'hug') => 'They just gave you a hug',
+      (_, 'tease') => 'They just kept poking you',
+      (_, 'pat') => 'They just patted your head',
+      ('tail', _) => 'They just touched your tail',
+      ('face', _) => 'They just poked your cheek',
       _ => null,
     });
     if (_running || _sending) return; // Her words first.
@@ -610,10 +610,10 @@ class _CompanionPageState extends ConsumerState<CompanionPage> implements Compan
       _stage.command('activity', {'name': id, 'remainingMs': _localActivity[id]!.inMilliseconds});
     }
     _remember(id == 'snack' ? 'feed' : 'pet', switch (id) {
-      _ when invited => '你邀请对方陪你在海草软垫上歇一会儿，对方答应了',
-      'snack' => '对方刚才给你吃了一块点心',
-      'play' => '对方刚才陪你玩了泡泡球',
-      _ => '对方刚才让你在海草软垫上歇一会儿',
+      _ when invited => 'You invited the person to rest with you on the seaweed cushion, and they said yes',
+      'snack' => 'They just gave you a piece of snack',
+      'play' => 'They just played bubble ball with you',
+      _ => 'They just let you rest on the seaweed cushion for a while',
     });
     if (_running || _sending) return;
     final l10n = context.l10n;
@@ -689,7 +689,7 @@ class _CompanionPageState extends ConsumerState<CompanionPage> implements Compan
       if (old != null) _signals.retireSource(old);
       _hostSignals = null;
       if (connection != null && client != null && generation != null) {
-        // The alert tracker's key for this connection: 本机 is local whatever host is picked.
+        // The alert tracker's key for this connection: the local host is local whatever host is picked.
         final hostKey = companionHostKey(connection.isLocal ? HostRef.local : ref.read(activeHostProvider));
         try {
           late final CompanionSignalSource source;
@@ -1094,11 +1094,11 @@ class _CompanionPageState extends ConsumerState<CompanionPage> implements Compan
     unawaited(companionMovesSave(_movesKey, _moves));
   }
 
-  /// Renamed in 她的设定: back in the room, she answers to it.
+  /// Renamed in About her: back in the room, she answers to it.
   void _renamedTo(String name) {
     if (!mounted || !_stageReady) return;
     final l10n = context.l10n;
-    _remember('renamed', '对方刚给你起了新名字「$name」');
+    _remember('renamed', 'They just gave you a new name 「$name」');
     _stage.command('emotion', {'name': 'happy', 'hold': 3200});
     _stage.command('action', {'name': 'hop'});
     _say(l10n.companionRenamed(name));
@@ -1745,7 +1745,9 @@ class _CompanionPageState extends ConsumerState<CompanionPage> implements Compan
       if (capability == null && !firstInline) _contextUnsupported();
       final profile = _contextProfile();
       final sent = await chat.send(
-        firstInline ? '（从现在起请扮演下面的角色，直接开始，不要复述这段设定。）\n${_persona()}\n$raw' : raw,
+        firstInline
+            ? '(From now on, play the role described below. Start right away; do not repeat this setup.)\n${_persona()}\n$raw'
+            : raw,
         verbatim: true,
         beforeDeliver: capability == null || client == null
             ? null
@@ -2444,7 +2446,7 @@ class _CompanionPageState extends ConsumerState<CompanionPage> implements Compan
     );
   }
 
-  /// 她多主动: off, or one of the paces. Off is the old 「主动邀请」 switch, so
+  /// How often she speaks up: off, or one of the paces. Off is the old invitation switch, so
   /// an earlier no stays a no.
   static List<(CompanionInitiativePace?, String, String)> _paceChoices(L10n l10n) => [
     (null, l10n.companionPaceQuiet, l10n.companionPaceQuietHint),
@@ -2509,7 +2511,7 @@ class _CompanionPageState extends ConsumerState<CompanionPage> implements Compan
     );
   }
 
-  /// 她会提起什么: the four consents of the signal gate. Each one below needs
+  /// What she brings up: the four consents of the signal gate. Each one below needs
   /// the one above it; all of it stays in this room.
   void _openSignals() {
     unawaited(
@@ -3166,7 +3168,7 @@ class _LabelDialogState extends State<_LabelDialog> {
   }
 }
 
-/// 适配这个模型: what to tell her AI, and whether new models are fitted on
+/// Fit this model: what to tell her AI, and whether new models are fitted on
 /// their own. The sheet owns its field.
 class _AdaptSheet extends StatefulWidget {
   const _AdaptSheet({required this.adapted, required this.onRun, required this.onUndo});

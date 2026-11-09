@@ -60,7 +60,7 @@ final companionInitiativeEnabledProvider = NotifierProvider<CompanionInitiativeE
   CompanionInitiativeEnabled.new,
 );
 
-/// How often she speaks up when she may (「她多主动」). Unread or unknown is
+/// How often she speaks up when she may ("How often she speaks up"). Unread or unknown is
 /// the original pace: two a day, six hours apart.
 class CompanionInitiativePaceSetting extends Notifier<CompanionInitiativePace> {
   @override
@@ -208,7 +208,7 @@ class CompanionInitiative {
     if (!_restored.isCompleted) _restored.complete();
   }
 
-  /// The person's pick (「她多主动」), from the next check on: a quiet stretch
+  /// The person's pick ("How often she speaks up"), from the next check on: a quiet stretch
   /// already turned down under the old pace is looked at again.
   set pace(CompanionInitiativePace value) {
     if (_disposed || value == _pace) return;

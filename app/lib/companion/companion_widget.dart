@@ -1,4 +1,4 @@
-// 伙伴小屋 on the home screen (android companion/CompanionWidget.kt): what the
+// The Companion room on the home screen (android companion/CompanionWidget.kt): what the
 // room looks like, sent whenever it changes. Without the native side (iOS for
 // now, tests) the call fails quietly and nothing else changes.
 

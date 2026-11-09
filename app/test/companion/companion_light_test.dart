@@ -45,7 +45,7 @@ void main() {
       final words = await streamCompanionReply(
         client: client,
         apiKey: 'sk-test',
-        system: '你是鲸鱼娘',
+        system: 'You are a whale girl',
         lines: const [CompanionLine.user('你好')],
       ).toList();
       expect(words.join(), '[表情:开心]你来啦。');
@@ -55,7 +55,7 @@ void main() {
       expect(body['model'], 'deepseek-flash');
       expect(body['stream'], isTrue);
       expect(body['thinking'], {'type': 'disabled'});
-      expect(body['system'], '你是鲸鱼娘');
+      expect(body['system'], 'You are a whale girl');
       expect(body['messages'], [
         {'role': 'user', 'content': '你好'},
       ]);

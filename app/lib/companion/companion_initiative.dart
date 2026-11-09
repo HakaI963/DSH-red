@@ -14,7 +14,7 @@ abstract final class CompanionInitiativeRules {
   static const maxInvites = 2;
 }
 
-/// How often she may speak up unasked (「她多主动」, the person's pick): how
+/// How often she may speak up unasked ("How often she speaks up", the person's pick): how
 /// many invitations and signal lines in a day, how far apart, and how long
 /// the person must be quiet first. At every pace she says nothing at night
 /// and invites at most once a visit.

@@ -187,9 +187,9 @@ class CompanionMoves {
     final moves = [for (final m in offeredMotions) '[动作:${m.label}]'];
     if (faces.isEmpty && moves.isEmpty) return null;
     return [
-      '这个角色还有自己的表情和动作，同样写成标记，界面会执行：',
-      if (faces.isNotEmpty) '- 表情：${faces.join(' ')}',
-      if (moves.isNotEmpty) '- 动作：${moves.join(' ')}',
+      'This character has expressions and motions of her own, written the same way as marks; the interface will run them:',
+      if (faces.isNotEmpty) '- Expressions: ${faces.join(' ')}',
+      if (moves.isNotEmpty) '- Actions: ${moves.join(' ')}',
     ].join('\n');
   }
 

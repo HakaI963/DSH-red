@@ -19,7 +19,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 enum CompanionVoiceSource { system, preset, openai, custom }
 
 /// Her style, for services that take one, when the person hasn't written their own.
-const companionVoiceStyleDefault = '用自然、温柔、带一点俏皮的少女语气说，像在陪朋友聊天。';
+const companionVoiceStyleDefault = 'Speak in a natural, gentle, slightly playful girl\'s tone, like chatting with a friend.';
 
 /// A voice a preset offers: its id at the service, and what kind it is.
 typedef CompanionPresetVoice = ({String id, String? kind});
@@ -62,7 +62,7 @@ String _jsonText(Object value) => jsonEncode(value);
 final companionVoicePresets = <CompanionVoicePreset>[
   CompanionVoicePreset(
     id: 'mimo',
-    name: '小米 MiMo',
+    name: 'Xiaomi MiMo',
     site: 'platform.xiaomimimo.com',
     styled: true,
     clones: true,
@@ -125,7 +125,7 @@ final companionVoicePresets = <CompanionVoicePreset>[
   ),
   CompanionVoicePreset(
     id: 'siliconflow',
-    name: '硅基流动',
+    name: 'SiliconFlow',
     site: 'cloud.siliconflow.cn',
     voices: const [
       (id: 'claire', kind: 'f'),
@@ -149,7 +149,7 @@ final companionVoicePresets = <CompanionVoicePreset>[
   ),
   CompanionVoicePreset(
     id: 'bailian',
-    name: '阿里云百炼',
+    name: 'Alibaba Cloud Model Studio',
     site: 'bailian.console.aliyun.com',
     voices: const [
       (id: 'Cherry', kind: 'f'),

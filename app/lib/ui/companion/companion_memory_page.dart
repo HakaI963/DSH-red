@@ -1,4 +1,4 @@
-// 她记得的事: the companion's confirmed memories on the active host
+// What she remembers: the companion's confirmed memories on the active host
 // (packages/dsh_client/lib/src/companion_api.dart). Every change shows only
 // once the Host has answered; a conflict reads the list again instead of
 // writing over someone else's change.

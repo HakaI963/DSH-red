@@ -206,7 +206,7 @@ void main() {
 
       await tester.tap(find.text('常用服务'));
       await tester.pumpAndSettle();
-      expect(find.text('小米 MiMo'), findsOneWidget);
+      expect(find.text('Xiaomi MiMo'), findsOneWidget);
       final key = find.byWidgetPredicate((w) => w is TextField && w.decoration?.hintText == 'sk-…');
       await tester.scrollUntilVisible(key, 200, scrollable: find.byType(Scrollable).first);
       await tester.enterText(key, 'mimo-key');

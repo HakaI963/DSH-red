@@ -1,5 +1,5 @@
 // What her full-mode conversation is waiting on the person for, answered right
-// here in 伙伴小屋: an approval for something she wants to do, or a question she
+// here in the Companion room: an approval for something she wants to do, or a question she
 // asked with the ask tool. The cards are the main chat's own (the same buttons,
 // the same risk confirmation, the same answers sent back), drawn on her deep
 // glass so they belong to the room instead of sending the person elsewhere.

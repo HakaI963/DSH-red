@@ -1,4 +1,4 @@
-// Everything 伙伴小屋 draws in Flutter on top of her: the top bar with her name and
+// Everything the Companion room draws in Flutter on top of her: the top bar with her name and
 // what she's up to, her words, the input, and the first-run and failure screens.
 // All of it is built on the app's glass surfaces under a dark theme, because the
 // water behind is dark at every hour (companion_page.dart wraps it).

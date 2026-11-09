@@ -1,6 +1,6 @@
-// 她的声音: whether she speaks, and in whose voice. The phone's own; an
+// Her voice: whether she speaks, and in whose voice. The phone's own; an
 // OpenAI-compatible speech API; or any HTTP API the person describes
-// (companion_voice_source.dart). Fields save as they are edited; 试听 says a
+// (companion_voice_source.dart). Fields save as they are edited; Preview says a
 // line with what is filled in now.
 
 import 'dart:async';
@@ -54,7 +54,7 @@ class _CompanionVoicePageState extends ConsumerState<CompanionVoicePage> {
   bool _obscure = true;
   Timer? _saveTimer;
 
-  /// 试听: null idle, '' requesting, 'ok', or why it failed.
+  /// Preview: null idle, '' requesting, 'ok', or why it failed.
   String? _preview;
 
   // The recording to clone from: what it is, picking one, why that failed.

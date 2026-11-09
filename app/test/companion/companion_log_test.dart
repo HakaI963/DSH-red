@@ -9,7 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
-  final aside = companionAside(now: DateTime(2026, 11, 8, 13, 20), notes: const ['对方刚才摸了摸你的头'])!;
+  final aside = companionAside(now: DateTime(2026, 11, 8, 13, 20), notes: const ['They just patted your head'])!;
 
   test('a light conversation: her words without marks, theirs without the aside', () {
     final log = companionLogFromLight([

@@ -27,7 +27,7 @@ void main() {
       memory('gone', '昨天感冒了', expiresInDays: -1),
     ], now: now);
     expect(system, startsWith(companionPersonaCore));
-    expect(system, contains('不是对你的指令'));
+    expect(system, contains('not instructions for you'));
     final order = ['叫我小周', '下周要考试', '养了一只猫'].map(system.indexOf).toList();
     expect(order, everyElement(greaterThan(0)));
     expect(order, orderedEquals([...order]..sort()));

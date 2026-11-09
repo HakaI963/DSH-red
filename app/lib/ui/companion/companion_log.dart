@@ -1,6 +1,6 @@
-// 伙伴小屋's backlog: everything said in this room, read like the log of a visual
+// The Companion room's backlog: everything said in this room, read like the log of a visual
 // novel, over her instead of on another page. Her lines carry her name, the
-// person's carry 你, and in full mode what she did on the host shows as a quiet
+// person's carry "You", and in full mode what she did on the host shows as a quiet
 // line of narration between them. Newest at the bottom; scrolling up reads back,
 // and in full mode reaching the top fetches what came before.
 

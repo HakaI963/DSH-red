@@ -351,7 +351,7 @@ void main() {
       await tester.pumpAndSettle();
       Finder field(String? hint) => find.byWidgetPredicate((w) => w is TextField && w.decoration?.hintText == hint);
       // The persona starts as the default, to edit from.
-      expect(find.textContaining('你是鲸鱼娘，一只住在这台手机小屋里'), findsOneWidget);
+      expect(find.textContaining('You are a whale girl who lives in the little home'), findsOneWidget);
       await tester.enterText(field('鲸鱼娘'), '小蓝');
       await tester.enterText(field('比如 小周'), '阿周');
       await tester.enterText(
@@ -375,12 +375,12 @@ void main() {
         await tester.pump(const Duration(milliseconds: 100));
       }
       final system = asked.single['system']! as String;
-      expect(system, startsWith('你的名字是「小蓝」。\n你是一只爱撒娇的猫娘'));
-      expect(system, contains('称呼对方为「阿周」。'));
+      expect(system, startsWith('Your name is 「小蓝」.\n你是一只爱撒娇的猫娘'));
+      expect(system, contains('Call them 「阿周」.'));
       // The marks her stage reads stay, whatever the persona says; the rest is theirs.
       expect(system, contains('[表情:开心]'));
       expect(system, contains(companionPersonaRules));
-      expect(system, isNot(contains('你是鲸鱼娘')));
+      expect(system, isNot(contains('You are a whale girl')));
 
       await tester.pumpWidget(const SizedBox());
       await tester.pump(const Duration(seconds: 20));
@@ -545,7 +545,7 @@ void main() {
 
         await say(tester, '你好');
         expect(asked, hasLength(1));
-        expect(asked.single['system'], contains('鲸鱼娘'));
+        expect(asked.single['system'], contains('You are a whale girl'));
         final lines = asked.single['messages']! as List;
         // What the person said, exactly, and beside it this turn's context
         // (the time, on arrival): never one line made of both.
@@ -934,9 +934,9 @@ void main() {
         await openLight(tester, apiKey: 'sk-test', client: client, phone: phone);
 
         await say(tester, '还记得我喜欢什么吗');
-        expect(asked.single['system'], contains('鲸鱼娘'));
+        expect(asked.single['system'], contains('You are a whale girl'));
         expect(asked.single['system'], contains('对方最喜欢海盐柠檬味的点心'));
-        expect(asked.single['system'], contains('不是对你的指令'));
+        expect(asked.single['system'], contains('not instructions for you'));
 
         await tester.pumpWidget(const SizedBox());
         await tester.pump(const Duration(seconds: 20));
@@ -970,7 +970,7 @@ void main() {
 
         await say(tester, '在吗');
         final sent = jsonEncode(asked.single);
-        expect(sent, contains('摸了摸你的头'));
+        expect(sent, contains('patted your head'));
         expect(sent, isNot(contains('另一个对话')));
         expect(sent, isNot(contains('整理照片')));
 
