@@ -11,8 +11,8 @@ import '../../theme/app_icons.dart';
 import '../../theme/theme.dart';
 import 'dock_pill.dart';
 
-/// 「⚑ 目标 把登录迁到新接口… ⋯」;暂停时图形换成暂停、目标字淡下去、右边
-/// 写「已暂停」,受阻时是警示色的「受阻」。点一下打开目标操作。
+/// "⚑ Goal  migrate login to the new API… ⋯"; paused, the glyph becomes pause, the goal text dims, and
+/// the right reads "Paused", or warning-colored "Blocked" when blocked. A tap opens the goal actions.
 class GoalBar extends StatelessWidget {
   const GoalBar({super.key, required this.goal, this.onTap});
 
@@ -118,7 +118,7 @@ class GoalLook {
   final IconData icon;
   final Color iconColor;
 
-  /// The sheet's status word: 「进行中」「已暂停」「受阻」.
+  /// The sheet's status word: "In progress", "Paused", "Blocked".
   final String status;
 
   /// The bar's status word; null while the goal simply runs.

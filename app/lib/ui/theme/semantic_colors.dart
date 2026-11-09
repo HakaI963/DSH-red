@@ -5,41 +5,41 @@ import 'package:flutter/material.dart';
 import 'accent.dart';
 import 'palette.dart';
 
-/// DSH 工具调用的视觉类别。名字 → 类别的映射在 `common/tool_glyph.dart`。
+/// Visual categories for DSH tool calls. Name → category mapping lives in `common/tool_glyph.dart`.
 enum ToolTone {
-  /// bash / pwsh / job_*:终端。
+  /// bash / pwsh / job_*: terminal.
   terminal,
 
-  /// read / read_image / present:读取。
+  /// read / read_image / present: reading.
   read,
 
-  /// write / edit / str_replace_editor:改动文件。
+  /// write / edit / str_replace_editor: changing files.
   edit,
 
-  /// grep / glob:搜索。
+  /// grep / glob: searching.
   search,
 
-  /// web_fetch / web_search:联网。
+  /// web_fetch / web_search: going online.
   web,
 
-  /// subagent / workflow / skill / send_message:另一个智能体在干活。
+  /// subagent / workflow / skill / send_message: another agent at work.
   agent,
 
-  /// todo_write / *_goal / ask_user_question:计划与协作。
+  /// todo_write / *_goal / ask_user_question: planning and collaboration.
   plan,
 
-  /// MCP 工具、插件工具、未知工具。
+  /// MCP tools, plugin tools, unknown tools.
   neutral,
 }
 
-/// 语义色扩展:与强调色**无关**的固定色。
+/// Semantic-colour theme extension: fixed colours **unrelated** to the accent.
 ///
-/// 只有中性的几格(文字层级、代码井)随配色换色调,见 [forAccent]。
+/// Only the neutral slots (text levels, code wells) retint with the palette — see [forAccent].
 ///
-/// - 一张 `bash` 行在任何配色下都必须长得一样:色相本身就是语义。
-/// - 所有 mono / 代码 / diff / ANSI 必须铺在 [codeWellBg] 上,**不能**直接
-///   放在玻璃或页面渐变上 —— 只有固定的井底才能保证这些固定前景色的对比度。
-/// - 文字类前景对其底色 ≥ 4.5(容器上的 on-色 ≥ 7)。
+/// - A `bash` row must look identical under every palette: the hue itself is the meaning.
+/// - All mono / code / diff / ANSI must sit on [codeWellBg], and **may not** go directly
+///   on glass or the page gradient — only the fixed well floor guarantees these fixed foreground colours' contrast.
+/// - Text-like foregrounds clear ≥ 4.5 against their floor (on-colours on containers ≥ 7).
 class DshColors extends ThemeExtension<DshColors> {
   const DshColors({
     required this.textTertiary,
@@ -76,10 +76,10 @@ class DshColors extends ThemeExtension<DshColors> {
     required this.onToolContainers,
   });
 
-  /// 三级文字(时间戳、摘要、占位符)。仍 ≥ 4.5,可承载信息。
+  /// Tertiary text (timestamps, digests, placeholders). Still ≥ 4.5, may carry information.
   final Color textTertiary;
 
-  /// 禁用 / 装饰。不得承载必要信息。
+  /// Disabled / decorative. Must not carry essential information.
   final Color textDisabled;
 
   final Color success;
@@ -92,7 +92,7 @@ class DshColors extends ThemeExtension<DshColors> {
   final Color warningContainer;
   final Color onWarningContainer;
 
-  /// 与 `colorScheme.error` 同值;放在这里是为了状态映射写起来对称。
+  /// Same value as `colorScheme.error`; kept here so state mappings read symmetrically.
   final Color danger;
   final Color onDanger;
   final Color dangerContainer;
@@ -108,31 +108,31 @@ class DshColors extends ThemeExtension<DshColors> {
   final Color diffDelFg;
   final Color diffHunkFg;
 
-  /// 代码井:比页面深一档的冷灰(浅色)/ 比页面更深的墨(深色),像嵌进去的。
+  /// Code well: cold grey one step deeper than the page (light) / ink deeper still than the page (dark), like it is recessed in.
   final Color codeWellBg;
 
-  /// 代码井标题条(语言名 + 复制键)。
+  /// Code-well header bar (language name + copy key).
   final Color codeWellHeader;
   final Color codeWellFg;
   final Color codeWellBorder;
   final Color lineNumberFg;
 
-  /// SGR 30–37 + 90–97(标准 8 色 + 亮色 8 色),对 [codeWellBg] 全部 ≥ 4.5。
+  /// SGR 30–37 + 90–97 (standard 8 + bright 8), all ≥ 4.5 against [codeWellBg].
   final List<Color> ansi;
 
-  /// 身份色(会话头像、设置分组图标)。8 组容器 / on-容器,固定不随 accent 转。
+  /// Identity colours (session avatars, settings group icons). 8 container / on-container pairs, fixed, never following the accent.
   final List<Color> identity;
   final List<Color> onIdentity;
 
-  /// 工具类别色,按 [ToolTone.index] 取。
+  /// Tool-category colours, indexed by [ToolTone.index].
   final List<Color> toolContainers;
   final List<Color> onToolContainers;
 
   static DshColors of(BuildContext context) => Theme.of(context).extension<DshColors>()!;
 
-  /// [accent] 配色下的一套:语义色、ANSI、身份色、工具色原样不动(色相本身
-  /// 就是语义);中性的那几格 —— 三级 / 禁用文字、代码井、行号、diff 标题 ——
-  /// 换成这套配色的中性色。雾蓝直接返回 [light] / [dark]。
+  /// The set under [accent]: semantic, ANSI, identity and tool colours stay untouched (the hue itself
+  /// is the meaning); the neutral slots — tertiary / disabled text, code well, line numbers, diff
+  /// hunk header — take this palette's neutrals. Mist blue returns [light] / [dark] directly.
   static DshColors forAccent(Brightness brightness, AppAccent accent) {
     final dark = brightness == Brightness.dark;
     final base = dark ? DshColors.dark : DshColors.light;
@@ -161,13 +161,13 @@ class DshColors extends ThemeExtension<DshColors> {
           );
   }
 
-  /// 工具类别的 (容器, on-容器)。
+  /// The tool category's (container, on-container) pair.
   (Color, Color) tool(ToolTone tone) => (toolContainers[tone.index], onToolContainers[tone.index]);
 
-  /// 由稳定字符串(会话 id、工作目录)映射到 identity 下标。
+  /// Maps a stable string (session id, working directory) to an identity slot.
   ///
-  /// 不用 `String.hashCode`:Dart 不保证它跨进程稳定,重启后颜色会整体重排。
-  /// 这里用固定的 FNV-1a。
+  /// Not `String.hashCode`: Dart does not guarantee it across processes, so colours would all reshuffle after a restart.
+  /// This uses fixed FNV-1a.
   static int identityIndex(String key, [int slots = 8]) {
     var hash = 0x811c9dc5;
     for (final unit in key.codeUnits) {
@@ -180,7 +180,7 @@ class DshColors extends ThemeExtension<DshColors> {
   static const light = DshColors(
     textTertiary: Color(0xFF646974),
     textDisabled: Color(0xFFA1A5AC),
-    // 状态色一律低饱和:鲜绿 / 鲜红一出现,界面立刻变成"运维面板"。
+    // Status colours stay low-chroma across the board: bright green / bright red appearing anywhere turns the UI into an "ops dashboard".
     success: Color(0xFF337250),
     onSuccess: Color(0xFFF7FBF9),
     successContainer: Color(0xFFD9F0E1),
@@ -206,7 +206,7 @@ class DshColors extends ThemeExtension<DshColors> {
     codeWellFg: Color(0xFF1E232E),
     codeWellBorder: Color(0xFFDBDEE5),
     lineNumberFg: Color(0xFF7D8088),
-    // 浅色井底上的 ANSI:"白"必须映射成深灰,否则在浅底上看不见。
+    // ANSI on a light well floor: "white" must map to dark grey, or it is invisible on a light floor.
     ansi: [
       Color(0xFF1E232E),
       Color(0xFF903C39),
@@ -226,14 +226,14 @@ class DshColors extends ThemeExtension<DshColors> {
       Color(0xFF2A2E36),
     ],
     identity: [
-      Color(0xFFDAECFF), // 晴蓝
-      Color(0xFFE9E6FF), // 薰衣
-      Color(0xFFF9E1F3), // 藕荷
-      Color(0xFFFFE2E0), // 珊瑚
-      Color(0xFFF8E6D1), // 麦黄
-      Color(0xFFE0EFD8), // 苔绿
-      Color(0xFFD3F1E9), // 薄荷
-      Color(0xFFD1F0F8), // 湖青
+      Color(0xFFDAECFF), // clear blue
+      Color(0xFFE9E6FF), // lavender
+      Color(0xFFF9E1F3), // lilac
+      Color(0xFFFFE2E0), // coral
+      Color(0xFFF8E6D1), // wheat
+      Color(0xFFE0EFD8), // moss
+      Color(0xFFD3F1E9), // mint
+      Color(0xFFD1F0F8), // lake teal
     ],
     onIdentity: [
       Color(0xFF173F65),
@@ -245,7 +245,7 @@ class DshColors extends ThemeExtension<DshColors> {
       Color(0xFF00483D),
       Color(0xFF004552),
     ],
-    // 顺序 = ToolTone:terminal, read, edit, search, web, agent, plan, neutral
+    // Order = ToolTone: terminal, read, edit, search, web, agent, plan, neutral.
     toolContainers: [
       Color(0xFFE6EAF2),
       Color(0xFFDAECFF),
@@ -291,7 +291,7 @@ class DshColors extends ThemeExtension<DshColors> {
     diffDelBg: Color(0xFF422423),
     diffDelFg: Color(0xFFF2A7A1),
     diffHunkFg: Color(0xFFB6BBC5),
-    // 夜里的井底比页面更深:代码像嵌进纸里,而不是浮在上面。
+    // At night the well floor goes deeper than the page: code looks recessed into the paper, not floating on it.
     codeWellBg: Color(0xFF14171E),
     codeWellHeader: Color(0xFF1A1E26),
     codeWellFg: Color(0xFFE6E9F0),

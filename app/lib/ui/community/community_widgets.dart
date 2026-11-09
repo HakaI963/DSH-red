@@ -1,4 +1,4 @@
-// The pieces of the 社区 hub: a picked plugin's row,
+// The pieces of the Community hub: a picked plugin's row,
 // prompt tiles, group rows and the group sheet with its QR code.
 
 import 'dart:async';
@@ -40,7 +40,7 @@ Future<bool> openCommunityLink(BuildContext context, String url) async {
   return ok;
 }
 
-/// `10月24日` this year, `2025年10月` before.
+/// `Oct 24` this year, `Oct 2025` before.
 String communityDate(DateTime t, {DateTime? now}) {
   final local = t.toLocal();
   return local.year == (now ?? DateTime.now()).year
@@ -77,7 +77,7 @@ IconData communityGroupIcon(String kind) => switch (kind) {
 };
 
 /// A recommended plugin, market-row style: icon, name, the curator's line,
-/// and the 获取 capsule. Every state opens the market's detail sheet, where
+/// and the Get capsule. Every state opens the market's detail sheet, where
 /// installing happens (with its trust note), like the market itself.
 class CommunityPluginRow extends ConsumerWidget {
   const CommunityPluginRow({super.key, required this.pick, required this.entry});
@@ -137,7 +137,7 @@ class CommunityGroupRow extends StatelessWidget {
 }
 
 /// A group up close: the QR code (to scan from another phone or to save),
-/// then 「复制」 and 「打开」.
+/// then "Copy" and "Open".
 Future<void> showCommunityGroupSheet(BuildContext context, CommunityGroup group) =>
     showAppSheet<void>(context, isScrollControlled: true, builder: (_) => CommunityGroupSheet(group: group));
 

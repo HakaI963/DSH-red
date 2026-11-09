@@ -32,7 +32,7 @@ class HostStatusView {
       : HostStatusView(StatusTone.idle, appL10n.remoteOffline);
 }
 
-/// Live status of [host]: the engine for 本机, the link for remote hosts.
+/// Live status of [host]: the engine for the local device, the link for remote hosts.
 HostStatusView watchHostStatus(WidgetRef ref, HostRef host) {
   if (host.isLocal) {
     final view = EngineStatusView.of(ref.watch(localRuntimeProvider));

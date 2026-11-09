@@ -1,8 +1,8 @@
-// 模型设置 (a form page): one model of a custom provider — its name, how much it
+// Model settings (a form page): one model of a custom provider — its name, how much it
 // holds (context length, max output), what it takes (text, or text and images)
 // and whether it thinks, at which efforts. These are the `llm-pi-ai` model
 // entry's own fields; an empty one falls back to the route's default. One
-// pinned button: 「完成」 hands the model back to the edit form, 「保存」 (from the
+// pinned button: "Done" hands the model back to the edit form, "Save" (from the
 // detail page) writes it.
 
 import 'dart:async';
@@ -24,10 +24,10 @@ import '../shell/page_frame.dart';
 import '../theme/theme.dart';
 import 'provider_widgets.dart';
 
-/// Quick picks under 「上下文长度」: the sizes models are sold in.
+/// Quick picks under "Context length": the sizes models are sold in.
 const contextPresets = [32768, 65536, 131072, 200000, 262144, 1000000];
 
-/// Quick picks under 「最大输出」.
+/// Quick picks under "Max output".
 const maxOutputPresets = [8192, 16384, 32768, 65536, 131072];
 
 /// The levels a model offers when thinking is first switched on: the common
@@ -35,7 +35,7 @@ const maxOutputPresets = [8192, 16384, 32768, 65536, 131072];
 const initialThinkingLevels = {'low', 'medium', 'high'};
 
 /// The levels this page lists, a multiple choice. `off` is not one of them:
-/// a model that thinks here also offers 不思考 in the chat's picker (the
+/// a model that thinks here also offers "No thinking" in the chat's picker (the
 /// adapter lists only what the entry declares, so the page declares it).
 /// `minimal` (one older OpenAI model's) is not listed; an entry that
 /// declares it keeps it.
@@ -66,7 +66,7 @@ class _ProviderModelPageState extends State<ProviderModelPage> {
   late final _name = TextEditingController(text: _model.name ?? '');
 
   /// The counts as they will be written: exact until the text is edited (the
-  /// field shows 131072 as 「128K」), then whatever the text says.
+  /// field shows 131072 as "128K"), then whatever the text says.
   late int? _context = _model.contextWindow;
   late int? _maxOutput = _model.maxTokens;
   late final _contextText = TextEditingController(text: _format(_context));
@@ -83,7 +83,7 @@ class _ProviderModelPageState extends State<ProviderModelPage> {
   /// switching it back on restores them.
   late Set<String> _levels = {..._initialLevels}..remove('off');
 
-  /// Whether the picker also offers 不思考: yes for a model set up here; one
+  /// Whether the picker also offers "No thinking": yes for a model set up here; one
   /// declared elsewhere without `off` (a model that always thinks) keeps that.
   late final bool _offersOff = !_model.thinks || _initialLevels.contains('off');
 
@@ -419,7 +419,7 @@ class _CapacityField extends StatelessWidget {
   }
 }
 
-/// 「可选档位」 under the thinking switch: the levels the chat's picker will
+/// "Available levels" under the thinking switch: the levels the chat's picker will
 /// offer for this model, ticked (a multiple choice, unlike the quick picks
 /// above it). Names as in the picker.
 class _LevelList extends StatelessWidget {

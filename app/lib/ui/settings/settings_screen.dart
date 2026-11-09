@@ -74,8 +74,8 @@ abstract final class SettingsHues {
 }
 
 /// Settings hub: search, the overview card (account, balance, engine), then
-/// six groups by what people come to do — AI, 能力, 外观, 通用, 主机, 帮助与
-/// 关于 (docs/design/settings-ia.md §4.2). Every row that opens a page says
+/// six groups by what people come to do — AI, Capabilities, Appearance, General, Hosts, Help &
+/// About (docs/design/settings-ia.md §4.2). Every row that opens a page says
 /// where it stands; nothing here loosens a safeguard or deletes anything:
 /// those live on their own pages.
 class SettingsScreen extends ConsumerWidget {
@@ -102,7 +102,7 @@ class SettingsScreen extends ConsumerWidget {
     final prefs = canEditReplyPrefs(ref)
         ? (replyPrefsSummary(ref) == null ? l10n.commonNotSet : l10n.hubValueSet)
         : null;
-    // 能力.
+    // Capabilities.
     final phone = ref.watch(phoneProvider);
     final phoneValue = !phone.loaded || !phone.status.ready
         ? null
@@ -117,12 +117,12 @@ class SettingsScreen extends ConsumerWidget {
     final newApi = search == null
         ? null
         : search.valueOf(const FieldRef(WebSearchSettingsPage.webNs, ['searchProvider'])) == 'deepseek-search-api';
-    // 通用.
+    // General.
     final exempt = ref.watch(batteryExemptProvider).value;
-    // 主机.
+    // Hosts.
     final ssh = ref.watch(hostsProvider.select((s) => s.ssh.length));
     final hostName = host.isLocal ? l10n.commonThisPhone : ref.watch(hostNameProvider(host)) ?? l10n.commonRemoteHost;
-    // 帮助与关于.
+    // Help & about.
     final update = ref.watch(appUpdateProvider);
     final newVersion = update.hasUpdate && !update.isSkipped;
 
@@ -340,13 +340,13 @@ class SettingsScreen extends ConsumerWidget {
     );
   }
 
-  /// 权限's value: the default for new conversations, and whether it is one
+  /// The Permissions value: the default for new conversations, and whether it is one
   /// that stops asking (shown in the warning colour).
   (String, bool)? _permissionValue(WidgetRef ref) {
     final local = ref.watch(activeHostProvider).isLocal;
     final auto = ref.watch(settingsProvider.select((s) => s.autoApproveCommands));
     final safe = ref.watch(localRuntimeProvider.select((s) => s.status.inSafeMode));
-    // On the phone, 完全权限 for new conversations is the app's own switch.
+    // On the phone, Full access for new conversations is the app's own switch.
     if (local && auto && !safe) return (permissionName('danger-full-access'), true);
     if (ref.watch(activeConnectionProvider).value == null) return null;
     final state = ref.watch(permissionStateProvider(null)).value;
@@ -358,10 +358,10 @@ class SettingsScreen extends ConsumerWidget {
 }
 
 /// The hub's overview card: who is paying (DeepSeek account or API Key) and
-/// the balance, with the engine's state underneath. The card opens 账号, the
-/// engine line opens 引擎. With no runtime on this phone and a remote host in
+/// the balance, with the engine's state underneath. The card opens Account, the
+/// engine line opens Engine. With no runtime on this phone and a remote host in
 /// use there is nothing here to sign in to: the card shows that host and
-/// opens 远程主机.
+/// play, it opens Remote hosts.
 class SettingsOverview extends ConsumerStatefulWidget {
   const SettingsOverview({super.key});
 
@@ -447,7 +447,7 @@ class _SettingsOverviewState extends ConsumerState<SettingsOverview> {
         subtitle = l10n.hubSettingsOrApiKey;
     }
     final dsh = runtime.status.dshVersion;
-    // The card is 账号's way in (its title is whoever is signed in).
+    // The card is Account's way in (its title is whoever is signed in).
     return SpotAnchor(
       spot: SettingsIndex.entry(SettingsPageId.account),
       child: OverviewCard(

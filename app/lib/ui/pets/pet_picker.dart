@@ -1,7 +1,7 @@
-// Picks the pet (Deepy 小鲸鱼, 鲸娘, the ones you brought, 不显示) with live
-// previews, for 宠物设置 and the pet's long-press menu. Same grid as the other
-// pickers on the 主题 page (PickerGrid: 16 in, 12 apart, label 8 under), three
-// to a row. 宠物设置 adds 导入 (a pack zip, pet_library.dart); a brought pet
+// Picks the pet (Deepy the little whale, Whale girl, the ones you brought, Don't show) with live
+// previews, for Pet settings and the pet's long-press menu. Same grid as the other
+// pickers on the Theme page (PickerGrid: 16 in, 12 apart, label 8 under), three
+// to a row. Pet settings adds Import (a pack zip, pet_library.dart); a brought pet
 // is removed with a long press.
 
 import 'dart:async';
@@ -26,7 +26,7 @@ import '../theme/app_icons.dart';
 import '../theme/theme.dart';
 import 'pet_sprite.dart';
 
-/// Names for the picker before a pack has loaded (and for 不显示).
+/// Names for the picker before a pack has loaded (and for Don't show).
 Map<String, String> get petNames => {
   'deepy-whale': appL10n.botsPetDeepy,
   'whale-girl': appL10n.botsPetWhaleGirl,
@@ -70,7 +70,7 @@ String petImportProblemText(L10n l10n, PetImportException error) => switch (erro
 /// │  🐋    │  │  👧    │  │        │   the pet standing on a little capsule
 /// │ ▔▔▔▔▔▔ │  │ ▔▔▔▔▔▔ │  │ ▔▔▔▔▔▔ │
 /// ╰────────╯  ╰────────╯  ╰────────╯
-///  Deepy 小鲸鱼   鲸娘       不显示
+///  Deepy whale  Whale girl  Hidden
 /// ```
 class PetPicker extends ConsumerStatefulWidget {
   const PetPicker({super.key, this.padding = const EdgeInsets.all(16), this.onPicked, this.importable = false});
@@ -80,7 +80,7 @@ class PetPicker extends ConsumerStatefulWidget {
   /// After a choice (the menu's sheet closes).
   final ValueChanged<String>? onPicked;
 
-  /// Offers 导入 after the pets (宠物设置; the menu's quick swap doesn't).
+  /// Offers Import after the pets (Pet settings; the menu's quick swap doesn't).
   final bool importable;
 
   static const gap = 12.0;
@@ -215,7 +215,7 @@ class _PetPickerState extends ConsumerState<PetPicker> {
   }
 }
 
-/// 导入: a pack zip of your own.
+/// Import: a pack zip of your own.
 class _ImportOption extends StatelessWidget {
   const _ImportOption({required this.busy, required this.onTap});
 
@@ -361,7 +361,7 @@ class PetPreview extends StatelessWidget {
       ),
     );
     if (pack == null) return Stack(children: [perch]);
-    // As big as on the chat page at 标准 (whole device pixels per art pixel),
+    // As big as on the chat page at Standard (whole device pixels per art pixel),
     // a step smaller if the body would not fit over the capsule.
     var k = petDevicePixels(pack, PetSize.medium, dpr);
     final room = perchTop - 4;

@@ -1,6 +1,6 @@
-// Which plugins get a 「设置」 entry, what it is called and whether it can be
+// Which plugins get a "Settings" entry, what it is called and whether it can be
 // changed: every plugin entry whose Config has something to draw, wherever
-// it is listed — its detail sheet, the inventory, 设置 › 引擎参数 › 插件, the
+// it is listed — its detail sheet, the inventory, Settings › Engine parameters › Plugins, the
 // settings search. A plugin is a row of a bundle the person chose —
 // installed from the market or a local path, or an official optional bundle
 // switched on ([PluginConfigScope]); DSH's core and the App's own rows never
@@ -12,7 +12,7 @@
 //
 // Names. A bundle with one entry to set is called by its title; a bundle
 // with several (the voice-input kit's three) calls each
-// 「bundle title · entry name」. The entry name is the row's own title, else
+// "bundle title · entry name". The entry name is the row's own title, else
 // one its schema gives itself, else the entry id made readable — the app's
 // names for official entries, words for the rest. A row title that only
 // repeats the package, or that the bundle or a sibling shares, says nothing
@@ -70,7 +70,7 @@ List<PluginBundleRow> bundleConfigRows(PluginBundle bundle, PluginConfigState? s
 
 /// What entry [ns]'s row says under its name when it can be read here but
 /// not changed (the Host's list says so up front: bridge R7 `writable:
-/// false`): 「由配置文件固定」 when an overlay sets it, else 「只读」. Null for
+/// false`): "Pinned by the config file" when an overlay sets it, else "Read-only". Null for
 /// one that can be changed, and wherever the Host does not say (an older
 /// bridge: as before, the form tells once read).
 String? pluginConfigReadOnlyNote(PluginConfigState? state, String ns, {L10n? l10n}) {
@@ -101,7 +101,7 @@ bool pluginConfigNamedByBundle(PluginConfigState? state, String ns) => state?.en
 
 /// What entry [ns] is called wherever it is listed and on its page: its
 /// bundle's title when it is the bundle's only entry with a page,
-/// 「bundle title · entry name」 when the bundle has several
+/// "bundle title · entry name" when the bundle has several
 /// ([pluginConfigEntryName]). A bundle without a title of its own adds
 /// nothing: the entry's name (one entry: the app's or the row's, else the
 /// package name). Outside any bundle: the Host's label, else the app's name

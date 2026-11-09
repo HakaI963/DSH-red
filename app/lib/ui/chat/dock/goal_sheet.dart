@@ -1,5 +1,5 @@
-// The goal bar's actions: a sheet with the whole goal and 编辑 / 暂停 / 恢复 /
-// 清除 (DSH GoalBar's icon actions), the multi-line editor, and the 清除
+// The goal bar's actions: a sheet with the whole goal and Edit / Pause / Resume /
+// Clear (DSH GoalBar's icon actions), the multi-line editor, and the Clear
 // confirmation.
 
 import 'package:flutter/material.dart';
@@ -22,8 +22,8 @@ enum GoalAction { edit, pause, resume, clear }
 Future<GoalAction?> showGoalSheet(BuildContext context, String sessionId) =>
     showAppSheet<GoalAction>(context, isScrollControlled: true, builder: (_) => GoalSheet(sessionId: sessionId));
 
-/// 弹层:标题「目标」→ 完整的目标文字 → 一行状态(进行中 · 第 3 / 256 轮;
-/// 受阻时下面是原因)→ 一组操作。
+/// The sheet: title "Goal" → the full goal text → a status line (In progress · round 3 / 256;
+/// the reason below it when blocked) → a row of actions.
 class GoalSheet extends ConsumerWidget {
   const GoalSheet({super.key, required this.sessionId});
 
@@ -135,7 +135,7 @@ class GoalSheet extends ConsumerWidget {
   }
 }
 
-/// 「编辑目标」:多行输入,保留换行;空的或没改时不能保存。Resolves to the
+/// "Edit goal": multi-line input, newlines kept; Save is disabled when empty or unchanged. Resolves to the
 /// new text (trimmed), or null.
 Future<String?> showGoalEditor(BuildContext context, {required String initial}) => showAppDialog<String>(
   context: context,
@@ -192,7 +192,7 @@ class _GoalEditorState extends State<_GoalEditor> {
   }
 }
 
-/// 「清除目标？」,目标文字作正文;确认键是危险色。
+/// "Clear the goal?", with the goal text as the body; the confirm key is danger-colored.
 Future<bool> confirmClearGoal(BuildContext context, String objective) async {
   final l10n = context.l10n;
   final ok = await showAppDialog<bool>(

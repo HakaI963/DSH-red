@@ -27,10 +27,10 @@ import 'usage_sheet.dart' show formatTokens;
 import 'widgets/live_clock.dart';
 import '../common/brief_notice.dart';
 
-/// 显示的输出上限;复制拿到的永远是全文。
+/// The output cap that is displayed; copying always yields the full text.
 const _maxShownChars = 60000;
 
-/// 一步的全貌。模型请求按步号找,工具调用(和它的审批)按 callId 找。
+/// The full picture of one step. Model requests are found by step number; tool calls (and their approvals) by callId.
 class StepDetailPage extends ConsumerWidget {
   const StepDetailPage({
     super.key,
@@ -110,7 +110,7 @@ class _Missing extends StatelessWidget {
 }
 
 // -----------------------------------------------------------------------------
-// 工具调用
+// Tool call
 
 class _ToolStep extends StatelessWidget {
   const _ToolStep({required this.trace, required this.span, required this.skew, this.work, this.wait, this.item});
@@ -291,7 +291,7 @@ class _ToolStep extends StatelessWidget {
 }
 
 // -----------------------------------------------------------------------------
-// 模型请求
+// Model request
 
 class _ModelStep extends StatelessWidget {
   const _ModelStep({
@@ -497,16 +497,16 @@ class _CallRow extends StatelessWidget {
 }
 
 // -----------------------------------------------------------------------------
-// 共用件
+// Shared pieces
 
-/// `15:20:31`(本地时间)。
+/// `15:20:31` (local time).
 String clockTime(DateTime t) {
   final local = t.toLocal();
   String two(int n) => n.toString().padLeft(2, '0');
   return '${two(local.hour)}:${two(local.minute)}:${two(local.second)}';
 }
 
-/// 审批答复的人话。
+/// The approval's answer in plain words.
 String approvalLabel(ApprovalOutcome outcome) => switch (outcome) {
   ApprovalOutcome.allowedOnce => appL10n.activityApprovalAllowed,
   ApprovalOutcome.rejected => appL10n.commonDeclined,
@@ -515,7 +515,7 @@ String approvalLabel(ApprovalOutcome outcome) => switch (outcome) {
   ApprovalOutcome.unknown => appL10n.activityApprovalAnswered,
 };
 
-/// JSON 原文缩进排好;不是 JSON 时原样。
+/// The JSON source, indented and tidy; verbatim when it isn't JSON.
 String prettyJson(String raw) {
   try {
     return const JsonEncoder.withIndent('  ').convert(jsonDecode(raw));
@@ -530,7 +530,7 @@ TextStyle? _value(BuildContext context, [Color? color]) => AppType.tabular(
 
 Widget _plain(BuildContext context, String text) => Text(text, style: _value(context));
 
-/// 度量值(时长、token 数、速度):数字等宽,单位小一号、次级色。
+/// Measure values (duration, token counts, speed): digits monospaced, unit one size smaller in secondary color.
 Widget _measure(BuildContext context, String text) => Text.rich(
   TextSpan(children: measureSpans(text, _value(context)!, unitColor: Theme.of(context).colorScheme.onSurfaceVariant)),
 );
@@ -540,7 +540,7 @@ Widget _mono(BuildContext context, String text) => SelectableText(
   style: AppType.mono(
     size: 13,
     color: Theme.of(context).colorScheme.onSurface,
-    // 与左边标签(bodyMedium 14 / 1.55)同一个行高,首行文字对齐。
+    // Same line height as the label on the left (bodyMedium 14 / 1.55); first lines of text align.
     height: 14 * 1.55 / 13,
   ),
 );
@@ -560,7 +560,7 @@ Widget _wellText(BuildContext context, String text, {bool ansi = false, Color? c
   );
 }
 
-/// 进行中的段落走秒,结束的写死。
+/// An in-progress stretch ticks seconds; finished ones state it flat.
 class _Elapsed extends StatelessWidget {
   const _Elapsed({required this.span, required this.skew, this.suffix = '', this.warn = false});
 
@@ -594,7 +594,7 @@ class _Elapsed extends StatelessWidget {
   }
 }
 
-/// 一组"名称 — 值"的事实,一块玻璃卡。
+/// A set of "name — value" facts, as one glass card.
 class FactsCard extends StatelessWidget {
   const FactsCard({super.key, required this.facts, this.title});
 
@@ -636,7 +636,7 @@ class FactsCard extends StatelessWidget {
   }
 }
 
-/// 带标题、复制键的一块代码井(参数、输出、diff)。[prose] 时铺成普通卡片。
+/// A titled code well with a copy key (arguments, output, diff). With [prose], laid out as a plain card.
 class CodeSection extends StatelessWidget {
   const CodeSection({
     super.key,
@@ -691,7 +691,7 @@ class CodeSection extends StatelessWidget {
       child: prose
           ? GlassSurface(tier: GlassTier.card, borderRadius: AppShape.radiusLg, child: body)
           : DecoratedBox(
-              // 与上面的事实卡同一圆角(20):整页的块是一家。
+              // Same corner radius (20) as the fact card above: all blocks on the page are one family.
               decoration: ShapeDecoration(
                 color: dsh.codeWellBg,
                 shape: RoundedSuperellipseBorder(

@@ -1,4 +1,4 @@
-// The 32dp file-type glyph of the 文件 page's rows, in the artifact cards' visual
+// The 32dp file-type glyph of the Files page's rows, in the artifact cards' visual
 // language (a faint squircle tile, the kind's colour): folders, a document-kind
 // icon, a photo's own thumbnail on this phone, or the extension as a monogram
 // for code and text.

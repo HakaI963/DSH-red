@@ -1,4 +1,4 @@
-// The side panel with a conversation open: 信息 and 插件, the shortcuts at its foot.
+// The side panel with a conversation open: Info and Plugins, the shortcuts at its foot.
 // Everything else about a conversation is on the page behind its title.
 
 import 'package:flutter/material.dart';
@@ -110,7 +110,7 @@ class ConversationPanel extends ConsumerWidget {
   }
 }
 
-/// 插件: always there. One panel fills it, several get a row to pick from, none says so
+/// Plugins: always there. One panel fills it, several get a row to pick from, none says so
 /// and leads to where plugins come from.
 class _Plugins extends ConsumerWidget {
   const _Plugins({required this.sessionId, required this.onOpen});

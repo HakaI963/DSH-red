@@ -1,9 +1,9 @@
-// The tabs of 对话详情, on their own so the layout state (which tab the page, the
+// The tabs of Chat details, on their own so the layout state (which tab the page, the
 // sheet and the panel show) can name them without importing the page.
 
 import '../../l10n/l10n.dart';
 
-/// The tabs of 对话详情.
+/// The tabs of Chat details.
 enum SessionTab {
   trajectory,
   changes,

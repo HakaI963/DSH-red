@@ -17,7 +17,7 @@ import '../../theme/theme.dart';
 /// │ ▣   ◷  │  │ ▣   ◷  │  │ ▣   ◷  │   2 × 2 tiles, equal insets round them
 /// │ ✣   ▭  │  │ ✣   ▭  │  │ ✣   ▭  │
 /// ╰────────╯  ╰────────╯  ╰────────╯
-///  扁平双色     极简几何     玻璃渐变
+///  Flat two-tone  Minimal geometry  Glass gradient
 /// ```
 ///
 /// Equal columns [gap] apart, [padding] on every side; each preview is square,

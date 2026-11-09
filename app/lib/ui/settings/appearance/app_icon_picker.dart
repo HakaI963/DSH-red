@@ -1,4 +1,4 @@
-// Picks the launcher icon (桌面图标), for the appearance page. The icons
+// Picks the launcher icon, for the appearance page. The icons
 // themselves: android/app/src/main/res (ic_launcher_*).
 
 import 'dart:async';
@@ -22,7 +22,7 @@ import '../../common/brief_notice.dart';
 ///   ╭───╮      ╭───╮      ╭───╮      ╭───╮
 ///  ( ◖● )     │ ◖● │     │ ◖● │     │ ◖● │    a ring [ringGap] off the chosen
 ///   ╰───╯      ╰───╯      ╰───╯      ╰───╯    icon, in the icon's own shape
-///   雾蓝        夜幕        霜白         墨
+///   Mist Blue   Nightfall   Frost White   Ink
 /// ```
 ///
 /// Equal columns [gap] apart, [padding] on every side; each icon is centred in

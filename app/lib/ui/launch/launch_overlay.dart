@@ -1,4 +1,4 @@
-// 启动画面: the layer over the whole app at a cold start (lib/launch/launch_state.dart has the
+// Launch screen: the layer over the whole app at a cold start (lib/launch/launch_state.dart has the
 // story). Its first frame is the system's launch picture redrawn pixel for pixel; then the icon
 // settles above the wordmark and a fine light crosses it once (lib/launch/launch_motion.dart),
 // or the user's own launch screen fades in and plays once. The moment the app is usable the
@@ -65,7 +65,7 @@ class LaunchOverlay extends StatefulWidget {
 
   final LaunchController controller;
 
-  /// Overrides the system's 减少动画 (tests, previews); null reads it from MediaQuery.
+  /// Overrides the system's Reduce motion (tests, previews); null reads it from MediaQuery.
   final bool? reduceMotion;
 
   /// The layer's tap target (a tap skips the launch screen).
@@ -114,7 +114,7 @@ class _LaunchOverlayState extends State<LaunchOverlay> with TickerProviderStateM
 
   bool get _reduced => widget.reduceMotion ?? AppMotion.reduced(context);
 
-  /// The system's own 减少动画, without a light phone's (which [_reduced] has too): the user's
+  /// The system's own Reduce motion, without a light phone's (which [_reduced] has too): the user's
   /// launch screen is their own choice, and only this keeps it to its first frame.
   bool get _systemReduced =>
       widget.reduceMotion ?? WidgetsBinding.instance.platformDispatcher.accessibilityFeatures.disableAnimations;
@@ -148,7 +148,7 @@ class _LaunchOverlayState extends State<LaunchOverlay> with TickerProviderStateM
     if (media == null || _mediaPlaying) return;
     _mediaPlaying = true;
     if (_systemReduced) {
-      // 减少动画: its first frame, still.
+      // Reduce motion: its first frame, still.
       _custom.value = 1;
       _c.mediaFinished();
     } else {
@@ -165,7 +165,7 @@ class _LaunchOverlayState extends State<LaunchOverlay> with TickerProviderStateM
   @override
   Widget build(BuildContext context) {
     if (_c.phase == LaunchPhase.gone) return const SizedBox.shrink();
-    // 减少动画 (the system's, or the app's own on a light phone, which can arrive a moment
+    // Reduce motion (the system's, or the app's own on a light phone, which can arrive a moment
     // late): the controller then waits for nothing. The user's own picture still plays on a light
     // phone.
     final reduced = _c.showsCustom ? _systemReduced : _reduced;

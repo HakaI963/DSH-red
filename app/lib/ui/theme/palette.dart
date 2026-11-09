@@ -6,69 +6,69 @@ import 'accent.dart';
 import 'oklch.dart';
 import 'surfaces.dart';
 
-/// 雾蓝玻璃(Mist Glass)配色:**手工构造**,不走 `ColorScheme.fromSeed`。
+/// The Mist Glass palette: **hand-built**, not `ColorScheme.fromSeed`.
 ///
-/// 为什么不用 fromSeed:M3 tonalSpot 会把任何种子推成一套高彩度"现代 App"
-/// 色阶,恰好抹掉这里要的低饱和。所以每个槽位手工指定。
+/// Why not fromSeed: M3 tonalSpot pushes any seed into a high-chroma "modern app"
+/// ramp, which erases exactly the low saturation wanted here. So every slot is set by hand.
 ///
-/// ## 两套印次
+/// ## Two print runs
 ///
-/// - 浅色:晨雾蓝纸面。页面是一条极淡的竖向渐变(顶 `#EBF1FE` → 底 `#F6F7FC`),
-///   彩度 ≤ 0.019。
-/// - 深色:深海石板。明度 0.23–0.25,与 Claude 深色同一档,**不是**纯黑科技风:
-///   纯黑底上的亮字长时间看会"晕"。
-/// - 浅深都**不用**纯白 / 纯黑做大面积面色;纯白只出现在玻璃的高光和主按钮字上。
+/// - Light: morning-mist blue paper. The page is a very faint vertical gradient (top `#EBF1FE` → bottom `#F6F7FC`),
+///   chroma ≤ 0.019.
+/// - Dark: deep-sea slate. Lightness 0.23–0.25, the same tier as Claude dark — **not**
+///   pure-black tech: bright text on pure black makes the eyes swim over long sessions.
+/// - Neither run uses pure white / pure black for large surfaces; pure white appears only in glass highlights and primary-button text.
 ///
-/// ## 比例
+/// ## Ratios
 ///
-/// 70% 中性面(渐变 + 玻璃)、25% 文字与细线、≤5% 强调色。强调色只出现在
-/// 主按钮、发送键、选中态、链接、进度。铺多了就不"静"了。
+/// 70% neutral surfaces (gradient + glass), 25% text and hairlines, ≤5% accent. The accent appears only on
+/// the primary button, the send key, selected states, links and progress. Spread wider and it stops feeling quiet.
 ///
-/// ## 配色
+/// ## Palettes
 ///
-/// 这里的中性色常量是默认配色(雾蓝)的。用户换了配色,页面、玻璃、文字
-/// 走 [NeutralTones](同明度、换色调),界面代码一律从主题取色,不直接用
-/// 这些常量;暮紫 tertiary 和错误色是语义色,不随配色转。
+/// The neutral constants here belong to the default palette (mist blue). When the user changes palette, page, glass and text
+/// go through [NeutralTones] (same lightness, new tint); UI code always takes colours from the theme, never these
+/// constants directly; dusk-purple tertiary and the error colour are semantic and do not rotate.
 abstract final class DshPalette {
-  // ══ 浅色:晨雾 ══════════════════════════════════════════
-  /// 页面渐变顶 · 晨雾蓝(与 DSH 官方 deepseek-50 同族)。
+  // ══ Light: morning mist ══════════════════════════════════════════
+  /// Page gradient top · morning-mist blue (same family as DSH official deepseek-50).
   static const mistTop = Color(0xFFEBF1FE);
 
-  /// 页面渐变底 · 近白微紫。
+  /// Page gradient bottom · near-white with a hint of violet.
   static const mistBottom = Color(0xFFF6F7FC);
 
-  /// 不透明页面底(渐变的中值;无法铺渐变时用)。
+  /// Opaque page floor (the gradient's midpoint; used when a gradient cannot be painted).
   static const mist = Color(0xFFF0F4FD);
 
-  /// 面色阶梯(不透明),玻璃关闭或 M3 组件需要实色时用。
+  /// Surface ladder (opaque), for when glass is off or M3 widgets need solid colours.
   static const mistLowest = Color(0xFFFBFCFF);
   static const mistLow = Color(0xFFF6F9FE);
   static const mistContainer = Color(0xFFEEF1F9);
   static const mistHigh = Color(0xFFE7EBF4);
   static const mistHighest = Color(0xFFDFE4EE);
 
-  /// 主文字 · 深墨蓝(对所有浅色面 ≥ 13)。
+  /// Primary text · deep ink blue (≥ 13 on every light surface).
   static const ink = Color(0xFF1E232E);
 
-  /// 次级文字(≥ 6.2)。
+  /// Secondary text (≥ 6.2).
   static const inkMuted = Color(0xFF4F5562);
 
-  /// 三级文字 · 时间戳、摘要、占位符(≥ 4.6,仍可承载信息)。
+  /// Tertiary text · timestamps, digests, placeholders (≥ 4.6, still fit to carry information).
   static const inkFaint = Color(0xFF646974);
 
-  /// 禁用 / 纯装饰(约 2.5,**不得**承载必要信息)。
+  /// Disabled / pure decoration (about 2.5, **must not** carry essential information).
   static const inkGhost = Color(0xFFA1A5AC);
 
-  /// 输入框等交互边界(非文字对比 ≥ 3)。
+  /// Interactive bounds such as field outlines (non-text contrast ≥ 3).
   static const outlineLight = Color(0xFF7E838D);
 
-  /// 分割线 / 发丝描边(装饰性)。
+  /// Dividers / hairline strokes (decorative).
   static const ruleLight = Color(0xFFDCE0E8);
 
-  /// 冷墨阴影基色:阴影带一点蓝,比纯黑阴影干净。
+  /// Cold-ink shadow base: shadows carry a little blue, cleaner than pure black.
   static const shadowInk = Color(0xFF0B152D);
 
-  // ══ 深色:深海石板 ══════════════════════════════════════
+  // ══ Dark: deep-sea slate ══════════════════════════════════════
   static const nightTop = Color(0xFF1D222C);
   static const nightBottom = Color(0xFF1B1C23);
   static const night = Color(0xFF1C1F28);
@@ -78,7 +78,7 @@ abstract final class DshPalette {
   static const nightHigh = Color(0xFF2D323C);
   static const nightHighest = Color(0xFF343944);
 
-  /// 主文字 · 雾白(不是纯白,对深色面 ≥ 10.5)。
+  /// Primary text · mist white (not pure white; ≥ 10.5 on dark surfaces).
   static const paper = Color(0xFFE6E9F0);
   static const paperMuted = Color(0xFFB6BBC5);
   static const paperFaint = Color(0xFF9A9EA9);
@@ -87,17 +87,17 @@ abstract final class DshPalette {
   static const ruleDark = Color(0xFF343841);
   static const shadowNight = Color(0xFF03060D);
 
-  // ══ 中性辅助色(两套共用的语义角色) ═════════════════════
-  /// 浅色 secondary · 板岩蓝灰:次要按钮、未选中强调。
+  // ══ Neutral helpers (semantic roles shared by both schemes) ═════════════════════
+  /// Light secondary · slate blue-grey: secondary buttons, unselected emphasis.
   static const slate = Color(0xFF545E6F);
   static const slateContainer = Color(0xFFE2E6F0);
 
-  /// 深色 secondary。tonal 按钮底是叠在玻璃卡上约 9% 的白,和卡片拉开层次。
+  /// Dark secondary. The tonal button floor is about 9% white over the glass card, lifting it off the card.
   static const slateLift = Color(0xFFB3BED2);
   static const onSlateLift = Color(0xFF1A2230);
   static const slateContainerDark = Color(0x17FFFFFF);
 
-  /// tertiary · 暮紫:计划 / 目标 / 子代理这类"智能体在规划"的点缀。
+  /// tertiary · dusk purple: the accent for plan / goal / subagent — "the agent is planning".
   static const dusk = Color(0xFF6B578F);
   static const duskContainer = Color(0xFFECE5FB);
   static const onDuskContainer = Color(0xFF3B2C54);
@@ -106,7 +106,7 @@ abstract final class DshPalette {
   static const duskContainerDark = Color(0xFF3E3451);
   static const onDuskContainerDark = Color(0xFFE4DDF3);
 
-  // ══ 错误(低饱和砖玫红,与 DshColors 的 danger 同值) ═══
+  // ══ Error (low-chroma brick rose, same values as DshColors' danger) ═══
   static const danger = Color(0xFFA54743);
   static const onDanger = Color(0xFFFDF9F8);
   static const dangerContainer = Color(0xFFFFE2E0);
@@ -116,14 +116,14 @@ abstract final class DshPalette {
   static const dangerContainerDark = Color(0xFF542C29);
   static const onDangerContainerDark = Color(0xFFF8D9D7);
 
-  /// 遮罩基色(抽屉、模态底)。
+  /// Scrim base colour (drawers, modal backdrop).
   static const scrim = Color(0xFF0B111F);
 
-  /// 浅色方案。
+  /// The light scheme.
   ///
-  /// `surface` 是不透明兜底;真正的页面背景由 `AppBackdrop` 画渐变,
-  /// 卡片 / 顶栏 / 输入条走 `GlassSurface`。`surfaceContainer*` 五档仍按
-  /// "越高越深"排,给没有玻璃的 M3 组件(菜单、对话框、Chip)用。
+  /// `surface` is the opaque fallback; the real page background is the gradient painted by `AppBackdrop`,
+  /// and cards / top bar / composer go through `GlassSurface`. The five `surfaceContainer*` steps still run
+  /// "higher means deeper", serving glass-less M3 widgets (menus, dialogs, Chips).
   static ColorScheme lightScheme(AppAccent accent) {
     final n = NeutralTones.forAccent(accent);
     return ColorScheme(
@@ -136,7 +136,7 @@ abstract final class DshPalette {
       onSecondary: const Color(0xFFFFFFFF),
       secondaryContainer: n.slateContainer,
       onSecondaryContainer: n.ink,
-      // 暮紫是"智能体在规划"的语义色,不随配色转。
+      // Dusk purple is the semantic colour of "the agent is planning"; it never rotates with the palette.
       tertiary: dusk,
       onTertiary: const Color(0xFFFFFFFF),
       tertiaryContainer: duskContainer,
@@ -155,7 +155,7 @@ abstract final class DshPalette {
       surfaceContainer: n.mistContainer,
       surfaceContainerHigh: n.mistHigh,
       surfaceContainerHighest: n.mistHighest,
-      // 关掉 M3 的 elevation 着色:层次靠玻璃和细线,不靠给面染主色。
+      // Turn off M3 elevation tinting: hierarchy comes from glass and hairlines, not from dyeing surfaces with the primary.
       surfaceTint: Colors.transparent,
       inverseSurface: n.inverseSurface,
       onInverseSurface: n.onInverseSurface,
@@ -167,7 +167,7 @@ abstract final class DshPalette {
     );
   }
 
-  /// 深色方案:深海石板 + 提亮主色(深墨字)。
+  /// Dark scheme: deep-sea slate + a lightened primary (with deep ink text).
   static ColorScheme darkScheme(AppAccent accent) {
     final n = NeutralTones.forAccent(accent);
     return ColorScheme(
@@ -210,12 +210,12 @@ abstract final class DshPalette {
   }
 }
 
-/// 一套配色下的全部中性色:页面渐变、面色阶梯、各级文字、细线、阴影、
-/// 代码井、终端。
+/// All neutrals under one palette: page gradients, surface ladder, every text level,
+/// hairlines, shadows, code wells, terminal.
 ///
-/// [defaults] 就是 [DshPalette] 里那些常量;别的配色由 [of] 把它整条转到
-/// `AppAccent.tintHue` 上,彩度乘 `AppAccent.tintChroma`,**明度一点不动**
-/// —— 所以文字对比度、玻璃层次在每套配色里都一样(测试逐条验)。
+/// [defaults] are the constants in [DshPalette]; other palettes get them from [of], which rotates
+/// the whole ramp onto `AppAccent.tintHue` and multiplies chroma by `AppAccent.tintChroma`, **lightness untouched**
+/// — so text contrast and glass layering come out the same in every palette (the tests verify each one).
 @immutable
 class NeutralTones {
   const NeutralTones({
@@ -276,25 +276,25 @@ class NeutralTones {
   final Color ink, inkMuted, inkFaint, inkGhost, outlineLight, ruleLight, shadowInk;
   final Color slate, slateContainer, inverseSurface, onInverseSurface, scrim;
 
-  /// 浅色代码井:底、标题条、描边、行号;代码注释。
+  /// Light code well: floor, header bar, border, line numbers; code comments.
   final Color codeWell, codeWellHeader, codeWellBorder, lineNumber, comment;
 
   final Color nightTop, nightBottom, night, nightLowest, nightLow, nightContainer, nightHigh, nightHighest;
   final Color paper, paperMuted, paperFaint, paperGhost, outlineDark, ruleDark, shadowNight;
   final Color slateLift, onSlateLift;
 
-  /// 深色玻璃:chrome 的烟灰、弹层的底。
+  /// Dark glass: chrome's smoke grey, the sheet floor.
   final Color smoke, sheetDark;
 
   final Color codeWellDark, codeWellHeaderDark, codeWellBorderDark, lineNumberDark, commentDark;
 
-  /// 终端卡(浅色模式也是深底)和它的按键底。
+  /// Terminal card (dark floor even in light mode) and its key background.
   final Color terminal, terminalKey;
 
-  /// 雾蓝中性色所在的色相。
+  /// The hue the mist-blue neutrals sit on.
   static const baseHue = 266.0;
 
-  /// 雾蓝的中性色(就是 [DshPalette] 的常量)。
+  /// Mist blue's neutrals (the [DshPalette] constants themselves).
   static const defaults = NeutralTones(
     mistTop: DshPalette.mistTop,
     mistBottom: DshPalette.mistBottom,
@@ -353,16 +353,16 @@ class NeutralTones {
 
   static NeutralTones forAccent(AppAccent accent) => of(tintHue: accent.tintHue, tintChroma: accent.tintChroma);
 
-  /// 当前主题那套配色的中性色。
+  /// The neutrals of the current theme's palette.
   static NeutralTones current(BuildContext context) =>
       forAccent(Theme.of(context).extension<DshSurfaces>()?.accent ?? AppAccent.mist);
 
-  /// 把一个按雾蓝调出来的中性色换到 [accent] 的色调上(零散的灰,比如图表
-  /// 里的「其他」)。
+  /// Moves a mist-tuned neutral onto [accent]'s tint (stray greys,
+  /// e.g. the 「其他」 slice in charts).
   static Color tint(Color mistNeutral, AppAccent accent) =>
       retint(mistNeutral, hueShift: accent.tintHue - baseHue, chromaScale: accent.tintChroma);
 
-  /// 转到 [tintHue]、彩度乘 [tintChroma] 的整条中性色。结果按参数缓存。
+  /// The whole neutral ramp rotated to [tintHue] with chroma multiplied by [tintChroma]. Results are cached per argument pair.
   static NeutralTones of({required double tintHue, required double tintChroma}) {
     if (tintHue == baseHue && tintChroma == 1) return defaults;
     return _cache.putIfAbsent((tintHue, tintChroma), () {
@@ -427,7 +427,7 @@ class NeutralTones {
   }
 }
 
-/// WCAG 2.x 相对亮度对比度。给测试和运行时断言用。
+/// WCAG 2.x relative-luminance contrast ratio. For tests and runtime assertions.
 double contrastRatio(Color a, Color b) {
   final la = a.computeLuminance();
   final lb = b.computeLuminance();

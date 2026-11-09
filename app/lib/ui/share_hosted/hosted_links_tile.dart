@@ -1,4 +1,4 @@
-// 「我的分享链接」 on 隐私与分享, with how many there are.
+// "My share links" on Privacy & sharing, with how many there are.
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';

@@ -7,7 +7,7 @@ import '../../../l10n/l10n.dart';
 /// Sending unchanged can't help; choose a supported effort/model or upgrade.
 const modelRefusalCodes = {'CLIENT_UPGRADE_REQUIRED', 'MODEL_UNSUPPORTED', 'UNSUPPORTED_REASONING_EFFORT'};
 
-/// 一轮出错时说明行上的短句,按错误码给;后端原文放在点开的详情里。
+/// The short line on a failed turn's notice, keyed by error code; the backend's own text goes under the expandable details.
 String turnFailureText(String? code) => switch (code) {
   'AUTH' || 'INVALID_CREDENTIAL' => appL10n.chatErrApiKey,
   'QUOTA' => appL10n.chatErrBalance,

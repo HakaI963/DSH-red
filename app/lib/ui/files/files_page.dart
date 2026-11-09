@@ -1,4 +1,4 @@
-// 文件: one conversation's workspace as a list page — the official file panel
+// Files: one conversation's workspace as a list page — the official file panel
 // (`dsh-client-ui-sidebar-files`) and its document preview, native.
 
 import 'dart:math' as math;
@@ -21,7 +21,7 @@ String homePath(String path, String? home) {
   return path;
 }
 
-/// 文件 (list page): large title with the workspace folder as subtitle, then the
+/// Files (list page): large title with the workspace folder as subtitle, then the
 /// search field, path capsules and the current folder. Pull to refresh; updates
 /// itself while the agent writes files; back goes up a folder first.
 class WorkspaceFilesPage extends ConsumerWidget {

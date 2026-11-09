@@ -214,8 +214,8 @@ final _pageFocusProvider = Provider.autoDispose.family<PetFocus?, String?>((ref,
 ///
 /// Through a subscription, not this widget's builds: with the app in the
 /// background there are no frames, and the pet out there still has to see the
-/// turn end. A frozen 「running」 would keep it working and swallow the turn's
-/// 做完了 (a new round, as far as it could tell), while the notification stays
+/// turn end. A frozen "running" would keep it working and swallow the turn's
+/// "all done" (a new round, as far as it could tell), while the notification stays
 /// silent for the pet to say it (`ResultSilence`).
 class _FocusReporter extends ConsumerStatefulWidget {
   const _FocusReporter({required this.sessionId, required this.child});
@@ -954,7 +954,7 @@ class PetLayerState extends ConsumerState<PetLayer> with TickerProviderStateMixi
 
     final bubble = shown && !_dragging ? pet.bubble : null;
     const room = 160.0;
-    // Over the head, and over what the state holds up (Deepy's 「!」, a
+    // Over the head, and over what the state holds up (Deepy's "!", a
     // thought cloud): the higher of the body and the state's own art.
     final stateAnim = _variant ?? pack.animFor(pet.state, tier: pet.tier);
     final headArt = math.min(pack.contentBox.top, stateAnim.box.top) * s;

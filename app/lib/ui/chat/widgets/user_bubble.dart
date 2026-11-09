@@ -15,19 +15,19 @@ import '../secret_mask.dart';
 import 'message_actions.dart';
 import 'quote_chip.dart';
 
-/// 用户消息:**右对齐的软气泡**,比页面深一档,像"按进去"的(Claude 式)。
+/// User message: **a right-aligned soft bubble**, one shade deeper than the page — "pressed in" (Claude-style).
 ///
-/// 禁配:气泡底上只用主文字 / 次级文字;三级文字(4.32)与主色(4.22)
-/// 不过 AA。
+/// Forbidden pairings: on the bubble ground only primary / secondary text; tertiary text (4.32) and the accent color (4.22)
+/// don't pass AA.
 ///
-/// 长按气泡:复制 / 选择文字 / 编辑后重发([onEdit]),和回复同一个菜单。
+/// Long-press the bubble: copy / select text / edit and resend ([onEdit]) — the same menu as replies.
 ///
-/// 以引用块开头的消息(引用追问),引文画在气泡顶部([BubbleQuote]),
-/// 下面是正文;复制、选择文字、编辑拿到的仍是发出去的原文。
+/// Messages starting with a quote block (quote follow-up) render the quote atop the bubble ([BubbleQuote])
+/// with the body below; copy, select-text and edit still yield exactly what was sent.
 ///
-/// 可识别的凭据(API Key、令牌、私钥、地址里的密码)只在屏幕上遮挡
-/// ([SecretText]);复制、选择文字、编辑拿到的都是原文。已发送的消息每段
-/// 带眼睛可以显示,乐观气泡只遮挡。
+/// Recognizable credentials (API keys, tokens, private keys, passwords in URLs) are masked only on screen
+/// ([SecretText]); copying, selecting text and editing all get the original. Each segment of a sent message
+/// carries a revealing eye; optimistic bubbles mask only.
 class UserBubble extends StatelessWidget {
   const UserBubble({
     super.key,
@@ -41,19 +41,19 @@ class UserBubble extends StatelessWidget {
 
   final String text;
 
-  /// Images and file cards, shown right-aligned above the bubble (Claude 式:
-  /// 附件不塞进气泡里)。
+  /// Images and file cards, shown right-aligned above the bubble (Claude style:
+  /// attachments aren't stuffed inside the bubble).
   final Widget? attachments;
 
-  /// 非空 = 乐观气泡(还没被 DSH 回显),显示在气泡下方("发送中" / "排队中")。
+  /// Non-empty = optimistic bubble (not yet echoed by DSH); shown below the bubble ("Sending" / "Queued").
   final String? pendingLabel;
   final IconData pendingIcon;
 
-  /// Small text actions after the pending label ("改为插话", "撤回").
+  /// Small text actions after the pending label ("Switch to interject", "Withdraw").
   final List<(String, VoidCallback)> pendingActions;
 
-  /// "编辑后重发" in the long-press menu; null leaves it out (optimistic
-  /// bubbles: they have "撤回" instead).
+  /// "Edit and resend" in the long-press menu; null leaves it out (optimistic
+  /// bubbles: they have "Withdraw" instead).
   final VoidCallback? onEdit;
 
   /// What the bubble shows: a generation request without its header.
@@ -63,8 +63,8 @@ class UserBubble extends StatelessWidget {
     final onEdit = this.onEdit;
     final action = await showMessageMenu(
       context,
-      // 菜单顶部的预览也是显示,同样遮挡;预览会把 `**` 当粗体删掉,
-      // 所以这里用 •。
+      // The menu's top preview is display too, masked the same way; the preview strips `**` as bold,
+      // so • is used here.
       text: maskSecrets(_shown, mark: '•'),
       actions: [MessageAction.copy, MessageAction.selectText, if (onEdit != null) MessageAction.edit],
     );
@@ -93,7 +93,7 @@ class UserBubble extends StatelessWidget {
     final shown = generate?.description ?? text;
     final (:quote, :body) = splitQuote(shown);
     final interactive = pendingLabel == null;
-    // Selecting goes through the menu ("选择文字"): long-press is the menu.
+    // Selecting goes through the menu ("Select text"): long-press is the menu.
     // `@` references draw as chips; text with a credential stays a plain
     // SecretText.
     Widget content = ReferenceText(quote == null ? shown : body, style: style, interactive: interactive);
@@ -168,9 +168,9 @@ class UserBubble extends StatelessWidget {
   }
 }
 
-/// [_PendingMeta] 的位置:回显时(同一行,标签变成 null)这一行和输入条上
-/// 的胶囊同一节奏收起,气泡平稳落位,不会"啪"地矮一截。收起途中还画着
-/// 最后一次的状态。
+/// Where [_PendingMeta] sits: on echo (same row, label turning null) this line and the pill on the input bar
+/// collapse at the same pace, and the bubble lands smoothly instead of snapping a notch shorter. While collapsing it still paints
+/// the last known state.
 class _PendingSlot extends StatefulWidget {
   const _PendingSlot({required this.label, required this.icon, required this.actions});
 
@@ -211,10 +211,10 @@ class _PendingSlotState extends State<_PendingSlot> {
   );
 }
 
-/// 乐观气泡下方的一行:状态("排队中 · 本轮结束后发送")+ 文字操作。
+/// The line under an optimistic bubble: status ("Queued · sends after this turn") + text actions.
 ///
-/// 右端与气泡的直边对齐(缩进 8):只有状态时状态文字留 8;有操作时最后
-/// 一个操作自带左右 8 的点按区,文字同样停在 8 处。
+/// The right end aligns with the bubble's straight edge (8 indent): status only — the status text keeps 8; with actions —
+/// the last action brings its own 8 per side tap area, so its text likewise rests at 8.
 class _PendingMeta extends StatelessWidget {
   const _PendingMeta({required this.label, required this.icon, required this.actions});
 
@@ -255,7 +255,7 @@ class _PendingMeta extends StatelessWidget {
   }
 }
 
-/// 「图像 · 3:4 · 2 张」 under a generation request: the pending line's look
+/// "Image · 3:4 · 2 pieces" under a generation request: the pending line's look
 /// (12 icon, small tertiary text), its right end 8 in from the bubble's
 /// straight edge.
 class GenerateParamsLine extends StatelessWidget {

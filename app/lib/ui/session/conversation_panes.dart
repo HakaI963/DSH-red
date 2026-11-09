@@ -28,7 +28,7 @@ class ConversationPane {
   final String Function() label;
   final Widget Function(String sessionId) build;
 
-  /// Its tab on 对话详情; null when it is only in the side panel.
+  /// Its tab on Chat details; null when it is only in the side panel.
   final SessionTab? tab;
 
   static final overview = ConversationPane(
@@ -62,7 +62,7 @@ class ConversationPane {
     label: () => panel.title,
     build: (id) => ListView(
       padding: const EdgeInsets.fromLTRB(16, 4, 16, 16),
-      // One for 全部功能 only has no conversation to be about.
+      // One for All features only has no conversation to be about.
       children: [
         NativePanelView(
           panel: panel,
@@ -87,7 +87,7 @@ class ConversationPane {
     ),
   );
 
-  /// The side panel's 插件, for [sessionId]: every plugin panel, wherever it asked to be,
+  /// The side panel's Plugins, for [sessionId]: every plugin panel, wherever it asked to be,
   /// each its own; then the web plugins.
   static List<ConversationPane> pluginsFor(WidgetRef ref, String sessionId) {
     final webParts = !ref.watch(chatWebPluginsProvider(sessionId)).isEmpty;

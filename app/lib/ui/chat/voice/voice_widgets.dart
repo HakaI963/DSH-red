@@ -1,5 +1,5 @@
 // Pieces of the composer while listening: the live level bars and the cancel
-// key that takes the ＋ key's place.
+// key that takes the + key's place.
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -9,8 +9,8 @@ import '../../../l10n/l10n.dart';
 import '../../theme/app_icons.dart';
 import '../../theme/theme.dart';
 
-/// 听写中的音量条:5 根圆头竖条,最新的音量从右边进来。最高 24,比两侧
-/// 的 36 圆键矮;占发送键左边那个 36 高的小件位。
+/// The volume meter while dictating: 5 round-capped vertical bars, the newest level entering from the right. Max 24,
+/// shorter than the 36 round keys beside it; it occupies the 36-tall slot left of the send key.
 class VoiceWaveform extends StatefulWidget {
   const VoiceWaveform({super.key, required this.level, this.active = true});
 
@@ -95,7 +95,7 @@ class _VoiceWaveformState extends State<VoiceWaveform> {
   }
 }
 
-/// 听写中替换 ＋ 键的 ✕:同样 36 的圆、同样的淡底,镜像右边的停止键。
+/// The ✕ that replaces the + key while dictating: same 36 circle, same tinted ground, mirroring the stop key on the right.
 class VoiceCancelKey extends StatelessWidget {
   const VoiceCancelKey({super.key, required this.onPressed});
 

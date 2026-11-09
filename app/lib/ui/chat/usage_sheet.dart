@@ -15,7 +15,7 @@ import '../theme/theme.dart';
 import 'balance_widgets.dart';
 
 /// `999` / `1K` / `43K` / `500K` / `1.05M` / `100M`: K is a thousand and M a
-/// million in every UI language (no 万/亿), the same units model context
+/// million in every UI language (no ten-thousand grouping units), the same units model context
 /// windows are quoted in.
 String formatTokens(int n) {
   String trimZeros(String text) {
@@ -49,13 +49,13 @@ String formatTokens(int n) {
   return '$sign${trimZeros((value / 1000000).toStringAsFixed(2))}M';
 }
 
-/// `12%`;大于 0 但不到 1% 时写 `<1%`。
+/// `12%`; when above 0 but under 1%, writes `<1%`.
 String formatPercent(double fraction) {
   if (fraction > 0 && fraction < 0.01) return '<1%';
   return '${(fraction * 100).round()}%';
 }
 
-/// 上下文占用的颜色:<60% 主色、60–85% warning、>85% danger。
+/// Context-usage color: <60% accent, 60–85% warning, >85% danger.
 Color contextTone(BuildContext context, double fraction) {
   final dsh = DshColors.of(context);
   if (fraction > 0.85) return dsh.danger;
@@ -63,8 +63,8 @@ Color contextTone(BuildContext context, double fraction) {
   return Theme.of(context).colorScheme.primary;
 }
 
-/// 输入条里的上下文占用:小环 + 百分比(只画环在静止帧里像加载圈),
-/// 点开用量弹层。60% 起环和字一起变色。
+/// Context usage in the input bar: a small ring + percentage (ring alone at rest looks like a loader),
+/// tap opens the usage sheet. From 60% the ring and text change color together.
 class ContextRing extends StatelessWidget {
   const ContextRing({super.key, required this.fraction, this.onTap});
 
@@ -141,7 +141,7 @@ class _RingPainter extends CustomPainter {
   bool shouldRepaint(_RingPainter old) => old.fraction != fraction || old.track != track || old.fill != fill;
 }
 
-/// 用量弹层:上下文窗口、本对话的 token、DeepSeek 余额。
+/// The usage sheet: context window, this chat's tokens, DeepSeek balance.
 Future<void> showUsageSheet(BuildContext context, {required String sessionId, ModelSelection? model}) {
   return showAppSheet<void>(
     context,
@@ -152,14 +152,14 @@ Future<void> showUsageSheet(BuildContext context, {required String sessionId, Mo
 
 /// ```
 ///                    ───
-///   用量                                   (×)
-///     上下文
+///   Usage                                    (×)
+///     Context
 ///   ╭──────────────────────────────────────╮
 ///   │ 6%                      61.8K / 1M │
 ///   │ ▰▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱ │
-///   │ 系统 1.5K · 工具 5.2K · 消息 54.9K    │
+///   │ system 1.5K · tools 5.2K · messages 54.9K  │
 ///   ╰──────────────────────────────────────╯
-///     本对话 …          DeepSeek 余额 …
+///     This chat …         DeepSeek balance …
 /// ```
 class UsageSheet extends ConsumerWidget {
   const UsageSheet({super.key, required this.sessionId, this.model});
@@ -193,11 +193,11 @@ class UsageSheet extends ConsumerWidget {
   }
 }
 
-/// 上下文窗口 + 本对话 token 两块(用量弹层与对话详情共用)。
+/// Context window + this chat's token cards (shared by the usage sheet and chat details).
 ///
-/// 页面里(默认)沿用 [SheetGroup] 自带的组标题,与页面上其他分组一致;
-/// 弹层里传 [margin](20)和 `sheet: true`,组标题换成弹层的小而淡的
-/// [SheetSectionLabel],块与块之间 16。
+/// On a page (default) it keeps [SheetGroup]'s own group title, like other groups on the page;
+/// in a sheet pass [margin] (20) and `sheet: true`: the group title becomes the sheet's small, faint
+/// [SheetSectionLabel], 16 between blocks.
 class SessionUsageSections extends StatelessWidget {
   const SessionUsageSections({
     super.key,
@@ -235,8 +235,8 @@ class SessionUsageSections extends StatelessWidget {
   }
 }
 
-/// 一个数:数字是等宽数字,后面的单位(`K`、`M`、`%`)小一号、次要色。
-/// `71K` → **71** K;`¥110.00` → ¥ **110.00**。纯文本仍是原字符串。
+/// A number: digits in monospaced figures, the trailing unit (`K`, `M`, `%`) one size smaller, secondary color.
+/// `71K` → **71** K; `¥110.00` → ¥ **110.00**. Plain text stays the original string.
 class UsageFigure extends StatelessWidget {
   const UsageFigure(this.text, {super.key, required this.style, this.color});
 
@@ -350,7 +350,7 @@ class _ContextSection extends StatelessWidget {
   }
 }
 
-/// 6 高的细条;占用变化时平滑走到新位置。
+/// A 6-tall thin bar; glides smoothly to the new position as usage changes.
 class _Bar extends StatelessWidget {
   const _Bar({required this.fraction, required this.color});
 

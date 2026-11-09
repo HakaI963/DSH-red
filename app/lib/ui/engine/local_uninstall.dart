@@ -1,6 +1,6 @@
-// 「卸载运行环境」: frees the room the on-device runtime
+// "Uninstall the runtime": frees the room the on-device runtime
 // takes, for a phone that runs DSH on a remote host. Installing again is one
-// tap away wherever 本机 shows as 未安装.
+// tap away wherever the local device shows as Not installed.
 
 import 'dart:async';
 
@@ -23,7 +23,7 @@ import '../theme/theme.dart';
 abstract final class LocalUninstall {
   static Future<void> run(ProviderContainer container) async {
     final prefs = container.read(onboardingPrefsProvider.notifier);
-    // Before the phase reads 未安装, so the root gate stays home.
+    // Before the phase reads Not installed, so the root gate stays home.
     await prefs.setLocalDeclined(true);
     try {
       await container.read(localRuntimeProvider.notifier).resetKeeping(const ResetKeep());
@@ -36,7 +36,7 @@ abstract final class LocalUninstall {
   }
 }
 
-/// The engine page's row under 「重置运行环境」.
+/// The engine page's row under "Reset the runtime".
 class LocalUninstallRow extends ConsumerWidget {
   const LocalUninstallRow({super.key, required this.enabled});
 
@@ -66,7 +66,7 @@ class LocalUninstallRow extends ConsumerWidget {
     final container = ProviderScope.containerOf(context, listen: false);
     final messenger = ScaffoldMessenger.maybeOf(context);
     try {
-      // The page stays: it turns into 未安装 with 「安装运行环境」.
+      // The page stays: it turns into Not installed with "Install the runtime".
       await LocalUninstall.run(container);
     } catch (_) {
       messenger?.showSnackBar(SnackBar(content: Text(l10n.localEnvUninstallFailed)));

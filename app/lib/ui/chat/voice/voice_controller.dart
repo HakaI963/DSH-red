@@ -29,7 +29,7 @@ class VoiceMessage {
 
   /// Another way of dictating would do (no recognizer, no service, the
   /// service failed, the voice model not downloaded): the toast offers
-  /// 「更换」, to 设置 › 语音输入 (the mode and the voice model).
+  /// "Change", to Settings › Voice input (the mode and the voice model).
   final bool change;
 }
 
@@ -480,7 +480,7 @@ class VoiceInputController extends ChangeNotifier with WidgetsBindingObserver {
 
   void _error(int operation, int code) {
     // The app holds the microphone permission (checked before starting), so
-    // ERROR_INSUFFICIENT_PERMISSIONS here is the service's own: Xiaomi's 小爱
+    // ERROR_INSUFFICIENT_PERMISSIONS here is the service's own: Xiaomi's XiaoAI
     // without its permissions, a vendor service refusing other apps.
     if (_engine == VoiceEngine.system &&
         _runMode == VoiceMode.auto &&

@@ -12,9 +12,9 @@ import '../../theme/theme.dart';
 import '../run_info.dart';
 import '../usage_sheet.dart' show formatTokens;
 
-/// 一轮结束后的**回合脚注**:`47 秒 · 12 步 · 约 ¥0.03 · 36 万 tokens ›`。
+/// The **turn footnote** after a finished turn: `47 s · 12 steps · ≈¥0.03 · 360K tokens ›`.
 ///
-/// 放不下时依次省掉 tokens、步数、花费,时长总在。点开本轮轨迹。
+/// When space is tight it drops tokens, steps, cost in that order; the duration always stays. Tap opens this turn's trajectory.
 class TurnFootnote extends StatelessWidget {
   const TurnFootnote({super.key, required this.trace, this.onTap, this.notes});
 
@@ -24,7 +24,7 @@ class TurnFootnote extends StatelessWidget {
   /// What plugins say about this turn (`turn.note`): the first thing to go when it doesn't fit.
   final NativeTurnNotes? notes;
 
-  /// 从全到简的几种写法(第一种放得下就用它)。
+  /// Forms from full to spare (use the first that fits).
   static List<String> variants(TurnTrace trace, {String? note}) {
     final duration = trace.duration;
     final time = duration == null ? appL10n.commonInProgress : formatSpan(duration);
@@ -61,8 +61,8 @@ class TurnFootnote extends StatelessWidget {
         customBorder: Squircle.border(AppShape.sm),
         child: ConstrainedBox(
           constraints: const BoxConstraints(minHeight: 36),
-          // 放进 Bleed(8) 的操作行里:左 8 让文字贴正文左缘;右 4 是光学补偿,
-          // 箭头字形在 16 的格子里右侧自带约 5 的空白,补完后笔画贴正文右缘。
+          // Placed inside the Bleed(8) action row: left 8 makes the text hug the body's left edge; right 4 is optical compensation —
+          // the arrow glyph carries ~5 of its own whitespace inside the 16 cell, so the stroke lands flush with the body's right edge.
           child: Padding(
             padding: const EdgeInsets.fromLTRB(8, 4, 4, 4),
             child: LayoutBuilder(

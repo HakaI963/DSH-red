@@ -1,4 +1,4 @@
-// 「导出诊断包」: the diagnostics bundle shared or saved
+// "Export diagnostics": the diagnostics bundle shared or saved
 // to Downloads, from the diagnostics page and the engine's failure card.
 
 import 'dart:async';
@@ -24,8 +24,8 @@ String diagnosticsStepText(DiagnosticsStep step) => switch (step) {
   DiagnosticsStep.saving => appL10n.phoneDiagnosticsSaving,
 };
 
-/// The two ways out for a diagnostics bundle — 「分享诊断包」 and
-/// 「存到「下载」」 — as one card of list rows. While one runs, its subtitle
+/// The two ways out for a diagnostics bundle — "Share diagnostics" and
+/// "Save to Downloads" — as one card of list rows. While one runs, its subtitle
 /// says the step and a small ring replaces the chevron; the other waits.
 /// [extra] rows join the card below them.
 class DiagnosticsExportCard extends ConsumerStatefulWidget {
@@ -42,7 +42,7 @@ class DiagnosticsExportCard extends ConsumerStatefulWidget {
   final EdgeInsetsGeometry margin;
   final List<Widget> extra;
 
-  /// Replaces the 「已存到 …」 toast (the sheet closes first, then toasts).
+  /// Replaces the "Saved to …" toast (the sheet closes first, then toasts).
   final void Function(String where)? onSaved;
 
   /// Called after the bundle went somewhere through the share sheet.
@@ -144,7 +144,7 @@ class _DiagnosticsExportCardState extends ConsumerState<DiagnosticsExportCard> {
 /// What a bundle holds, under the card.
 String get diagnosticsBundleNote => appL10n.phoneDiagnosticsNote;
 
-/// 「导出诊断包」 as a sheet (the failure card's way in): the card, then a
+/// "Export diagnostics" as a sheet (the failure card's way in): the card, then a
 /// faint line on what is inside. A save closes the sheet before its toast,
 /// so the toast isn't left under the sheet.
 Future<void> showDiagnosticsExportSheet(BuildContext context) {

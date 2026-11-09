@@ -1,6 +1,6 @@
-// 搜索设置: the field on top; before typing, a few common words and the last
-// searches; then results in two groups (设置, 功能), each a title and the way
-// there; with none, 「问 AI」 with the question as typed. A result opens its
+// Search settings: the field on top; before typing, a few common words and the last
+// searches; then results in two groups (Settings, Features), each a title and the way
+// there; with none, "Ask AI" with the question as typed. A result opens its
 // page straight over this one — back comes here — with the row lit.
 
 import 'dart:async';
@@ -251,7 +251,7 @@ class _SettingsSearchPageState extends ConsumerState<SettingsSearchPage> {
 }
 
 /// A plugin's own settings form, found once the host has said it has one,
-/// under the name 设置 › 引擎参数 › 插件 lists it by (in both languages).
+/// under the name Settings › Engine parameters › Plugins lists it by (in both languages).
 /// Only when the host's settings were read already: opening search doesn't
 /// ask the host for them.
 final _pluginSpotsProvider = Provider.autoDispose<List<SettingSpot>>((ref) {
@@ -299,7 +299,7 @@ class _SpotResult extends ConsumerWidget {
   }
 }
 
-/// No settings matched: the question, as typed, for 问 AI (not in 网页模式,
+/// No settings matched: the question, as typed, for Ask AI (not in Web mode,
 /// where there is no native chat to take it).
 class _NoResults extends ConsumerWidget {
   const _NoResults({required this.query});

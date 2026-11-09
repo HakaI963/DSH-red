@@ -1,30 +1,30 @@
 import 'package:flutter/widgets.dart';
 
-/// 动画时钟防跳帧。
+/// Animation clock that absorbs frame stalls.
 ///
-/// 动画按墙上时钟走:一帧卡了 150ms(新页面第一次排版、着色器编译),下一帧动画就
-/// 直接跳到半路,开头那段全被吞掉,看起来就是「一顿」。这里让时钟每帧最多走
-/// [maxStep]:卡顿之后动画从卡住的地方接着走,只是晚一点到,不再跳。
+/// Animations run on the wall clock: one frame stalled for 150ms (a new page's first layout, shader compilation) makes
+/// the next jump to mid-flight, swallowing the opening — it reads as a hitch. This clock advances at most [maxStep] per
+/// frame: after a stall the animation resumes where it froze, arriving late but never jumping.
 ///
-/// 对全 App 的动画都生效,本身几乎没有开销。持续低于 30 帧时动画会变慢一些,而不是
-/// 掉帧跳着走。[maxStep] 是绝对时长,不按屏幕刷新率算:120Hz 屏跑在 60 帧时不会变慢。
+/// Applies to every animation in the app at almost no cost. Sustained rates under 30 FPS slow animations down instead of
+/// skipping ahead. [maxStep] is an absolute duration, not tied to the refresh rate: 60 FPS on a 120Hz screen is not slowed.
 ///
-/// 只改动画看到的时间:`Timer`、`DateTime`、指针事件的时间都不受影响。
+/// Only changes the time animations see: `Timer`, `DateTime` and pointer event timestamps are unaffected.
 class FrameClock {
   FrameClock({this.maxStep = const Duration(milliseconds: 34)});
 
-  /// [SteadyFrameBinding] 用的那一个;`lib/app.dart` 按灵动动效开关设置 [enabled]。
+  /// The one used by [SteadyFrameBinding]; `lib/app.dart` sets [enabled] from the fluid-motion switch.
   static final instance = FrameClock();
 
   final Duration maxStep;
 
-  /// 关掉后不再累计新的跳过量;已经跳过的继续扣掉,时间不会往回或往前突变。
+  /// When off, no new jump amount accumulates; already-skipped time keeps being subtracted, so it never snaps back or forward.
   bool enabled = false;
 
   Duration? _last;
   Duration _skipped = Duration.zero;
 
-  /// 一帧的原始时间戳换算成动画看到的时间戳。
+  /// Turns a frame's raw timestamp into the timestamp animations see.
   Duration adjust(Duration raw) {
     final last = _last;
     _last = raw;
@@ -43,7 +43,7 @@ class FrameClock {
   }
 }
 
-/// 把 [FrameClock] 接进帧调度。要在其他任何 binding 之前创建,而且只能建一次。
+/// Plugs [FrameClock] into frame scheduling. Must be created before any other binding, and only once.
 class SteadyFrameBinding extends WidgetsFlutterBinding {
   @override
   void handleBeginFrame(Duration? rawTimeStamp) {

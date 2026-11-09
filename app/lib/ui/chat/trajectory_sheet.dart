@@ -1,4 +1,4 @@
-// Layer 2 of the run information, "本轮轨迹". The timeline reading (bars
+// Layer 2 of the run information, "Turn trajectory". The timeline reading (bars
 // placed at their real start, model bars split into time-to-first-token and
 // decoding, work in progress without an invented end) follows the official
 // DSH trajectory overview.
@@ -24,7 +24,7 @@ import 'usage_sheet.dart' show formatPercent, formatTokens;
 import 'widgets/live_clock.dart';
 import 'widgets/turn_failure_text.dart';
 
-/// 半屏弹层:一轮里每一段的用时,按真实时间排成瀑布。
+/// A half-screen sheet: how long each stretch of a turn took, laid out as a waterfall over real time.
 Future<void> showTrajectorySheet(BuildContext context, {required String sessionId, required int turn}) {
   return showAppSheet<void>(
     context,
@@ -128,8 +128,8 @@ class TrajectorySheet extends ConsumerWidget {
   }
 }
 
-/// 进行中的一轮:打开时停在最新的一步,之后贴底跟随;往上翻就不再打扰
-/// (官方轨迹视图同样停在尾部)。
+/// A running turn: on open it sits at the latest step, then follows the bottom; scroll up and it stops bothering you
+/// (the official trajectory view likewise stays at the tail).
 class _FollowTail extends StatefulWidget {
   const _FollowTail({required this.controller, required this.follow, required this.child});
 
@@ -188,7 +188,7 @@ class _FollowTailState extends State<_FollowTail> {
   Widget build(BuildContext context) => widget.child;
 }
 
-/// 滚动区上下各 12dp 渐隐:内容从卡片底下"沉"下去,不是被一刀切断。
+/// A 12dp fade at both ends of the scroll area: content "sinks" under the card edge instead of being knife-cut.
 class _EdgeFade extends StatelessWidget {
   const _EdgeFade({required this.child});
 
@@ -212,7 +212,7 @@ class _EdgeFade extends StatelessWidget {
   }
 }
 
-/// 标题行:左上角关闭,"本轮轨迹 · 47 秒";没正常结束时下面一行说明。
+/// The title row: close at top left, "Turn trajectory · 47 s"; when the turn didn't end cleanly, an explanation below.
 class _Header extends StatelessWidget {
   const _Header({required this.trace, required this.total});
 
@@ -239,8 +239,8 @@ class _Header extends StatelessWidget {
     final titleStyle = theme.textTheme.titleLarge!;
     final secondary = theme.colorScheme.onSurfaceVariant;
     final showClose = SheetDismissScope.of(context) == SheetDismissal.button;
-    // 同 SheetTitleBar 的关闭策略;只有显式关闭键时才为其留位。
-    // 说明紧贴标题,无关闭键时两侧都保留20。
+    // Same close strategy as SheetTitleBar; reserve space for it only when the close key is explicit.
+    // The explanation hugs the title; without a close key both sides keep 20.
     final line = MediaQuery.textScalerOf(context).scale(titleStyle.fontSize!) * (titleStyle.height ?? 1.2);
     return Padding(
       padding: EdgeInsets.fromLTRB(20, 0, showClose ? 14 : 20, 8),
@@ -302,8 +302,8 @@ class _Header extends StatelessWidget {
   }
 }
 
-/// 数字与单位分开排:数字用 [number](等宽),单位(「秒」「分」「万」
-/// 「%」「tokens」……)小一号、次级色。
+/// Digits and units set separately: digits in [number] (monospaced), units ("s", "min",
+/// "%", "tokens"…) one size smaller in secondary color.
 List<TextSpan> measureSpans(String text, TextStyle number, {double unitScale = 0.82, Color? unitColor}) {
   final unit = number.copyWith(
     fontSize: (number.fontSize ?? 14) * unitScale,
@@ -321,7 +321,7 @@ List<TextSpan> measureSpans(String text, TextStyle number, {double unitScale = 0
 
 final _measurePart = RegExp(r'[\d.,:<>+\-−—~]+|[^\d.,:<>+\-−—~]+');
 
-/// 一根堆叠条:模型 / 工具 / 等你 各占多少,下面一行图例。
+/// One stacked bar: how much model / tools / waiting take, with a legend line below.
 class _Composition extends StatelessWidget {
   const _Composition({required this.trace, required this.total});
 
@@ -397,13 +397,13 @@ class _Composition extends StatelessWidget {
   }
 }
 
-/// 工具类别在时间条上的颜色:容器色与 on-色之间,浅深两色下都看得清。
+/// Tool-category colors on the time bar: between container and on-color so both themes read them.
 Color toolBarColor(BuildContext context, ToolTone tone) {
   final (bg, fg) = DshColors.of(context).tool(tone);
   return Color.lerp(bg, fg, 0.42)!;
 }
 
-/// 轨迹行列表(弹层与会话详情共用)。[total] 是时间轴的长度。
+/// The trajectory row list (shared by the sheet and session details). [total] is the timeline's length.
 class TrajectoryList extends StatefulWidget {
   const TrajectoryList({
     super.key,
@@ -419,7 +419,7 @@ class TrajectoryList extends StatefulWidget {
   final Map<String, ToolChatItem> tools;
   final ValueChanged<TraceSpan>? onOpen;
 
-  /// 行内容离两边的距离:页面里 16,弹层里 20。
+  /// Row content's side inset: 16 on a page, 20 in the sheet.
   final double inset;
 
   @override
@@ -427,7 +427,7 @@ class TrajectoryList extends StatefulWidget {
 }
 
 class _TrajectoryListState extends State<TrajectoryList> {
-  /// 展开的组(按组里第一段的 seq)。
+  /// The expanded groups (keyed by the seq of the group's first stretch).
   final _expanded = <int>{};
 
   @override
@@ -482,8 +482,8 @@ class _TrajectoryListState extends State<TrajectoryList> {
   }
 }
 
-/// 一段:图标、标题 · 摘要、用时,下面一根按真实起止放置的细条。
-/// 等你确认 / 回答的段落铺一层警示色,"慢"常常是在等你。
+/// One stretch: icon, title · summary, elapsed time, and below it a thin bar placed by real start/end.
+/// Stretches waiting for your confirmation / answer get a warning-color ground — "slow" is often waiting on you.
 class SpanTile extends StatelessWidget {
   const SpanTile({
     super.key,
@@ -501,13 +501,13 @@ class SpanTile extends StatelessWidget {
   final TurnTrace trace;
   final Duration total;
 
-  /// 进行中的段落算到这里(Host 时间)。
+  /// An in-progress stretch is measured up to here (Host time).
   final DateTime now;
   final ToolChatItem? tool;
   final VoidCallback? onTap;
   final double indent;
 
-  /// 行内容离两边的距离(等待段的浅底比它往外 8)。
+  /// Row content's side inset (the waiting stretch's ground reaches 8 further out).
   final double inset;
 
   @override
@@ -623,8 +623,8 @@ class SpanTile extends StatelessWidget {
   }
 }
 
-/// 一段的图标块:模型是主色的思考图标(官方 Web 的原子),回复是对话
-/// 气泡,工具沿用类别方块,等你是警示色。
+/// A stretch's icon block: model is the accent thinking icon (the atomic one on official Web), reply is a
+/// speech bubble, tools keep their category squares, waiting-on-you is warning-colored.
 class SpanGlyph extends StatelessWidget {
   const SpanGlyph({super.key, required this.span, this.size = 24});
 
@@ -638,7 +638,7 @@ class SpanGlyph extends StatelessWidget {
     if (span.kind == TraceKind.tool) {
       return ToolGlyph(name: span.toolName ?? '', size: size);
     }
-    // null = 思考图标(不是字体图标,单独画)。
+    // null = the thinking icon (not a font icon, painted on its own).
     final (IconData? icon, Color bg, Color fg) = switch (span.kind) {
       TraceKind.approval => (AppIcons.approval, dsh.warningContainer, dsh.onWarningContainer),
       TraceKind.question => (AppIcons.question, dsh.warningContainer, dsh.onWarningContainer),
@@ -660,8 +660,8 @@ class SpanGlyph extends StatelessWidget {
   }
 }
 
-/// 时间轴上的一段:浅色轨道上,从真实起点画到终点;最短 3dp 也看得见。
-/// 模型段的 [head](首字前的等待)画浅一档。进行中的段落右端是虚的。
+/// One stretch on the timeline: drawn from its real start to end over a pale track; even 3dp stays visible.
+/// A model stretch's [head] (wait before the first token) paints one shade paler. An in-progress stretch's right end is dashed.
 class TimelineBar extends StatelessWidget {
   const TimelineBar({
     super.key,
@@ -679,7 +679,7 @@ class TimelineBar extends StatelessWidget {
   final Duration total;
   final Color color;
 
-  /// 0..1:前面这一截是首字前的等待。
+  /// 0..1: how much of the front of this stretch is pre-first-token waiting.
   final double? head;
   final bool open;
   final double height;
@@ -760,7 +760,7 @@ class _BarPainter extends CustomPainter {
       old.open != open;
 }
 
-/// 同一步里连续的几次工具调用:一行摘要,点开逐条。
+/// Consecutive tool calls within one step: a summary row, tap to open them one by one.
 class _GroupTile extends StatelessWidget {
   const _GroupTile({
     required this.spans,
@@ -898,7 +898,7 @@ class _GroupTile extends StatelessWidget {
   }
 }
 
-/// 组的图标:前两类工具的方块错叠。
+/// A group's icon: the first two categories' tool squares, offset-stacked.
 class _Stack extends StatelessWidget {
   const _Stack({required this.spans});
 
@@ -940,7 +940,7 @@ class _Stack extends StatelessWidget {
   }
 }
 
-/// 弹层底部:输入(含缓存)、缓存命中、输出、首字;单价已知时加估算花费。
+/// Sheet footer: input (cache included), cache hit, output, first token; when unit prices are known, plus estimated cost.
 class TraceUsageFooter extends StatelessWidget {
   const TraceUsageFooter({super.key, required this.trace, this.margin});
 

@@ -24,14 +24,14 @@ import 'setup_progress.dart';
 /// served by the local engine, and both paths need it anyway.
 ///
 /// While the runtime still unpacks (first run, set up beside it) the account
-/// way has to wait for it: 「用 DeepSeek 账号登录」 then shows the unpack
-/// with 「就绪后自动打开 DeepSeek 登录」 and goes on by itself once it is
+/// way has to wait for it: "Sign in with DeepSeek" then shows the unpack
+/// with "Opens DeepSeek sign-in automatically once ready" and goes on by itself once it is
 /// done. The API key needs no engine and is saved at once.
 class ConnectPage extends ConsumerStatefulWidget {
   const ConnectPage({super.key, required this.onDone});
 
   /// Called after a successful sign-in, a saved key, a saved custom provider,
-  /// or "稍后设置".
+  /// or "Set up later".
   final VoidCallback onDone;
 
   @override
@@ -136,7 +136,7 @@ class _ConnectPageState extends ConsumerState<ConnectPage> {
     unawaited(_signIn());
   }
 
-  /// Back to the ways in (取消, back, or the runtime is here or failed).
+  /// Back to the ways in (Cancel, back, or the runtime is here or failed).
   void _stopAwaiting() => setState(() {
     _awaitingRuntime = false;
     _signInOnReturn = false;

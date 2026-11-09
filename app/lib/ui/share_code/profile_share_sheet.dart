@@ -1,4 +1,4 @@
-// 「分享配置」 — pick what of the active engine's setup to include (a checklist with
+// "Share config" — pick what of the active engine's setup to include (a checklist with
 // sizes), then the link / QR code / file.
 
 import 'dart:async';
@@ -23,7 +23,7 @@ import '../theme/theme.dart';
 import 'share_code_panel.dart';
 import 'share_code_widgets.dart';
 
-/// 「分享配置」 (settings): the active engine's setup as a share code.
+/// "Share config" (settings): the active engine's setup as a share code.
 Future<void> showShareProfileSheet(BuildContext context) => showAppSheet<void>(
   context,
   dismissal: SheetDismissal.drag,
@@ -39,7 +39,7 @@ Future<void> showProfileSharePreview(BuildContext context, ProfileShare share) =
   builder: (_) => SheetNavigator(root: (_) => ProfileSharePreview(share: share)),
 );
 
-/// `3 个插件 · 5 项设置 · 2 个技能 · AGENTS.md`.
+/// `3 plugins · 5 settings · 2 skills · AGENTS.md`.
 String profileSummary(ProfileShare p) => [
   if (p.plugins.isNotEmpty) appL10n.pluginsPluginCount(p.plugins.length),
   if (p.settings.isNotEmpty) appL10n.pluginsSettingsCount(p.settings.length),

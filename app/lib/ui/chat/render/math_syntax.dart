@@ -6,7 +6,7 @@
 //
 // * `$…$` is inline maths when the opening `$` is followed by a non-space,
 //   the closing `$` is preceded by a non-space and not followed by a digit,
-//   and both are on one line — so `$5 and $10`, `$5-$10`, `5$ 和 10$` stay
+//   and both are on one line — so `$5 and $10`, `$5-$10`, `5$ and 10$` stay
 //   prose;
 // * `$$…$$` is display maths and may span lines;
 // * `\(…\)` and `\[…\]` are passed through (gpt_markdown parses them itself);
@@ -59,7 +59,7 @@ int inlineDollarCloser(String text, int open) {
   if (k + 1 < n && text.codeUnitAt(k + 1) == _dollar) return -1;
   // `$5 and $10`: the closer hugs the text before it, never a space.
   if (_isSpace(text.codeUnitAt(k - 1))) return -1;
-  // `$5-$10`, `$5，$10`: a closer followed by a digit is the next price.
+  // `$5-$10`, `$5, $10`: a closer followed by a digit is the next price.
   if (k + 1 < n && _isDigit(text.codeUnitAt(k + 1))) return -1;
   final body = text.substring(open + 1, k);
   if (_readsAsPrices(body)) return -1;

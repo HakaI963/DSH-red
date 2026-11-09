@@ -12,12 +12,12 @@ import 'goal_bar.dart';
 import 'goal_sheet.dart';
 import 'todo_bar.dart';
 
-/// 输入条上方的停靠区:待办在上、目标在下(官方的顺序:Todo、Goal),再往下
-/// 是思考胶囊和输入条。两根条各自长出 / 收回;都没有时零高。
+/// The dock above the input bar: todo on top, goal below (official order: Todo, Goal); further down
+/// sit the thinking pill and the input bar. Each bar grows / retracts on its own; zero height when both are absent.
 ///
-/// 放在输入条那一列里(和横幅、思考胶囊同一列),列表的下沿、底色遮罩
-/// 跟着整列的高度走,不需要另外的插槽。聊天页把两根条分开交给
-/// `DockStack`(dock_stack.dart,可以叠成一摞),这里是不叠的那一列。
+/// It sits in the input bar's column (same column as banners and the thinking pill); the list's bottom edge and the
+/// backdrop scrim follow the whole column's height, needing no extra slot. The chat page hands the two bars separately to
+/// `DockStack` (dock_stack.dart, which may stack them into a pile); this is the non-stacking column.
 class ChatDock extends StatelessWidget {
   const ChatDock({super.key, required this.sessionId});
 

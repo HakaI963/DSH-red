@@ -1,5 +1,5 @@
-// 渠道详情 (a detail page): what one custom provider is, whether it works (a cheap
-// 「测试连接」: the endpoint's model listing with the stored key), its models, edit
+// Channel details (a detail page): what one custom provider is, whether it works (a cheap
+// "Test connection": the endpoint's model listing with the stored key), its models, edit
 // and delete.
 
 import 'package:flutter/material.dart';
@@ -38,7 +38,7 @@ class ProviderDetailPage extends ConsumerStatefulWidget {
   ConsumerState<ProviderDetailPage> createState() => _ProviderDetailPageState();
 }
 
-/// Outcome of 「测试连接」.
+/// Outcome of "Test connection".
 sealed class _Probe {
   const _Probe();
 }
@@ -63,7 +63,7 @@ class _ProviderDetailPageState extends ConsumerState<ProviderDetailPage> {
 
   void _push(Widget page) => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => page));
 
-  /// 模型设置, saved on the spot (only the `models` list is written).
+  /// Model settings, saved on the spot (only the `models` list is written).
   void _editModel(CustomProvider provider, ProviderModelSpec model) => _push(
     ProviderModelPage(
       model: model,
@@ -285,7 +285,7 @@ class _ProviderDetailPageState extends ConsumerState<ProviderDetailPage> {
   }
 }
 
-/// 「测试连接」 and its outcome on the second line.
+/// "Test connection" and its outcome on the second line.
 class _TestRow extends StatelessWidget {
   const _TestRow({required this.probe, required this.onTap});
 

@@ -17,13 +17,13 @@ import 'turn_summary.dart';
 import 'widgets/change_card.dart';
 import '../common/brief_notice.dart';
 
-/// 换行开关在一次运行内记住(上次怎么看,下次还怎么看)。默认换行:
-/// 手机上横向滚动的代码会吃掉"左右滑切文件"的手势,不换行时切文件靠
-/// 顶上的胶囊。
+/// The wrap toggle is remembered within a run (last look, next look). Wrap on by default:
+/// on a phone, horizontally scrolling code would eat the "swipe left/right to switch files" gesture; unwrapped,
+/// switching files relies on the pills up top.
 bool _wrapPreference = true;
 
-/// 一组文件的改动:顶上一排文件胶囊,左右滑切换文件;每个文件是带行号的
-/// 统一 diff。右上角:换行开关、复制补丁。
+/// A set of files' changes: a row of file pills up top, swipe left/right to switch files; each file is a numbered
+/// unified diff. Top right: wrap toggle, copy patch.
 class ChangeDiffPage extends StatefulWidget {
   const ChangeDiffPage({super.key, required this.files, this.initialIndex = 0, this.title});
 
@@ -191,7 +191,7 @@ class _ChangeDiffPageState extends State<ChangeDiffPage> {
   }
 }
 
-/// 换行开关:开着时是主色实心圆。
+/// The wrap toggle: a solid tinted circle when on.
 class _ToggleButton extends StatelessWidget {
   const _ToggleButton({required this.icon, required this.tooltip, required this.active, required this.onPressed});
 
@@ -229,7 +229,7 @@ class _ToggleButton extends StatelessWidget {
   }
 }
 
-/// 文件胶囊:文件名 + `+n −m`;当前文件是主色容器。
+/// File pill: filename + `+n −m`; the current file is a tinted container.
 class _FileChip extends StatelessWidget {
   const _FileChip({super.key, required this.file, required this.selected, required this.onTap});
 
@@ -283,7 +283,7 @@ class _FileChip extends StatelessWidget {
   }
 }
 
-/// 一行要画的东西:hunk 标题,或一行 diff(带旧 / 新行号)。
+/// What a line draws: a hunk header, or one diff line (with old / new line numbers).
 sealed class _Row {
   const _Row();
 }
@@ -351,11 +351,11 @@ List<_Row> _rowsOf(FileChange file) {
   return rows;
 }
 
-/// diff 行去掉首列的 +/−/空格。
+/// Diff lines drop the leading +/−/space column.
 String _body(String text) => text.isEmpty ? '' : text.substring(1);
 
-/// 一个文件的整页 diff:文件头(目录、事实、复制路径)+ 行号栏 + 代码。
-/// 不换行时整块横向滚动(行号跟着走,手机上留给代码的宽度更多)。
+/// A file's full-page diff: file header (directory, facts, copy path) + gutter + code.
+/// Unwrapped, the whole block scrolls horizontally (the gutter travels along, leaving more width for code on phones).
 class FileDiffPane extends StatelessWidget {
   const FileDiffPane({super.key, required this.file, required this.wrap, this.bottomInset = 0});
 
@@ -382,7 +382,7 @@ class FileDiffPane extends StatelessWidget {
     return LayoutBuilder(
       builder: (context, constraints) {
         final viewport = constraints.maxWidth;
-        // 与页面内容同一条左右边线(16),和上方文件胶囊、文件头对齐。
+        // Same left/right edge line (16) as page content, aligning with the file pills and header above.
         const sideMargin = 16.0;
         final wellWidth = viewport - sideMargin * 2;
         final contentWidth = wrap ? wellWidth : math.max(wellWidth, gutter + longest * charWidth + 28);
@@ -555,7 +555,7 @@ class _DiffLineRow extends StatelessWidget {
   }
 }
 
-/// 文件头:文件名、目录、+/−、新建 / 修改次数、复制路径。
+/// File header: filename, directory, +/−, created / modified counts, copy path.
 class _FileHeader extends StatelessWidget {
   const _FileHeader({required this.file});
 

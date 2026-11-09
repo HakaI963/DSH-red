@@ -1,4 +1,4 @@
-// Pictures in a conversation. Long-press one for 「保存到相册」 / 「分享」; the
+// Pictures in a conversation. Long-press one for "Save to gallery" / "Share"; the
 // full-screen viewer has the same save key.
 
 import 'dart:async';
@@ -27,9 +27,9 @@ String gallerySaveErrorText(String code) => switch (code) {
   _ => appL10n.chatImageSaveFailed,
 };
 
-/// 「保存到相册」: reads the picture with [load], puts it in the gallery's
-/// DSH album as [name] and says so (「已保存到相册」). Refused storage offers
-/// 「去设置」. True once saved.
+/// "Save to gallery": reads the picture with [load], puts it in the gallery's
+/// DSH album as [name] and says so ("Saved to the gallery"). Refused storage offers
+/// "Go to settings". True once saved.
 Future<bool> saveImageToGallery(BuildContext context, ImageBytes load, {String? name}) async {
   final l10n = context.l10n;
   final messenger = ScaffoldMessenger.maybeOf(context);
@@ -61,7 +61,7 @@ Future<bool> saveImageToGallery(BuildContext context, ImageBytes load, {String? 
   return false;
 }
 
-/// 「分享」 a picture: the Android share sheet with it as a file named
+/// "Share" a picture: the Android share sheet with it as a file named
 /// [name].
 Future<void> shareImageFile(BuildContext context, ImageBytes load, {String? name}) async {
   final l10n = context.l10n;
@@ -98,7 +98,7 @@ Future<void> showImageActions(
   }
 }
 
-/// The image viewer's 「保存到相册」 key: a glass round key, the same size as
+/// The image viewer's "Save to gallery" key: a glass round key, the same size as
 /// the viewer's close key opposite it, that shows a tick for a moment once
 /// the picture is saved.
 class GallerySaveButton extends StatefulWidget {

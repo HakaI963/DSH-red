@@ -128,7 +128,7 @@ class _ReplayListState extends ConsumerState<ReplayList> {
     return false;
   }
 
-  /// Back to the newest row (after a seek, or 「全文」).
+  /// Back to the newest row (after a seek, or "Full text").
   void _followAfterFrame() {
     if (!_pinned) return;
     WidgetsBinding.instance.addPostFrameCallback((_) {

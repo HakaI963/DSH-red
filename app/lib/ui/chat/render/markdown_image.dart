@@ -743,7 +743,7 @@ class _MarkdownImageState extends ConsumerState<MarkdownImage> {
     return framed;
   }
 
-  /// Long-press on a drawn picture: 「保存到相册」 / 「分享」 with its own bytes
+  /// Long-press on a drawn picture: "Save to gallery" / "Share" with its own bytes
   /// (the workspace file, the web image, the `data:` payload), not the
   /// smaller copy drawn inline. Wins over the reply's own long-press menu.
   void _actions(ImageProvider provider) => showImageActions(
@@ -840,7 +840,7 @@ class _ImageError extends StatelessWidget {
   final String name;
   final String message;
 
-  /// What a tap does (`轻点重试`), appended to [message].
+  /// What a tap does ("tap to retry"), appended to [message].
   final String? action;
   final VoidCallback? onTap;
 

@@ -8,42 +8,42 @@ import '../../common/bleed.dart';
 import '../../theme/app_icons.dart';
 import '../../theme/theme.dart';
 
-/// 过程行的几何:**左 24 图形列 + 8 间距 + 文字列**,和正文左缘对齐。
+/// Process-row geometry: **left 24 glyph column + 8 gap + text column**, aligned with the body's left edge.
 ///
 /// ```
-/// |▣ 运行 · flutter test            ◌|   ← 图形贴正文左缘,行尾贴正文右缘
-/// |│ (展开的内容从 32 起)            |   ← 细线在图形中线 x=12
+/// |▣ run · flutter test            ◌|   ← glyph hugs the body's left edge, the row tail hugs the right
+/// |│ (expanded content starts at 32)   |   ← hairline at the glyph midline x=12
 /// ```
 ///
-/// 点按高亮向两侧各溢出 [bleed](见 [Bleed]),内容本身不缩进。
+/// Press highlight overflows [bleed] past each side (see [Bleed]); the content itself is not indented.
 abstract final class StreamRow {
-  /// 图形列宽(工具图标块、思考图形、状态图标都放在这一格里居中)。
+  /// The glyph column's width (tool icon blocks, the thinking glyph, status icons all center inside it).
   static const lead = 24.0;
 
-  /// 图形与文字之间。
+  /// Between glyph and text.
   static const gap = 8.0;
 
-  /// 文字列的起点;展开内容从这里起。
+  /// Where the text column starts; expanded content begins here.
   static const indent = lead + gap;
 
-  /// 单行最小高度(24 图形 + 上下各 4)。
+  /// Single line's minimum height (24 glyph + 4 top and bottom).
   static const minHeight = 32.0;
 
-  /// 点按高亮溢出到正文外的宽度。
+  /// How far the press highlight spills outside the body text.
   static const bleed = 8.0;
 
-  /// 行标签(动词、摘要):次级色 14 号 —— 过程比回答安静一档。
+  /// Row labels (verb, summary): secondary color, size 14 — process sits a notch quieter than answers.
   static TextStyle? label(BuildContext context) =>
       Theme.of(context).textTheme.bodyMedium
           ?.copyWith(color: Theme.of(context).colorScheme.onSurfaceVariant, height: 1.3);
 
-  /// 行内细节(命令、路径、预览):三级色 13 号。
+  /// Inline detail (commands, paths, previews): tertiary color, size 13.
   static TextStyle? detail(BuildContext context) =>
       Theme.of(context).textTheme.bodySmall
           ?.copyWith(fontSize: 13, color: DshColors.of(context).textTertiary, height: 1.3);
 }
 
-/// 一行过程行的外壳:最小 32 高、上下 4、点按高亮向两侧溢出 8。
+/// One process row's shell: at least 32 tall, 4 top/bottom, press highlight spilling 8 each side.
 class StreamRowFrame extends StatelessWidget {
   const StreamRowFrame({super.key, required this.child, this.onTap, this.onLongPress});
 
@@ -69,7 +69,7 @@ class StreamRowFrame extends StatelessWidget {
   }
 }
 
-/// 图形列的一格:24×24,子组件居中。
+/// One cell of the glyph column: 24×24, child centered.
 class StreamLead extends StatelessWidget {
   const StreamLead({super.key, required this.child});
 
@@ -82,7 +82,7 @@ class StreamLead extends StatelessWidget {
   );
 }
 
-/// 行尾的展开箭头:收起朝下,展开朝上,和折叠同一条曲线转。
+/// The row-tail expand chevron: pointing down when folded, up when expanded, turning on the same curve as the collapse.
 class StreamChevron extends StatelessWidget {
   const StreamChevron({super.key, required this.open});
 
@@ -97,9 +97,9 @@ class StreamChevron extends StatelessWidget {
   );
 }
 
-/// 展开内容:左边一道 1px 细线在图形列中线上(x = 12),内容从文字列起。
+/// Expanded content: a 1px hairline at left on the glyph column's midline (x = 12), content starting at the text column.
 ///
-/// 表示"这些属于上面那一行"(思考全文、工具组里的各次调用、收起的一轮)。
+/// Says "these belong to the row above" (full thinking text, each call inside a tool group, a collapsed turn).
 class StreamThread extends StatelessWidget {
   const StreamThread({super.key, required this.child});
 
@@ -141,7 +141,7 @@ class _RailPainter extends CustomPainter {
   bool shouldRepaint(_RailPainter old) => old.color != color;
 }
 
-/// 动词与摘要之间的间隔点(3dp,竖直居中,两边各 6)。
+/// The interpunct between verb and summary (3dp, vertically centered, 6 on each side).
 class StreamDot extends StatelessWidget {
   const StreamDot({super.key});
 

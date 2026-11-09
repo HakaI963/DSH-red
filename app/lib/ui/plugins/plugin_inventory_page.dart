@@ -1,8 +1,8 @@
-// 插件清单 (page-design.md §1 C, list page, read-only): every Loader entry
+// Plugin inventory (page-design.md §1 C, list page, read-only): every Loader entry
 // of the active host with its state, grouped by the bundle that brings it,
 // and — when an agent-preset roster is composed — each preset's own
 // composition. Mirrors `dsh-client-ui-settings-plugin-inventory` over
-// `pluginInventory/list`; switches stay on the 插件 page.
+// `pluginInventory/list`; switches stay on the Plugins page.
 
 import 'dart:async';
 
@@ -288,7 +288,7 @@ class _PluginInventoryPageState extends ConsumerState<PluginInventoryPage> {
   }
 }
 
-/// A preset's name, 「（默认）」 on the default one.
+/// A preset's name, "(default)" on the default one.
 String presetLabel(PresetPlugins preset) {
   final name = switch (preset.name) {
     final n? when n.trim().isNotEmpty => n.trim(),
@@ -327,7 +327,7 @@ class InventoryRow extends StatelessWidget {
   }
 }
 
-/// 「系统组件」: internal components without a Chinese name, folded into one
+/// "System components": internal components without a localized name, folded into one
 /// row until opened.
 class SystemComponentsCard extends StatelessWidget {
   const SystemComponentsCard({super.key, required this.items, required this.open, required this.onToggle});

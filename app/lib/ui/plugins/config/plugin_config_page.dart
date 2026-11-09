@@ -1,8 +1,8 @@
 // A plugin's configuration as a native page (docs/design/plugin-config.md):
 // every field its Config declares, drawn by the schema form engine. Live
-// fields take effect as they change; the others wait for 保存, which reloads
+// fields take effect as they change; the others wait for Save, which reloads
 // the plugin with progress, and a failed reload can be retried, put back or
-// dropped. Long forms fold their groups and their plumbing (「高级」) and get
+// dropped. Long forms fold their groups and their plumbing ("Advanced") and get
 // a search; a plugin that ships its own web page keeps a way there.
 
 import 'dart:async';
@@ -137,7 +137,7 @@ class _PageFrame {
       state.writable,
       state.local,
       state.hostLabel,
-      // 「在网页版设置」 is shut while a save or a live write is on its way.
+      // "Set up in the web app" is shut while a save or a live write is on its way.
       state.isApplying(ns),
       state.pending[ns]?.isNotEmpty ?? false,
       if (form != null && settings != null) ...[
@@ -205,7 +205,7 @@ class _PluginConfigPageState extends ConsumerState<PluginConfigPage> {
 
   @override
   void dispose() {
-    // Left with 放弃: the held edits go too (a save in flight carries on).
+    // Left with Discard: the held edits go too (a save in flight carries on).
     final controller = _controller;
     final ns = this.ns;
     scheduleMicrotask(() => controller.discardIfIdle(ns));
@@ -263,9 +263,9 @@ class _PluginConfigPageState extends ConsumerState<PluginConfigPage> {
 
   /// Off to DSH Web, which edits the same configuration through its own
   /// page. Not while [_busy]: it would land on a plugin in the middle of its
-  /// reload. Held edits go first, when the person says so: kept, a later 保存
+  /// reload. Held edits go first, when the person says so: kept, a later Save
   /// would write them over what was set there. A row of the form that names
-  /// only this entry ([target], 「在网页版编辑此项」) lands on the plugin's own
+  /// only this entry ([target], "Edit this item in the web app") lands on the plugin's own
   /// card too.
   Future<void> _openWeb(String title, List<PluginBundle>? bundles, [DshWebTarget? target]) async {
     final state = ref.read(pluginConfigProvider).value;
@@ -285,7 +285,7 @@ class _PluginConfigPageState extends ConsumerState<PluginConfigPage> {
     );
   }
 
-  /// 「放弃修改？」, as when leaving the page with held edits.
+  /// "Discard changes?", as when leaving the page with held edits.
   Future<bool> _confirmDiscard() async {
     final l10n = context.l10n;
     final colors = DshColors.of(context);
@@ -449,7 +449,7 @@ class _PluginConfigPageState extends ConsumerState<PluginConfigPage> {
     final layout = cachedPluginConfigLayout(form, copy: copy, query: _query);
     final searching = _query.trim().isNotEmpty;
     final web = _hasWebPage(form, bundles);
-    // What the Host keeps as the person's own (held edits are 放弃's).
+    // What the Host keeps as the person's own (held edits are Discard's).
     final userSet = form.view.user?.isNotEmpty ?? false;
 
     Widget webCard() => SettingsSection(
@@ -538,7 +538,7 @@ class _PluginConfigPageState extends ConsumerState<PluginConfigPage> {
         isDirty: () => _dirty.value,
         child: Stack(
           children: [
-            // The form's own ways to DSH Web (「在网页版编辑此项」) go the page's way.
+            // The form's own ways to DSH Web ("Edit this item in the web app") go the page's way.
             DshWebOpenScope(onOpen: (target) => unawaited(_openWeb(title, bundles, target)), child: page),
             _SaveBarSlot(ns: ns, controller: _controller),
           ],

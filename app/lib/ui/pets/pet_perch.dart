@@ -16,7 +16,7 @@ enum PerchKind {
   /// The composer (or the read-only bar in its place): the fallback.
   composer,
 
-  /// The run strip (思考条).
+  /// The run strip (thinking strip).
   strip,
 
   /// The todo and goal bars.

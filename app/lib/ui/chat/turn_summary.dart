@@ -6,7 +6,7 @@ import '../../l10n/l10n.dart';
 import 'render/diff_view.dart';
 import 'tool_view.dart';
 
-/// 工具在摘要里归到哪一类。
+/// Which category a tool falls into in the summary.
 enum ToolKind { command, edit, read, search, web, agent, todo, other }
 
 ToolKind toolKindOf(ToolChatItem tool) {
@@ -32,7 +32,7 @@ ToolKind toolKindOf(ToolChatItem tool) {
   }
 }
 
-/// 一组连续工具调用的计数(文件按路径去重)。
+/// Counts for a run of consecutive tool calls (files deduped by path).
 class ToolSummary {
   const ToolSummary({
     this.commands = 0,
@@ -56,11 +56,11 @@ class ToolSummary {
   final int todos;
   final int other;
 
-  /// 真失败的调用(不含 Android 上"没有沙箱"的第一次拒绝)。
+  /// Calls that truly failed (excluding the Android "no sandbox" first rejection).
   final int failed;
   final int total;
 
-  /// "执行 3 条命令 · 改了 2 个文件 · 读了 4 个文件"(失败数不在这里)。
+  /// "ran 3 commands · changed 2 files · read 4 files" (failure counts don't live here).
   List<String> get segments => [
     if (commands > 0) appL10n.activitySummaryCommands(commands),
     if (editedFiles > 0) appL10n.activitySummaryEditedFiles(editedFiles),
@@ -78,12 +78,12 @@ class ToolSummary {
   }
 }
 
-/// 把一组工具调用数成 [ToolSummary]。
+/// Count a run of tool calls into a [ToolSummary].
 ///
-/// - 文件类按路径去重(同一文件读三次算"读了 1 个文件");路径还没流完的按调用算;
-///   失败 / 被拒 / 被取消的文件调用不算"改了""读了";
-/// - 被沙箱拦下、随后带授权重试的那次 bash 不计(它和重试是同一条命令);
-/// - 流式中 / 运行中的调用照常计入:摘要描述的是"这一组在做什么"。
+/// - File tools dedupe by path (reading one file thrice counts as "read 1 file"); calls whose path is still streaming count individually;
+///   failed / refused / cancelled file calls don't count as "changed" or "read";
+/// - the bash stopped by the sandbox that retried with authorization doesn't count (it and the retry are one command);
+/// - streaming / running calls count normally: the summary describes "what this group is doing".
 ToolSummary summarizeTools(Iterable<ToolChatItem> tools) {
   var commands = 0, searches = 0, web = 0, agents = 0, todos = 0, other = 0;
   var failed = 0, total = 0;
@@ -95,7 +95,7 @@ ToolSummary summarizeTools(Iterable<ToolChatItem> tools) {
     if (view.sandboxBlocked) continue;
     if (tool.status == ToolStatus.failed) failed++;
     final fileKey = _normalisePath(view.path) ?? '#${tool.callId}';
-    // "改了 / 读了" claim it happened: a failed, refused or abandoned file
+    // "changed / read" claims it happened: a failed, refused or abandoned file
     // call shows up in the failure count (or nowhere), not as a file.
     final happened = switch (tool.status) {
       ToolStatus.failed || ToolStatus.denied || ToolStatus.cancelled => false,
@@ -135,25 +135,25 @@ ToolSummary summarizeTools(Iterable<ToolChatItem> tools) {
 }
 
 // -----------------------------------------------------------------------------
-// 改动卡
+// Change card
 
-/// 一处改动:增删 / 上下文行,和它在文件里的起始行号(知道时)。
+/// One change: added/removed / context lines, and its start line in the file (when known).
 ///
-/// DSH 的 diff meta 不带行号,所以行号要靠同一轮里更早的 `read` 窗口或整
-/// 文件写入对位:旧文本在已知内容里**唯一**出现才算数,对不上就不编号。
+/// DSH's diff meta carries no line numbers, so numbering relies on an earlier `read` window in the same turn or a full
+/// file write to align: the old text counts only when it appears **uniquely** in known content; otherwise no numbering.
 class DiffHunk {
   const DiffHunk({required this.lines, required this.edit, this.oldStart, this.newStart});
 
-  /// 只有 add / del / context。
+  /// Only add / del / context.
   final List<DiffLine> lines;
 
-  /// 第几次修改(从 1 起),同一次修改的多处共享。
+  /// Which edit this belongs to (1-based), shared by all hunks of one edit.
   final int edit;
 
-  /// 旧文件里的起始行;null = 不知道(或纯新增)。
+  /// Start line in the old file; null = unknown (or pure addition).
   final int? oldStart;
 
-  /// 新文件里的起始行;null = 不知道。
+  /// Start line in the new file; null = unknown.
   final int? newStart;
 
   bool get numbered => newStart != null;
@@ -162,7 +162,7 @@ class DiffHunk {
   int get newCount => lines.where((l) => l.kind != DiffLineKind.del).length;
 }
 
-/// 一轮里被改过的一个文件:多次修改合并成一份 diff。
+/// One file touched in a turn: multiple edits merged into one diff.
 class FileChange {
   const FileChange({
     required this.path,
@@ -175,28 +175,28 @@ class FileChange {
     this.lastCallId,
   });
 
-  /// 工具参数里的原始路径(复制路径用它)。
+  /// The raw path from the tool arguments (copy-path uses it).
   final String path;
 
-  /// 本轮第一次碰它时是新建(write create / str_replace_editor create)。
+  /// Whether the first touch this turn created it (write create / str_replace_editor create).
   final bool created;
   final int added;
   final int removed;
 
-  /// 合并后的行级 diff;多次修改之间插一行 hunk 标题。
+  /// The merged line-level diff; one hunk-header line separates successive edits.
   final List<DiffLine> lines;
 
-  /// 成功修改的次数。
+  /// How many edits succeeded.
   final int edits;
 
-  /// 同一份改动按处拆开(带行号时可以画行号栏、拼补丁)。
+  /// The same changes split per hunk (with line numbers you can draw the gutter and assemble a patch).
   final List<DiffHunk> hunks;
 
-  /// 最后一次改它的工具调用(按它找出是哪一轮改的)。
+  /// The last tool call that changed it (finds which turn did it).
   final String? lastCallId;
 
-  /// 统一 diff 格式的补丁(复制用)。不知道行号的那几处按第 1 行写,
-  /// `patch` 会按上下文找位置。
+  /// A unified-diff patch (for copying). Hunks with unknown line numbers are written at line 1;
+  /// `patch` will locate them by context.
   String get patch {
     final shown = shownPath;
     final out = StringBuffer()
@@ -215,7 +215,7 @@ class FileChange {
     return out.toString();
   }
 
-  /// 工作区内去掉 `/root/workspace/` 前缀。
+  /// Inside the workspace, strip the `/root/workspace/` prefix.
   String get shownPath => displayPath(path);
 
   String get fileName {
@@ -224,7 +224,7 @@ class FileChange {
     return slash < 0 ? shown : shown.substring(slash + 1);
   }
 
-  /// 所在目录(工作区根下的文件为空串)。
+  /// The containing directory (empty string for files at the workspace root).
   String get directory {
     final shown = shownPath;
     final slash = shown.lastIndexOf('/');
@@ -232,11 +232,11 @@ class FileChange {
   }
 }
 
-/// 一轮(两条用户消息之间)的改动。
+/// One turn's changes (between two user messages).
 class TurnChanges {
   const TurnChanges({required this.afterKey, required this.files});
 
-  /// 这一轮最后一条 transcript 项的 key:改动卡接在它后面。
+  /// Key of this turn's last transcript item: the change card attaches after it.
   final String afterKey;
   final List<FileChange> files;
 
@@ -244,12 +244,12 @@ class TurnChanges {
   int get removed => files.fold(0, (sum, f) => sum + f.removed);
 }
 
-/// 一组工具调用改了哪些文件,按第一次修改的顺序。
+/// Which files a run of tool calls changed, in order of first edit.
 ///
-/// 只算**成功**的 write / edit / str_replace_editor(create、str_replace、insert);
-/// diff 优先用结果 meta 里 DSH 算好的 hunk(`meta.diffs`),其次用参数里的
-/// old/new 文本,新建文件按全文计为新增。bash 里的 `sed -i`、重定向等写文件
-/// 的方式看不出来,不在此列。
+/// Counts only **successful** write / edit / str_replace_editor (create, str_replace, insert);
+/// diffs prefer the hunks DSH computed in the result meta (`meta.diffs`), else the arguments'
+/// old/new text; a newly created file counts as a full addition. Writes via bash `sed -i`, redirection, etc.
+/// are invisible here and not included.
 List<FileChange> fileChangesOf(Iterable<ToolChatItem> tools) {
   final list = tools.where((tool) => tool.status == ToolStatus.succeeded).toList();
   if (list.isEmpty) return const [];
@@ -324,13 +324,13 @@ List<String> _contentLines(String text) {
   return body.split('\n');
 }
 
-/// 已知的一段连续文件内容(从 [start] 行起)。
+/// A known contiguous stretch of file content (starting at line [start]).
 class _KnownLines {
   _KnownLines(this.start, this.lines);
   final int start;
   final List<String> lines;
 
-  /// [needle] 在已知内容里(从 [from] 起)唯一出现的下标;否则 null。
+  /// The index where [needle] appears uniquely in known content (from [from]); null otherwise.
   int? find(List<String> needle, {int from = 0}) {
     if (needle.isEmpty || needle.length > lines.length) return null;
     int? found;
@@ -350,9 +350,9 @@ class _KnownLines {
   }
 }
 
-/// 按用户消息切轮,返回每一轮的改动(没有改动的轮不返回)。
+/// Cut turns at user messages, return each turn's changes (turns without changes are not returned).
 ///
-/// [running] 时最后一轮还没结束,不出卡片。
+/// While [running], the last turn hasn't ended and gets no card.
 List<TurnChanges> turnChanges(List<ChatItem> items, {bool running = false}) {
   final out = <TurnChanges>[];
   var tools = <ToolChatItem>[];
@@ -377,8 +377,8 @@ List<TurnChanges> turnChanges(List<ChatItem> items, {bool running = false}) {
   return out;
 }
 
-/// 一次修改的各处改动。[tracked] = 每一处都在已知内容里对上了位置
-/// (已知内容已同步更新;否则调用方该把它作废)。
+/// The hunks of one edit. [tracked] = every hunk matched a position in known content
+/// (known content was updated accordingly; otherwise the caller should discard this call).
 ({bool created, List<DiffHunk> hunks, bool tracked})? _changeOf(ToolView view, _KnownLines? known) {
   final name = view.name;
   final command = name == 'str_replace_editor' ? view.arg('command') : null;
@@ -528,9 +528,9 @@ String? _normalisePath(String? path) {
   return displayPath(p);
 }
 
-// ToolView 的 diff 是 LCS,不便宜。transcript 每来一个持久事件就会重建所有
-// ToolChatItem,但结果片段 / meta / 参数都还是同一批对象,所以按 callId 缓存
-// 视图,用 [ToolView.matches] 校验,diff 每次调用只算一遍。
+// ToolView's diff is LCS, not cheap. Every persisted transcript event rebuilds all
+// ToolChatItems, but the result chunks / meta / arguments are the same objects, so views are cached by callId,
+// validated with [ToolView.matches], and the diff is computed once per call.
 final _views = <String, ToolView>{};
 const _maxCachedViews = 600;
 

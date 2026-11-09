@@ -1,6 +1,6 @@
-// 添加 / 编辑渠道 (a form page): name, protocol, Base URL, API Key, then the models —
+// Add / edit channel (a form page): name, protocol, Base URL, API Key, then the models —
 // fetched from the endpoint (`llm/discoverModels`) and picked in a sheet, or
-// added by hand. One pinned 「保存」.
+// added by hand. One pinned "Save".
 
 import 'dart:async';
 import 'dart:convert';
@@ -23,7 +23,7 @@ import '../theme/theme.dart';
 import 'provider_model_page.dart';
 import 'provider_widgets.dart';
 
-/// Protocol choices, in the adapter's order. 「兼容」 lives in the field label
+/// Protocol choices, in the adapter's order. "Compatible" lives in the field label
 /// so all three labels fit one capsule without shrinking.
 const _protocols = [
   PillSegment(ProviderApi.openaiCompletions, 'OpenAI'),
@@ -53,7 +53,7 @@ class _ProviderFormPageState extends ConsumerState<ProviderFormPage> {
   late List<ProviderModelSpec> _models = [...?widget.existing?.models];
 
   /// The provider being edited; set after a create whose key failed, so the
-  /// next 「保存」 only retries what is missing.
+  /// next "Save" only retries what is missing.
   late CustomProvider? _editing = widget.existing;
 
   bool _obscure = true;
@@ -65,7 +65,7 @@ class _ProviderFormPageState extends ConsumerState<ProviderFormPage> {
   /// Discovery's failure, under the models card.
   String? _modelsError;
 
-  /// 「已补全为 …」 under the Base URL, after discovery added `/v1`.
+  /// "Completed as …" under the Base URL, after discovery added `/v1`.
   String? _baseUrlNote;
 
   /// A failure that isn't about one field.
@@ -215,7 +215,7 @@ class _ProviderFormPageState extends ConsumerState<ProviderFormPage> {
 
   void _remove(ProviderModelSpec model) => setState(() => _models = [..._models]..remove(model));
 
-  /// 模型设置; what comes back replaces the row and is saved with the form.
+  /// Model settings; what comes back replaces the row and is saved with the form.
   Future<void> _editModel(ProviderModelSpec model) async {
     FocusManager.instance.primaryFocus?.unfocus();
     final edited = await Navigator.of(context).push(
@@ -445,8 +445,8 @@ class _ProviderFormPageState extends ConsumerState<ProviderFormPage> {
   }
 }
 
-/// 「模型」: the fetch action, the chosen models (each opens its settings),
-/// 「手动添加」; discovery's outcome right under the card.
+/// "Models": the fetch action, the chosen models (each opens its settings),
+/// "Add manually"; discovery's outcome right under the card.
 class _ModelsCard extends StatelessWidget {
   const _ModelsCard({
     required this.models,

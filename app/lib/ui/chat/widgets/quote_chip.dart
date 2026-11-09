@@ -1,4 +1,4 @@
-// 引用追问 in the composer and in the bubble it becomes. The passage itself
+// Quote follow-up in the composer and in the bubble it becomes. The passage itself
 // travels as a Markdown blockquote (`state/composer_quote.dart`).
 
 import 'dart:math' as math;
@@ -11,11 +11,11 @@ import '../../common/expand_reveal.dart';
 import '../../theme/app_icons.dart';
 import '../../theme/theme.dart';
 
-/// 引用片:输入框上方的一行,引号 + 单行省略的引文 + ✕。
+/// The quote chip: one line above the input field — quote glyph + single-line elided quotation + ✕.
 ///
-/// 全圆胶囊。引号和 ✕ 各占一端 [height] 见方的格子、居中,所以四周等距
-/// ([glyphInset])、与胶囊两端的半圆同心,左右镜像;字号变大时胶囊跟着
-/// 长高,两端仍同心。
+/// A full-radius pill. The quote mark and ✕ each hold a [height]-square cell at one end, centred, so insets are equal all around
+/// ([glyphInset]) and concentric with the pill's rounded ends, mirrored left/right; when the font size grows the pill
+/// grows taller too and the ends stay concentric.
 class QuoteChip extends StatelessWidget {
   const QuoteChip({super.key, required this.quote, required this.onRemove});
 

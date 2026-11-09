@@ -1,5 +1,5 @@
 // The chat header's multi-agent pieces (DSH Web shows
-// them in its session header: the lineage breadcrumb, 「N 个子代理」 and the
+// them in its session header: the lineage breadcrumb, "N subagents" and the
 // Agent Teams action).
 //
 // Each piece reads the current conversation itself, so the header only places
@@ -28,7 +28,7 @@ final _currentAgentsProvider = Provider.autoDispose<(String, HeaderAgents)?>((re
   return (sessionId, ref.watch(headerAgentsProvider(sessionId)));
 });
 
-/// The left key: [menu] (the drawer), or 「‹ 上级对话」 in a subagent
+/// The left key: [menu] (the drawer), or "‹ Parent chat" in a subagent
 /// conversation.
 class HeaderLeadSlot extends ConsumerWidget {
   const HeaderLeadSlot({super.key, required this.menu});
@@ -89,7 +89,7 @@ class HeaderTrailingSlot extends ConsumerWidget {
   }
 }
 
-/// 「‹ 上级对话标题」:回到派出这个子代理的对话。
+/// "‹ Parent chat title": back to the chat that spawned this subagent.
 class HeaderBackKey extends ConsumerWidget {
   const HeaderBackKey({super.key, required this.parent});
 
@@ -139,7 +139,7 @@ class HeaderBackKey extends ConsumerWidget {
 }
 
 /// The agents capsule: the team (members) when the Agent Teams bundle is on,
-/// else the subagents (「N 个子代理」; on a phone the compact form DSH Web
+/// else the subagents ("N subagents"; on a phone the compact form DSH Web
 /// also uses in a narrow header: glyph + count). A breathing dot on the glyph
 /// while any of them runs.
 class HeaderAgentsKey extends StatelessWidget {

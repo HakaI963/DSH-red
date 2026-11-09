@@ -76,7 +76,7 @@ IconData presetIcon(String id) => switch (id) {
 };
 
 /// The permission a new session gets without a pick: on this device with
-/// 自动批准命令 on (and outside safe mode) session creation switches to full
+/// "Auto-approve commands" on (and outside safe mode) session creation switches to full
 /// access (sessions_state.dart `createForConnection`); elsewhere the Host's
 /// default for new sessions.
 String effectiveNewChatPermission(
@@ -235,7 +235,7 @@ class NewChatOptions extends ConsumerWidget {
       ),
     );
     if (pick == null || pick == selected || !context.mounted || !current()) return;
-    // Full access and auto review ask once, as on the 权限 page.
+    // Full access and auto review ask once, as on the Permissions page.
     if (pick != fallback && !await confirmPermission(context, pick)) return;
     if (!context.mounted || !current()) return;
     ref.read(pendingNewChatModesProvider.notifier).selectPermission(pick == fallback ? null : pick);

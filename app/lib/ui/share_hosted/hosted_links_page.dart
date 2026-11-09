@@ -1,4 +1,4 @@
-// 「我的分享链接」, a list page: every hosted link made on this phone, with when it
+// "My share links", a list page: every hosted link made on this phone, with when it
 // stops working, copy and delete. Delete asks first, then can be undone for a
 // few seconds before the link is removed from the host.
 
@@ -21,7 +21,7 @@ import '../theme/app_icons.dart';
 import '../theme/theme.dart';
 import '../common/brief_notice.dart';
 
-/// 「11 月 24 日到期」「永久有效」「已过期」.
+/// "expires Nov 24", "never expires", "expired".
 String hostedExpiryText(HostedLink link, DateTime now) => linkExpiryText(link.expiresAt, now);
 
 /// The same for any link that ends at [expiresAt] (null: never).

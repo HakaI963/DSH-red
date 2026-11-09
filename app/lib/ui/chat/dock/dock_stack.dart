@@ -18,7 +18,7 @@ import '../../theme/app_icons.dart';
 import '../../theme/theme.dart';
 import 'dock_pill.dart';
 
-/// 「叠起」 or 「展开」 the dock, remembered; folded by default.
+/// "Stack" or "expand" the dock, remembered; folded by default.
 class DockFoldController extends Notifier<bool> {
   static const key = 'chat_dock_folded';
 
@@ -88,7 +88,7 @@ abstract final class DockStackMetrics {
 /// lowest one showing is the front card, until a swipe on the folded deck
 /// brings another one forward (down: the next one behind; up: the back one).
 /// Cards coming or going put the lowest one in front again. [accessory] sits
-/// right of the front card and is as high as it (「自动允许中」 beside the
+/// right of the front card and is as high as it ("Auto-allowing" beside the
 /// activity strip): it stays tappable on the folded deck. With fewer than two
 /// cards showing there is nothing to fold and the deck is the plain column.
 /// Spread, a round fold button sits right of the top card: no row of its own.

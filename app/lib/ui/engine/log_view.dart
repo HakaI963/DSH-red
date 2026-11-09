@@ -76,7 +76,7 @@ class LogView extends StatelessWidget {
 ///
 /// ```
 /// ╭──────────────────────────────────────╮
-/// │ 日志  14 行                  ⧉   ⇪ │
+/// │ Log   14 lines                 ⧉   ⇪ │
 /// │ [gateway] listening on 127.0.0.1…   │
 /// ╰──────────────────────────────────────╯
 /// ```
@@ -98,7 +98,7 @@ class TerminalCard extends StatelessWidget {
   /// A command shown under the title row (`\$ npm run dev`).
   final String? command;
 
-  /// Replaces 「N 行」 next to the title.
+  /// Replaces "N lines" next to the title.
   final String? countLabel;
   final String? shareSubject;
 

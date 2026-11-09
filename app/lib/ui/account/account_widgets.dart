@@ -87,7 +87,7 @@ class SignInStatus extends StatelessWidget {
 
   final AccountState state;
 
-  /// Show the brief "登录成功" beat before the caller moves on.
+  /// Show the brief "login success" beat before the caller moves on.
   final bool succeeded;
   final double haloSize;
 
@@ -299,7 +299,7 @@ class SignInFailureCard extends ConsumerWidget {
 /// Settings row for the DeepSeek account: avatar, name and masked contact when
 /// signed in, otherwise a sign-in prompt. Opens [AccountPage].
 ///
-/// Place it inside a `SheetGroup`, for example as the first row of "模型与密钥".
+/// Place it inside a `SheetGroup`, for example as the first row of "Models & keys".
 class AccountTile extends ConsumerWidget {
   const AccountTile({super.key});
 

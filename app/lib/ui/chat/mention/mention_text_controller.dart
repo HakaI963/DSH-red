@@ -9,17 +9,17 @@ import 'package:flutter/material.dart';
 import 'mention_chip.dart';
 import 'mention_syntax.dart';
 
-/// 输入框的文字控制器:`@` 引用是一个整体。
+/// The input field's text controller: an `@` mention is one atom.
 ///
-/// - 文字永远是要发出去的原文(`@lib/main.dart`、
-///   `@[标题](dsh-session:…)`);每个引用画成一枚行内小签:第一个字符换成
-///   签(WidgetSpan),其余字符画成零宽;
-/// - 光标进不了签的内部:落进去就吸到边上(向左走一格吸到左边);
-/// - 删除碰到签的任何一部分,整枚一起删;在签中间插字会落到签后面;
-/// - 整段换进来的文字(恢复草稿、粘贴)里的引用自动成签,一个字一个字打出来
-///   的 `@xxx` 仍是普通文字,要从面板里选。
+/// - The text is always exactly what gets sent (`@lib/main.dart`,
+///   `@[title](dsh-session:…)`); each mention renders as one inline chip: its first character becomes
+///   the chip (WidgetSpan), the rest render zero-width;
+/// - The caret cannot enter a chip: land inside and it snaps to a side (moving left snaps to the left edge);
+/// - Deletion touching any part of a chip removes the whole chip; typing inside a chip lands after it;
+/// - Text replaced wholesale (draft restore, paste) turns its mentions into chips automatically, while `@xxx` typed
+///   one character at a time stays plain text and must be picked from the panel.
 ///
-/// [provisional] 是语音识别还没定下来的那一段,画成次级文字色。
+/// [provisional] is the stretch voice recognition hasn't committed yet; it renders in secondary text color.
 class MentionTextController extends TextEditingController {
   MentionTextController({super.text}) {
     _tokens = parseDraftMentions(text);

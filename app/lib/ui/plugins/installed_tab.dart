@@ -17,7 +17,7 @@ import 'plugin_detail_sheet.dart';
 import 'plugin_widgets.dart';
 import 'plugins_screen.dart';
 
-/// 「已安装」: third-party bundles of the profile, then DSH's own optional
+/// "Installed": third-party bundles of the profile, then DSH's own optional
 /// and on-demand bundles. Infrastructure bundles (dsh-base, web-app, ...)
 /// are not listed.
 class InstalledPluginsSliver extends ConsumerWidget {
@@ -122,7 +122,7 @@ class InstalledPluginsSliver extends ConsumerWidget {
   }
 }
 
-/// One bundle: icon · title (+ 官方) · version / summary / problem · switch.
+/// One bundle: icon · title (+ Official) · version / summary / problem · switch.
 class BundleTile extends ConsumerWidget {
   const BundleTile({super.key, required this.bundle, this.job, this.readOnly = false, this.displaySnapshot = false});
 

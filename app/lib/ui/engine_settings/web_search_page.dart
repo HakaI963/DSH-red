@@ -1,4 +1,4 @@
-// 「联网搜索」, after `dsh-client-ui-settings-web-search`: the switch between
+// "Web search", after `dsh-client-ui-settings-web-search`: the switch between
 // DeepSeek Messages search (`web-search-deepseek`) and the Search / Fetch
 // APIs (`web-deepseek-api`), which writes both provider selections of `web`
 // together; then the selected API's key, endpoint and per-search limit. The

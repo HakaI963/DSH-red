@@ -1,4 +1,4 @@
-// 「安装运行环境」 after first run — for a phone that started on a remote host, or
+// "Install the runtime" after first run — for a phone that started on a remote host, or
 // after an uninstall. Every install entry (the engine page, the host switcher,
 // the empty chat and drawer, the web page) opens this one page.
 
@@ -26,9 +26,9 @@ import 'runtime_setup_page.dart';
 Future<void> openLocalInstall(BuildContext context, {bool useWhenDone = false}) =>
     Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => LocalInstallPage(useWhenDone: useWhenDone)));
 
-/// What installing costs and one 「安装」; then the same progress as first
+/// What installing costs and one "Install"; then the same progress as first
 /// run. Once installed the engine starts, and a phone with no model yet goes
-/// on to 「连接 DeepSeek」.
+/// on to "Connect DeepSeek".
 ///
 /// The back key leaves at any point: an install already running carries on
 /// in the background (its notification shows the progress) and this page
@@ -36,7 +36,7 @@ Future<void> openLocalInstall(BuildContext context, {bool useWhenDone = false}) 
 class LocalInstallPage extends ConsumerStatefulWidget {
   const LocalInstallPage({super.key, this.useWhenDone = false});
 
-  /// Make 本机 the active host once installed (opened from the host list).
+  /// Make Local device the active host once installed (opened from the host list).
   final bool useWhenDone;
 
   @override

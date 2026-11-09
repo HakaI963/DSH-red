@@ -1,9 +1,9 @@
-// Plugs the share host (app/lib/share_hosted/) into the share panel's 「链接」
+// Plugs the share host (app/lib/share_hosted/) into the share panel's "Link"
 // (ui/replay/conversation_out.dart):
 //
 //   conversationLinkMakerProvider.overrideWith(hostedConversationLinkMaker)
 //
-// Every link made this way is kept in 「我的分享链接」.
+// Every link made this way is kept in "My share links".
 
 import 'dart:typed_data';
 
@@ -31,7 +31,7 @@ class HostedConversationLinkMaker implements ConversationLinkMaker {
     return ConversationLink(url: Uri.parse(link.url), expiresAt: link.expiresAt, id: link.id);
   }
 
-  /// Hidden from 「我的分享链接」 at once, deleted on the host after the
+  /// Hidden from "My share links" at once, deleted on the host after the
   /// undo window (as a delete there).
   @override
   Future<void> revoke(ConversationLink link) async {

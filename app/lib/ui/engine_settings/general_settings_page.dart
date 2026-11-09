@@ -1,8 +1,8 @@
-// 「通用设置」: the preferences the official General settings keep on the
+// "General settings": the preferences the official General settings keep on the
 // engine — the code work view (`ui-settings`), work details, collapse timing,
 // performance & usage and link opening (`ui-chat`), the busy-Enter behaviour
 // (`ui-conversation`) — all of which only the web client reads, hence the
-// 网页版 groups — and the session log upload (`session-log-deepseek`), which
+// web app's groups — and the session log upload (`session-log-deepseek`), which
 // the engine itself honours. Language is left out: the app has its own.
 
 import 'package:flutter/material.dart';

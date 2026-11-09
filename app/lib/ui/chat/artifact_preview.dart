@@ -52,7 +52,7 @@ const _workbookBytes = 16 * 1024 * 1024;
 const _remoteImageBytes = 32 * 1024 * 1024;
 const _remotePdfBytes = 64 * 1024 * 1024;
 
-/// [path] 所在的目录;没有目录部分时为 null(交给会话的工作目录)。
+/// The directory containing [path]; null when the path has no directory part (falls back to the session's working directory).
 String? _folderOf(String path) {
   final cut = path.lastIndexOf('/');
   if (cut < 0) return null;
@@ -128,8 +128,8 @@ bool isTextLikePath(String path) {
   return languageForPath(path) != null;
 }
 
-/// App 里能直接预览的:位图、PDF、Markdown、文本与代码、CSV / TSV / XLSX;
-/// [officeToPdf](Host 能转换)时还有 Office 文档(转成 PDF 再看)。
+/// What the app can preview directly: bitmaps, PDF, Markdown, text and code, CSV / TSV / XLSX;
+/// with [officeToPdf] (when the Host can convert) also Office documents (converted to PDF first).
 bool artifactPreviewable(Artifact artifact, {bool officeToPdf = false}) {
   final mode = previewModeOf(artifact.path, officeToPdf: officeToPdf);
   if (mode == PreviewMode.unsupported) return false;
@@ -144,7 +144,7 @@ bool artifactPreviewable(Artifact artifact, {bool officeToPdf = false}) {
   return true;
 }
 
-/// Runs a file action (artifact menus, the 文件 page's long press); errors
+/// Runs a file action (artifact menus, the Files page's long press); errors
 /// become a snack bar. A workspace-relative path is made absolute first.
 Future<void> runArtifactAction(
   BuildContext context,
@@ -227,9 +227,9 @@ Future<Artifact> _absolute(WidgetRef ref, String sessionId, Artifact artifact) a
 
 enum _Fix { none, retry, open }
 
-/// 一个文件的预览页:图片可缩放,PDF 逐页显示,Markdown 排版显示,文本带行号,
-/// 表格固定表头。右上角:分享和更多操作(打开、存到「下载」、复制路径)。
-/// 文件变了自动刷新。
+/// A preview page for one file: images zoomable, PDF page by page, Markdown typeset, text with line numbers,
+/// tables with a fixed header. Top right: share and more actions (open, save to "Downloads", copy path).
+/// Refreshes automatically when the file changes.
 class ArtifactPreviewPage extends ConsumerStatefulWidget {
   const ArtifactPreviewPage({
     super.key,
@@ -401,7 +401,7 @@ class _ArtifactPreviewPageState extends ConsumerState<ArtifactPreviewPage> {
   VoidCallback? get _openElsewhere => _busy ? null : () => _act(ArtifactAction.open);
 
   /// The folder the file is in: relative to the workspace when it is in it
-  /// (「工作区」 at its top), else as the Host names it.
+  /// ("Workspace" at its top), else as the Host names it.
   String _where() {
     final root = ref.watch(workspaceRootProvider(widget.sessionId));
     final path = _artifact.path;
@@ -816,7 +816,7 @@ class _TextPreviewState extends ConsumerState<_TextPreview> {
       if (!mounted || token != _token) return;
       // A reload that fails keeps what is on screen.
       if (!_loaded) setState(() => _error = error);
-      // 文件较大 says how large.
+      // "Large file" says how large.
       if (_bytes == null && widget.artifact.bytes == null) {
         try {
           final stat = await source.stat(widget.artifact.path);
@@ -1062,7 +1062,7 @@ class _MarkdownDocument extends StatelessWidget {
           )
         else if (front.raw case final raw?)
           CodeBlock(code: raw, language: 'yaml'),
-        // 文档里的相对图片路径从它自己的目录算起。
+        // Relative image paths inside a document resolve from the document's own directory.
         MarkdownImageScope(
           sessionId: sessionId,
           baseDir: _folderOf(path),
@@ -1449,8 +1449,8 @@ class _ImagePreviewState extends ConsumerState<_ImagePreview> {
   }
 }
 
-/// 全屏看一张不在工作区里的图片(回复里的网页图片、`data:` 图片):和产物
-/// 预览的图片页同一个样子,文件操作只有「保存到相册」。
+/// Full-screen view of an image that is not inside the workspace (a web image in a reply, a `data:` image): the same look as the
+/// artifact preview's image page; the only file action is "Save to gallery".
 class ImageViewerPage extends StatefulWidget {
   const ImageViewerPage({super.key, required String this._title, required ImageProvider this._image})
     : images = null,
@@ -1537,7 +1537,7 @@ class _ImageViewerPageState extends State<ImageViewerPage> {
   }
 }
 
-/// 图片预览的外框:黑底全屏,左上返回 + 标题,右上操作。
+/// The image preview's frame: full screen on black, back + title at top left, actions at top right.
 class _ImageViewerFrame extends StatelessWidget {
   const _ImageViewerFrame({
     required this.title,

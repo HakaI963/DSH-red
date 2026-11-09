@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../runtime/runtime_state.dart';
 
-/// Shows the runtime's one-off notices ("已用安全模式启动", "已恢复正常模式") as snack
+/// Shows the runtime's one-off notices ("Started in safe mode", "Back in normal mode") as snack
 /// bars. Wrap the home shell (below the MaterialApp) with it once.
 class SafeModeNoticeListener extends ConsumerWidget {
   const SafeModeNoticeListener({super.key, required this.child});

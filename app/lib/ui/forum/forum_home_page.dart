@@ -1,4 +1,4 @@
-// 「论坛」, the forum's home (a list page): 最新 / 热门 / the categories as capsules,
+// "Forum", the forum's home (a list page): Latest / Hot / the categories as capsules,
 // topics below, pull to refresh, more as you scroll. Signed out it reads public
 // categories; signing in (account button) adds posting, replies, likes and
 // notifications.
@@ -253,7 +253,7 @@ class _AccountButton extends StatelessWidget {
   }
 }
 
-/// 「搜索话题和帖子」: a capsule that opens search (the plugin market's look).
+/// "Search topics and posts": a capsule that opens search (the plugin market's look).
 class _SearchEntry extends StatelessWidget {
   const _SearchEntry({required this.onTap});
 
@@ -320,7 +320,7 @@ class _UnreadBadge extends StatelessWidget {
   }
 }
 
-/// 「发帖」: the page's one primary control, floating bottom-right.
+/// "New post": the page's one primary control, floating bottom-right.
 class ForumComposeButton extends StatelessWidget {
   const ForumComposeButton({super.key, required this.onPressed});
 

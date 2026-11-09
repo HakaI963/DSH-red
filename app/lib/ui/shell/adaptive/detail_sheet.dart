@@ -1,4 +1,4 @@
-// 对话详情 on a medium window (an open foldable, a small
+// Chat details on a medium window (an open foldable, a small
 // tablet upright) — a bottom sheet wider than the app's other sheets, with
 // two heights: half (the chat stays in sight above it) and full.
 

@@ -1,4 +1,4 @@
-// 「传文件到电脑」 atop the 「文件」 tab on a Remote computer: files picked on
+// "Upload files to the computer" atop the "Files" tab on a Remote computer: files picked on
 // the phone go straight into the conversation's workspace on the computer
 // (ds-harness-remote `workspace.upload.v1`), without sending a message.
 

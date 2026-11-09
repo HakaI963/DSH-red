@@ -18,7 +18,7 @@ import '../theme/theme.dart';
 import 'account_widgets.dart';
 import '../common/brief_notice.dart';
 
-/// 账号: the DeepSeek account of the on-device engine (profile, wallets, top-up,
+/// Account: the DeepSeek account of the on-device engine (profile, wallets, top-up,
 /// sign-out; the browser sign-in otherwise) and the API Key, the other way in.
 class AccountPage extends ConsumerStatefulWidget {
   const AccountPage({super.key});
@@ -410,7 +410,7 @@ class _SignedOutView extends StatelessWidget {
   }
 }
 
-/// 「API Key」: the key saved in the app (replace / clear) and, when set, its
+/// "API Key": the key saved in the app (replace / clear) and, when set, its
 /// balance. The other way to use DeepSeek models besides the account.
 class ApiKeySection extends ConsumerWidget {
   const ApiKeySection({super.key});

@@ -6,8 +6,8 @@ import '../../state/hosts_state.dart';
 import '../theme/app_icons.dart';
 import '../theme/theme.dart';
 
-/// Step-by-step connect progress: 连接服务器 → 验证主机指纹 → 启动 DSH →
-/// 建立隧道 → 登录, each done / running / failed / waiting, with the error
+/// Step-by-step connect progress: Connect to server → Verify host fingerprint → Start DSH →
+/// Open tunnel → Sign in, each done / running / failed / waiting, with the error
 /// (and its technical detail, copyable) under the step that failed.
 class LinkProgressCard extends StatelessWidget {
   const LinkProgressCard({super.key, required this.status, this.onRetry});
@@ -123,13 +123,13 @@ class _StepRow extends StatelessWidget {
   }
 }
 
-/// A failure, said plainly, with the raw detail tucked under "详情".
+/// A failure, said plainly, with the raw detail tucked under "Details".
 class LinkErrorBox extends StatefulWidget {
   const LinkErrorBox({super.key, required this.error, this.action});
 
   final HostLinkError error;
 
-  /// One follow-up, e.g. ('重试', …) or ('主机设置', …).
+  /// One follow-up, e.g. ('Retry', …) or ('Host settings', …).
   final (String, VoidCallback)? action;
 
   @override

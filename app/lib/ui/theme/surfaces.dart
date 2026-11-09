@@ -5,21 +5,21 @@ import 'package:flutter/material.dart';
 import 'accent.dart';
 import 'palette.dart';
 
-/// 玻璃层级。决定填充透明度、是否模糊、描边与阴影。
+/// Glass tiers. Decide fill opacity, whether it blurs, the stroke and the shadow.
 ///
-/// | 层级 | 用在哪 | 模糊 |
+/// | Tier | Where it sits | Blur |
 /// |---|---|---|
-/// | [chrome] | 顶栏胶囊、圆钮、输入条、底栏 —— 浮在滚动内容上的 | 有 |
-/// | [sheet] | 底部弹层、菜单、抽屉 | 有 |
-/// | [card] | 设置卡、审批卡、工具组 —— 躺在页面背景上的 | 无 |
-/// | [pill] | 思考胶囊、模型胶囊、状态 chip —— 滚动列表里的小件 | 无 |
+/// | [chrome] | top-bar capsules, round keys, composer, bottom bar — floating over scrolling content | yes |
+/// | [sheet] | bottom sheets, menus, drawers | yes |
+/// | [card] | settings cards, approval cards, tool groups — lying on the page background | no |
+/// | [pill] | thinking pill, model capsule, status chips — small items in scrolling lists | no |
 ///
-/// 只有 chrome / sheet 真模糊:它们背后是会滚动的内容,模糊才有意义;
-/// card / pill 背后只是静态渐变,半透明白(或白光)就已经读作"磨砂",
-/// 再上 `BackdropFilter` 只是白白烧 GPU(列表里几十个就是几十次模糊)。
+/// Only chrome / sheet really blur: what moves behind them is scrollable content, so blurring means something;
+/// behind card / pill there is only a static gradient, and translucent white (or white light) already reads as "frosted" —
+/// adding a `BackdropFilter` would just burn GPU (dozens in a list means dozens of blurs).
 enum GlassTier { chrome, sheet, card, pill }
 
-/// 一种玻璃材质的全部参数。
+/// All parameters of one glass material.
 @immutable
 class GlassStyle {
   const GlassStyle({
@@ -33,27 +33,27 @@ class GlassStyle {
     this.shadows = const [],
   });
 
-  /// 开启模糊时的填充(带透明度)。
+  /// Fill while blur is on (with transparency).
   final Color fill;
 
-  /// 关闭模糊时的填充(低端机、省电、"减少透明度"、高对比度模式)。
-  /// 必须接近不透明,否则没有模糊时背后的字会透出来干扰阅读。
+  /// Fill while blur is off (low-end devices, power saving, "减少透明度", high-contrast mode).
+  /// Must be near-opaque, otherwise text behind it bleeds through and disturbs reading once blur is gone.
   final Color fallbackFill;
 
-  /// 发丝描边:界定玻璃边缘。浅色是冷墨 8%,深色是白 9%。
+  /// Hairline stroke: defines the glass edge. Cold ink 8% in light, white 9% in dark.
   final Color hairline;
   final double hairlineWidth;
 
-  /// 顶边高光起始色,向下 45% 处渐隐到透明 —— 光从上方打在玻璃边上。
+  /// Start colour of the top-edge highlight, fading to transparent by 45% down — light falling on the glass rim from above.
   final Color rim;
 
-  /// 高斯模糊 σ(逻辑像素)。0 = 不模糊。
+  /// Gaussian blur σ (logical pixels). 0 = no blur.
   final double blurSigma;
 
-  /// 模糊后的饱和度增益(1 = 不变)。iOS 式"透色":背后的颜色透过来更鲜一点。
+  /// Saturation gain after the blur (1 = unchanged). iOS-style colour transmission: colours behind bleed through a touch fresher.
   final double saturation;
 
-  /// 只画在形状**外部**的投影(玻璃内部不被阴影弄脏)。
+  /// Shadows painted only **outside** the shape (the glass interior stays clean).
   final List<BoxShadow> shadows;
 
   bool get blurs => blurSigma > 0;
@@ -94,10 +94,10 @@ class GlassStyle {
   }
 }
 
-/// 页面材质扩展:背景渐变、光晕、用户气泡、四种玻璃。
+/// Page-material theme extension: backdrop gradient, glows, user bubble, the four glasses.
 ///
-/// 与 `DshColors` 不同,这里**随 accent 变**(光晕与气泡带主色调),
-/// 也随"是否允许模糊"变。
+/// Unlike `DshColors`, these **follow the accent** (glows and bubble carry the primary hue)
+/// and also whether blur is allowed.
 class DshSurfaces extends ThemeExtension<DshSurfaces> {
   const DshSurfaces({
     required this.backdropTop,
@@ -115,21 +115,21 @@ class DshSurfaces extends ThemeExtension<DshSurfaces> {
     this.blurEnabled = true,
   });
 
-  /// 页面竖向渐变的顶 / 底。
+  /// Top / bottom of the page's vertical gradient.
   final Color backdropTop;
   final Color backdropBottom;
 
-  /// 右上角主色光晕(已含透明度)。
+  /// Top-right primary glow (alpha included).
   final Color glowPrimary;
 
-  /// 左下角光晕(已含透明度):配主色的邻近色,雾蓝配暮紫。
+  /// Bottom-left glow (alpha included): a neighbour of the primary — Mist blue pairs with dusk purple.
   final Color glowSecondary;
 
-  /// 用户气泡:比页面深一档的主色调(Claude 式"按进去"的软气泡)。
+  /// User bubble: the primary tint one step deeper than the page (Claude-style "pressed-in" soft bubble).
   final Color userBubble;
   final Color onUserBubble;
 
-  /// 抽屉 / 模态遮罩(已含透明度)。
+  /// Drawer / modal scrim (alpha included).
   final Color scrim;
 
   final GlassStyle chrome;
@@ -137,12 +137,12 @@ class DshSurfaces extends ThemeExtension<DshSurfaces> {
   final GlassStyle card;
   final GlassStyle pill;
 
-  /// 这套材质出自哪套配色。主题之外另起主题的地方(分享卡、终端页)
-  /// 用它照着当前配色重建,而不是退回默认。
+  /// Which palette this material came from. Places that build their own theme outside the
+  /// app theme (share cards, the terminal page) use it to rebuild for the current palette instead of falling back to the default.
   final AppAccent accent;
 
-  /// 总开关。关掉后所有 [GlassTier] 都走 `fallbackFill`,不再创建
-  /// `BackdropFilter`。由设置里的"减少透明效果"或性能探测决定。
+  /// Master switch. When off, every [GlassTier] uses `fallbackFill` and no
+  /// `BackdropFilter` is created. Driven by the "减少透明效果" setting or the performance probe.
   final bool blurEnabled;
 
   static DshSurfaces of(BuildContext context) => Theme.of(context).extension<DshSurfaces>()!;
@@ -154,8 +154,8 @@ class DshSurfaces extends ThemeExtension<DshSurfaces> {
     GlassTier.pill => pill,
   };
 
-  /// 浅色:晨雾渐变 + 白玻璃。渐变、阴影、实色兜底跟配色的中性色走;
-  /// 玻璃本身是白的,高光也是白的 —— 换了配色,玻璃还是玻璃。
+  /// Light: morning-mist gradient + white glass. Gradient, shadows and solid fallbacks follow the palette's neutrals;
+  /// the glass itself is white and the highlight too — change the palette, it is still glass.
   factory DshSurfaces.light(AppAccent accent, {bool blurEnabled = true}) {
     final n = NeutralTones.forAccent(accent);
     final ink = n.shadowInk;
@@ -206,12 +206,12 @@ class DshSurfaces extends ThemeExtension<DshSurfaces> {
     );
   }
 
-  /// 深色:深海石板渐变 + 烟灰玻璃(石板与烟灰跟配色的中性色走)。
+  /// Dark: deep-sea slate gradient + smoke-grey glass (slate and smoke follow the palette's neutrals).
   factory DshSurfaces.dark(AppAccent accent, {bool blurEnabled = true}) {
     final n = NeutralTones.forAccent(accent);
     const white = Color(0xFFFFFFFF);
     const black = Color(0xFF000000);
-    // 雾蓝里是 OKLCH(0.30, 0.022, 266):比页面高一档的石板灰。
+    // In Mist blue this is OKLCH(0.30, 0.022, 266): a slate grey one step above the page.
     final smoke = n.smoke;
     return DshSurfaces(
       backdropTop: n.nightTop,

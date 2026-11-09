@@ -17,7 +17,7 @@ import 'safe_mode_actions.dart';
 class SafeModeBanner extends ConsumerWidget {
   const SafeModeBanner({super.key, this.onRepair, this.onDetails, this.padding = EdgeInsets.zero});
 
-  /// 「帮我修复」. Default: queue the repair prompt in [repairDraftProvider] (not sent).
+  /// "Fix it for me". Default: queue the repair prompt in [repairDraftProvider] (not sent).
   final VoidCallback? onRepair;
 
   /// Tapping the banner itself, e.g. to open the engine page's safe-mode card.

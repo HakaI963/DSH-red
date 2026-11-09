@@ -149,7 +149,7 @@ class EngineScreen extends ConsumerWidget {
                   height: logHeight,
                 ),
               ),
-            // Their home is 设置; the way in from here keeps the name.
+            // Their home is Settings; the way in from here keeps the name.
             SettingsSection(
               title: l10n.commonMore,
               children: [
@@ -192,7 +192,7 @@ class EngineScreen extends ConsumerWidget {
   }
 }
 
-/// 「启动 · 停止 · 重启」: three equal-width capsules. Starting is the one
+/// "Start · Stop · Restart": three equal-width capsules. Starting is the one
 /// primary action when the engine is down; while it runs all three are quiet.
 class EngineActions extends ConsumerWidget {
   const EngineActions({super.key, required this.phase});
@@ -350,8 +350,8 @@ class _Capsule extends StatelessWidget {
   }
 }
 
-/// 「重置运行环境」: the dialog says what goes and offers to keep the parts
-/// the user wrote (界面配置和技能, on by default) or installed (插件和设置).
+/// "Reset the runtime": the dialog says what goes and offers to keep the parts
+/// the user wrote (interface settings and skills, on by default) or installed (plugins & settings).
 class _ResetRow extends ConsumerWidget {
   const _ResetRow({required this.enabled});
 
@@ -387,7 +387,7 @@ class _ResetRow extends ConsumerWidget {
   }
 }
 
-/// What a reset with [keep] deletes, as one phrase: 「对话、工作区、插件和设置」.
+/// What a reset with [keep] deletes, as one phrase: "chats, workspace, plugins and settings".
 @visibleForTesting
 String resetDeletes(ResetKeep keep) {
   return switch ((keep.uiAndSkills, keep.pluginsAndSettings)) {
@@ -398,7 +398,7 @@ String resetDeletes(ResetKeep keep) {
   };
 }
 
-/// Pops the chosen [ResetKeep], or null on 取消.
+/// Pops the chosen [ResetKeep], or null on Cancel.
 class _ResetDialog extends StatefulWidget {
   const _ResetDialog();
 

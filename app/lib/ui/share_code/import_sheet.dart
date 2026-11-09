@@ -1,7 +1,7 @@
 // The confirm sheet a share code opens — what it is, where it comes from,
 // whether it checks out, what would change on the chosen engine (per-item
 // switches for a profile), then the install with progress. A profile import
-// pins a restore point on the device first, so 安全模式's 「恢复上次正常的配置」 undoes it.
+// pins a restore point on the device first, so Safe mode's "Restore last good config" undoes it.
 
 import 'dart:async';
 
@@ -30,7 +30,7 @@ import 'profile_share_sheet.dart' show profileSummary;
 import 'share_code_widgets.dart';
 import 'share_content_sheet.dart';
 
-/// How the code arrived (the profile's 来源 row).
+/// How the code arrived (the profile's Source row).
 enum ShareOrigin {
   link,
   file,

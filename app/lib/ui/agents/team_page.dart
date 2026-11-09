@@ -298,7 +298,7 @@ class _AvatarStack extends StatelessWidget {
 }
 
 // -----------------------------------------------------------------------------
-// 成员
+// Members
 
 class _MembersTab extends ConsumerWidget {
   const _MembersTab({required this.members, required this.currentId, required this.onOpen});
@@ -381,7 +381,7 @@ class _CurrentTag extends StatelessWidget {
 }
 
 // -----------------------------------------------------------------------------
-// 任务
+// Tasks
 
 class _TasksTab extends StatelessWidget {
   const _TasksTab({required this.tasks});
@@ -554,7 +554,7 @@ class _Fact extends StatelessWidget {
 }
 
 // -----------------------------------------------------------------------------
-// 消息
+// Messages
 
 class _MessagesTab extends ConsumerWidget {
   const _MessagesTab({required this.leadId, required this.members});
@@ -693,7 +693,7 @@ class _MessageRow extends StatelessWidget {
   }
 }
 
-/// 「14:08」, or 「10月23日 14:08」 for an earlier day.
+/// "14:08", or "Oct 23, 14:08" for an earlier day.
 String _clock(DateTime time, {DateTime? now}) {
   final local = time.toLocal();
   final today = now ?? runClock();

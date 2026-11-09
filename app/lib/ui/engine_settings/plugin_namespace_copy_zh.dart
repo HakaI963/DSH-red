@@ -201,7 +201,7 @@ const pluginNamespaceCopyZh = <String, Map<String, FieldCopy>>{
     'browserExecutablePath': FieldCopy(label: '浏览器程序路径'),
     'resourceCacheRoot': FieldCopy(label: '资源缓存目录'),
   },
-  // @deepseek-ai/dsh-experimental-speech-to-text-sensevoice 未知（所属bundle为0.2.1-rc.4）; bundle row: speech-to-text-sensevoice.
+  // @deepseek-ai/dsh-experimental-speech-to-text-sensevoice unknown (owning bundle is 0.2.1-rc.4); bundle row: speech-to-text-sensevoice.
   'speech-to-text-sensevoice': {
     'providerId': FieldCopy(label: '识别服务 ID'),
     'dataRoot': FieldCopy(label: '识别服务数据目录'),

@@ -14,7 +14,7 @@ import '../access/access_summary_page.dart';
 import '../access/access_walk.dart';
 import 'onboarding_scaffold.dart';
 
-/// 想让 DSH Go 帮你做哪些事 → 逐项开启 → 汇总. 跳过 on the first page goes on
+/// What should DSH Go do for you? → enable one by one → summary. Skip on the first page goes on
 /// with nothing changed. The picks are kept until the step is over, so a
 /// launch after the app was killed in system settings comes back to the walk.
 class AccessStepPage extends ConsumerStatefulWidget {
@@ -38,10 +38,10 @@ class _AccessStepPageState extends ConsumerState<AccessStepPage> {
     if (mounted) setState(() => _summary = true);
   }
 
-  /// 继续: what was picked goes on as the summary is left, so an item turned
+  /// Continue: what was picked goes on as the summary is left, so an item turned
   /// on from it counts ([AccessSetupController.finish]). If that fails (the
   /// readings could not be taken) the step is not over and nothing is lost:
-  /// it says so with 重试 (over 继续 while it shows), and 继续 works again.
+  /// it says so with Retry (over Continue while it shows), and Continue works again.
   Future<void> _finish() async {
     if (_finishing) return;
     _finishing = true;
@@ -56,7 +56,7 @@ class _AccessStepPageState extends ConsumerState<AccessStepPage> {
           ..showSnackBar(
             SnackBar(
               content: Text(l10n.accessFinishFailed),
-              // Goes by itself: 继续 underneath does the same.
+              // Goes by itself: Continue underneath does the same.
               persist: false,
               duration: const Duration(seconds: 6),
               action: SnackBarAction(label: l10n.commonRetry, onPressed: () => unawaited(_finish())),

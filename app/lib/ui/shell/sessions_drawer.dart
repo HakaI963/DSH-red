@@ -72,10 +72,10 @@ Color sessionSelectionColor(BuildContext context) {
   return scheme.primary.withValues(alpha: scheme.brightness == Brightness.dark ? 0.18 : 0.09);
 }
 
-/// The sessions drawer: brand and "新对话" on top, search, the workspace
+/// The sessions drawer: brand and "New chat" on top, search, the workspace
 /// switcher with the list's options, the status filters, the active host's
 /// conversations (pinned, folders, then by day), and an identity bar at the
-/// bottom (the host, 网页版, 设置). In multi-select the brand row and the
+/// bottom (the host, Web app, Settings). In multi-select the brand row and the
 /// identity bar give way to the selection header and its action bar.
 class SessionsDrawer extends ConsumerWidget {
   const SessionsDrawer({
@@ -163,7 +163,7 @@ class SessionsDrawer extends ConsumerWidget {
                         child: FittedBox(fit: BoxFit.scaleDown, child: BrandLockup(height: 19)),
                       ),
                     ),
-                    // 网页模式, quietly: the one solid element stays 新对话.
+                    // Web mode, quietly: the one solid element stays New chat.
                     const WebModeKey(tier: GlassTier.pill),
                     const SizedBox(width: 8),
                     NewChatButton(onTap: newChat),
@@ -325,7 +325,7 @@ class _RenderReportHeight extends RenderProxyBox {
   }
 }
 
-/// "新对话": the drawer's one solid primary element, a 36dp pill.
+/// "New chat": the drawer's one solid primary element, a 36dp pill.
 class NewChatButton extends StatelessWidget {
   const NewChatButton({super.key, required this.onTap});
 
@@ -371,7 +371,7 @@ class NewChatButton extends StatelessWidget {
   }
 }
 
-/// 「对话列表」 options at the end of the workspace row, its circle on the 10
+/// "Conversation list" options at the end of the workspace row, its circle on the 10
 /// line; only while there are conversations to organise.
 class _ViewOptionsKey extends ConsumerWidget {
   const _ViewOptionsKey({required this.onClose});
@@ -640,7 +640,7 @@ class _SessionList extends ConsumerWidget {
 }
 
 /// DS Bot's conversations as one row above the list: the glyph on the 20
-/// text line, 「DS Bot」, then a breathing dot while a Bot works and the
+/// text line, "DS Bot", then a breathing dot while a Bot works and the
 /// unread count. Opens the Bot pages.
 class DsBotDrawerRow extends ConsumerWidget {
   const DsBotDrawerRow({super.key, required this.running, required this.onTap});
@@ -915,7 +915,7 @@ class _RemoteEmptyState extends ConsumerWidget {
 }
 
 /// The drawer's footer: the host icon opens its details; the name and dropdown
-/// switch hosts. 全部功能 and 设置 follow as two equal round buttons.
+/// switch hosts. All features and Settings follow as two equal round buttons.
 class IdentityBar extends ConsumerWidget {
   const IdentityBar({
     super.key,
@@ -931,8 +931,8 @@ class IdentityBar extends ConsumerWidget {
   /// Local hosts have engine details, not a remote network path.
   final VoidCallback? onLocalDetails;
 
-  /// 全部功能: what there is to do now. (网页版 is in 全部功能, in 设置 ›
-  /// 界面 and on the brand row's switch.)
+  /// All features: what there is to do now. (Web app is inside All features, in Settings ›
+  /// Interface and on the brand row's switch.)
   final VoidCallback onFeatures;
   final VoidCallback onSettings;
 

@@ -1,21 +1,21 @@
-// First run, right after 手机操控's disclosure: ask at the key steps, or run
-// on its own the whole way. Nothing is chosen to begin with; 全程自动 says
+// First run, right after Phone control's disclosure: ask at the key steps, or run
+// on its own the whole way. Nothing is chosen to begin with; fully automatic says
 // what still stays with the person before it can be confirmed.
 //
 // ```
-//   选择确认方式                          (×)
-//   随时可在设置里更改
+//   Choose confirmation mode                          (×)
+//   You can change this anytime in Settings
 //   ╭──────────────────────────────────╮
-//   │ ✋ 关键步骤先问我               ○ │
-//   │    进新 App、发送、删除、付款前先问 │
-//   │ ⚡ 全程自动                     ● │
-//   │    不再询问，全程免打扰           │
+//   │ ✋ Ask at key steps               ○ │
+//   │    ask before new apps, sending, deleting, paying │
+//   │ ⚡ Fully automatic                     ● │
+//   │    no more prompts, uninterrupted throughout           │
 //   ╰──────────────────────────────────╯
-//   ╭ ⓘ 这些仍由你来操作 ──────────────╮   (全程自动 only)
-//   │ 系统设置和权限页面、密码和验证码、… │
-//   │ 如需让 AI 操作系统设置、密码等，…   │
+//   ╭ ⓘ You still handle these ──────────────╮   (fully automatic only)
+//   │ system settings & permission pages, passwords and codes, … │
+//   │ To let the AI handle settings, passwords, etc., …   │
 //   ╰──────────────────────────────────╯
-//   (            开启全程自动            )
+//   (            Turn on fully automatic            )
 // ```
 
 import 'package:flutter/material.dart';

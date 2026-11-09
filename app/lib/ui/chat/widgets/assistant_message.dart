@@ -19,28 +19,28 @@ import 'message_actions.dart';
 import 'stream_row.dart';
 import 'thinking_pill.dart';
 
-/// 三个点交给下一块内容:旧的线性淡出,新的淡入并上移一点(Grok 公开的数值)。
+/// The three dots hand off to the next content block: old fades out linearly, new fades in nudging up a bit (Grok's published numbers).
 const _handOffOut = Duration(milliseconds: 90);
 const _handOffIn = AppMotion.quick;
 const _handOffCurve = Cubic(0.23, 1, 0.32, 1);
 const _handOffRise = 3.0;
 
-/// 思考之后的第一段正文淡入。
+/// The first body paragraph after thinking fades in.
 const _firstTextIn = Duration(milliseconds: 200);
 
-/// 助手消息:**无框裸排的全宽正文**(Claude 式),没有头像也没有署名。
+/// Assistant message: **frameless full-width body** (Claude-style), no avatar, no nameplate.
 ///
 /// ```
-/// (思考过程 ⌄)
-/// 正文 Markdown…▍
-/// ⚠ 响应已中断
-/// ⧉ ⇪ ⑂ ↻ ⋯        ← 一轮的最后一条才有(分叉视 DSH 是否支持;
-///                    ↻ 重新回答只给整个对话的最后一条)
+/// (Thinking process ⌄)
+/// body Markdown…▍
+/// ⚠ Response interrupted
+/// ⧉ ⇪ ⑂ ↻ ⋯        ← only the last message of a turn (branch depends on whether DSH supports it;
+///                    ↻ Answer again only on the conversation's very last reply)
 /// ```
 ///
-/// ⇪ 和菜单里的「分享」打开同一个分享面板。长按或 ⋯:同一个消息菜单(复制 /
-/// 选择文字 / 引用 / 分享 / 重新回答 / 从这里分叉)。正文因此不再直接长按选字,选字走菜单里的
-/// "选择文字",选中一段还能「引用」(Claude 式)。
+/// ⇪ and the menu's "Share" open the same share panel. Long-press or ⋯: the same message menu (Copy /
+/// Select text / Quote / Share / Answer again / Branch from here). So the body no longer long-presses into selection directly; selection goes through the menu's
+/// "Select text", and a selected passage can also be "Quoted" (Claude-style).
 class AssistantMessage extends StatefulWidget {
   const AssistantMessage({
     super.key,
@@ -56,25 +56,25 @@ class AssistantMessage extends StatefulWidget {
 
   final AssistantChatItem item;
 
-  /// 是否在正文下方显示复制等操作(只给一轮里最后一条助手正文)。
+  /// Whether to show copy and other actions below the body (only the turn's last assistant body message does).
   final bool showActions;
 
-  /// "从这里分叉";null = 这条不是已完成一轮的最后一条回复。
+  /// "Branch from here"; null = this is not the last reply of a finished turn.
   final VoidCallback? onBranch;
 
-  /// 正在从这里分叉:分叉键转圈,不能再点。
+  /// Branching from here right now: the branch key spins and can't be tapped again.
   final bool branching;
 
-  /// 「重新回答」;null = 这条不是对话的最后一条回复,或提问发不了第二次。
+  /// "Answer again"; null = this is not the conversation's last reply, or the prompt can't be sent a second time.
   final VoidCallback? onRegenerate;
 
-  /// 正在准备重新回答:重答键转圈,不能再点。
+  /// Preparing Answer again: the regenerate key spins and can't be tapped again.
   final bool regenerating;
 
-  /// 「引用」:整条回复,或「选择文字」里选中的一段,放到输入框上方。
+  /// "Quote": the whole reply, or a passage picked in "Select text", dropped above the input field.
   final ValueChanged<String>? onQuote;
 
-  /// 回合脚注(这一轮在这条回复处结束),挂在操作行右端。
+  /// The turn footnote (this turn ended at this reply), hung at the action row's right end.
   final Widget? footnote;
 
   @override
@@ -87,11 +87,11 @@ class _AssistantMessageState extends State<AssistantMessage> {
   bool? _bodyStreaming;
   bool? _bodyReveal;
 
-  /// 这条回复在这里等过(画过三个点)。只有它才包交接动画:打开会话时已有的、
-  /// 翻回去重建的回复都不多这一层。
+  /// This reply once waited here (drew the three dots). Only it gets the handoff wrapper: replies already present when opening
+  /// the conversation, or rebuilt after scrolling back, never add this layer.
   bool _waited = false;
 
-  /// 正文是思考之后才开始的:第一段淡入。
+  /// The body began after thinking: the first paragraph fades in.
   bool _textAfterThinking = false;
 
   static bool _waiting(AssistantChatItem item) =>
@@ -126,8 +126,8 @@ class _AssistantMessageState extends State<AssistantMessage> {
     }
   }
 
-  /// 同一段文字只建一次 Markdown 子树:列表每 32ms 重建一次时,
-  /// 没变的消息直接复用同一个 widget 实例,Flutter 不会再往下走。
+  /// One text builds its Markdown subtree once: while the list rebuilds every 32ms,
+  /// unchanged messages reuse the same widget instance and Flutter won't walk into them again.
   Widget _markdown(String text, bool streaming) {
     final reveal = _reveal = _reveal || (streaming && _startedEmpty && AppMotion.fluid(context));
     if (_body == null || _bodyText != text || _bodyStreaming != streaming || _bodyReveal != reveal) {
@@ -197,8 +197,8 @@ class _AssistantMessageState extends State<AssistantMessage> {
           if (text.isNotEmpty)
             _textAfterThinking ? _FirstTextIn(child: _markdown(text, streaming)) : _markdown(text, streaming),
           if (item.interrupted) const _InterruptedMark(),
-          // 一轮结束时和输入条上的胶囊同一节奏展开:胶囊收回多少,这里长出
-          // 多少,回答不会先被顶上去再落回来。打开对话时已结束的轮直接展开。
+          // At a turn's end it unfolds at the same pace as the pill on the input bar: however much the pill
+          // retracts, this grows, so the answer is never pushed up and then dropped back. Turns already finished when opening the chat unfold directly.
           ExpandReveal(
             open: actions,
             duration: AppMotion.standard,
@@ -221,7 +221,7 @@ class _AssistantMessageState extends State<AssistantMessage> {
         ],
       ),
     );
-    // 一条回复是读屏里的一个分组,里面的段落、标题照常逐个读。
+    // A reply is one screen-reader group; paragraphs and headings inside are read normally.
     final message = Semantics(key: const ValueKey('reply'), container: true, explicitChildNodes: true, child: reply);
     return _waited ? _HandOff(waiting: false, child: message) : message;
   }
@@ -265,10 +265,10 @@ class _AssistantMessageState extends State<AssistantMessage> {
   }
 }
 
-/// 等待的三个点和接上来的内容之间的交接:一个槽,叠着交叉淡入淡出。
+/// The handoff between the waiting three dots and the content that follows: one slot, stacked layers crossfading.
 ///
-/// 等待时占住思考行的高度:接上来的是思考行,这一行的高度不变,贴底的列表不用
-/// 追;接上来的是矮一点的正文,多出来的几像素在淡入的同时缓缓还回去。
+/// While waiting it holds the thinking row's height: if thinking follows, the height is unchanged and a bottom-pinned list needs
+/// no chase; if the shorter body follows, the few extra pixels are slowly given back during the fade-in.
 class _HandOff extends StatelessWidget {
   const _HandOff({required this.waiting, required this.child});
 
@@ -281,14 +281,14 @@ class _HandOff extends StatelessWidget {
       animation: animation,
       child: child,
       builder: (context, child) => Transform.translate(
-        // 只有进来的上移;出去的原地淡掉。
+        // Only the incoming one rises; the outgoing one fades in place.
         offset: Offset(0, animation.status == AnimationStatus.reverse ? 0 : _handOffRise * (1 - animation.value)),
         child: child,
       ),
     ),
   );
 
-  // passthrough:回复拿到的约束和不包这一层时一样(整行宽,长按的落点不缩)。
+  // passthrough: the reply gets the same constraints as without this layer (full row width; long-press hit spots don't shrink).
   static Widget _layout(Widget? current, List<Widget> previous) => Stack(
     fit: StackFit.passthrough,
     alignment: AlignmentDirectional.topStart,
@@ -321,8 +321,8 @@ class _HandOff extends StatelessWidget {
   }
 }
 
-/// 思考之后的第一段正文:淡入,连上面的间距一起从 0 长到全高。思考窗口此刻正在
-/// 收起,一边收、一边长,贴底的列表只朝一个方向走,不会先被顶上去再落回来。
+/// The first body paragraph after thinking: fades in while its top spacing grows from 0 to full. The thinking window is
+/// collapsing right now — one side retracts as the other grows, so a bottom-pinned list moves in one direction only, never up-and-back.
 class _FirstTextIn extends StatelessWidget {
   const _FirstTextIn({required this.child});
 
@@ -334,7 +334,7 @@ class _FirstTextIn extends StatelessWidget {
     duration: AppMotion.of(context, _firstTextIn),
     curve: AppMotion.collapseCurve,
     builder: (context, t, child) => ClipRect(
-      // 落定后同一层包装、不再裁剪(正文里的代码块会溢出到两侧)。
+      // Once settled: the same wrapper, no clipping (code blocks in the body may overflow sideways).
       clipBehavior: t < 1 ? Clip.hardEdge : Clip.none,
       child: Align(
         alignment: Alignment.topCenter,
@@ -349,7 +349,7 @@ class _FirstTextIn extends StatelessWidget {
   );
 }
 
-/// 被取消 / 中断:正文末尾一行 danger 小字,不改正文颜色。
+/// Cancelled / interrupted: a small danger-color line at the body's end; the body color stays untouched.
 class _InterruptedMark extends StatelessWidget {
   const _InterruptedMark();
 

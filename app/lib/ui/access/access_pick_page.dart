@@ -1,5 +1,5 @@
-// First run, 「想让 DSH Go 帮你做哪些事」: what DSH Go should do, by feature
-// (docs: lib/state/access_state.dart). Nothing is picked to begin with; 跳过
+// First run, "What should DSH Go do for you?": what DSH Go should do, by feature
+// (docs: lib/state/access_state.dart). Nothing is picked to begin with; Skip
 // leaves everything as it is.
 
 import 'dart:async';
@@ -20,30 +20,30 @@ import 'access_widgets.dart';
 import 'phone_mode_sheet.dart';
 
 /// ```
-///   ▣  想让 DSH Go 帮你做哪些事
-///      选好后逐项开启
+///   ▣  What should DSH Go do for you?
+///      Enable the picked ones
 ///   ╭──────────────────────────────────╮
-///   │ ▢ 读写手机里的文件            ☐  │
-///   │   需要文件访问权限                │
-///   │ ▢ 桌宠与悬浮窗               ☐  │
-///   │ ▢ 手机操控                   ☐  │
-///   │ ▢ 后台持续运行               ☐  │
-///   │ ▢ 语音输入                   ☐  │
-///   │   需要麦克风权限                  │
-///   │   离线识别，需下载约 241 MB 语音模型 │
+///   │ ▢ Read & write phone files    ☐  │
+///   │   needs file access permission    │
+///   │ ▢ Desk pet & overlay window  ☐  │
+///   │ ▢ Phone control               ☐  │
+///   │ ▢ Keep running in background ☐  │
+///   │ ▢ Voice input                 ☐  │
+///   │   needs microphone permission     │
+///   │   offline STT, ~241 MB model      │
 ///   ╰──────────────────────────────────╯
-///   (             开启所选             )
-///                 跳过
+///   (          Enable selected         )
+///                 Skip
 /// ```
 ///
-/// Picking 手机操控 shows its disclosure and then asks how it confirms
-/// (关键步骤先问我 / 全程自动), and 读写手机里的文件 what AI may then do, right
+/// Picking Phone control shows its disclosure and then asks how it confirms
+/// (ask at key steps / fully automatic), and read/write-phone-files what AI may then do, right
 /// there, the way their switches in settings do; declining either leaves the
 /// box empty.
 class AccessPickPage extends ConsumerStatefulWidget {
   const AccessPickPage({super.key, required this.onPicked, required this.onSkip});
 
-  /// The features, and 手机操控's 确认方式 when it is among them.
+  /// The features, and Phone control's confirmation mode when it is among them.
   final void Function(Set<AccessFeature> features, PhoneConfirmMode? phoneMode) onPicked;
   final VoidCallback onSkip;
 
@@ -55,7 +55,7 @@ class _AccessPickPageState extends ConsumerState<AccessPickPage> {
   final _picked = <AccessFeature>{};
   bool _asking = false;
 
-  /// 手机操控's 确认方式, chosen right after its disclosure.
+  /// Phone control's confirmation mode, chosen right after its disclosure.
   PhoneConfirmMode? _phoneMode;
 
   Future<void> _toggle(AccessFeature feature) async {
@@ -87,7 +87,7 @@ class _AccessPickPageState extends ConsumerState<AccessPickPage> {
     return true;
   }
 
-  /// 关键步骤先问我 / 全程自动, every time 手机操控 is picked: closed without
+  /// Ask at key steps / fully automatic, every time Phone control is picked: closed without
   /// one, the box stays empty.
   Future<bool> _chooseMode() async {
     if (!mounted) return false;

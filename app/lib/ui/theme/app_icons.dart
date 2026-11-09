@@ -1,33 +1,33 @@
 import 'dsh_glyphs.dart';
 
-/// 图标词汇:**Phosphor Regular**(1.5 描边、圆端、几何),选中 / 点亮 / 开启态用同一
-/// 骨架的 **Fill**。规范见 `docs/design/polish-guide.md` §1。
+/// Icon vocabulary: **Phosphor Regular** (1.5 stroke, round caps, geometric), with the **Fill** of
+/// the same skeleton for selected / lit / on states. Spec: `docs/design/polish-guide.md` §1.
 ///
-/// - 按**角色**命名,不按图形命名:同一个图形可以担几个角色(`regenerate` 和 `refresh`
-///   都是顺时针箭头),一个角色只有一个图形。业务代码只写 `AppIcons.xxx`,不写
-///   `Icons.*`,也不写 `DshGlyphs.*`。换图形改这里一行;换整套只重生成 [DshGlyphs]。
-/// - 字形来自自建子集字体 `assets/fonts/DshIcons.ttf`。Phosphor 在网格里留白比
-///   Material 多,字体里已统一放大 10%,所以同一个 `size:` 和 Material 图标占同样
-///   的格子、同样的视觉大小。颜色和尺寸走 `IconTheme` / `DshColors`。
-/// - 新增角色:在下面加一行 `static const foo = DshGlyphs.barBaz;`(Phosphor 名的
-///   驼峰,`…Fill` 取 Fill),然后在 `app/` 下运行 `python3 tool/make_icon_font.py`。
+/// - Named by **role**, not by shape: one shape can serve several roles (`regenerate` and `refresh`
+///   are both clockwise arrows) while one role owns exactly one shape. Business code writes only
+///   `AppIcons.xxx` — never `Icons.*`, never `DshGlyphs.*`. Swapping a shape is one line here; swapping the whole set just regenerates [DshGlyphs].
+/// - Glyphs come from the custom subset font `assets/fonts/DshIcons.ttf`. Phosphor leaves more
+///   whitespace in its grid than Material; the font scales everything up 10% so the same `size:`
+///   occupies the same box at the same visual size as a Material icon. Colour and size go through `IconTheme` / `DshColors`.
+/// - Adding a role: write a line `static const foo = DshGlyphs.barBaz;` below (Phosphor name in
+///   camelCase, `…Fill` for the Fill), then run `python3 tool/make_icon_font.py` from `app/`.
 abstract final class AppIcons {
-  // ── 导航与外壳 ──────────────────────────────────────────────
+  // ── Navigation & shell ──────────────────────────────────────────────
   static const back = DshGlyphs.arrowLeft;
   static const forward = DshGlyphs.arrowRight;
   static const close = DshGlyphs.x;
   static const menu = DshGlyphs.list;
   static const more = DshGlyphs.dotsThree;
 
-  /// 系统「⋮」菜单(只在引导里指给用户看)。
+  /// The system 「⋮」 menu (only ever pointed out to users in the onboarding).
   static const moreVertical = DshGlyphs.dotsThreeVertical;
 
-  /// 行尾「进入」、面包屑分隔。
+  /// Row-end "go in"; breadcrumb separator.
   static const disclosure = DshGlyphs.caretRight;
   static const expand = DshGlyphs.caretDown;
   static const collapse = DshGlyphs.caretUp;
 
-  /// 可切换的选择器:主机、工作区、余额。
+  /// Switchable selectors: host, workspace, balance.
   static const dropdown = DshGlyphs.caretUpDown;
   static const openExternal = DshGlyphs.arrowSquareOut;
   static const openLink = DshGlyphs.arrowUpRight;
@@ -39,31 +39,31 @@ abstract final class AppIcons {
   static const dragHandle = DshGlyphs.dotsSixVertical;
   static const swap = DshGlyphs.arrowsLeftRight;
 
-  /// 终端方向键、补全面板里的回车提示。
+  /// Terminal arrow keys; the Enter hint in the completion panel.
   static const keyUp = DshGlyphs.caretUp;
   static const keyDown = DshGlyphs.caretDown;
   static const keyLeft = DshGlyphs.caretLeft;
   static const keyRight = DshGlyphs.caretRight;
   static const enterKey = DshGlyphs.arrowElbowDownLeft;
 
-  /// 翻页(插件轮播):上一页 / 下一页。上一页在从右往左的语言里要镜像着画。
+  /// Paging (plugin carousel): previous / next page. The previous caret mirrors in right-to-left languages.
   static const pagePrevious = DshGlyphs.caretLeft;
   static const pageNext = DshGlyphs.caretRight;
 
-  // ── 输入框 ──────────────────────────────────────────────────
+  // ── Composer ──────────────────────────────────────────────────
   static const send = DshGlyphs.arrowUp;
 
-  /// 输入框圆键里的停止(生成、语音):实心方块。
+  /// The stop inside the composer's round key (generation, voice): a solid square.
   static const stopGenerating = DshGlyphs.stopFill;
   static const voice = DshGlyphs.microphone;
 
-  /// 插话:本轮中途送进去。
+  /// Steer: fed in mid-turn.
   static const steer = DshGlyphs.arrowElbowDownRight;
 
-  /// 排队:本轮结束后发送。
+  /// Queue: sent after the current turn ends.
   static const queued = DshGlyphs.clock;
 
-  /// 打断:停掉本轮再发。
+  /// Interrupt: stops the turn, then sends.
   static const interrupt = DshGlyphs.stopCircle;
   static const camera = DshGlyphs.camera;
   static const gallery = DshGlyphs.images;
@@ -73,21 +73,21 @@ abstract final class AppIcons {
   /// 「传文件到电脑」 (Remote workspace upload).
   static const uploadToHost = DshGlyphs.boxArrowUp;
 
-  // ── 消息操作 ────────────────────────────────────────────────
+  // ── Message actions ────────────────────────────────────────────────
   static const copy = DshGlyphs.copy;
   static const quote = DshGlyphs.quotes;
   static const share = DshGlyphs.export;
   static const qrCode = DshGlyphs.qrCode;
   static const shareImage = DshGlyphs.image;
 
-  /// 分享面板的另两个去向:文件、文字。
+  /// The share sheet's other two destinations: file, text.
   static const shareFile = DshGlyphs.fileText;
   static const shareText = DshGlyphs.textAlignLeft;
 
-  /// 刚生成的链接上的「停止分享」。
+  /// The 「停止分享」 on a freshly made link.
   static const stopSharing = DshGlyphs.linkBreak;
 
-  /// 分享出去的内容已隐藏密钥和个人路径。
+  /// Shared content has keys and personal paths redacted.
   static const redacted = DshGlyphs.shieldCheck;
 
   static const selectText = DshGlyphs.textT;
@@ -96,18 +96,18 @@ abstract final class AppIcons {
   static const edit = DshGlyphs.pencilSimple;
   static const reply = DshGlyphs.arrowBendUpLeft;
 
-  /// 代码、diff 的自动换行开关。
+  /// Auto-wrap toggle for code and diffs.
   static const wrapLines = DshGlyphs.textWrap;
   static const save = DshGlyphs.downloadSimple;
   static const preview = DshGlyphs.eye;
 
-  /// 操作完成的回执:已复制、已保存。
+  /// The receipt of a finished action: copied, saved.
   static const done = DshGlyphs.check;
 
-  // ── 通用操作 ────────────────────────────────────────────────
+  // ── Common actions ────────────────────────────────────────────────
   static const add = DshGlyphs.plus;
 
-  /// 输入框尾部的「添加这一项」。
+  /// The "add this entry" at the composer's tail.
   static const addEntry = DshGlyphs.plusCircleFill;
   static const increment = DshGlyphs.plus;
   static const decrement = DshGlyphs.minus;
@@ -115,10 +115,10 @@ abstract final class AppIcons {
   static const rename = DshGlyphs.pencilSimpleLine;
   static const delete = DshGlyphs.trash;
 
-  /// 文件已被删掉的占位。
+  /// Placeholder for a file that has since been deleted.
   static const deleted = DshGlyphs.trash;
 
-  /// 清空输入框。
+  /// Clears the input box.
   static const clear = DshGlyphs.xCircleFill;
   static const clearAll = DshGlyphs.broom;
   static const paste = DshGlyphs.clipboard;
@@ -145,38 +145,38 @@ abstract final class AppIcons {
   static const logout = DshGlyphs.signOut;
   static const power = DshGlyphs.power;
 
-  /// 行、胶囊里的启动 / 暂停 / 停止:和别的操作一样用描边。
+  /// Play / pause / stop in rows and capsules: outlined like every other action.
   static const play = DshGlyphs.play;
   static const pause = DshGlyphs.pause;
   static const stop = DshGlyphs.stop;
 
-  /// 回放的播放键:媒体控件按惯例用实心。
+  /// The replay play key: media controls use solid glyphs by convention.
   static const mediaPlay = DshGlyphs.playFill;
   static const mediaPause = DshGlyphs.pauseFill;
 
-  /// 回放播完后从头再放。
+  /// After a replay ends, start it over from the top.
   static const replay = DshGlyphs.arrowCounterClockwise;
 
-  /// 回放页的「全文」。
+  /// The 「全文」 of the replay page.
   static const fullText = DshGlyphs.article;
   static const enterPath = DshGlyphs.cursorText;
   static const viewConfig = DshGlyphs.fileText;
 
-  /// 拿一条要在终端里跑的命令。
+  /// Grab a command to run in the terminal.
   static const command = DshGlyphs.terminalWindow;
   static const fetchModels = DshGlyphs.cloudArrowDown;
   static const testConnection = DshGlyphs.broadcast;
   static const markAllRead = DshGlyphs.checks;
   static const manageFolders = DshGlyphs.arrowsDownUp;
 
-  /// /compact:压缩上下文。
+  /// /compact: compress the context.
   static const compact = DshGlyphs.arrowsInLineVertical;
 
-  /// 完成后把思考与工具调用收成一行。
+  /// After a turn finishes, fold its thinking and tool calls into one line.
   static const foldTurns = DshGlyphs.arrowsInLineVertical;
 
-  // ── 选择与开关(选中 / 开启态用 Fill)──────────────────────
-  /// 列表里当前选中的那一项。
+  // ── Selection and toggles (Fill marks the selected / on state)──────────────────────
+  /// The list's currently selected item.
   static const selected = DshGlyphs.check;
   static const allowed = DshGlyphs.check;
   static const radioOn = DshGlyphs.checkCircleFill;
@@ -195,7 +195,7 @@ abstract final class AppIcons {
   static const notificationsOn = DshGlyphs.bellFill;
   static const notificationsOff = DshGlyphs.bellSlash;
 
-  // ── 状态 ────────────────────────────────────────────────────
+  // ── Status ────────────────────────────────────────────────────
   static const success = DshGlyphs.checkCircleFill;
   static const completed = DshGlyphs.checkCircle;
   static const error = DshGlyphs.warningCircle;
@@ -205,7 +205,7 @@ abstract final class AppIcons {
   static const attention = DshGlyphs.exclamationMark;
   static const caution = DshGlyphs.warningOctagon;
 
-  /// 工具调用等的失败叉(配危险色)。
+  /// The failure cross of tool calls and the like (paired with the danger colour).
   static const failed = DshGlyphs.x;
   static const stopped = DshGlyphs.stopCircle;
   static const paused = DshGlyphs.pauseCircle;
@@ -227,11 +227,11 @@ abstract final class AppIcons {
   static const noMatches = DshGlyphs.funnelX;
   static const noFolder = DshGlyphs.folderSlash;
 
-  /// 主机或版本不支持这项能力。
+  /// The host or its version does not support this capability.
   static const unsupported = DshGlyphs.puzzlePieceSlash;
   static const taskBlocked = DshGlyphs.lockSimple;
 
-  // ── 连接、主机与引擎 ────────────────────────────────────────
+  // ── Connection, hosts and engine ────────────────────────────────────────
   static const offline = DshGlyphs.cloudSlash;
   static const disconnected = DshGlyphs.linkBreak;
   static const reconnecting = DshGlyphs.arrowsClockwise;
@@ -248,12 +248,12 @@ abstract final class AppIcons {
   static const checkUpdate = DshGlyphs.arrowCircleUp;
   static const autoUpdate = DshGlyphs.clockClockwise;
 
-  // ── 安全与权限 ──────────────────────────────────────────────
+  // ── Security and permissions ──────────────────────────────────────────────
   static const lock = DshGlyphs.lockSimple;
   static const lockActive = DshGlyphs.lockSimpleFill;
   static const unlock = DshGlyphs.lockSimpleOpen;
 
-  /// 凭据只留在本机。
+  /// Credentials never leave this device.
   static const localOnly = DshGlyphs.lockKey;
   static const approval = DshGlyphs.shieldWarning;
   static const securityWarning = DshGlyphs.shieldWarning;
@@ -265,10 +265,10 @@ abstract final class AppIcons {
   static const noApiKey = DshGlyphs.keySlash;
   static const autoApprove = DshGlyphs.checks;
 
-  // ── 文件与内容 ──────────────────────────────────────────────
+  // ── Files and content ──────────────────────────────────────────────
   static const folder = DshGlyphs.folder;
 
-  /// 带分组色的实心文件夹(抽屉文件夹、文件列表)。
+  /// Solid folder carrying the group colour (drawer folders, file lists).
   static const folderMark = DshGlyphs.folderFill;
   static const folderOpen = DshGlyphs.folderOpen;
   static const workspace = DshGlyphs.folder;
@@ -300,31 +300,31 @@ abstract final class AppIcons {
   static const artifacts = DshGlyphs.package;
   static const shareBundle = DshGlyphs.package;
 
-  /// 文件还在生成。
+  /// The file is still being generated.
   static const generating = DshGlyphs.sparkle;
 
-  // ── 图像与视频生成(docs/design/media-generation.md)──────────────
-  /// ＋ 面板的「生成」磁贴、设置 › 图像与视频。
+  // ── Image & video generation (docs/design/media-generation.md)──────────────
+  /// The 「生成」 tile of the ＋ panel; 设置 › 图像与视频.
   static const generateMedia = DshGlyphs.magicWand;
 
-  /// 模式胶囊、参数弹层:图像 / 视频。
+  /// Mode capsules and the parameter sheet: image / video.
   static const generateImage = DshGlyphs.image;
   static const generateVideo = DshGlyphs.filmStrip;
 
-  /// 查看器:「详情」。
+  /// Viewer: 「详情」.
   static const mediaDetails = DshGlyphs.info;
 
-  /// 查看器:变体、编辑、放大。
+  /// Viewer: vary, edit, upscale.
   static const mediaVary = DshGlyphs.stack;
   static const mediaEdit = DshGlyphs.pencilSimple;
   static const mediaUpscale = DshGlyphs.arrowsInLineVertical;
 
-  /// 权限胶囊:比工作区内修改更宽松。
+  /// Permission capsule: looser than editing inside the workspace.
   static const permissionRisky = DshGlyphs.warning;
   static const web = DshGlyphs.globe;
   static const readText = DshGlyphs.note;
 
-  // ── 功能 ────────────────────────────────────────────────────
+  // ── Features ────────────────────────────────────────────────────
   static const terminal = DshGlyphs.terminalWindow;
   static const plugin = DshGlyphs.puzzlePiece;
   static const pluginInventory = DshGlyphs.listBullets;
@@ -332,7 +332,7 @@ abstract final class AppIcons {
   static const model = DshGlyphs.cpu;
   static const providers = DshGlyphs.sparkle;
 
-  /// 模型列表里的一个模型。
+  /// One model in the model list.
   static const modelItem = DshGlyphs.cpu;
   static const subagents = DshGlyphs.treeStructure;
   static const workflow = DshGlyphs.flowArrow;
@@ -358,7 +358,7 @@ abstract final class AppIcons {
   static const diagnostics = DshGlyphs.stethoscope;
   static const cordis = DshGlyphs.squaresFour;
 
-  /// Bot 发来的可交互面板。
+  /// An interactive panel sent by a Bot.
   static const panel = DshGlyphs.squaresFour;
   static const feedback = DshGlyphs.chatCenteredDots;
   static const tool = DshGlyphs.wrench;
@@ -392,7 +392,7 @@ abstract final class AppIcons {
   /// 设置 › 隐私与分享.
   static const privacy = DshGlyphs.lockKey;
 
-  // ── 手机操控 ────────────────────────────────────────────────
+  // ── Phone control ────────────────────────────────────────────────
   static const phoneControl = DshGlyphs.handTap;
   static const readScreen = DshGlyphs.scan;
   static const askFirst = DshGlyphs.handPalm;
@@ -417,7 +417,7 @@ abstract final class AppIcons {
   /// 解除限制's confirmation page: what can go wrong, and the disclaimer.
   static const riskWarning = DshGlyphs.shieldWarning;
 
-  // ── 系统权限(首次启动的「按功能开启」与 设置 › 系统权限)──────
+  // ── System permissions (the per-feature 「按功能开启」 screen at first launch, and 设置 › 系统权限)──────
   static const systemAccess = DshGlyphs.shieldCheck;
   static const fileAccess = DshGlyphs.folderUser;
   static const accessibility = DshGlyphs.scan;
@@ -426,7 +426,7 @@ abstract final class AppIcons {
   static const autostart = DshGlyphs.power;
   static const backgroundPopUp = DshGlyphs.boxArrowUp;
 
-  // ── DS Bot 与群聊 ───────────────────────────────────────────
+  // ── DS Bot and group chat ───────────────────────────────────────────
   static const bot = DshGlyphs.robot;
   static const groupChat = DshGlyphs.chats;
   static const newGroupChat = DshGlyphs.userPlus;
@@ -450,7 +450,7 @@ abstract final class AppIcons {
   static const presetCordis = DshGlyphs.magicWand;
   static const presetPtc = DshGlyphs.cards;
 
-  // ── 论坛与社区 ──────────────────────────────────────────────
+  // ── Forum and community ──────────────────────────────────────────────
   static const forum = DshGlyphs.chats;
   static const community = DshGlyphs.usersFour;
   static const newTopic = DshGlyphs.chatTeardropText;
@@ -469,7 +469,7 @@ abstract final class AppIcons {
   static const travel = DshGlyphs.suitcase;
   static const calendar = DshGlyphs.calendarBlank;
 
-  /// 社区里的外部渠道。
+  /// External channels of the community.
   static const wechat = DshGlyphs.chatCircleFill;
   static const qq = DshGlyphs.usersThreeFill;
   static const telegram = DshGlyphs.paperPlaneRight;

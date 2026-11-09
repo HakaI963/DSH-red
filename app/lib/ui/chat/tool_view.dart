@@ -10,9 +10,9 @@ import '../../state/sessions_state.dart' show localWorkspaceDir;
 import 'render/code_block.dart' show languageForPath;
 import 'render/diff_view.dart';
 
-/// 插件工具的原生卡片(结果 meta 里的 `dsh-go/view`,见
-/// `docs/design/native-plugins-views.md` §8):null = 没有;
-/// `DshUiInvalid` = 有但画不了。只在成功的调用上读;解析按 meta 对象缓存。
+/// A plugin tool's native card (`dsh-go/view` in the result meta, see
+/// `docs/design/native-plugins-views.md` §8): null = none;
+/// `DshUiInvalid` = present but unrenderable. Read only on successful calls; parsing is cached per meta object.
 DshUiParse? toolCardParse(ToolChatItem item) {
   if (item.status != ToolStatus.succeeded) return null;
   final meta = item.meta;
@@ -20,9 +20,9 @@ DshUiParse? toolCardParse(ToolChatItem item) {
   return parsePluginView(meta[toolCardViewKey], budget: PluginViewBudget.toolCard);
 }
 
-/// 生成的图片 / 视频(结果 meta 里的 `dsh-go/media`,见
-/// `docs/design/media-generation.md` §2.5):null = 没有。任何状态都读(视频
-/// 先回一张「生成中」,失败也带原因);解析按 meta 对象缓存。
+/// Generated image / video (`dsh-go/media` in the result meta, see
+/// `docs/design/media-generation.md` §2.5): null = none. Read in any state (video
+/// answers with a "generating" card first; failures carry the reason too); parsing cached per meta object.
 MediaMeta? toolMedia(ToolChatItem item) {
   final meta = item.meta;
   if (meta is! Map || !meta.containsKey(mediaMetaKey)) return null;
@@ -35,30 +35,30 @@ MediaMeta? toolMedia(ToolChatItem item) {
 
 final _media = Expando<(MediaMeta?,)>('media');
 
-/// 这次调用带了一张画得出来的原生卡片(插件卡片,或生成的媒体卡)。
+/// This call carries a renderable native card (a plugin card or a generated-media card).
 bool hasToolCard(ToolChatItem item) => toolCardParse(item) is DshUiParsed || toolMedia(item) != null;
 
-/// 带原生卡片的工具调用,卡片画在哪(`ToolCallRow.card`)。
+/// Where the card draws for tool calls with native cards (`ToolCallRow.card`).
 enum ToolCardPlacement {
-  /// 工具行里:卡片默认展开,参数和结果收在卡片下的「详情」里。
+  /// In the tool row: the card is expanded by default; arguments and result collapse under "Details" below the card.
   inline,
 
-  /// 一轮折叠后留在消息流里的卡片本身(没有工具行)。
+  /// The card itself left in the message stream after a whole turn folds up (no tool row).
   cardOnly,
 
-  /// 折进过程里的那一行:卡片已经在外面了,这里只是普通的工具行。
+  /// The row folded into the process: the card is already outside, so this is just an ordinary tool row.
   rowOnly,
 }
 
-/// 本机没有沙箱后端时,DSH 默认 `workspace-write` 预设下第一次 bash 会被拒,
-/// 模型随后带 `danger-full-access` 重试并触发审批。这次失败不是用户的错,
-/// 工具行要把它显示成中性的"需要授权",而不是红色错误。
+/// With no sandbox backend on the local device, DSH rejects the first bash under the default `workspace-write` preset, and
+/// the model then retries with `danger-full-access`, triggering approval. This failure is not the user's fault,
+/// so the tool row shows it as a neutral "authorization needed", not a red error.
 const _sandboxUnavailableMarker = 'no sandbox backend is usable';
 
-/// 一次工具调用的展示视图:动词、摘要、命令、diff、read 窗口……
+/// The display view of one tool call: verb, summary, command, diff, read window…
 ///
-/// 全部从 [ToolChatItem] 现算,但 diff(LCS)不便宜,所以惰性 + 由工具行的
-/// State 按输入身份复用([matches])。
+/// All computed fresh from [ToolChatItem], but diffs (LCS) aren't cheap, so it is lazy and reused by the tool row's
+/// State per input identity ([matches]).
 class ToolView {
   ToolView._(this.item) : args = _decode(item.arguments);
 
@@ -68,12 +68,12 @@ class ToolView {
   final ToolChatItem item;
   final _locale = AppLocale.current;
 
-  /// 解析后的参数;流式中(JSON 不完整)为 null。
+  /// The parsed arguments; null while streaming (incomplete JSON).
   final Map<String, Object?>? args;
 
   String get name => item.name;
 
-  /// 输入没变就复用(结果片段、meta 来自事件对象,身份稳定)。
+  /// Reused while the input is unchanged (result chunks and meta come from event objects with stable identity).
   bool matches(ToolChatItem other) => _locale == AppLocale.current && sameInput(item, other);
 
   static bool sameInput(ToolChatItem item, ToolChatItem other) =>
@@ -96,7 +96,7 @@ class ToolView {
     }
   }
 
-  /// 读一个字符串参数;JSON 还没流完时从半截原文里尽量抠出来。
+  /// Reads a string argument; while the JSON is still streaming, scrapes as much as possible from the partial text.
   String? arg(String key) {
     final value = args?[key];
     if (value is String) return value;
@@ -124,13 +124,13 @@ class ToolView {
     _ => false,
   };
 
-  /// 第一次 bash 撞上"没有可用沙箱"的拒绝(见 [_sandboxUnavailableMarker])。
+  /// The first bash hit a "no usable sandbox" rejection (see [_sandboxUnavailableMarker]).
   late final bool sandboxBlocked =
       item.status == ToolStatus.failed &&
       ((item.resultText.contains(_sandboxUnavailableMarker)) ||
           (item.failure?.reason?.contains(_sandboxUnavailableMarker) ?? false));
 
-  /// 工具行的动词("运行"、"读取"……)。
+  /// The tool row's verb ("run", "read"…).
   String get verb {
     if (name == 'str_replace_editor') {
       return switch (arg('command')) {
@@ -143,16 +143,16 @@ class ToolView {
     return ToolGlyphs.labelFor(name);
   }
 
-  /// read / write / edit / str_replace_editor:详情里只列路径,不摊开参数。
+  /// read / write / edit / str_replace_editor: details list just the path, not the spread-out arguments.
   bool get isFileTool => const {'read', 'write', 'edit', 'str_replace_editor', 'read_image'}.contains(name);
 
-  /// 文件类工具的路径。
+  /// The file path of file-family tools.
   String? get path => arg('file_path') ?? arg('path');
 
-  /// bash / pwsh 的完整命令。
+  /// The full command of bash / pwsh.
   String? get command => isTerminal ? arg('command') : null;
 
-  /// 摘要是不是命令 / 路径 / 模式(用等宽)。
+  /// Whether the summary is a command / path / pattern (set in monospace).
   bool get summaryIsCode => switch (name) {
     'bash' ||
     'pwsh' ||
@@ -168,18 +168,18 @@ class ToolView {
     _ => false,
   };
 
-  /// 一行摘要(行内显示时由 Text 自己省略)。
+  /// A one-line summary (Text elides it itself when shown inline).
   String get summary => _summary();
 
-  /// 插件工具的原生卡片,见 [toolCardParse]。
+  /// The plugin tool's native card, see [toolCardParse].
   /// Read through the parse cache each time: it starts over when the
   /// person's palette changes (a card that asked for `accent: "app"`).
   DshUiParse? get pluginView => toolCardParse(item);
 
-  /// 生成的媒体,见 [toolMedia]。
+  /// Generated media, see [toolMedia].
   late final MediaMeta? media = toolMedia(item);
 
-  /// 原生卡片的标题:折叠行的摘要用它(卡片画不了或没写标题时为 null)。
+  /// The native card's title: the folded row's summary uses it (null when the card can't render or wrote no title).
   String? get pluginTitle => switch (pluginView) {
     DshUiParsed(:final view) => view.title,
     _ => null,
@@ -251,7 +251,7 @@ class ToolView {
     return '';
   }
 
-  /// 参数的可读形式(展开区"参数"一栏)。
+  /// A readable form of the arguments (the expanded area's "Arguments" slot).
   late final String prettyArguments = _pretty();
 
   String _pretty() {
@@ -274,10 +274,10 @@ class ToolView {
 
   bool get hasImages => images.isNotEmpty || imagePath != null;
 
-  /// 结果文本(原样,含 ANSI)。
+  /// The result text (as-is, ANSI included).
   String get resultText => item.resultText;
 
-  /// 失败原因(结果文本优先,其次 failure.reason)。
+  /// The failure reason (the result text first, else failure.reason).
   String? get failureText {
     if (item.status != ToolStatus.failed) return null;
     final text = item.resultText.trim();
@@ -286,13 +286,13 @@ class ToolView {
   }
 
   // ---------------------------------------------------------------------------
-  // 结构化结果:edit / write 的 diff、read 的行号窗口
+  // Structured results: edit / write diffs, read's line-number window
 
-  /// edit / write / str_replace_editor 的行级 diff;没有可用信息时为 null。
+  /// The line-level diff for edit / write / str_replace_editor; null when there's no usable information.
   late final List<DiffLine>? diff = _diff();
 
-  /// 这次修改的各处 old → new 文本块(按文件顺序):优先结果 meta 里 DSH
-  /// 算好的 hunk(带 3 行上下文),其次参数里的 old/new。null = 不是这类修改。
+  /// The old → new text blocks of this edit (in file order): first the hunks DSH
+  /// computed in the result meta (with 3 lines of context), else the old/new in the arguments. null = not this kind of edit.
   late final List<({String? oldText, String newText})>? changeBlocks = _changeBlocks();
 
   List<({String? oldText, String newText})>? _changeBlocks() {
@@ -311,8 +311,8 @@ class ToolView {
     return null;
   }
 
-  /// [changeBlocks] 每一块的行级 diff,只算一次(详情和本轮改动共用)。
-  /// 纯插入时 DSH 写的 `oldText` 是 null。
+  /// Line-level diff of each block in [changeBlocks], computed once (shared by the details and this turn's change card).
+  /// On a pure insertion DSH writes `oldText` as null.
   late final List<List<DiffLine>>? blockDiffs = changeBlocks == null
       ? null
       : [for (final block in changeBlocks!) computeLineDiff(block.oldText ?? '', block.newText)];
@@ -351,7 +351,7 @@ class ToolView {
     return out.isEmpty ? null : out;
   }
 
-  /// 新写入文件的内容(write 新建,或 str_replace_editor create)。
+  /// The content newly written to a file (write create, or str_replace_editor create).
   String? get writtenContent {
     if (name == 'write') return arg('content');
     if (name == 'str_replace_editor' && arg('command') == 'create') {
@@ -373,7 +373,7 @@ class ToolView {
     return null;
   }
 
-  /// read 的行号窗口:优先 meta,退回解析结果文本里的 `N: text` 行。
+  /// read's line-number window: meta first, else parse `N: text` lines out of the result text.
   late final ({String code, int firstLine, String? language})? readWindow = _read();
 
   ({String code, int firstLine, String? language})? _read() {
@@ -414,7 +414,7 @@ class ToolView {
   }
 }
 
-/// 工作区内的路径去掉工作区前缀,其余原样。
+/// Paths inside the workspace lose the workspace prefix; everything else stays as-is.
 String displayPath(String path) {
   const prefix = '$localWorkspaceDir/';
   if (path.startsWith(prefix)) return path.substring(prefix.length);

@@ -58,30 +58,30 @@ import 'widgets/user_bubble.dart';
 /// Sends [text] with [images] in conversation [sessionId] (a fork just made).
 typedef ResendPrompt = Future<void> Function(String sessionId, String text, List<DraftAttachment> images);
 
-/// 消息列表:最新在底部,流式时跟随,用户上翻后不打扰。
+/// The message list: newest at the bottom, follows while streaming, and leaves the reader alone after they scroll up.
 ///
-/// ## 为什么是"居中锚定"的 CustomScrollView
+/// ## Why a "centred-anchor" CustomScrollView
 ///
-/// 视口被切成两段 sliver,中心([center])在两段之间:
+/// The viewport is split into two sliver segments, with the centre ([center]) between them:
 ///
 /// ```
-///   顶部留白 / 加载更早
-///   ┌ before:打开会话时已有的行,倒序向上长 ┐   ← 加载更早的历史接在这一段的
-///   └──────────────── center ───────────────┘      最上方,不改变任何现有偏移
-///   ┌ after:之后新来的行,向下长           ┐   ← 流式增长只发生在这一段,
-///   └ 底部留白(= 输入条高度)             ┘      上翻阅读时视口纹丝不动
+///   top padding / load earlier
+///   ┌ before: rows already present when opening, growing up reversed ┐   ← older history attaches at the
+///   └──────────────── centre ───────────────┘      top of this segment, changing no existing offset
+///   ┌ after: rows that arrive from now on, growing down          ┐   ← streaming growth happens only here;
+///   └ bottom padding (= input bar height)             ┘      scrolled up to read, the viewport never moves
 /// ```
 ///
-/// - 头部插入历史、尾部流式增长都不移动用户正在看的内容(普通列表两者必有
-///   其一要做偏移补偿,而惰性列表的 `maxScrollExtent` 只是估算值)。
-/// - [CustomScrollView.anchor] 设为"输入条上沿"在视口里的比例:零偏移
-///   正好让 before 段的最后一行贴着输入条,打开会话不需要先跳一次。
-/// - 跟随 = 贴底时内容一变,**同一次布局**里就把位置挪到新的末尾
-///   ([_FollowPhysics]):新内容不会先藏在输入条后面一帧再跳上来,内容
-///   变矮时也不会先露一道缝再弹回去。离底较远时(刚发了消息)由帧后的
-///   `jumpTo(maxScrollExtent)` 追过去,追到底之后同样由它接手。
-/// - 列表的下沿由页面跟着输入条在同一帧里排好(见 ChatScreen),所以
-///   [bottomInset] 只是"伸到输入条下面多少",是个常量。
+/// - Inserting history at the top and growing at the bottom both leave what the user is reading unmoved (in a normal
+///   list one of the two needs offset compensation, and a lazy list's `maxScrollExtent` is only an estimate).
+/// - [CustomScrollView.anchor] is the viewport ratio of the "input bar's top edge": zero offset
+///   makes the before segment's last row sit right against the input bar, so opening a conversation needs no initial jump.
+/// - Following = while pinned to the bottom, a content change moves the position to the new end in
+///   **the same layout pass** ([_FollowPhysics]): new content never hides behind the input bar for a frame before
+///   jumping up, and shrinking content never exposes a gap before springing back. When far from the bottom (just sent a message),
+///   the post-frame `jumpTo(maxScrollExtent)` catches up; once pinned, it takes over the same way.
+/// - The page lays out the list's bottom edge against the input bar in the same frame (see ChatScreen), so
+///   [bottomInset] is only "how far it reaches under the input bar" — a constant.
 class ChatList extends ConsumerStatefulWidget {
   const ChatList({
     super.key,
@@ -100,7 +100,7 @@ class ChatList extends ConsumerStatefulWidget {
 
   final String sessionId;
 
-  /// 顶栏占的高度(含状态栏)。
+  /// The height the header occupies (status bar included).
   final double topInset;
 
   /// How far the viewport extends below the composer's top edge. Overflowing
@@ -112,33 +112,33 @@ class ChatList extends ConsumerStatefulWidget {
   /// fades in its backdrop by it.
   final ValueNotifier<double>? scrolledUnder;
 
-  /// "撤回" on a queued message; the screen puts it back into the composer.
+  /// "Withdraw" on a queued message; the screen puts it back into the composer.
   final ValueChanged<PendingPrompt>? onWithdraw;
 
-  /// 「立即发送」 on a waiting message (「发送」 once no turn runs); null
+  /// "Send now" on a waiting message ("Send" once no turn runs); null
   /// leaves it out.
   final ValueChanged<PendingPrompt>? onSendNow;
 
-  /// "编辑后重发" on a sent message: called with its text once the fork that
+  /// "Edit and resend" on a sent message: called with its text once the fork that
   /// ends just before it is open; the screen puts the text into the composer.
   /// Null leaves the action out.
   final ValueChanged<String>? onEditPrompt;
 
-  /// 「重新回答」: called once the fork that ends just before the last prompt
+  /// "Answer again": called once the fork that ends just before the last prompt
   /// is open and selected, with that prompt's text and images; the screen
   /// sends them there (and puts them back into the composer if that fails).
   /// Null leaves the action out.
   final ResendPrompt? onResend;
 
-  /// 「引用」 on a reply (all of it, or a passage picked in 「选择文字」); the
+  /// "Quote" on a reply (all of it, or a passage picked in "Select text"); the
   /// screen puts it above the composer. Null leaves the action out.
   final ValueChanged<String>? onQuote;
 
-  /// A toast clear of the composer (「已在新对话中打开」 with 返回原对话);
+  /// A toast clear of the composer ("Opened in a new chat" with Return to original chat);
   /// null: the plain SnackBar.
   final ComposerToast? onToast;
 
-  /// 「换模型」 on a turn the engine refused for its model; the screen opens
+  /// "Switch model" on a turn the engine refused for its model; the screen opens
   /// the model sheet for this conversation. Null leaves the action out.
   final VoidCallback? onSwitchModel;
 
@@ -168,12 +168,12 @@ class _ChatListState extends ConsumerState<ChatList> with SingleTickerProviderSt
     return _anchorPixels - rows - history - widget.topInset - AppSpace.sm;
   }
 
-  /// 视口贴在底部(决定流式时是否跟随)。
+  /// The viewport sits pinned at the bottom (decides whether to follow while streaming).
   bool _pinned = true;
 
-  /// 手指刚点过列表里的东西(展开一组工具、一段思考):这之后行自己长高
-  /// 不算"新内容",不去追底,点开的标题留在原处。新数据到来或开始拖动时
-  /// 解除。
+  /// The finger just tapped something in the list (expanding a tool group or a thinking stretch): after this, rows
+  /// growing taller on their own are not "new content" — don't chase the bottom; the opened title stays put. Cleared when
+  /// new data arrives or a drag starts.
   bool _held = false;
 
   late final _physics = _FollowPhysics(() => _pinned && !_held && _fingers == 0, glides: () => _glidable);
@@ -243,16 +243,16 @@ class _ChatListState extends ConsumerState<ChatList> with SingleTickerProviderSt
     p.jumpTo(p.pixels + gap * (1 - math.exp(-seconds / _glideSeconds)));
   }
 
-  /// 回到底部按钮 / 新内容角标。用 notifier 而不是 setState:
-  /// 显隐翻转不该重建整个列表。
+  /// Back-to-bottom button / new-content badge. Uses a notifier instead of setState:
+  /// a show/hide flip should not rebuild the whole list.
   final _showJump = ValueNotifier<bool>(false);
   final _hasNew = ValueNotifier<bool>(false);
 
-  /// before 段最后一行的主键;null = before 段为空。首次加载完成时确定。
+  /// The key of the before segment's last row; null = the before segment is empty. Decided when the first load completes.
   String? _splitKey;
   bool _splitChosen = false;
 
-  // 行派生缓存:输入不变就不重算。
+  // Row-derivation cache: unchanged inputs never recompute.
   List<ChatRow> _rows = const [];
   final _rowCache = ChatRowsCache();
   Map<String, int> _index = const {};
@@ -266,25 +266,25 @@ class _ChatListState extends ConsumerState<ChatList> with SingleTickerProviderSt
   /// The turn is running (queued bubbles can still be moved into it).
   bool _running = false;
 
-  /// 正在分叉的那条回复(挡连点)。
+  /// The reply currently being forked (blocks rapid double taps).
   String? _forkingId;
 
-  /// 正在准备重新回答的那条回复(读原图、分叉;挡连点)。
+  /// The reply currently preparing to be re-answered (reading the original images, forking; blocks rapid double taps).
   String? _regeneratingId;
 
-  // 一轮在眼前结束时怎么收起过程(开着「收起过程」时):贴底看着的,先按原样
-  // 画一帧再平滑收起;往上翻着看的,下一次派生里直接收掉,不保留展开。
-  // 冷打开、重新加载时已结束的轮照旧直接收着。
+  // How a turn's process collapses when it ends in plain view (with "collapse process" on): watched pinned to the bottom,
+  // paint one frame as-is then collapse smoothly; watched from scrolled-up, collapse directly in the next derivation without keeping expansions.
+  // On cold opens and reloads, already-finished turns stay collapsed as before.
   Set<int> _runningTurns = const {};
 
-  /// 要播收起动画的过程行;第一次建出来就拿掉(同 [_fresh])。
+  /// The process row whose collapse animation should play; taken on first build (like [_fresh]).
   final Set<String> _settling = {};
 
-  /// 刚出现、还没画过的行 → 它在这一批里的序号(淡入上移的错开)。
-  /// 第一次建出来就从这里拿掉:滚出去再滚回来不会重播。
+  /// Rows just appeared and never painted → their index in this batch (staggered fade-in-and-rise).
+  /// Taken from here on first build: scrolling out and back does not replay it.
   final Map<String, int> _fresh = {};
 
-  // 方法 tear-off 对同一个 State 恒等:子行的回调不会每帧都"变"。
+  // Method tear-offs are identical for the same State: children's callbacks never "change" every frame.
   Future<void> _respond(ApprovalRequest request, ApprovalDecision decision) =>
       ref.read(chatProvider(widget.sessionId).notifier).respond(request, decision);
 
@@ -313,7 +313,7 @@ class _ChatListState extends ConsumerState<ChatList> with SingleTickerProviderSt
   }
 
   // ---------------------------------------------------------------------------
-  // 跟随与贴底
+  // Following and bottom-pinning
 
   bool _atBottom([double slop = 24]) {
     if (!_scroll.hasClients) return true;
@@ -321,7 +321,7 @@ class _ChatListState extends ConsumerState<ChatList> with SingleTickerProviderSt
     return p.maxScrollExtent - p.pixels <= slop;
   }
 
-  /// 下一帧贴到底;max 在新内容布局后可能再变,最多追几帧。
+  /// Stick to the bottom on the next frame; max may change again after new content lays out — chase at most a few frames.
   void _follow() {
     if (_followScheduled) return;
     _followScheduled = true;
@@ -434,7 +434,7 @@ class _ChatListState extends ConsumerState<ChatList> with SingleTickerProviderSt
         _follow();
       }
     }
-    // 点开的内容往下长出了视口:不再算贴底,之后的新内容不把它顶走。
+    // Opened content grew down past the viewport: no longer counts as pinned, later new content won't shove it away.
     if (_held && _pinned && !_atBottom()) {
       _pinned = false;
       if (!_showJump.value && !_atBottom(160)) _showJump.value = true;
@@ -451,7 +451,7 @@ class _ChatListState extends ConsumerState<ChatList> with SingleTickerProviderSt
     _reportScrolledUnder(metrics);
     if (n is UserScrollNotification) _held = false;
     if (n is UserScrollNotification && n.direction == ScrollDirection.forward) {
-      // 手指往下拖 = 往回看:立刻停止跟随,别和用户抢。
+      // Finger dragging down = looking back: stop following immediately, don't fight the user.
       _pinned = false;
       _goingUp = true;
     } else if (n is UserScrollNotification && n.direction == ScrollDirection.reverse) {
@@ -487,7 +487,7 @@ class _ChatListState extends ConsumerState<ChatList> with SingleTickerProviderSt
   }
 
   // ---------------------------------------------------------------------------
-  // 行与分界
+  // Rows and the boundary
 
   void _deriveRows(ChatState s, {required bool foldTurns, List<TurnArtifacts> artifacts = const []}) {
     if (s.loading || !foldTurns) {
@@ -497,8 +497,8 @@ class _ChatListState extends ConsumerState<ChatList> with SingleTickerProviderSt
         if (turn.running || !_runningTurns.contains(turn.startSeq) || !(turn.endReason?.isCompleted ?? false)) {
           continue;
         }
-        // 贴底看着的一轮:先按原样画一帧,再平滑收成摘要。往上翻着看的
-        // 不播动画,直接收 —— 过程一律收起来,不再有"读过就不收"。
+        // A turn that ended while watched pinned to the bottom: paint one frame as-is, then collapse smoothly into the summary. Watched
+        // from scrolled-up: no animation, collapse directly — process always collapses; no more "once read, leave it open".
         if (_pinned) _settling.add('tp${turn.startSeq}');
       }
     }
@@ -527,8 +527,8 @@ class _ChatListState extends ConsumerState<ChatList> with SingleTickerProviderSt
     final hadPending = _rows.any((r) => r is PendingRow);
     _rows = _rowCache.update(s, foldTurns: foldTurns, artifacts: artifacts);
     _index = _rowCache.index;
-    // 被插话切开的轮:前几片的摘要行(`tp<轮起点>@<插话>`)跟最后一片一起收。
-    // 这一帧没建出来的(在屏幕外)不留到以后:翻回去时不该再播一遍。
+    // Turns split by an interjection: the earlier slices' summary rows (`tp<turn start>@<interjection>`) collapse with the last slice.
+    // Rows not built this frame (off screen) don't carry forward: scrolling back should not replay them.
     for (final row in _rows) {
       if (row is TurnProcessRow &&
           row.cut != null &&
@@ -543,7 +543,7 @@ class _ChatListState extends ConsumerState<ChatList> with SingleTickerProviderSt
     _markFresh(previousKeys, hadPending: hadPending, loading: s.loading);
 
     if (s.pending.length > _lastPendingCount) {
-      // 自己刚发了消息:无论之前翻到哪,都回到底部。
+      // Just sent a message yourself: wherever you had scrolled, go back to the bottom.
       _pinned = true;
       _goingUp = false;
       _followNow = true;
@@ -552,14 +552,14 @@ class _ChatListState extends ConsumerState<ChatList> with SingleTickerProviderSt
     _lastPendingCount = s.pending.length;
 
     if (s.loading) {
-      // (重新)加载中:等首个快照到了再定分界,别把整段历史放进 after 段。
+      // (Re)loading: wait for the first snapshot before setting the boundary; don't dump all history into the after segment.
       _splitChosen = false;
       _splitKey = null;
     } else if (!_splitChosen) {
       _splitChosen = true;
       _splitKey = _lastStableKey();
     } else if (_splitKey != null && !_index.containsKey(_splitKey)) {
-      // 锚点行被替换(重新同步后结构变了):重新分界,贴底时跟上。
+      // The anchor row got replaced (structure changed after resync): re-bound, and catch up when pinned to the bottom.
       final folded = _rows.whereType<TurnProcessRow>().where((row) => row.rows.any((child) => child.key == _splitKey));
       _splitKey = folded.isEmpty ? _lastStableKey() : folded.first.key;
     }
@@ -574,7 +574,7 @@ class _ChatListState extends ConsumerState<ChatList> with SingleTickerProviderSt
       });
     }
     if (s.hasMoreHistory) {
-      // 内容不满一屏时没有滚动事件可等:帧后看一眼是否已经在顶端。
+      // With content that doesn't fill the screen there is no scroll event to wait for: check post-frame whether we're already at the top.
       _afterFrame(() {
         if (_scroll.hasClients) _maybeLoadOlder(_scroll.position);
       });
@@ -587,11 +587,11 @@ class _ChatListState extends ConsumerState<ChatList> with SingleTickerProviderSt
     }
   }
 
-  /// 这次派生里新出现的行,哪些要淡入上移。
+  /// Of the rows newly appearing in this derivation, which should fade in and rise.
   ///
-  /// 只认打开会话之后、在底部新长出来的"消息":气泡、回复、卡片、提示。
-  /// 重新分组(三次调用并成一组、一轮结束收起过程)换了主键但不是新内容,
-  /// 不播;回显的用户消息替换的是刚才的乐观气泡,也不播。
+  /// Only "messages" that grew at the bottom after the conversation opened: bubbles, replies, cards, notices.
+  /// Regrouping (three calls merged into one group, a turn ending and its process collapsing) changes keys but is not new content —
+  /// no animation; an echoed user message replaces the optimistic bubble from a moment ago — also no animation.
   void _markFresh(Map<String, int> previous, {required bool hadPending, required bool loading}) {
     _fresh.removeWhere((key, _) => !_index.containsKey(key));
     if (!_splitChosen || loading) return;
@@ -618,7 +618,7 @@ class _ChatListState extends ConsumerState<ChatList> with SingleTickerProviderSt
     }
   }
 
-  /// build 期间不能改 notifier(会在同一帧标脏别的元素):挪到帧后。
+  /// Notifiers can't change during build (it would dirty other elements in the same frame): moved to post-frame.
   void _afterFrame(VoidCallback action) {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) action();
@@ -742,8 +742,8 @@ class _ChatListState extends ConsumerState<ChatList> with SingleTickerProviderSt
                   ),
                 ),
               ),
-              // 浮层与阅读列边缘、与输入条之间都是 12(和顶栏、输入条同一层);
-              // 手机上阅读列就是整屏宽。
+              // Floating layers keep 12 from the reading column's edges and from the input bar (same tier as header and input bar);
+              // on a phone the reading column is the full screen width.
               Positioned(
                 right: math.max(0.0, (constraints.maxWidth - AppSpace.readingWidth) / 2) + AppSpace.floatInset,
                 bottom: widget.bottomInset + 12,
@@ -782,9 +782,9 @@ class _ChatListState extends ConsumerState<ChatList> with SingleTickerProviderSt
       child: Center(
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: AppSpace.readingWidth),
-          // 撑满阅读宽度:否则短行(用户气泡、提示行)会被 Center 居中。
+          // Fill the reading width: otherwise short rows (user bubbles, notice lines) get centred by Center.
           child: row is AssistantRow
-              // 等待和思考算过程行,正文不算:接上正文时间距缓缓让开,回复不跳。
+              // Waiting and thinking count as process rows, the body doesn't: spacing yields gradually as the body attaches, the reply doesn't jump.
               ? AnimatedPadding(
                   duration: AppMotion.of(context, AppMotion.quick),
                   curve: AppMotion.std,
@@ -797,9 +797,9 @@ class _ChatListState extends ConsumerState<ChatList> with SingleTickerProviderSt
     );
   }
 
-  /// 过程行:工具、工具组、只有思考的回复(或还在等第一个字:接上来多半是思考,
-  /// 间距先按它算,交接时不跳)、斜杠指令、非错误提示。
-  /// 它们自带上下 4 的留白,彼此之间不再加间距(图形块之间正好 8)。
+  /// Process rows: tools, tool groups, replies with only thinking (or still waiting for the first character: what attaches next
+  /// is most likely thinking, so spacing is sized for it and the handover doesn't jump), slash commands, non-error notices.
+  /// They carry their own 4 of top/bottom padding, so nothing is added between them (graph blocks land exactly 8 apart).
   static bool _isProcess(ChatRow? row) => switch (row) {
     ToolCallRow() || ToolGroupRow() || CommandNoticeRow() => true,
     AssistantRow(:final item) => item.text.trim().isEmpty && (item.reasoning.trim().isNotEmpty || item.streaming),
@@ -812,7 +812,7 @@ class _ChatListState extends ConsumerState<ChatList> with SingleTickerProviderSt
     _ => false,
   };
 
-  /// 换轮 24、同一轮 8、相邻过程行 0、卡片 12、脚注 4(全是 4 的倍数)。
+  /// Turn change 24, same turn 8, adjacent process rows 0, cards 12, footnotes 4 (all multiples of 4).
   static double _gapBefore(ChatRow row, ChatRow? previous) {
     if (previous == null) return 0;
     if (_isUser(row)) return _isUser(previous) ? AppSpace.sm : AppSpace.xxl;
@@ -913,7 +913,7 @@ class _ChatListState extends ConsumerState<ChatList> with SingleTickerProviderSt
   }
 
   // ---------------------------------------------------------------------------
-  // 消息操作:分叉打开的是一个新对话,原对话不动。
+  // Message actions: forking opens a new conversation; the original one stays untouched.
 
   Widget _reply(AssistantChatItem item, bool showActions, TurnTrace? footnote) {
     // A picture a media card shows is not drawn again in the reply.
@@ -922,7 +922,7 @@ class _ChatListState extends ConsumerState<ChatList> with SingleTickerProviderSt
     }
     final chat = ref.read(chatProvider(widget.sessionId).notifier);
     final branchable = chat.branchPointAfter(item) != null;
-    // 「重新回答」: the conversation's last reply, its turn over cleanly.
+    // "Answer again": the conversation's last reply, its turn over cleanly.
     final prompt = branchable && widget.onResend != null
         ? regenerablePrompt(ref.read(chatProvider(widget.sessionId)), item)
         : null;
@@ -978,7 +978,7 @@ class _ChatListState extends ConsumerState<ChatList> with SingleTickerProviderSt
     }
   }
 
-  /// 「重新回答」: read the prompt's images back, fork just before it, open
+  /// "Answer again": read the prompt's images back, fork just before it, open
   /// the fork, and let the screen send the prompt there again. The source
   /// stays as it was. A failure before the fork stays here, in the banner.
   Future<void> _regenerate(AssistantChatItem item, UserChatItem prompt) async {
@@ -1058,24 +1058,24 @@ class _ChatListState extends ConsumerState<ChatList> with SingleTickerProviderSt
     );
   }
 
-  /// 「子代理 · …」: that child's conversation, once the host lists it.
+  /// "Subagent · …": that child's conversation, once the host lists it.
   bool _openSubagent(String id) {
     if (!ref.read(hostSessionsProvider).containsKey(id)) return false;
     selectConversation(ref, id);
     return true;
   }
 
-  /// 对话停在出错、被打断或输出到上限的一轮上:提示行尾给一个「重试」
-  /// (这一轮什么都还没做、问的是纯文字,原样再发)或「继续」。
-  /// 引擎拒绝这个模型时给去处:本机引擎太旧就「检查更新」(引擎随 App
-  /// 更新),其余「换模型」。
+  /// The conversation sits on a turn that failed, was interrupted, or hit the output cap: the notice line's tail offers a "Retry"
+  /// (the turn did nothing yet and the prompt is plain text: send it again as-is) or "Continue".
+  /// Gives a way out when the engine refuses this model: local engine too old → "Check for updates" (the
+  /// engine updates with the app); otherwise "Switch model".
   NoticeAction? _noticeAction(NoticeChatItem notice) {
     final s = ref.read(chatProvider(widget.sessionId));
     if (s.running) return null;
     final code = notice.failure?.code ?? '';
     final refused = notice.kind == 'error' && modelRefusalCodes.contains(code);
     final repeatable = switch (notice.kind) {
-      // 换个说法、再发一次都没用的:Key、余额、账号额度、模型本身用不了。
+      // Ones where rephrasing or sending again won't help: key, balance, account quota, the model itself unusable.
       'error' =>
         !refused && !const {'AUTH', 'INVALID_CREDENTIAL', 'QUOTA'}.contains(code) && !code.startsWith('ACCOUNT_'),
       'interrupted' || 'max-tokens' => true,
@@ -1174,7 +1174,7 @@ class _ChatListState extends ConsumerState<ChatList> with SingleTickerProviderSt
   }
 }
 
-/// 列表顶端:加载更早历史时的小环;没有更多时什么也不画。
+/// Top of the list: a small spinner while loading earlier history; draws nothing when there is no more.
 class _HistoryHeader extends StatelessWidget {
   const _HistoryHeader({required this.loading, required this.hasMore});
 
@@ -1198,9 +1198,9 @@ class _HistoryHeader extends StatelessWidget {
   }
 }
 
-/// 回到底部:输入条右上方的 chrome 玻璃圆钮(44 / 图标 22,与顶栏圆钮
-/// 同规格);离开期间有新内容加主色角标。有待确认的审批 / 提问时换成一枚
-/// 同高的胶囊。两种形态之间交叉淡变。
+/// Back to bottom: a chrome-glass round button above the input bar's right side (44 / icon 22, same spec
+/// as the header's round keys); a tinted badge marks new content added while you were away. With a pending approval / question it becomes one
+/// pill of the same height. The two forms cross-fade.
 class _JumpToBottom extends StatelessWidget {
   const _JumpToBottom({required this.visible, required this.hasNew, required this.waiting, required this.onTap});
 
@@ -1223,7 +1223,7 @@ class _JumpToBottom extends StatelessWidget {
     final pill = GlassSurface(
       key: const ValueKey('waiting'),
       tier: GlassTier.chrome,
-      // 悬在滚动 / 流式内容上:每帧重采样背景太贵,这两颗悬浮胶囊直接不模糊。
+      // Hovering over scrolling / streaming content: resampling the background each frame is too costly, so these two floating pills skip the blur.
       blur: false,
       stadium: true,
       onTap: onTap,
@@ -1260,7 +1260,7 @@ class _JumpToBottom extends StatelessWidget {
               child: Center(child: Icon(AppIcons.scrollToBottom, size: 22, color: colors.onSurface)),
             ),
           ),
-          // 角标圆心落在圆钮 45° 的边上(离右上角 22·(1−cos45°) ≈ 6.4)。
+          // The badge's center sits on the round button's 45° edge (22·(1−cos45°) ≈ 6.4 from the top-right corner).
           Positioned(
             top: 2,
             right: 2,
@@ -1316,12 +1316,12 @@ class _JumpToBottom extends StatelessWidget {
   }
 }
 
-/// 贴底跟随:跟随中(且这一刻本来就停在末尾)内容高度一变,在同一次布局
-/// 里把位置放到新的末尾。拖动、惯性滚动中不插手。
+/// Follow-the-bottom: while following (and already sitting at the end at this moment), a content-height change
+/// moves the position to the new end within the same layout pass. It does not interfere while dragging or flinging.
 ///
-/// 默认的 [RangeMaintainingScrollPhysics] 只在"变矮且越界"时夹回范围,而
-/// 且上一帧刚 `jumpTo` 过就不夹:那一帧末尾露出一道缝,再由回弹动画收回,
-/// 看起来像被往上推了一下。
+/// The default [RangeMaintainingScrollPhysics] only clamps back into range when "shrunk out of bounds", and
+/// skips the clamp if the previous frame just called `jumpTo`: that frame leaves a gap at the end which the
+/// spring-back animation then closes — looking like the list was nudged upward.
 class _FollowPhysics extends ScrollPhysics {
   const _FollowPhysics(this.follows, {required this.glides, super.parent});
 
@@ -1349,7 +1349,7 @@ class _FollowPhysics extends ScrollPhysics {
       velocity: velocity,
     );
     if (isScrolling || velocity != 0 || !follows()) return adjusted;
-    // 上一帧之后可能刚追过底(帧后 jumpTo):看当前位置,也看上次记下的。
+    // Since the last frame we may have just chased the bottom (post-frame jumpTo): look at both the current and the last remembered position.
     final at = newPosition.pixels > oldPosition.pixels ? newPosition.pixels : oldPosition.pixels;
     if (oldPosition.maxScrollExtent - at > 1 && !glides()) return adjusted;
     if (glides() && newPosition.maxScrollExtent >= at) return adjusted;

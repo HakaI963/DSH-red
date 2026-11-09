@@ -110,7 +110,7 @@ class PluginAvatar extends StatelessWidget {
 TextStyle? pluginRowTitle(BuildContext context) =>
     Theme.of(context).textTheme.titleSmall?.copyWith(fontSize: 15, height: 1.4);
 
-/// Small tinted label ("官方", "编辑推荐", "网页版").
+/// Small tinted label ("Official", "Editor's pick", "Web app").
 class PluginBadge extends StatelessWidget {
   const PluginBadge(this.text, {super.key, this.tone = PluginBadgeTone.neutral});
 
@@ -143,8 +143,8 @@ class PluginBadge extends StatelessWidget {
 
 enum PluginBadgeTone { neutral, official, featured, warning, danger }
 
-/// The app-store capsule at the end of a market row: 获取 / 更新 / 已安装,
-/// or a small ring with 安装中 while an install runs. Every state opens the
+/// The app-store capsule at the end of a market row: Get / Update / Installed,
+/// or a small ring with Installing while an install runs. Every state opens the
 /// detail sheet ([onPressed]); installing always goes through it.
 class PluginInstallButton extends StatelessWidget {
   const PluginInstallButton({super.key, required this.status, this.job, this.onPressed});
@@ -206,7 +206,7 @@ class PluginInstallButton extends StatelessWidget {
 }
 
 /// Live progress of one install: phase, an indeterminate bar, cancel and
-/// the pnpm output behind 「查看安装日志」.
+/// the pnpm output behind "View install log".
 class PluginInstallProgress extends StatelessWidget {
   const PluginInstallProgress({super.key, required this.job, this.onCancel});
 
@@ -310,7 +310,7 @@ class _PluginLogBoxState extends State<PluginLogBox> {
 }
 
 /// A failed operation: title, plain explanation, optional actions and the
-/// diagnostic behind 「查看详情」.
+/// diagnostic behind "View details".
 class PluginFailureBox extends StatelessWidget {
   const PluginFailureBox({super.key, required this.failure, this.actions = const []});
 

@@ -1,4 +1,4 @@
-// 插件详情 › 网页版界面 (docs/design/plugin-ui-v3.md §3.5): where a plugin's web
+// Plugin detail › Web UI (docs/design/plugin-ui-v3.md §3.5): where a plugin's web
 // part lives that the app has no seat for, in plain words, each a way to DSH
 // Web. Nothing is dropped silently: an installed plugin with a browser half
 // always has at least one way to be seen.
@@ -66,7 +66,7 @@ enum WebPlace {
     return elsewhere;
   }
 
-  /// Where 「网页版」 lands for this place.
+  /// Where "Web app" lands for this place.
   DshWebTarget target({String? sessionId, List<String> pluginNames = const []}) => switch (this) {
     besideComposer || header || messages || rightbar || files => DshWebTarget(sessionId: sessionId),
     sidebar => const DshWebTarget(sidebar: true),

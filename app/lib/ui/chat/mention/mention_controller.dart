@@ -55,11 +55,11 @@ class MentionSection {
   final List<MentionItem> items;
 }
 
-/// `@` 面板的状态:跟着输入框里光标所在的 `@` 词,查候选、排序、选中。
+/// State of the `@` panel: follows the `@`-word under the input's caret — queries candidates, sorts, tracks selection.
 ///
-/// 只有一个 `@` 时列出各类的前几项(「最近」在最前);继续打字就过滤
-/// (文件由引擎模糊匹配,对话在本地模糊匹配并补上引擎的子串结果)。
-/// 打了字时第一行是"发送"会选中的那一行。
+/// With just a lone `@`, list a few of each category ("Recent" first); keep typing to filter
+/// (files fuzzy-matched by the engine; conversations fuzzy-matched locally, topped up with the engine's substring hits).
+/// Once text is typed, row one is the one "send" would pick.
 class MentionPickerController extends ChangeNotifier {
   MentionPickerController({
     required this.input,

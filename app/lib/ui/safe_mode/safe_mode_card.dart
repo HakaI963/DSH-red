@@ -30,7 +30,7 @@ String safeModeReasonText(RuntimeStatus status) {
 class SafeModeCard extends ConsumerWidget {
   const SafeModeCard({super.key, this.onRepair, this.padding = EdgeInsets.zero});
 
-  /// 「帮我修复」. Default: queue the repair prompt and go back to the chat.
+  /// "Fix it for me". Default: queue the repair prompt and go back to the chat.
   final VoidCallback? onRepair;
   final EdgeInsetsGeometry padding;
 

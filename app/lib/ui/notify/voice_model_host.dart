@@ -1,7 +1,7 @@
 // Keeps the voice model controller alive with the shell, so the download the
 // person chose during setup starts once the engine is up and goes on after a
 // restart. Says when it starts, when voice input is ready and why it failed
-// (with 重试); the engine notification carries the progress while the app is
+// (with Retry); the engine notification carries the progress while the app is
 // away. Draws nothing.
 
 import 'dart:async';
@@ -63,11 +63,11 @@ class _VoiceModelHostState extends ConsumerState<VoiceModelHost> {
               content: Text(
                 l10n.voiceModelFailedToast(voiceModelFailureText(l10n, event.failure, neededBytes: event.neededBytes)),
               ),
-              // Goes by itself: the reason and 重试 stay on the voice settings page.
+              // Goes by itself: the reason and Retry stay on the voice settings page.
               persist: false,
               duration: const Duration(seconds: 8),
               // Asks about mobile data first, as the settings page does: the line may have changed since.
-              // A failed 重新下载 kept the model in place: 重试 asks for the whole model again.
+              // A failed re-download kept the model in place: Retry asks for the whole model again.
               action: SnackBarAction(
                 label: l10n.commonRetry,
                 onPressed: () => unawaited(downloadVoiceModel(context, ref, again: event.again)),

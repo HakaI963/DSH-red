@@ -1,4 +1,4 @@
-// The share card (晒成果) — a fixed-width poster of a reply, a stretch of a
+// The share card (showing off results) — a fixed-width poster of a reply, a stretch of a
 // conversation, a file or a plugin, in the app's own type and the person's
 // accent colour, with the dsh-go lockup and a QR code to the project page.
 
@@ -60,18 +60,18 @@ enum ShareTemplate {
 ///
 /// ```
 /// ┌──────────────────────────────────────┐
-/// │ 修复登录按钮重复提交                    │  title, up to three lines
-/// │ (deepseek-v4-pro) (53 秒) (8 步)       │  meta capsules
-/// │ ⌕ 联网搜索 3   ▷ 运行命令 1             │  what the agent did
+/// │ Fix duplicate login-button submits            │  title, up to three lines
+/// │ (deepseek-v4-pro) (53 s) (8 steps)          │  meta capsules
+/// │ ⌕ web search 3   ▷ ran commands 1             │  what the agent did
 /// │                        ▢▢ pictures    │
 /// │                  ╭─────────────────╮  │
-/// │                  │ 登录按钮连点…     │  │  the question
+/// │                  │ login button double-taps…  │  │  the question
 /// │                  ╰─────────────────╯  │
 /// │ The answer, as Markdown, ▢ pictures…  │
 /// │ …                                     │  when cut
 /// │ ───────────────────────────────────── │
 /// │ ◖● dsh-go                     ▣▣▣▣    │  brand + QR; the QR's corner
-/// │    手机上的 DSH · 扫码获取       ▣▣▣▣    │  as far from both edges
+/// │                  DSH on your phone · scan to get it        ▣▣▣▣    │  as far from both edges
 /// └──────────────────────────────────────┘
 /// ```
 class ShareCard extends StatelessWidget {
@@ -290,7 +290,7 @@ abstract final class _PaperLook {
   static final ink = const Oklch(0.24, 0.012, hue - 20).toColor();
 }
 
-/// 浅色 / 深色 / 纸张: content straight on the page.
+/// Light / Dark / Paper: content straight on the page.
 class _PageLayout extends StatelessWidget {
   const _PageLayout({required this.card, required this.layout, required this.look});
 
@@ -338,7 +338,7 @@ class _PageLayout extends StatelessWidget {
   }
 }
 
-/// 玻璃 / 卡片: the body on a panel floating on the accent field, the brand
+/// Glass / Card: the body on a panel floating on the accent field, the brand
 /// line under it on the field. The panel's margin, the gap below it and the
 /// brand line's margin are all [ShareCard.fieldInset].
 class _FieldLayout extends StatelessWidget {
@@ -964,7 +964,7 @@ class _Plugin extends StatelessWidget {
   }
 }
 
-/// The brand line: the 「DSH Go」 lockup with one short line under its word,
+/// The brand line: the "DSH Go" lockup with one short line under its word,
 /// the QR code at the right edge, the two centred on each other. A link too
 /// long to scan at the card's size ([ShareCard.qrFor]) leaves the lockup alone.
 class _Footer extends StatelessWidget {
@@ -1125,7 +1125,7 @@ class _PaperPainter extends CustomPainter {
   bool shouldRepaint(_PaperPainter old) => old.top != top || old.bottom != bottom;
 }
 
-/// The coloured field of 玻璃 / 卡片: a diagonal gradient, light from the top
+/// The coloured field of Glass / Card: a diagonal gradient, light from the top
 /// right; glass adds soft orbs for its frost to blur.
 class _FieldPainter extends CustomPainter {
   const _FieldPainter({required this.top, required this.bottom, this.orb, this.pool});

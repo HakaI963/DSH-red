@@ -69,7 +69,7 @@ class IslandRecipe {
   final Duration? ready;
 
   /// The DSH slots an island of an app-side key shows together (the chat
-  /// page's 「插件」 sheet); null: just the key itself.
+  /// page's "Plugins" sheet); null: just the key itself.
   final List<String>? slots;
 
   /// The slots whose official entries the bridge masks.
@@ -228,7 +228,7 @@ class IslandRecipeBook {
         return at(then: {'rightbar': names});
       case 'session-view':
         // A view has no id on screen: island.js finds its tab (or its row
-        // under 「更多会话视图」) by name, then confirms by the id: the one
+        // under "More conversation views") by name, then confirms by the id: the one
         // the client stores for the conversation once it is picked.
         if (cell.isEmpty || names.isEmpty) return null;
         return at(

@@ -16,24 +16,24 @@ import 'chat_card.dart';
 
 typedef ApprovalResponder = Future<void> Function(ApprovalRequest request, ApprovalDecision decision);
 
-/// "本对话都允许":允许这一次,并让本对话之后的审批都自动放行。
+/// "Allow for this chat": allow this once and auto-pass every later approval in this chat.
 typedef ApprovalAllowAll = Future<void> Function(ApprovalRequest request);
 
-/// 审批卡:**屏幕上最显眼的东西,但不靠大红色**。
+/// The approval card: **the most eye-catching thing on screen, but not via big red**.
 ///
-/// 本机没有 bash 沙箱,审批是最后一道闸。外壳与标题行是 [ChatCard] 的
-/// 「警示」语气:警示色盾牌 + 1px 警示细线,标题直接问「允许运行这条命令？」。
+/// The local device has no bash sandbox, so the approval is the last gate. The shell and title row use [ChatCard]'s
+/// "warning" register: a warning-colored shield + 1px warning hairline, and the title asks directly "Allow running this command?".
 ///
 /// ```
 /// ┌──────────────────────────────────┐
-/// │ ⛉ 允许运行这条命令？             │
-/// │   运行登录相关测试               │  说明(次级)
+/// │ ⛉ Allow running this command?       │
+/// │   run the login-related tests       │  note (secondary)
 /// │ ┌──────────────────────────────┐ │
-/// │ │ $ flutter test test/auth     │ │  命令井
+/// │ │ $ flutter test test/auth     │ │  command well
 /// │ └──────────────────────────────┘ │
-/// │   沙箱外运行:需要联网            │  理由(三级)
-/// │ [    拒绝    ]  [   允许本次   ] │  等宽两键,主色只给"允许本次"
-/// │           本对话都允许           │  更宽的授权降为文字按钮,避免误触
+/// │   runs outside the sandbox: needs network │  reason (tertiary)
+/// │ [    Deny    ]  [   Allow once   ] │  two equal-width keys; the accent goes only to "Allow once"
+/// │        Allow for this chat           │  the wider grant demotes to a text button, to avoid mis-taps
 /// └──────────────────────────────────┘
 /// ```
 class ApprovalCard extends StatefulWidget {
@@ -42,10 +42,10 @@ class ApprovalCard extends StatefulWidget {
   final ApprovalRequest request;
   final ApprovalResponder onRespond;
 
-  /// null 时不显示"本对话都允许"。
+  /// "Allow for this chat" is hidden when null.
   final ApprovalAllowAll? onAllowAll;
 
-  /// 对应的工具调用(有的话用它的命令 / 路径做正文)。
+  /// The matching tool call (if any, its command / path becomes the body).
   final ToolView? view;
 
   @override
@@ -60,7 +60,7 @@ class _ApprovalCardState extends State<ApprovalCard> {
     HapticFeedback.selectionClick();
     setState(() => _busy = decision);
     await widget.onRespond(widget.request, decision);
-    // 成功时卡片会随 HostRequestCancelled 消失;失败时恢复可点。
+    // On success the card vanishes with HostRequestCancelled; on failure it returns to clickable.
     if (mounted) setState(() => _busy = null);
   }
 
@@ -231,7 +231,7 @@ class _CommandWell extends StatelessWidget {
   static String displayPathIfPath(String text, bool isCommand) => isCommand ? text : displayPath(text);
 }
 
-/// 按钮文字与小环交叉淡变(按钮宽度不跟着跳)。
+/// The button label and the small spinner crossfade (the button's width doesn't jump along).
 class _BusySwap extends StatelessWidget {
   const _BusySwap({required this.busy, required this.child, this.color});
 

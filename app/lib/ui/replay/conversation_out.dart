@@ -19,18 +19,18 @@ import '../../share_hosted/hosted_client.dart' show HostedShareException;
 import '../share_hosted/hosted_link_maker.dart' show hostedConversationLinkMaker;
 import '../../state/artifacts.dart' show FilesChannel, filesChannelProvider;
 
-/// 「我的分享链接」 for the share panel's link page.
+/// "My share links" for the share panel's link page.
 export '../share_hosted/manage_links_button.dart' show ManageLinksButton;
 
 /// The file forms of a shared conversation.
 enum ConversationFormat {
-  /// `.dshgo`: opens in dsh-go (replay, 「接着聊」) and on the landing page.
+  /// `.dshgo`: opens in dsh-go (replay, "Keep chatting") and on the landing page.
   file,
 
   /// `.html`: opens in any browser, offline.
   page,
 
-  /// `.md`: who said what, one line per tool call (what 「接着聊」 attaches).
+  /// `.md`: who said what, one line per tool call (what "Keep chatting" attaches).
   markdown;
 
   String get extension => switch (this) {
@@ -65,7 +65,7 @@ class ConversationOut {
     await SharePlus.instance.share(params);
   }
 
-  /// 「修复登录重复提交.dshgo」.
+  /// "Fix duplicate sign-in submissions.dshgo".
   static String fileName(String title, ConversationFormat format) => '${fileStem(title)}.${format.extension}';
 
   /// Writes [content] into the cache's `conversation/` (keeping the last few).
@@ -158,15 +158,15 @@ class ConversationLink {
 /// Puts a conversation file on the share host, encrypted on the phone (the
 /// key only in the link, after `#`). A seam over the share host's client
 /// (`app/lib/share_hosted/`, adapted in ui/share_hosted/hosted_link_maker.dart,
-/// which also keeps every link in 「我的分享链接」); null leaves 「链接」 out of
+/// which also keeps every link in "My share links"); null leaves "Links" out of
 /// the share sheet.
 abstract class ConversationLinkMaker {
   /// [fileBytes] is the `.dshgo` file's UTF-8 text; [title] names it in
-  /// 「我的分享链接」. Throws [HostedShareException] (its `message` is for the
+  /// "My share links". Throws [HostedShareException] (its `message` is for the
   /// person).
   Future<ConversationLink> upload(Uint8List fileBytes, LinkExpiry expiry, {required String title});
 
-  /// 「停止分享」: the link stops working once [undoWindow] passes without
+  /// "Stop sharing": the link stops working once [undoWindow] passes without
   /// [restore].
   Future<void> revoke(ConversationLink link);
 

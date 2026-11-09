@@ -509,7 +509,7 @@ class SchemaFieldView extends ConsumerWidget {
 
 /// The capsule a choice field shows (two or three choices, one of them
 /// current), or null when it gets a picker row: an unset optional choice
-/// reads 「未设置」 there instead of a capsule with nothing selected.
+/// reads "Not set" there instead of a capsule with nothing selected.
 ({List<(Object?, String)> options, Object? selected})? segmentOf(
   SchemaFieldSpec spec,
   SchemaNode node,
@@ -524,7 +524,7 @@ class SchemaFieldView extends ConsumerWidget {
   return matched == null ? null : (options: options, selected: matched.$1);
 }
 
-/// A write-only secret: 「已配置 / 未配置」, the sheet to replace or remove it.
+/// A write-only secret: "Configured / Not configured", the sheet to replace or remove it.
 /// The local engine's DeepSeek key belongs to the app (it is pushed on every
 /// start), so a field reading `DEEPSEEK_API_KEY` there opens the app's own
 /// API Key page instead.
@@ -703,7 +703,7 @@ List<SchemaFormSection> schemaSections(
 }
 
 /// One unsupported item still leaves the rest of the native form available:
-/// its title over 「在网页版编辑此项」 (wrapping, never cut), the
+/// its title over "Edit this item in the web app" (wrapping, never cut), the
 /// open-external glyph where a chevron would be, the row opening the item on
 /// the web.
 class SchemaUnsupportedField extends ConsumerWidget {

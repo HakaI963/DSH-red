@@ -30,7 +30,7 @@ const islandsWithoutGuard = bool.fromEnvironment('DSH_GO_LOCAL_ISLANDS');
 /// Whether a host may have islands at all (§9). Pure:
 ///
 /// - relay: never (no DSH Web over the relay);
-/// - SSH: yes, the same exposure as the 网页版 entry that's already there;
+/// - SSH: yes, the same exposure as the web app entry that's already there;
 /// - on-device: only once the route guard ships with the runtime — the
 ///   bridge says so ([reported], `routeGuard` in `/dsh-go/v1/inventory`)
 ///   *and* a cookieless call to a plugin route is refused ([probed]). Any
@@ -126,7 +126,7 @@ final islandHostGateProvider = Provider.family<bool, HostRef>((ref, host) {
   return islandHostAllowed(host.kind, reported: reported, probed: probed, override: islandsWithoutGuard);
 });
 
-/// The DSH Web launch URL for [host]'s islands (same as the 网页版's,
+/// The DSH Web launch URL for [host]'s islands (same as the web app's,
 /// `localWebUri`): the on-device engine while it runs, an SSH host through
 /// the app's forward while connected, nothing over the relay.
 final islandHostUrlProvider = Provider.autoDispose.family<Uri?, HostRef>((ref, host) {
@@ -148,6 +148,6 @@ final islandHostUrlProvider = Provider.autoDispose.family<Uri?, HostRef>((ref, h
 });
 
 /// `http://127.0.0.1:3080/?token=…`: the token only buys the session cookie,
-/// exactly as the 网页版 does.
+/// exactly as the web app does.
 Uri islandLaunchUri(String baseUrl, String token) =>
     Uri.parse(baseUrl).replace(path: '/', queryParameters: {'token': token});

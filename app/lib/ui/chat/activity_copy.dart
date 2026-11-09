@@ -6,15 +6,15 @@ import '../../l10n/l10n.dart';
 import 'run_info.dart';
 
 // -----------------------------------------------------------------------------
-// 轮换:每个窗口一句,同一窗口永远同一句
+// Rotation: one line per window, and the same window always shows the same line
 
-/// 一句文案停留多久。
+/// How long one line stays up.
 const phraseWindow = Duration(seconds: 4);
 
-/// 一轮里第一次思考有 1/150 的机会整段换成稀有彩蛋。
+/// The first thinking pass of a turn has a 1/150 chance of swapping the whole stretch for a rare easter egg.
 const rareOdds = 150;
 
-/// 一次性提醒(长时间运行)显示多久。
+/// How long the one-off reminder (long runs) shows.
 const reminderWindow = Duration(seconds: 8);
 
 int _imul(int a, int b) {
@@ -25,10 +25,10 @@ int _imul(int a, int b) {
   return (low + (high << 16)) & 0xFFFFFFFF;
 }
 
-/// 种子和窗口序号的确定性 32 位混合(雪崩后取低 32 位)。
+/// Deterministic 32-bit mix of the seed and the window index (low 32 bits after avalanche mixing).
 ///
-/// 要的是可重复,不是随机:同样的输入永远同样的输出,界面每秒重画多少次,
-/// 这一窗口的那句话都不会动。
+/// What we want is repeatability, not randomness: the same input always gives the same output, so however many
+/// times per second the UI repaints, this window's line never changes.
 int mixSlot(int seed, int slot) {
   var h = (_imul(seed, 0x9E3779B1) ^ _imul(slot, 0x85EBCA6B)) & 0xFFFFFFFF;
   h = _imul(h ^ (h >>> 15), 0x2545F491);
@@ -36,17 +36,17 @@ int mixSlot(int seed, int slot) {
   return (h ^ (h >>> 16)) & 0xFFFFFFFF;
 }
 
-/// 第 [slot] 个窗口的那句,池子不随窗口变。见 [_rotateAt]。
+/// The line for window [slot]; the pool does not vary by window. See [_rotateAt].
 String pickAt(List<String> pool, int seed, int slot) => _rotateAt(seed, slot, (_) => pool);
 
-/// 第 [slot] 个窗口的那句;[poolAt] 给出每个窗口用的池子(深夜、想得久了
-/// 会换池)。
+/// The line for window [slot]; [poolAt] gives the pool each window uses (late night, thinking
+/// too long, and the pool changes).
 ///
-/// 相邻两个窗口*实际显示*的话永远不同(按文字比,两个键译成同一句也算撞),
-/// 而且不用从第 0 个窗口回放:偶数窗口在自己的池里按哈希直接取;奇数窗口
-/// 按哈希起步,跳过前后两个偶数窗口实际显示的那两句。前后窗口换了池子也一样
-/// 成立,因为邻居按它自己的池子算。池里只有两句不同的话时轮流显示;只有一句
-/// 就只能重复。
+/// Two adjacent windows never *display* the same line (compared by text; two keys translating
+/// to the same line still counts as a clash), and this needs no replay from window 0: even windows
+/// take their line straight by hash from their own pool; odd windows start from their hash and
+/// skip the two lines the even windows on either side actually show. It still holds if a neighbor
+/// switched pools, since each neighbor is computed from its own pool. With only two distinct lines in a pool they alternate; with one there is nothing left but to repeat.
 String _rotateAt(int seed, int slot, List<String> Function(int slot) poolAt) {
   List<String> lines(int k) {
     final pool = poolAt(k).toSet().toList();
@@ -73,9 +73,9 @@ String _rotateAt(int seed, int slot, List<String> Function(int slot) poolAt) {
 }
 
 // -----------------------------------------------------------------------------
-// 文案池
+// Copy pools
 
-/// 模型在想(推理在流)。
+/// The model is thinking (reasoning is streaming).
 List<String> get thinkingPhrases => [
   appL10n.activityThinkingUntangle,
   appL10n.activityThinkingWorkThrough,
@@ -119,7 +119,7 @@ List<String> get thinkingPhrases => [
   appL10n.activityThinkingHands,
 ];
 
-/// 想得久了:按这一段思考已经多久换池子(在窗口开始时判断)。
+/// Thinking too long: the pool changes by how long this thinking stretch has run (decided when a window starts).
 List<(Duration, List<String>)> get thinkingTiers => <(Duration, List<String>)>[
   (
     const Duration(minutes: 5),
@@ -167,7 +167,7 @@ List<(Duration, List<String>)> get thinkingTiers => <(Duration, List<String>)>[
   ),
 ];
 
-/// 请求发出去了,第一个字还没来。
+/// The request is out, not a single character back yet.
 List<String> get waitingPhrases => [
   appL10n.activityWaitingCall,
   appL10n.activityWaitingOnWay,
@@ -187,7 +187,7 @@ List<String> get waitingPhrases => [
   appL10n.activityWaitingMoment,
 ];
 
-/// 回复正文在流。
+/// The reply body is streaming.
 List<String> get writingPhrases => [
   appL10n.activityWritingWords,
   appL10n.activityWritingTyping,
@@ -205,7 +205,7 @@ List<String> get writingPhrases => [
   appL10n.activityWritingFormat,
 ];
 
-/// 00:00–06:00 混进思考池。
+/// Mixed into the thinking pools from 00:00–06:00.
 List<String> get nightPhrases => [
   appL10n.activityNightAscend,
   appL10n.activityNightHello,
@@ -220,7 +220,7 @@ List<String> get nightPhrases => [
   appL10n.activityNightDawn,
 ];
 
-/// 周六日,一轮里第一次思考的第一句。
+/// Weekends: the first line of the first thinking pass of a turn.
 List<String> get weekendPhrases => [
   appL10n.activityWeekendChill,
   appL10n.activityWeekendHere,
@@ -233,7 +233,7 @@ List<String> get weekendPhrases => [
   appL10n.activityWeekendSkin,
 ];
 
-/// 节日(按 `MM-DD`),同样是一轮第一次思考的第一句。
+/// Holidays (keyed by `MM-DD`), likewise the first line of a turn's first thinking pass.
 Map<String, List<String>> get holidayPhrases => <String, List<String>>{
   '01-01': [
     appL10n.activityNewYearCheers,
@@ -279,7 +279,7 @@ Map<String, List<String>> get holidayPhrases => <String, List<String>>{
   ],
 };
 
-/// 春节七天(从正月初一起)。每年补一行;表过期时测试会红。
+/// The seven Spring Festival days (counting from lunar new year's day). Add a row each year; tests go red when the table expires.
 const lunarNewYearDays = <String>[
   '2025-01-29', '2026-02-17', '2027-02-06', '2028-01-26', '2029-02-13', //
   '2030-02-03', '2031-01-23', '2032-02-11', '2033-01-31', '2034-02-19',
@@ -311,7 +311,7 @@ List<String> lunarNewYearPhrases(int year) => [
   appL10n.activityLunarZodiac(_zodiac[(year - 4) % 12]),
 ];
 
-/// 稀有彩蛋(一轮一次,看种子)。
+/// Rare easter eggs (once per turn, chosen by the seed).
 List<String> get rarePhrases => [
   appL10n.activityRareSsr,
   appL10n.activityRareUr,
@@ -327,7 +327,7 @@ List<String> get rarePhrases => [
   appL10n.activityRareNextLevel,
 ];
 
-/// 上一个工具失败之后。
+/// After the previous tool call failed.
 List<String> get failPhrases => [
   appL10n.activityFailCrash,
   appL10n.activityFailOops,
@@ -347,7 +347,7 @@ List<String> get failPhrases => [
   appL10n.activityFailChance,
 ];
 
-/// 测试命令跑过 / 没跑过之后。
+/// After a test command ran / did not run.
 List<String> get testPassPhrases => [
   appL10n.activityTestGreen,
   appL10n.activityTestAllGreen,
@@ -363,7 +363,7 @@ List<String> get testFailPhrases => [
   appL10n.activityTestFix,
 ];
 
-/// git 提交 / 推送之后。
+/// After a git commit / push.
 List<String> get gitCommitPhrases => [
   appL10n.activityGitCommitSave,
   appL10n.activityGitSaved,
@@ -371,14 +371,14 @@ List<String> get gitCommitPhrases => [
 ];
 List<String> get gitPushPhrases => [appL10n.activityGitPushed, appL10n.activityGitPushDone, appL10n.activityGitCodeOut];
 
-/// 装完依赖之后。
+/// After dependencies finished installing.
 List<String> get installPhrases => [
   appL10n.activityInstallDone,
   appL10n.activityInstallInternet,
   appL10n.activityInstallPackages,
 ];
 
-/// 一轮里第 N 个工具调用完。
+/// After the Nth tool call of a turn.
 Map<int, String> get toolMilestones => <int, String>{
   5: appL10n.activityMilestoneFive,
   10: appL10n.activityMilestoneTen,
@@ -386,11 +386,11 @@ Map<int, String> get toolMilestones => <int, String>{
   50: appL10n.activityMilestoneFifty,
 };
 
-/// 服务方让重试(限流 / 临时错误)。
+/// The service asked us to retry (rate limit / transient error).
 List<String> get retryPhrases => [appL10n.activityRetryWait, appL10n.activityRetryBackoff, appL10n.activityRetryKnock];
 List<String> get rateLimitPhrases => [appL10n.activityRateLimited, appL10n.activityRate429, appL10n.activityRateQueue];
 
-/// 正在压缩上下文。
+/// Compressing the context.
 List<String> get compactionPhrases => [
   appL10n.activityCompactContext,
   appL10n.activityCompactBag,
@@ -400,7 +400,7 @@ List<String> get compactionPhrases => [
 ];
 
 // -----------------------------------------------------------------------------
-// 日期与工具
+// Dates & tools
 
 bool isNight(DateTime local) => local.hour < 6;
 
@@ -408,7 +408,7 @@ bool isWeekend(DateTime local) => local.weekday == DateTime.saturday || local.we
 
 String _two(int n) => n.toString().padLeft(2, '0');
 
-/// 今天的节日文案池;春节优先,没有为 null。
+/// Today's holiday copy pool; Spring Festival takes priority, null when there is none.
 List<String>? holidayPool(DateTime local) {
   final day = DateTime(local.year, local.month, local.day);
   for (final first in lunarNewYearDays) {
@@ -430,7 +430,7 @@ final _install = RegExp(
   r'pip3? install|flutter pub get|dart pub get|cargo fetch|apt(-get)? install)\b',
 );
 
-/// 刚结束的那个工具值得说一句吗;不值得为 null。
+/// Whether the tool that just finished deserves a line; null if it doesn't.
 List<String>? afterToolPool(AfterTool tool) {
   final command = tool.command;
   final isTest = command != null && _testCommand.hasMatch(command);
@@ -443,8 +443,8 @@ List<String>? afterToolPool(AfterTool tool) {
   return null;
 }
 
-/// 一轮跑了很久时的提醒:10 分钟、半小时、之后每整小时,各显示
-/// [reminderWindow];不在窗口里为 null。
+/// Reminders for a turn that has run long: at 10 minutes, half an hour, then every full hour, each shown for
+/// [reminderWindow]; null outside those windows.
 String? longTurnReminder(Duration elapsed) {
   String? within(Duration mark, String text) {
     final past = elapsed - mark;
@@ -460,7 +460,7 @@ String? longTurnReminder(Duration elapsed) {
 }
 
 // -----------------------------------------------------------------------------
-// 模型自述(`⏵` 行)
+// Model self-narration (`⏵` lines)
 
 const _narrationMaxColumns = 80;
 
@@ -475,10 +475,10 @@ bool _wide(int rune) =>
     (rune >= 0x1F000 && rune <= 0x1FAFF) ||
     (rune >= 0x20000 && rune <= 0x3FFFD);
 
-/// 模型写在正文里的最新一行 `⏵ 在做什么`;没有为 null。
+/// The latest `⏵ what it's doing` line the model wrote in the body; null when there is none.
 ///
-/// `⏵` 必须在行首(句中的 `⏵` 是模型在*提*这个格式,不是在用它);只取到
-/// 第一个句末标点,按显示宽度截到 80 列(约 40 个汉字),去掉控制字符。
+/// `⏵` must start the line (an `⏵` mid-sentence is the model *mentioning* the format, not
+/// using it); take only up to the first sentence-ending punctuation, cut to 80 display columns (~40 CJK glyphs), strip control characters.
 String? extractNarration(String text) {
   final matches = RegExp(r'(?:^|\n)⏵[ \t]*([^\n⏵]*)').allMatches(text);
   if (matches.isEmpty) return null;
@@ -518,30 +518,30 @@ String? extractNarration(String text) {
 }
 
 // -----------------------------------------------------------------------------
-// 这一刻胶囊上那句话
+// The line on the pill at this moment
 
 enum FlavorSource {
-  /// 模型自述(`⏵`)。
+  /// Model self-narration (`⏵`).
   narration,
 
-  /// 彩蛋:节日、周末、稀有、工具情境、长时间提醒。
+  /// Easter eggs: holidays, weekends, rare ones, tool context, long-run reminders.
   egg,
 
-  /// 普通轮换文案。
+  /// Ordinary rotating copy.
   phrase,
 }
 
-/// 活动条标题后面那句话。
+/// The line after the activity bar's title.
 typedef ActivityFlavor = ({String text, FlavorSource source});
 
-/// [now] 是设备本地时间(节日、周末、深夜按它算,而且按每个窗口开始那一刻
-/// 算:一句话不会在自己的窗口里变);经过的时间按 Host 时钟
-/// (`now - activity.skew`)。只有模型阶段、重试和压缩有这句话;工具、
-/// 等你确认、等你回答各有自己的目标,不再加料。
+/// [now] is the device's local time (holidays, weekends, late night are computed from it, and at the
+/// moment each window starts: one line never changes within its own window); elapsed time follows the Host clock
+/// (`now - activity.skew`). Only model phases, retries and compaction carry this line; tools,
+/// waiting-for-your-confirmation and waiting-for-your-answer have their own targets and get no extra copy.
 ///
-/// 轮换的话和相邻窗口实际显示的那句不重复([_rotateAt]);同样的输入永远
-/// 同样的输出。去重不看时区(种子、窗口都按时间戳和经过的时间算);节日、
-/// 周末、深夜照旧按本地时间。
+/// The rotated line never repeats what the adjacent window actually showed ([_rotateAt]); the same input
+/// always gives the same output. Dedup ignores time zones (seed and windows come from timestamps and elapsed time); holidays,
+/// weekends and late night still use local time.
 ActivityFlavor? activityFlavor(RunActivity a, DateTime now) {
   final hostNow = now.subtract(a.skew);
   final phaseStart = a.since ?? a.turnStart;
@@ -618,6 +618,6 @@ ActivityFlavor? activityFlavor(RunActivity a, DateTime now) {
 
 Duration _nonNegative(Duration d) => d.isNegative ? Duration.zero : d;
 
-/// 这一轮是不是抽中了稀有彩蛋(看种子,不掷骰子:读多少次都一样)。
+/// Whether this turn drew the rare easter egg (from the seed, no dice roll: every read gives the same answer).
 bool rareTurn(DateTime? turnStart) =>
     turnStart != null && mixSlot(turnStart.millisecondsSinceEpoch, 0x5EED) % rareOdds == 0;

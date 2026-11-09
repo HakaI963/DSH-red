@@ -6,7 +6,7 @@
 // trailing end, so the header keeps its four mirrored pieces. It reads the
 // conversation itself ([headerSchedulesProvider]); the header only places it
 // where the pill's own right padding would be. Tapping opens a compact sheet:
-// the task's name, rule and next runs, 「立即运行」 and 「管理」 (the native
+// the task's name, rule and next runs, "Run now" and "Manage" (the native
 // detail page). The Host has no pause: the official README states the page
 // offers neither pause nor run-now, and the record has no paused state.
 
@@ -63,8 +63,8 @@ mixin _Retick<T extends StatefulWidget> on State<T> {
 /// automation tasks, else the pill's own [padding].
 ///
 /// ```
-/// ( 修复登录重复提交      )        ( 修复登录重复提交  (◷) )
-/// ( ● 本机                )   →    ( ● 本机               )
+/// (  Fix duplicate sign-in submits )        (  Fix duplicate sign-in submits (◷) )
+/// ( ● Local device                )   →    ( ● Local device               )
 ///                       ↑ 16                    ↑ gap  ↑ inset
 /// ```
 ///
@@ -73,7 +73,7 @@ mixin _Retick<T extends StatefulWidget> on State<T> {
 /// size; its touch area is the pill's whole height from [gap] on. When the
 /// bar is too tight to keep the title's floor beside it, the header leaves
 /// it out (unpainted, untouchable, not read out) rather than shorten the
-/// title further; the tasks stay one tap away on 自动化任务.
+/// title further; the tasks stay one tap away on Automated tasks.
 class HeaderScheduleCap extends ConsumerStatefulWidget {
   const HeaderScheduleCap({super.key, required this.pillHeight});
 
@@ -119,7 +119,7 @@ class _HeaderScheduleCapState extends ConsumerState<HeaderScheduleCap> with _Ret
       child = const SizedBox(key: ValueKey('plain'), width: HeaderScheduleCap.padding);
     } else {
       final now = ref.watch(scheduleClockProvider)();
-      // The read-out says 「今天 / 明天」: refresh it at midnight.
+      // The read-out says "today / tomorrow": refresh it at midnight.
       retickIn(untilNextDay(now));
       child = _key(context, schedules, now);
     }
@@ -186,7 +186,7 @@ class _HeaderScheduleCapState extends ConsumerState<HeaderScheduleCap> with _Ret
 
 /// Opens [sessionId]'s automation tasks: a single task on its own page (the
 /// official clock opens that task's detail directly), more as a list.
-/// 「管理」 closes the sheet and pushes the task's detail page where
+/// "Manage" closes the sheet and pushes the task's detail page where
 /// [context] lives.
 Future<void> showHeaderSchedules(BuildContext context, {required String sessionId, required List<ScheduleTask> tasks}) {
   final navigator = Navigator.of(context);
@@ -226,7 +226,7 @@ class HeaderScheduleSheet extends StatelessWidget {
   );
 }
 
-/// 「没能刷新 · 重试」 under the tasks while the latest read failed (the last
+/// "Couldn't refresh · Retry" under the tasks while the latest read failed (the last
 /// ones read stay on screen).
 class _RefreshFailed extends ConsumerWidget {
   const _RefreshFailed({required this.sessionId});
@@ -326,18 +326,18 @@ class _ScheduleTaskSheetListState extends ConsumerState<ScheduleTaskSheetList> w
 }
 
 /// One task: its rule, its next runs on this phone's clock (the first with
-/// how far off it is), 「立即运行」 and 「管理」.
+/// how far off it is), "Run now" and "Manage".
 ///
 /// ```
-///   日报提醒                         (×)
-///   每天 21:30
-///     接下来
+///   Daily report reminder              (×)
+///   Every day 21:30
+///     Upcoming
 ///   ┌────────────────────────────────┐
-///   │ 今天 21:30            6 小时后 │
-///   │ 明天 21:30                     │
-///   │ 周一 21:30                     │
+///   │ Today 21:30            in 6 h   │
+///   │ Tomorrow 21:30                  │
+///   │ Mon 21:30                       │
 ///   └────────────────────────────────┘
-///   [  立即运行  ]  [     管理     ]
+///   [  Run now   ]  [     Manage     ]
 /// ```
 class ScheduleTaskSheetPage extends ConsumerStatefulWidget {
   const ScheduleTaskSheetPage({super.key, required this.sessionId, required this.initial, required this.onManage});
@@ -444,7 +444,7 @@ class _ScheduleTaskSheetPageState extends ConsumerState<ScheduleTaskSheetPage> w
                 else ...[
                   SheetSectionLabel(l10n.viewScheduleUpcoming),
                   // The next run says how far off it is; the ones after it
-                  // already read as 「明天」「周一」.
+                  // already read as "tomorrow" or "Mon".
                   SheetGroup(
                     children: [
                       for (final (i, at) in runs.indexed)

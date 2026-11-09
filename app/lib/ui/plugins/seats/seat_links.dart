@@ -18,7 +18,7 @@ import '../../web/dsh_web_launcher.dart';
 import '../../web/web_target.dart';
 import 'plugin_seat_page.dart';
 
-/// Opens DSH Web on a target (in 网页模式 the web home itself goes there);
+/// Opens DSH Web on a target (in Web mode the web home itself goes there);
 /// tests swap it for a recorder.
 final seatWebOpenerProvider = Provider<void Function(BuildContext context, WidgetRef ref, DshWebTarget target)>(
   (ref) =>
@@ -60,7 +60,7 @@ String seatEntryTitle(SlotOccupant o, {SeatInventory? inventory, PluginBundle? b
   return seatOccupantTitle(o, bundle: bundle);
 }
 
-/// A config occupant's row title: 「设置」, or the row's own name for one of
+/// A config occupant's row title: "Settings", or the row's own name for one of
 /// several rows (`plugins.row.config`).
 String seatConfigTitle(SlotOccupant o, {PluginBundle? bundle}) {
   if (o.slot != Slots.rowConfig) return appL10n.commonSettings;
@@ -97,7 +97,7 @@ DshWebTarget seatWebTarget(SlotOccupant o, {String? sessionId, PluginBundle? bun
 class SeatRowEntry {
   const SeatRowEntry({required this.web, required this.open});
 
-  /// It leaves for DSH Web (the row says 「网页版」).
+  /// It leaves for DSH Web (the row says "Web app").
   final bool web;
   final void Function(BuildContext context) open;
 }
@@ -132,9 +132,9 @@ SeatRowEntry seatRowEntry(WidgetRef ref, SeatContext seat, SeatItem item, {requi
 /// The seats' "open in DSH Web" entry (`SeatRenderers.webLink`).
 ///
 /// - In a list ([SeatPlacement.row], [SeatPlacement.panel]): a row named for
-///   the occupant, 「网页版」 at its end. When an island fits at page size the
+///   the occupant, "Web app" at its end. When an island fits at page size the
 ///   row opens that page instead, and says nothing about the web.
-/// - Filling a page: the occupant's name over 「在网页版打开」.
+/// - Filling a page: the occupant's name over "Open in the web app".
 class SeatWebLink extends ConsumerWidget {
   const SeatWebLink({super.key, required this.seat, required this.item});
 

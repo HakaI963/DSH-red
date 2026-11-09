@@ -1,5 +1,5 @@
-// 设置 › 插件 › 某插件, the plugin's native part (docs/design/native-plugins.md §3.7
-// 用户控制, §3.8): a switch per place it shows up, and one quiet status line —
+// Settings › Plugins › (one plugin), the plugin's native part (docs/design/native-plugins.md §3.7
+// user controls, §3.8): a switch per place it shows up, and one quiet status line —
 // problems, the last view's size, the last tap's round trip — that opens the
 // problems with their paths. Plugins without a native part get nothing here.
 

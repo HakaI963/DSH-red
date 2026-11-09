@@ -1,4 +1,4 @@
-// First run's welcome page, over 「开始」: the switch for anonymous usage
+// First run's welcome page, over "Get started": the switch for anonymous usage
 // statistics (lib/usage/usage_stats.dart), on, and what it leaves out. Every
 // fresh install sees it, on this phone or a remote host; seeing it is what
 // lets the app start counting.
@@ -14,9 +14,9 @@ import '../settings/settings_widgets.dart';
 import '../theme/theme.dart';
 
 /// ```
-///     发送匿名使用统计              ◉
-///     不含对话和个人信息，可随时关闭
-///   (               开始               )
+///     Send anonymous usage stats          ◉
+///     No chats or personal info; can be turned off anytime
+///   (              Get started              )
 /// ```
 ///
 /// Card-less and quiet, laid out as a settings row is: the text 16 in from

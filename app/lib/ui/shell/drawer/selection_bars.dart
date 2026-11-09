@@ -1,6 +1,6 @@
 // The drawer's chrome while choosing conversations: a
-// header (全选 · 已选 N 个 · 完成) in place of the brand row, and an action bar
-// (移到文件夹 · 置顶 · 归档 · 删除) in place of the identity bar, at the same heights
+// header (Select all · N selected · Done) in place of the brand row, and an action bar
+// (Move to folder · Pin · Archive · Delete) in place of the identity bar, at the same heights
 // so nothing below or above moves.
 
 import 'package:flutter/material.dart';
@@ -15,8 +15,8 @@ import '../../common/pressable.dart';
 import '../../theme/app_icons.dart';
 import '../../theme/theme.dart';
 
-/// Replaces the brand row: 全选 on the 20 line, the count centred on the
-/// drawer, 完成 where 新对话 was (same 36 pill, same 10 edge: the drawer's
+/// Replaces the brand row: Select all on the 20 line, the count centred on the
+/// drawer, Done where New chat was (same 36 pill, same 10 edge: the drawer's
 /// one primary element stays in its place).
 class DrawerSelectionHeader extends ConsumerWidget {
   const DrawerSelectionHeader({super.key, this.now});
@@ -28,7 +28,7 @@ class DrawerSelectionHeader extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = context.l10n;
     final theme = Theme.of(context);
-    // What 全选 picks: the conversations on screen.
+    // What Select all picks: the conversations on screen.
     final selectable = drawerSelectableIds(watchDrawerBlocks(ref, now: now) ?? const []);
     final selected = ref.watch(drawerSelectionProvider) ?? const {};
     final notifier = ref.read(drawerSelectionProvider.notifier);
@@ -108,7 +108,7 @@ class _TextKey extends StatelessWidget {
   }
 }
 
-/// 「完成」: the 36 primary pill in 新对话's place, even padding on both sides.
+/// "Done": the 36 primary pill in New chat's place, even padding on both sides.
 class DoneButton extends StatelessWidget {
   const DoneButton({super.key, required this.onTap});
 

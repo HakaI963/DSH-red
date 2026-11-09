@@ -35,7 +35,7 @@ String maskApiKey(String key) {
   return '$head…${k.substring(k.length - 4)}';
 }
 
-/// DeepSeek API key entry, used by onboarding and by settings ("更换 API Key").
+/// DeepSeek API key entry, used by onboarding and by settings ("Replace API Key").
 class ApiKeyPage extends ConsumerStatefulWidget {
   const ApiKeyPage({super.key, this.onDone, this.onboarding = true, this.onBack});
 
@@ -45,7 +45,7 @@ class ApiKeyPage extends ConsumerStatefulWidget {
   /// Onboarding only: shows a back button that returns to the sign-in choice.
   final VoidCallback? onBack;
 
-  /// Shows "稍后设置" and no back button.
+  /// Shows "Set up later" and no back button.
   final bool onboarding;
 
   @override
@@ -184,7 +184,7 @@ class _ApiKeyPageState extends ConsumerState<ApiKeyPage> {
     );
   }
 
-  /// The key field, its hint line and the 「获取 API Key」 card, shared by both frames.
+  /// The key field, its hint line and the "Get an API Key" card, shared by both frames.
   List<Widget> _fields(BuildContext context) {
     final l10n = context.l10n;
     final theme = Theme.of(context);

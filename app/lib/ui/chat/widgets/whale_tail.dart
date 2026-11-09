@@ -9,17 +9,17 @@ import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 
-/// DeepSeek 官方蓝。浅色玻璃上约 3.9–4.3:1(图形的 3:1 线以上)。
+/// DeepSeek's official blue. About 3.9–4.3:1 on light glass — above the 3:1 line for graphics.
 const deepSeekBlue = Color(0xFF4D6BFE);
 
-/// 深色模式的提亮版:同色相,OKLCH(0.70, 0.15, 270),在深色页面和玻璃
-/// (#14171E–#343944)上 4.2–6:1。只给图形用,文字仍用 onSurface。
+/// The brightened dark-mode variant: same hue, OKLCH(0.70, 0.15, 270), 4.2–6:1 on dark pages and glass
+/// (#14171E–#343944). For graphics only; text still uses onSurface.
 const deepSeekBlueDark = Color(0xFF7A98FB);
 
-/// 按亮度取鲸尾的默认颜色。
+/// Picks the whale tail's default color by brightness.
 Color whaleColorFor(Brightness brightness) => brightness == Brightness.dark ? deepSeekBlueDark : deepSeekBlue;
 
-/// 一档动画:一张精灵图,[frames] 帧,每帧 [frameMs] 毫秒(0 = 静止)。
+/// One animation tier: a sprite sheet, [frames] frames, [frameMs] ms per frame (0 = static).
 class WhaleSheet {
   const WhaleSheet(this.image, this.frames, this.frameMs);
   final ui.Image image;
@@ -29,7 +29,7 @@ class WhaleSheet {
   Duration get loop => Duration(milliseconds: frames * frameMs);
 }
 
-/// 四档精灵图 + 共同的帧尺寸。
+/// The four sprite sheets + the shared frame size.
 class WhaleAtlas {
   const WhaleAtlas({required this.frameWidth, required this.frameHeight, required this.columns, required this.levels});
 
@@ -42,7 +42,7 @@ class WhaleAtlas {
 
   WhaleSheet sheet(int level) => levels[level.clamp(1, 4)] ?? levels[1]!;
 
-  /// 第 [frame] 帧在精灵图里的位置。
+  /// Where frame [frame] sits inside the sprite sheet.
   Rect frameRect(int frame) {
     final row = frame ~/ columns;
     final col = frame % columns;
@@ -55,20 +55,20 @@ class WhaleAtlas {
   }
 }
 
-/// 精灵图只解码一次,进程内共享。
+/// The sprite sheet decodes once, shared in-process.
 abstract final class WhaleSprites {
   static const manifest = 'assets/whale/whale.json';
 
-  /// 清单里写的帧宽高比(加载前排版用)。
+  /// The frame aspect ratio from the manifest (used for layout before loading).
   static const aspect = 120 / 96;
 
   static WhaleAtlas? _atlas;
   static Future<WhaleAtlas>? _loading;
 
-  /// 已经加载好的;还没有为 null。
+  /// The loaded image; null while pending.
   static WhaleAtlas? get cached => _atlas;
 
-  /// 加载(只发生一次;失败了下次再试)。
+  /// The load (happens once; failure retries next time).
   static Future<WhaleAtlas> load([AssetBundle? bundle]) => _loading ??= () async {
     try {
       return _atlas = await _load(bundle ?? rootBundle);
@@ -97,32 +97,32 @@ abstract final class WhaleSprites {
   }
 }
 
-/// 鲸尾指示器。运行中一刻不停,只是游法和快慢在变:
+/// The whale-tail indicator. While running it never stops — only the stroke and pace change:
 ///
-/// | [level] | 什么时候 | 游法 | 速度 |
+/// | [level] | when | stroke | speed |
 /// |---|---|---|---|
-/// | 0 | 等你确认 / 回答 | 第 2 套 | 0.3× |
-/// | 1 | 在跑工具、等首字(没有字在流) | 第 2 套 | 0.5× |
-/// | 2 | 慢慢吐字 | 第 2 套 | 1× |
-/// | 3 | 正常速度 | 第 3 套 | 1× |
-/// | 4 | 飞快 | 第 4 套 | 1× |
+/// | 0 | waiting on your confirmation / answer | set 2 | 0.3× |
+/// | 1 | tools running, waiting for the first token (no text streaming) | set 2 | 0.5× |
+/// | 2 | slowly emitting text | set 2 | 1× |
+/// | 3 | normal speed | set 3 | 1× |
+/// | 4 | racing | set 4 | 1× |
 ///
-/// - 速度不跳:每一帧朝目标速度缓过去(时间常数约 0.35 秒)。
-/// - 游法不硬切:新旧两套同时继续游,交叉淡变 [_blend]。
-/// - 帧与帧之间按进度混合:放慢时也不会一格一格地跳。
+/// - Speed never jumps: each frame eases toward the target speed (time constant ≈0.35 s).
+/// - Strokes never hard-cut: old and new sets keep swimming together, crossfading over [_blend].
+/// - Blending by progress between frames: even slowed down it doesn't tick frame by frame.
 ///
-/// [still] 时(空状态的品牌图形)画静止的那一帧;系统关闭动画时也是。
-/// 精灵图是白色 + alpha 的蒙版,画的时候用 [color] 上色。
+/// With [still] (the empty state's brand graphic) paint the static frame; same when system animations are off.
+/// The sprite sheet is a white+alpha mask; it is painted tinted with [color].
 class WhaleTail extends StatefulWidget {
   const WhaleTail({super.key, this.level = 1, required this.color, this.height = 20, this.still = false});
 
   final int level;
   final Color color;
 
-  /// 帧的高度;宽度按帧比例(5:4)。
+  /// The frame's height; width follows the frame ratio (5:4).
   final double height;
 
-  /// 不动:静止的那一帧,没有计时器。
+  /// Motionless: the static frame, no timers.
   final bool still;
 
   @override
@@ -135,18 +135,18 @@ class WhaleTailState extends State<WhaleTail> with SingleTickerProviderStateMixi
   WhaleAtlas? _atlas = WhaleSprites.cached;
   bool _reduced = false;
 
-  /// 交叉淡变的时长。
+  /// The crossfade's duration.
   static const _blend = Duration(milliseconds: 320);
 
-  /// 速度追向目标的时间常数(秒)。
+  /// The time constant the speed chases its target with (seconds).
   static const _ease = 0.35;
 
-  /// 正在游的那一套([_from] 是淡出中的上一套,淡完为 null)。
+  /// The set currently swimming ([_from] is the previous set fading out; null once faded).
   int _form = 2;
   int? _from;
   double _mix = 1;
 
-  /// 每一套各自的进度(帧,含小数):淡变时两套都在走。
+  /// Each set's own progress (frames, fractional): during a blend both keep moving.
   final _phase = <int, double>{};
 
   double _rate = 0;
@@ -203,15 +203,15 @@ class WhaleTailState extends State<WhaleTail> with SingleTickerProviderStateMixi
 
   bool get _moving => !widget.still && !_reduced;
 
-  /// 正在游的那一套;静止时为 1(静止图)。
+  /// The set currently swimming; 1 (the static image) when still.
   @visibleForTesting
   int get shownForm => _moving ? _form : 1;
 
-  /// 当前速度倍数(朝 [WhaleTail.level] 的目标缓过去)。
+  /// The current speed multiplier (easing toward [WhaleTail.level]'s target).
   @visibleForTesting
   double get rate => _rate;
 
-  /// 当前这一套游到第几帧(取整)。
+  /// Which frame the current set is on (rounded).
   @visibleForTesting
   int get frame => (_phase[_form] ?? 0).floor();
 
@@ -268,7 +268,7 @@ class WhaleTailState extends State<WhaleTail> with SingleTickerProviderStateMixi
     );
   }
 
-  /// (套, 进度, 权重):淡变时两套,其余一套;静止时是静止图。
+  /// (set, progress, weight): two sets while blending, one otherwise; the static image when still.
   List<(int, double, double)> _layers() {
     if (!_moving) return const [(1, 0, 1)];
     return [

@@ -50,7 +50,7 @@ import 'session_tab.dart';
 
 export 'session_tab.dart';
 
-/// Where 对话详情 is drawn.
+/// Where Chat details is drawn.
 enum SessionDetailMode {
   /// A page of its own (phones).
   page,
@@ -75,19 +75,19 @@ bool dispatchedSubagents(Iterable<ChatItem> items) =>
 /// fight the conversation drawer's gesture on the left. Wider windows change
 /// the form ([SessionDetailMode]), not the tabs or their content; all three
 /// forms share one current tab ([sessionDetailTabProvider]). Always open it
-/// through [open]. 子代理 shows once the conversation has dispatched subagents,
+/// through [open]. Subagents shows once the conversation has dispatched subagents,
 /// or when opened from a subagent entry.
 class SessionDetailPage extends ConsumerStatefulWidget {
   const SessionDetailPage({super.key, required this.sessionId, this.initialTab, this.mode = SessionDetailMode.page});
 
-  /// 对话详情 beside the chat.
+  /// Chat details beside the chat.
   const SessionDetailPage.panel({super.key, required this.sessionId})
     : initialTab = null,
       mode = SessionDetailMode.panel;
 
   final String sessionId;
 
-  /// Null: 轨迹 on a page; the shared tab in the sheet and the panel.
+  /// Null: Trajectory on a page; the shared tab in the sheet and the panel.
   final SessionTab? initialTab;
   final SessionDetailMode mode;
 
@@ -96,7 +96,7 @@ class SessionDetailPage extends ConsumerStatefulWidget {
         builder: (_) => SessionDetailPage(sessionId: sessionId, initialTab: initialTab),
       );
 
-  /// Opens 对话详情 in the window's form: the panel beside the chat (shown,
+  /// Opens Chat details in the window's form: the panel beside the chat (shown,
   /// or folded when [toggle] and it already shows), the wide sheet, or a
   /// page. [tab] picks the tab.
   static void open(BuildContext context, String sessionId, {SessionTab? tab, bool toggle = false}) =>
@@ -117,7 +117,7 @@ class _SessionDetailPageState extends ConsumerState<SessionDetailPage> with Tick
   static const _pageBarHeight = 56.0;
   static const _tabsHeight = 52.0;
 
-  /// The tabs but 插件, decided when the page opens.
+  /// The tabs but Plugins, decided when the page opens.
   late final List<SessionTab> _baseTabs;
   late List<SessionTab> _tabs;
   late TabController _controller;
@@ -160,7 +160,7 @@ class _SessionDetailPageState extends ConsumerState<SessionDetailPage> with Tick
     ref.read(sessionDetailTabProvider.notifier).select(_tabs[_controller.index]);
   }
 
-  /// 插件 comes and goes with the host's plugin tabs for the conversation;
+  /// Plugins comes and goes with the host's plugin tabs for the conversation;
   /// the tab on screen stays where it is.
   void _syncPluginsTab(bool plugins) {
     if (plugins == _tabs.contains(SessionTab.plugins)) return;
@@ -276,7 +276,7 @@ class _SessionDetailPageState extends ConsumerState<SessionDetailPage> with Tick
       if (mounted) _measureHero();
     });
     if (_mode != SessionDetailMode.page) {
-      // Another entry (the progress strip, 全部功能) picked a tab.
+      // Another entry (the progress strip, All features) picked a tab.
       ref.listen(sessionDetailTabProvider, (_, tab) {
         final i = _tabs.indexOf(tab);
         if (i >= 0 && i != _controller.index) _controller.animateTo(i);
@@ -496,7 +496,7 @@ class _FadeTop extends StatelessWidget {
 }
 
 /// The page head: the conversation's title (two lines at most), how many
-/// rounds and whether one runs, then 用时 / 步骤 / 改动文件. Without a [title]
+/// rounds and whether one runs, then Elapsed / Steps / Files changed. Without a [title]
 /// (the panel and the sheet, named in their bar) the rounds line leads.
 class SessionHero extends ConsumerWidget {
   const SessionHero({super.key, required this.sessionId, required this.title, this.gutter = 24});
@@ -740,10 +740,10 @@ EdgeInsets _listPadding(BuildContext context) =>
     EdgeInsets.fromLTRB(0, 4, 0, MediaQuery.paddingOf(context).bottom + 24);
 
 // -----------------------------------------------------------------------------
-// 轨迹 (trajectory)
+// Trajectory
 
 /// One card per round, newest first; opened, it shows the same rows as the
-/// 本轮轨迹 sheet.
+/// The Turn trajectory sheet.
 class TrajectoryTab extends ConsumerWidget {
   const TrajectoryTab({super.key, required this.sessionId});
 
@@ -965,7 +965,7 @@ class _TurnCardState extends State<_TurnCard> {
 }
 
 // -----------------------------------------------------------------------------
-// 改动 (changes)
+// Changes
 
 /// Every file the conversation changed: one merged diff per file, tagged with
 /// the round that last changed it.
@@ -1057,7 +1057,7 @@ class _ChangesTabState extends ConsumerState<ChangesTab> {
 }
 
 // -----------------------------------------------------------------------------
-// 进度 (progress)
+// Progress
 
 /// The goal, plan mode and the todo list.
 class ProgressTab extends ConsumerWidget {
@@ -1216,7 +1216,7 @@ class _TodoRow extends StatelessWidget {
 }
 
 // -----------------------------------------------------------------------------
-// 上下文 (context)
+// Context
 
 /// The context window and this conversation's tokens (the usage sheet's
 /// data), plus the usage of each round.
@@ -1302,7 +1302,7 @@ class ContextTab extends ConsumerWidget {
 }
 
 // -----------------------------------------------------------------------------
-// 子代理 (subagents)
+// Subagents
 
 /// This conversation's subagents: the lineage first (who dispatched whom and
 /// what each is doing; a row opens its own conversation, where it can be

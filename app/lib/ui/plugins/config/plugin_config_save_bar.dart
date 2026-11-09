@@ -1,14 +1,14 @@
-// The bar under a plugin's configuration while edits wait for 保存: one
+// The bar under a plugin's configuration while edits wait for Save: one
 // status line, centred, over two equal buttons that mirror each other.
 //
 // ```
-//            2 项更改 · 保存后重新载入插件
-// |16| [      放弃      ] |12| [      保存      ] |16|
+//            2 changes · saving reloads the plugin
+// |16| [     Discard    ] |12| [      Save      ] |16|
 // ```
 //
 // Saving and reloading keep the line (with a quiet ring) and grey the
-// buttons; 已生效 stays a moment on its own; a failure says so in red and
-// offers 重试 beside 放弃 — or 恢复原设置 when the Host could not undo it.
+// buttons; Applied stays a moment on its own; a failure says so in red and
+// offers Retry beside Discard — or Restore defaults when the Host could not undo it.
 
 import 'package:flutter/material.dart';
 
@@ -125,7 +125,7 @@ class PluginConfigSaveBar extends StatelessWidget {
       ),
     );
 
-    // Left: 放弃 or 恢复原设置; right: 保存 or 重试 (the one primary key).
+    // Left: Discard or Restore defaults; right: Save or Retry (the one primary key).
     final unsettled = failure != null && !failure.settled;
     final left = unsettled ? l10n.pluginConfigRestore : l10n.pluginConfigDiscard;
     final right = failure != null ? l10n.commonRetry : l10n.commonSave;

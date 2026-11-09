@@ -18,17 +18,17 @@ import '../run_info.dart';
 import 'live_clock.dart';
 import 'whale_tail.dart';
 
-/// 生成中,输入条正上方的一颗玻璃胶囊:鲸尾(游速 = 出字速度)+ 此刻在做
-/// 什么 + 一句自述或趣味文案 + 本轮用时,有待办时右端是进度。点一下看本轮
-/// 轨迹;长按几秒内换成这一步的用时和估算速度。
+/// While generating, a glass pill above the input bar: whale tail (swim speed = output speed) + what it's doing
+/// now + a self-narration or whimsical line + this turn's elapsed time; with a todo, the right end shows progress. Tap for this
+/// turn's trajectory; long-press for a few seconds and it swaps to this step's duration and estimated speed.
 ///
 /// ```
-/// ( 🐋 跑  flutter test test/auth           0:19 │ 进度 3/5 ▰▰▰▱▱ )
-/// ( 🐋 思考中  脑子在冒烟                    0:07 )
+/// ( 🐋 run  flutter test test/auth           0:19 │ Progress 3/5 ▰▰▰▱▱ )
+/// ( 🐋 thinking  brain's practically smoking         0:07 )
 /// ```
 ///
-/// 只订阅 [runActivityOf] 的结果(值相等不重建)和 [RunPulse](换档、压缩
-/// 开始结束时才通知);走秒和文案轮换只重建文字那一段。
+/// Subscribes only to [runActivityOf]'s result (equal values don't rebuild) and [RunPulse] (notifies only on
+/// gear changes, compaction start/end); the ticking seconds and rotating copy rebuild just the text span.
 class ActivityStripSlot extends ConsumerStatefulWidget {
   const ActivityStripSlot({super.key, required this.sessionId, this.onTap, this.todoProgress = true});
 
@@ -42,10 +42,10 @@ class ActivityStripSlot extends ConsumerStatefulWidget {
   ConsumerState<ActivityStripSlot> createState() => _ActivityStripSlotState();
 }
 
-/// 出现时胶囊从输入条背后升起,收起时沉回去:插槽高度跟着动画走(列表的
-/// 底边距随之变化),胶囊本身始终整颗画出、不裁不淡。露在插槽外的下半截
-/// 被后画的输入条盖住,隔着它的毛玻璃只看得到一团模糊,不会和后面的消息
-/// 文字叠在一起,也没有被裁出来的硬边。
+/// On appearance the pill rises from behind the input bar and sinks back on dismissal: the slot's height animates along (the
+/// list's bottom padding follows), and the pill itself always paints whole — never clipped or faded. The lower half peeking
+/// past the slot is covered by the later-painted input bar; through its frosted glass you only see a blur, so it never
+/// clashes with the message text behind it, and there's no hard clipped edge.
 class _ActivityStripSlotState extends ConsumerState<ActivityStripSlot> with SingleTickerProviderStateMixin {
   late final AnimationController _rise = AnimationController(vsync: this, duration: AppMotion.standard)
     ..addStatusListener(_onStatus);
@@ -83,7 +83,7 @@ class _ActivityStripSlotState extends ConsumerState<ActivityStripSlot> with Sing
   }
 
   /// Starts rising / sinking right away, from build: its clock then counts
-  /// from this frame, like the reply actions and the "发送中" line that
+  /// from this frame, like the reply actions and the "Sending" line that
   /// start in didUpdateWidget, so they all move in step.
   void _drive(bool visible) {
     final status = _rise.status;
@@ -106,7 +106,7 @@ class _ActivityStripSlotState extends ConsumerState<ActivityStripSlot> with Sing
         final shown = compacting != null ? compactionActivity(ref.read(chatProvider(sessionId)), compacting) : activity;
         if (shown != null) {
           _last = shown;
-          // 等你时最慢的一档(0),不停下。
+          // The slowest gear (0) while waiting on you — it never stops.
           _lastLevel = shown.waiting || shown.kind == ActivityKind.stopping ? 0 : pulse.level;
         }
         _drive(shown != null);
@@ -159,23 +159,23 @@ class ActivityStrip extends StatefulWidget {
 
   final RunActivity activity;
 
-  /// 鲸尾档位:0 等你,1–4 见 [SpeedGauge](见 [WhaleTail])。
+  /// Whale-tail gears: 0 waiting on you, 1–4 see [SpeedGauge] (see [WhaleTail]).
   final int speedLevel;
 
-  /// 长按时读一次当前估算速度。
+  /// On long press, read the current estimated speed once.
   final double Function()? tokensPerSecond;
   final VoidCallback? onTap;
 
-  /// 鲸尾颜色;缺省是 DeepSeek 蓝(深色模式提亮),等你时是警示色。
+  /// The whale tail's color; default is DeepSeek blue (brightened in dark mode), warning color while waiting on you.
   final Color? whaleColor;
 
-  /// 右端的待办进度;聊天页上方有待办条时关掉,免得说两遍。
+  /// The todo progress at the right end; disabled when the chat page already has a todo bar above — no need to say it twice.
   final bool todoProgress;
 
-  /// 左端的鲸尾。宠物站在胶囊上时收起(位置一起收掉,左右内边距相等)。
+  /// The whale tail at the left end; retracts while a pet stands on the pill (the slot goes too, keeping equal side padding).
   final bool whale;
 
-  /// 长按后统计显示多久。
+  /// How long the post-long-press stats stay up.
   static const statsFor = Duration(seconds: 4);
 
   @override
@@ -242,7 +242,7 @@ class _ActivityStripState extends State<ActivityStrip> {
                           child: Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              // 自己一层:鲸尾每帧在动,不连累玻璃里的其余内容重绘。
+                              // Its own layer: the whale tail moves every frame and shouldn't force the glass pill's other content to repaint.
                               RepaintBoundary(
                                 child: WhaleTail(level: widget.speedLevel, color: whale, height: 20),
                               ),
@@ -281,7 +281,7 @@ class _ActivityStripState extends State<ActivityStrip> {
     );
   }
 
-  /// 长按的那几秒:这一步多久了 + 估算的出字速度。
+  /// Those seconds of long press: how long this step has taken + the estimated output speed.
   static String _stats(RunActivity a, double tps) {
     final since = a.since;
     final step = since == null ? null : formatClock(LiveElapsed.elapsedSince(since, a.skew));
@@ -290,7 +290,7 @@ class _ActivityStripState extends State<ActivityStrip> {
   }
 }
 
-/// 标题 + 第二段(工具目标 / 自述 / 文案 / 统计)+ 本轮用时。
+/// Title + second span (tool target / self-narration / rotating copy / stats) + this turn's elapsed time.
 class _Line extends StatelessWidget {
   const _Line({required this.activity, required this.elapsed, this.stats});
 
@@ -375,7 +375,7 @@ class _Line extends StatelessWidget {
   }
 }
 
-/// `进度 3/5` + 一根 3dp 细条。
+/// `Progress 3/5` + a 3dp thin bar.
 class TodoProgress extends StatelessWidget {
   const TodoProgress({super.key, required this.done, required this.total, this.barWidth = 30, this.showLabel = true});
 

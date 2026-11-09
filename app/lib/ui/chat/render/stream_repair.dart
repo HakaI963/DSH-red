@@ -269,7 +269,7 @@ class _InlineScan {
   static final _linkTargetEnd = RegExp(r'[)\n]');
 
   /// A marker run at the very end that neither opened nor closed anything
-  /// (`这是 **`, `然后 *`): it waits for the next character.
+  /// (`this is **`, `then *`): it waits for the next character.
   int? dangling;
 
   int _delimiterRun(int i, String c) {
@@ -381,6 +381,6 @@ bool _isSpace(String c) => c == ' ' || c == '\t' || c == '\n' || c == '\r' || c 
 bool _isPunct(String c) {
   final unit = c.codeUnitAt(0);
   if (unit < 0x80) return RegExp(r'[!-/:-@\[-`{-~]').hasMatch(c);
-  // CJK and full-width punctuation count, so `**「重点」**` still pairs.
+  // CJK and full-width punctuation count, so a quoted emphasis still pairs.
   return (unit >= 0x3000 && unit <= 0x303F) || (unit >= 0xFF00 && unit <= 0xFF65) || unit == 0x2014 || unit == 0x2026;
 }

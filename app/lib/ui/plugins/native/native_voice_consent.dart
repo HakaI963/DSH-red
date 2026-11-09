@@ -1,7 +1,7 @@
 // Asking whether a native plugin may hear the person speak (v1.2 `voice`,
 // docs/design/native-plugins-protocol.md §11.4). Asked once per host and
-// plugin, before Android's own microphone permission; 「不允许」 is remembered, and
-// the plugin's 「听你开口」 switch changes it later.
+// plugin, before Android's own microphone permission; "Don't allow" is remembered, and
+// the plugin's "Listen when you speak" switch changes it later.
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';

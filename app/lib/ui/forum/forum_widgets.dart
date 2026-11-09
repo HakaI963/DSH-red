@@ -15,7 +15,7 @@ import '../theme/theme.dart';
 
 // ── Time ─────────────────────────────────────────────────────────────────────
 
-/// `刚刚`, `5 分钟前`, `3 小时前`, `昨天`, `6 天前`, `10月3日`, `2025年3月1日`.
+/// `just now`, `5 min ago`, `3 hours ago`, `yesterday`, `6 days ago`, `Oct 3`, `Mar 1, 2025`.
 String forumAgo(DateTime? at, {DateTime? now}) {
   if (at == null) return '';
   final current = now ?? DateTime.now();
@@ -29,7 +29,7 @@ String forumAgo(DateTime? at, {DateTime? now}) {
   return appL10n.remoteForumYearDate(at.year, at.month.toString(), at.day);
 }
 
-/// `1.2万` for big counts, plain digits below ten thousand.
+/// `12K` for big counts, plain digits below ten thousand.
 String forumCount(int n) {
   if (n < 10000) return '$n';
   if (appL10n.localeName == 'en') return NumberFormat.compact(locale: 'en').format(n);
@@ -191,8 +191,8 @@ class ForumCategoryDot extends StatelessWidget {
 /// One topic in a list:
 ///
 /// ```
-/// │ 标题，最多两行                                   ◍◍◍ │
-/// │ ● 插件 · 12 回复 · 3 小时前                           │
+/// │ title, up to two lines                                ◍◍◍ │
+/// │ ● Plugin · 12 replies · 3 hours ago                          │
 /// ```
 class ForumTopicRow extends StatelessWidget {
   const ForumTopicRow({super.key, required this.topic, this.category, this.onTap, this.showCategory = true});

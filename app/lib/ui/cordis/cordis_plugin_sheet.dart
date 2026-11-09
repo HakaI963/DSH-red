@@ -31,17 +31,17 @@ Future<void> showCordisPluginSheet(BuildContext context, CordisPlugin plugin) =>
     showAppSheet<void>(context, isScrollControlled: true, builder: (_) => CordisPluginSheet(initial: plugin));
 
 /// Opens DSH Web on a target; tests swap it for a recorder. (The same shape
-/// as 全部功能's opener, kept here so this sheet doesn't pull in the catalog.)
+/// as All features' opener, kept here so this sheet doesn't pull in the catalog.)
 final cordisWebOpenerProvider = Provider<void Function(BuildContext context, WidgetRef ref, DshWebTarget target)>(
   (ref) =>
       (context, ref, target) => openDshWeb(context, ref, target: target),
 );
 
-/// Where 「在网页版打开」 lands: the owning conversation, with the Cordis
+/// Where "Open in web" lands: the owning conversation, with the Cordis
 /// panel open.
 DshWebTarget cordisWebTarget(CordisPlugin plugin) => DshWebTarget(sessionId: plugin.agentId, panel: DshWebPanel.cordis);
 
-/// 「后台和界面」: which halves the shown version has.
+/// "Backend & interface": which halves the shown version has.
 String cordisMakeup(CordisPackage package) => switch ((package.hasHostHalf, package.hasClientHalf)) {
   (true, true) => appL10n.catalogCordisHostClient,
   (true, false) => appL10n.catalogCordisHostOnly,
@@ -237,7 +237,7 @@ class _CordisPluginSheetState extends ConsumerState<CordisPluginSheet> {
   }
 }
 
-/// What failed, in words, with the Host's own message behind 「详情」.
+/// What failed, in words, with the Host's own message behind "Details".
 class _FailureLine extends StatelessWidget {
   const _FailureLine({required this.text, required this.detail, required this.open, required this.onToggle});
 

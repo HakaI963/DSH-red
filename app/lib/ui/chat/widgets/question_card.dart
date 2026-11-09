@@ -13,9 +13,9 @@ import 'stream_motion.dart';
 
 typedef QuestionResponder = Future<void> Function(UserQuestionRequest request, List<QuestionAnswer> answers);
 
-/// 提问卡(`ask_user_question`):[ChatCard] 的「提问」语气,与审批卡同一套
-/// 解剖;选项是可选中的行(按下缩放),底部一个通栏的「提交」;能拒绝时
-/// 与「不回答」左右成对,同审批卡。
+/// The question card (`ask_user_question`): [ChatCard]'s "question" register, the same
+/// anatomy as the approval card; options are selectable rows (scale on press), one full-width "Submit" at the bottom; when refusal is possible
+/// "Don't answer" pairs with it left/right, same as on the approval card.
 class QuestionCard extends StatefulWidget {
   const QuestionCard({super.key, required this.request, required this.onAnswer, this.onReject});
 
@@ -38,8 +38,8 @@ class _QuestionCardState extends State<QuestionCard> {
   /// The in-flight action is the decline (its button shows the spinner).
   bool _declining = false;
 
-  /// 选到一半滚出屏幕、切去别的对话再回来,选择和自填都还在:草稿记在
-  /// 所在路由的 [PageStorage] 里。
+  /// Picked halfway, scrolled off screen, switched to another chat and back — the selections and free-form text survive: the draft lives in
+  /// the route's [PageStorage].
   String get _draftId => 'question-${widget.request.eventId}';
 
   @override
@@ -73,7 +73,7 @@ class _QuestionCardState extends State<QuestionCard> {
     super.dispose();
   }
 
-  /// 每题都要有答案(选项或自填)才能提交。
+  /// Every question needs an answer (an option or free text) before Submit unlocks.
   bool get _complete {
     for (var i = 0; i < widget.request.questions.length; i++) {
       if (_picked[i].isEmpty && _custom[i].text.trim().isEmpty) return false;
@@ -90,7 +90,7 @@ class _QuestionCardState extends State<QuestionCard> {
         picked
           ..clear()
           ..add(option);
-        // 单选题点了选项就收起自填,避免两份答案互相打架。
+        // Single-choice questions hide the free-text field once an option is tapped, so the two answers can't fight.
         if (widget.request.questions[q].options.isNotEmpty) {
           _custom[q].clear();
           _customOpen[q] = false;
@@ -292,7 +292,7 @@ class _QuestionBlock extends StatelessWidget {
               child: TextButton.icon(
                 onPressed: enabled ? onToggleCustom : null,
                 icon: AnimatedRotation(
-                  // ＋ 转 45° 成 ×:同一个图形,不换图标。
+                  // + rotated 45° becomes ×: the same shape, no icon swap.
                   turns: customOpen ? 0.125 : 0,
                   duration: AppMotion.of(context, AppMotion.standard),
                   curve: AppMotion.std,
@@ -330,7 +330,7 @@ class _QuestionBlock extends StatelessWidget {
   }
 }
 
-/// 可选中的选项行:选中 = 主色浅底 + 主色细线 + 实心勾;按下轻轻缩放。
+/// A selectable option row: selected = sheer accent ground + accent hairline + solid check; scales gently on press.
 class _OptionRow extends StatelessWidget {
   const _OptionRow({
     required this.option,
@@ -377,7 +377,7 @@ class _OptionRow extends StatelessWidget {
             clipBehavior: Clip.antiAlias,
             child: InkWell(
               onTap: enabled ? onTap : null,
-              // 读屏:选中态和单选组读在这一行自己的节点上。
+              // Screen reader: the selected state and the radio group are announced on the row's own node.
               child: Semantics(
                 checked: selected,
                 inMutuallyExclusiveGroup: multi ? null : true,

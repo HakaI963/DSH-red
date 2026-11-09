@@ -103,10 +103,10 @@ import 'widgets/plus_panel.dart';
 import 'widgets/quote_chip.dart';
 import 'widgets/read_only_bar.dart';
 
-/// 聊天页:玻璃顶栏 + 消息列表 + 玻璃输入条。
+/// The chat page: glass header + message list + glass input bar.
 ///
-/// 读 [currentSessionProvider];为 null 时是"新对话"空状态,第一次发送时
-/// 才建会话(create → select → send)。
+/// Reads [currentSessionProvider]; null means the "New chat" empty state, and the session is only created on
+/// the first send (create → select → send).
 class ChatScreen extends ConsumerStatefulWidget {
   const ChatScreen({super.key, this.onOpenDrawer, this.backdrop = true});
 
@@ -186,13 +186,13 @@ class _ChatScreenState extends ConsumerState<ChatScreen> with WidgetsBindingObse
   late final VoiceInputActiveController _voiceFlag;
   final _focus = FocusNode();
 
-  /// 底色遮罩的实心高度:页面布局排好输入条时写入(见 [_ChatLayout])。
+  /// The solid height of the backdrop scrim: written once the page layout has placed the input bar (see [_ChatLayout]).
   final _veilHeight = ValueNotifier<double>(0);
 
   /// How far the list has scrolled under the header (0..1), for its fade.
   final _scrolledUnder = ValueNotifier<double>(0);
 
-  /// Picked in the ＋ menu, not sent yet.
+  /// Picked in the + menu, not sent yet.
   List<DraftAttachment> _drafts = const [];
 
   /// Only this creation may own the composer's busy state.
@@ -210,7 +210,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> with WidgetsBindingObse
   /// How the last turn ended, for the header's live region.
   String? _spoken;
 
-  /// 每个对话一份草稿:换对话时输入条换成那个对话的字和附件。
+  /// One draft per conversation: switching conversations swaps the input bar's text and attachments to that conversation's.
   late final DraftStore _draftStore;
 
   /// The open conversation's id, or `new`.
@@ -292,7 +292,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> with WidgetsBindingObse
     setState(() => _showDraft(ref.read(draftStoreProvider).drafts[key]));
   }
 
-  /// 没有会话时的错误(建会话失败),会话内的错误走 ChatState.error。
+  /// Errors with no session (session creation failed); errors inside a session go through ChatState.error.
   String? _localError;
 
   @override
@@ -370,12 +370,12 @@ class _ChatScreenState extends ConsumerState<ChatScreen> with WidgetsBindingObse
     _focus.requestFocus();
   }
 
-  /// Skills handed over from 技能: `/name` alone is then a message, never a
+  /// Skills handed over from the Skills page: `/name` alone is then a message, never a
   /// command whose name merely starts the same way (a new chat has no skill
   /// list to tell them apart).
   final _handedSkills = <String>{};
 
-  /// 技能 › 「在对话里用」/「新对话里用」: the word into that conversation's
+  /// Skills › "Use in chat" / "Use in a new chat": the word into that conversation's
   /// composer (null: a new one) at the caret, focused, confirmed above it.
   void _takeComposerInsert() {
     final insert = ref.read(composerInsertProvider.notifier).take();
@@ -400,8 +400,8 @@ class _ChatScreenState extends ConsumerState<ChatScreen> with WidgetsBindingObse
     _composerToast(composerInsertedText);
   }
 
-  /// A toast about the composer (a fork's 「返回原对话」, an inserted skill): above
-  /// it, once the frame has laid out whatever just went into it (编辑后重发's text)
+  /// A toast about the composer (a fork's "Return to original chat", an inserted skill): above
+  /// it, once the frame has laid out whatever just went into it (edit-and-resend's text)
   /// and the capsule has finished growing to it.
   void _composerToast(String message, {String? actionLabel, VoidCallback? onAction}) {
     void show() {
@@ -429,7 +429,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> with WidgetsBindingObse
   Timer? _composerToastWait;
 
   /// A phone's composer opens into two rows while typing. A window too short for the
-  /// extra row keeps it on one: the model is on the side panel's 信息 there.
+  /// extra row keeps it on one: the model is on the side panel's Info there.
   bool _composerOpens(BuildContext context) {
     final size = MediaQuery.sizeOf(context);
     return size.width < WindowClass.mediumMin && size.height >= WindowClass.compactHeight;
@@ -605,7 +605,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> with WidgetsBindingObse
     final generation = client.mux.generation;
     final scope = _draftScope;
     bool ownsDraft() => identical(_draftScope, scope) && _sameConnection(client, generation);
-    // 引用追问: the passage above the composer goes in front, as a quote.
+    // Quote follow-up: the passage above the composer goes in front, as a quote.
     final quote = ref.read(composerQuoteProvider)[_draftKey];
     final asked = quote == null ? typed : withQuote(quote, typed);
     // The header grammar refuses what it can't carry (§4.6.4): nothing goes.
@@ -701,7 +701,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> with WidgetsBindingObse
       identical(ref.read(activeConnectionProvider).value?.client, client) &&
       identical(client.mux.generation, generation);
 
-  /// 没发出去:把字、附件和引用还给那个对话(用户还没开始打新的才还)。
+  /// Not sent: hand the text, attachments and quote back to that conversation (only if the user hasn't started typing something new).
   void _giveBack(String sessionId, String text, List<DraftAttachment> attachments, {String? quote}) {
     final quotes = ref.read(composerQuoteProvider.notifier);
     if (quote != null && ref.read(composerQuoteProvider)[sessionId] == null) {
@@ -724,7 +724,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> with WidgetsBindingObse
     _saveDraft();
   }
 
-  /// 「重新回答」, second half: the fork is open; send the prompt there as
+  /// "Answer again", second half: the fork is open; send the prompt there as
   /// it was. Not sent: it waits in that conversation's composer.
   Future<void> _resend(String sessionId, String text, List<DraftAttachment> images) async {
     final client = ref.read(activeConnectionProvider).value?.client;
@@ -736,14 +736,14 @@ class _ChatScreenState extends ConsumerState<ChatScreen> with WidgetsBindingObse
     _giveBack(sessionId, quote == null ? text : body, images, quote: quote);
   }
 
-  /// 「引用」 on a reply of [sessionId]: the passage above its composer.
+  /// "Quote" on a reply of [sessionId]: the passage above its composer.
   void _quote(String sessionId, String passage) {
     ref.read(composerQuoteProvider.notifier).set(sessionId, passage);
     _focus.requestFocus();
   }
 
   /// [message] into the composer, its leading quote back above it as the
-  /// chip (「编辑后重发」 of a message that quoted something), a generation
+  /// chip ("edit and resend" of a message that quoted something), a generation
   /// request's header back as the mode. [quoteChip] false
   /// keeps it all as text (shared text: the chip would cut a long quote);
   /// [restoreMode] false takes a leading header as text too (a description
@@ -774,9 +774,9 @@ class _ChatScreenState extends ConsumerState<ChatScreen> with WidgetsBindingObse
   bool _takingCompose = false;
 
   /// The share sheet, a launcher shortcut, the tile, a file opened with the
-  /// app (ui/shell/system_entry_host.dart): 新对话, its composer filled — the
+  /// app (ui/shell/system_entry_host.dart): New chat, its composer filled — the
   /// shared text under what was there, attachments after its own — and
-  /// focused, or listening for 「语音输入」. Nothing is sent.
+  /// focused, or listening for voice input. Nothing is sent.
   void _takeCompose() {
     if (_takingCompose) return;
     _takingCompose = true;
@@ -874,7 +874,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> with WidgetsBindingObse
     await _send(mode: mode);
   }
 
-  /// 「立即发送」 / 「发送」 on a waiting message.
+  /// "Send now" / "Send" on a waiting message.
   Future<void> _sendNow(PendingPrompt prompt) async {
     final sessionId = ref.read(currentSessionProvider);
     if (sessionId == null) return;
@@ -894,7 +894,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> with WidgetsBindingObse
     _giveBack(sessionId, quote == null ? prompt.text : body, prompt.attachments, quote: quote);
   }
 
-  /// "撤回" on a queued message: out of the inbox and back into the composer
+  /// "Withdraw" on a queued message: out of the inbox and back into the composer
   /// (unless the person already started typing something new).
   Future<void> _withdraw(PendingPrompt prompt) async {
     final sessionId = ref.read(currentSessionProvider);
@@ -936,7 +936,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> with WidgetsBindingObse
   }
 
   // ---------------------------------------------------------------------------
-  // 附件
+  // Attachments
 
   Future<void> _attach() async {
     final room = maxAttachments - _drafts.length;
@@ -1063,9 +1063,9 @@ class _ChatScreenState extends ConsumerState<ChatScreen> with WidgetsBindingObse
   }
 
   // ---------------------------------------------------------------------------
-  // 生成模式 (docs/design/media-generation.md §4.2)
+  // Generation mode (docs/design/media-generation.md §4.2)
 
-  /// The last mode came from 编辑: the hint asks how to change it.
+  /// The last mode came from Edit: the hint asks how to change it.
   bool _editing = false;
 
   /// This host can generate now: the plugin runs, its catalogue reads, and a
@@ -1075,8 +1075,8 @@ class _ChatScreenState extends ConsumerState<ChatScreen> with WidgetsBindingObse
 
   /// Into generation mode for this conversation: its own mode if it has one,
   /// else the kind used last ([kind] picks one). A host that only offers the
-  /// plugin gets 「在此主机上安装」; a catalogue that is missing, damaged or
-  /// of an unknown version, 「生成模式不可用」 (chat goes on as usual).
+  /// plugin gets "Install on this host"; a catalogue that is missing, damaged or
+  /// of an unknown version → "Generation mode unavailable" (chat goes on as usual).
   void _enterGenerate({GenerateKind? kind, bool edit = false}) {
     if (ref.read(mediaPluginProvider) != MediaPluginState.ready) {
       unawaited(showMediaInstallSheet(context));
@@ -1122,7 +1122,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> with WidgetsBindingObse
     );
   }
 
-  /// The plugin is there with no service yet: 图像与视频 first, then the
+  /// The plugin is there with no service yet: Images & video first, then the
   /// mode once a service is set up.
   Future<void> _configureMedia({GenerateKind? kind, bool edit = false}) async {
     final key = _draftKey;
@@ -1131,7 +1131,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> with WidgetsBindingObse
     _enterGenerate(kind: kind, edit: edit);
   }
 
-  /// A generation request back in the composer (编辑后重发): exactly its
+  /// A generation request back in the composer (edit and resend): exactly its
   /// values become this conversation's mode, its model by marker or by a
   /// name only one choice has; otherwise the sheet asks (§4.6.5).
   void _restoreGenerate(GenerateHeader header) {
@@ -1191,7 +1191,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> with WidgetsBindingObse
   }
 
   /// ↻ on a card: the same request again, as a new generation message — when
-  /// the card's model pins one of this host's choices. Otherwise it is 修改:
+  /// the card's model pins one of this host's choices. Otherwise it is Modify:
   /// the person sees the values and picks.
   Future<void> _regenerateMedia(String sessionId, MediaMeta meta) async {
     final prompt = meta.prompt ?? '';
@@ -1209,7 +1209,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> with WidgetsBindingObse
     _reviseMedia(meta);
   }
 
-  /// 修改: the card's description back in the composer as it was, in
+  /// Modify: the card's description back in the composer as it was, in
   /// generation mode with the card's values where this host can generate.
   void _reviseMedia(MediaMeta meta) {
     final prompt = meta.prompt ?? '';
@@ -1223,7 +1223,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> with WidgetsBindingObse
     _compose(prompt, restoreMode: false);
   }
 
-  /// ⋯ › 编辑 / 做成视频: the picture into the tray, generation mode on.
+  /// ⋯ › Edit / Make into video: the picture into the tray, generation mode on.
   Future<void> _reuseMedia(String sessionId, MediaMeta meta, MediaItem item, {required bool video}) async {
     final scope = _draftScope;
     try {
@@ -1271,7 +1271,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> with WidgetsBindingObse
   }
 
   // ---------------------------------------------------------------------------
-  // 斜杠指令
+  // Slash commands
 
   List<SlashCommand> get _commands => ref.read(slashCommandsProvider(ref.read(currentSessionProvider)));
 
@@ -1416,7 +1416,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> with WidgetsBindingObse
     );
   }
 
-  /// 「换模型」 after the engine refused the model. DSH follows the official
+  /// "Switch model" after the engine refused the model. DSH follows the official
   /// model listing, so the catalog read earlier may be stale: read it again.
   void _switchModel() {
     ref.invalidate(modelCatalogProvider);
@@ -1466,7 +1466,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> with WidgetsBindingObse
     // The engine stopped on its own: the failure card above the empty state
     // carries the recovery, so the empty state offers no second one.
     final failureCard = local && ref.watch(localRuntimeProvider.select((s) => EngineFailureCard.visibleFor(s.status)));
-    // 本机 down for good: no runtime (notInstalled), or stopped with auto
+    // Local device down for good: no runtime (notInstalled), or stopped with auto
     // start off (installed). Null otherwise.
     final localIdle = local && !failureCard
         ? ref.watch(
@@ -1492,13 +1492,13 @@ class _ChatScreenState extends ConsumerState<ChatScreen> with WidgetsBindingObse
       ),
       _ => null,
     };
-    // A conversation open with nothing loaded while 本机 is down (a cold
+    // A conversation open with nothing loaded while the local device is down (a cold
     // start back into the last one, auto start off): the empty page with its
     // one fix rather than a blank list.
     final idleBlank =
         idle != null && sessionId != null && ref.watch(chatProvider(sessionId).select((s) => s.items.isEmpty));
 
-    // 只盯顶栏 / 输入条需要的几个字段:流式增量不重建整页。
+    // Watch only the few fields the header / input bar need: streaming deltas don't rebuild the whole page.
     final chat = sessionId == null
         ? null
         : ref.watch(
@@ -1537,7 +1537,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> with WidgetsBindingObse
     final contextFraction = sessionId == null
         ? null
         : ref.watch(sessionUsageProvider(sessionId).select((u) => u.contextFraction));
-    // 「帮我修复」: a fresh chat with the repair prompt in the composer,
+    // "Fix it for me": a fresh chat with the repair prompt in the composer,
     // not sent — the person reads it first.
     ref.listen(repairDraftProvider, (_, next) {
       if (next != null) _takeRepairDraft();
@@ -1607,10 +1607,10 @@ class _ChatScreenState extends ConsumerState<ChatScreen> with WidgetsBindingObse
     final readOnly =
         sessionId != null &&
         ref.watch(subagentParentProvider(sessionId).select((p) => p?.address.mode == SubagentMode.oneShot));
-    // A subagent conversation: 「‹ 上级对话」 takes the menu key's place, so
-    // the 新对话 key would have nothing to mirror.
+    // A subagent conversation: "‹ Parent chat" takes the menu key's place, so
+    // the New chat key would have nothing to mirror.
     final isChild = sessionId != null && ref.watch(subagentParentProvider(sessionId).select((p) => p != null));
-    // 生成模式: this conversation's, and what the host can do.
+    // Generation mode: this conversation's, and what the host can do.
     final generate = ref.watch(generateModeProvider.select((m) => m.byKey[_draftKey]));
     final mediaReady = ref.watch(mediaPluginProvider) == MediaPluginState.ready;
     // What the catalogue really offers here (§4.3): a picture can go in as a
@@ -1630,7 +1630,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> with WidgetsBindingObse
     final generateModel = generate == null
         ? null
         : ref.watch(mediaCatalogProvider.select((c) => c.resolve(generate.model, generate.kind)?.model));
-    // 引用追问: the passage waiting above this conversation's composer.
+    // Quote follow-up: the passage waiting above this conversation's composer.
     final quote = ref.watch(composerQuoteProvider.select((quotes) => quotes[_draftKey]));
     final modelDefaultWarning = sessionId != null && chat?.error == null && (chat?.defaultModelSaveFailed ?? false);
     final error = sessionId == null
@@ -1643,7 +1643,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> with WidgetsBindingObse
     // messages stay in sight above the composer.
     final typing =
         MediaQuery.sizeOf(context).height < WindowClass.compactHeight && MediaQuery.viewInsetsOf(context).bottom > 0;
-    // 「自动允许中」/「完全权限」 ride on the bar right above the composer, not a
+    // "Auto-allowing" / "Full access" ride on the bar right above the composer, not a
     // row of their own: beside the activity strip while a reply generates, at
     // the start of the capsule row otherwise. Their own row only where neither
     // shows (read only; a phone on its side typing folds both away).
@@ -1797,7 +1797,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> with WidgetsBindingObse
                             : () => SessionDetailPage.open(context, sessionId, toggle: true),
                         // A phone's conversation has no room for it beside its title: the
                         // model is shown and picked at the composer's foot while typing.
-                        // A new chat's title is only 「新对话」, so the model takes the
+                        // A new chat's title is only "New chat", so the model takes the
                         // header's right like on a wide window — picked before typing,
                         // once there is an engine to send to.
                         trailing: narrow && (sessionId != null || !connected)
@@ -2108,9 +2108,9 @@ class _ChatScreenState extends ConsumerState<ChatScreen> with WidgetsBindingObse
     return UiTrace(scope: 'chat', child: screen);
   }
 
-  /// What sits on the composer's top-left edge: 「自动允许中 ×」 while this
-  /// client allows everything, else 「⚠ 完全权限 ›」 for a conversation looser
-  /// than 工作区内修改 (unless [risk] is false: they are beside the activity
+  /// What sits on the composer's top-left edge: "Auto-allowing ×" while this
+  /// client allows everything, else "⚠ Full access ›" for a conversation looser
+  /// than edits-inside-the-workspace (unless [risk] is false: they sit beside the activity
   /// strip), then the generation mode's capsule; nothing otherwise.
   Widget? _composerPills(String? sessionId, {required bool autoApprove, GenerateParams? generate, bool risk = true}) {
     final capsule = generate == null
@@ -2144,7 +2144,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> with WidgetsBindingObse
     );
   }
 
-  /// 「自动允许中」/「完全权限」 beside the activity strip while a reply generates.
+  /// "Auto-allowing" / "Full access" beside the activity strip while a reply generates.
   Widget? _stripRisk(String sessionId, {required bool autoApprove}) {
     if (autoApprove) {
       return StripRiskChip.autoApprove(
@@ -2240,7 +2240,7 @@ class _ChatComposerHost implements NativeComposerHost {
   BuildContext? get context => _state.mounted ? _state.context : null;
 }
 
-/// 低余额横幅的位置:没有要说的时候是零高。
+/// Position of the low-balance banner: zero height when there is nothing to say.
 class _BalanceBannerSlot extends ConsumerWidget {
   const _BalanceBannerSlot();
 
@@ -2364,23 +2364,23 @@ class _HeaderAside extends StatelessWidget {
 
 enum _Slot { body, veil, header, palette, composer }
 
-/// 整页布局:先排输入条区域,挂在它上沿的东西(列表的下沿、底色遮罩、
-/// 斜杠面板)在同一次布局里跟上。
+/// Whole-page layout: the input-bar area is laid out first, and things hanging on its top edge (the list's bottom
+/// edge, the backdrop scrim, the slash panel) follow in the same layout pass.
 ///
-/// 不走「帧后报高度、下一帧再 setState」:那样胶囊升起 / 收回的每一帧列表
-/// 都晚一拍,最后一条消息和胶囊之间时而压住、时而露出一道缝。
+/// Not "report the height post-frame, setState on the next frame": that puts the list one beat behind on every
+/// frame a pill rises or retracts — alternately squeezing the last message against the pill or exposing a gap.
 class _ChatLayout extends MultiChildLayoutDelegate {
   _ChatLayout(this.veilHeight);
 
-  /// 列表视口伸到输入条上沿以下的距离:底色在那里已经是实心,看不见裁切。
+  /// How far the list viewport reaches below the input bar's top edge: the backdrop is already solid there, so no clipping shows.
   static const overlap = 6.0;
 
-  /// 斜杠面板离屏幕两边、离输入条上沿的距离。
+  /// The slash panel's distance from the screen sides and from the input bar's top edge.
   static const _side = 12.0;
   static const _gap = 6.0;
 
-  /// 写给底色遮罩:从输入条上沿往下 [overlap] 起实心,到页面底。遮罩在
-  /// 布局之后才画,这一帧就按新高度画。
+  /// Written to the backdrop scrim: solid from [overlap] below the input bar's top edge down to the page
+  /// bottom. The scrim paints after layout, so it draws at the new height in this frame.
   final ValueNotifier<double> veilHeight;
 
   @override
@@ -2420,7 +2420,7 @@ class _ChatLayout extends MultiChildLayoutDelegate {
   bool shouldRelayout(_ChatLayout oldDelegate) => oldDelegate.veilHeight != veilHeight;
 }
 
-/// Applies the 对话字号 setting to chat content only (header and composer
+/// Applies the chat font size setting to chat content only (header and composer
 /// keep the system size), on top of the system font scale.
 class _ChatTextScale extends ConsumerWidget {
   const _ChatTextScale({required this.child});

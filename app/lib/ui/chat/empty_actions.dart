@@ -1,7 +1,7 @@
 // The controls of the new-chat empty state.
 //
 // - Primary: at most one, and only when the screen has a way forward of its
-//   own (「重新连接」). A brand-filled pill.
+//   own ("Reconnect"). A brand-filled pill.
 // - Secondary: the workspace chip and the new chat's options (folder, preset,
 //   permissions) — quiet chips of one size: a faint fill, no shadow, muted text.
 // - Suggestions: quiet cards with a tinted glyph, a title and one line of

@@ -42,7 +42,7 @@ import 'spots.dart';
 
 export 'spots.dart';
 
-/// The page for [id]; [sessionId] is the conversation open in the chat (权限
+/// The page for [id]; [sessionId] is the conversation open in the chat (Permissions
 /// shows its preset).
 Widget settingsPage(SettingsPageId id, {String? sessionId}) => switch (id) {
   SettingsPageId.hub => const SettingsScreen(),

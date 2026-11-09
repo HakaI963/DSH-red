@@ -8,10 +8,10 @@ import '../slash_palette.dart' show slashIconFor;
 import 'command_result_text.dart';
 import 'stream_row.dart';
 
-/// 斜杠指令的执行记录:指令图标 + 等宽的 `/compact`,下面是 DSH 返回的结果文字。
+/// A slash command's execution record: command icon + monospaced `/compact`, DSH's result text below.
 ///
-/// 指令不进模型上下文,所以它长得像提示行而不是消息:没有气泡,三级文字;
-/// 失败用 danger 色,执行中行尾一个小环。
+/// Commands never enter the model's context, so they look like notice lines, not messages: no bubble, tertiary text;
+/// failures in danger color, a small spinner at the row tail while executing.
 class CommandRow extends StatelessWidget {
   const CommandRow({super.key, required this.notice});
 
@@ -49,7 +49,7 @@ class CommandRow extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
               children: [
-                // 指令行与 24 的图形块竖直居中。
+                // The command line and the 24 glyph block are vertically centered.
                 SizedBox(
                   height: StreamRow.lead,
                   child: Align(

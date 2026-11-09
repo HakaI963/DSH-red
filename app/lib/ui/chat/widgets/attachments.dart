@@ -16,14 +16,14 @@ import 'stream_motion.dart';
 
 export 'plus_panel.dart' show AttachSource;
 
-/// The ＋ panel's tiles alone: without [files] (DSH Remote stages no files)
+/// The + panel's tiles alone: without [files] (DSH Remote stages no files)
 /// the two photo ones. The chat page opens the whole panel ([showPlusPanel]).
 Future<AttachSource?> showAttachMenu(BuildContext context, {bool files = true}) async {
   final choice = await showPlusPanel(context, files: files);
   return choice is AttachChoice ? choice.source : null;
 }
 
-/// 40dp round ＋ at the composer's leading edge.
+/// 40dp round + at the composer's leading edge.
 class AttachButton extends StatelessWidget {
   const AttachButton({super.key, required this.onPressed});
 
@@ -72,7 +72,7 @@ class ComposerTray extends StatelessWidget {
   final ValueChanged<DraftAttachment> onRemove;
 
   /// A small label on the tile at the same position (generation mode's
-  /// 首帧 / 尾帧), 6 in from its bottom-left corner.
+  /// first / last frame), 6 in from its bottom-left corner.
   final List<Widget?> labels;
 
   static const height = 56 + _overhang;
@@ -231,7 +231,7 @@ class _Thumb extends StatelessWidget {
   final double? aspect;
   final VoidCallback? onTap;
 
-  /// 「保存到相册」 / 「分享」 (sent images).
+  /// "Save to gallery" / "Share" (sent images).
   final VoidCallback? onLongPress;
 
   @override
@@ -375,7 +375,7 @@ class FileCard extends StatelessWidget {
     final badge = dsh.identity[tint % dsh.identity.length];
     final onBadge = dsh.onIdentity[tint % dsh.onIdentity.length];
     final meta = [if (ext != null) ext.toUpperCase(), if (bytes != null) formatBytes(bytes!)].join(' · ');
-    // 外圆角 16、内边距 8、类型块圆角 8:内外同心(16 − 8)。
+    // Outer radius 16, inner padding 8, type block radius 8: concentric inside/outside (16 − 8).
     return Container(
       height: height,
       constraints: const BoxConstraints(minWidth: 140, maxWidth: 220),

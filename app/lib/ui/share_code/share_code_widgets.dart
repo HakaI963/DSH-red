@@ -33,7 +33,7 @@ class ShareAction {
   final bool done;
 }
 
-/// 「复制链接 · 二维码 · 分享 · 存为文件」: equal cells, a 52 round key over a
+/// "Copy link · QR code · Share · Save as file": equal cells, a 52 round key over a
 /// one-line label, keys centred in their cells (mirrored edges). A label too
 /// wide for its cell (large text, a narrow phone) shrinks to fit rather than
 /// being cut.

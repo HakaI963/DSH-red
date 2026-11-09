@@ -25,9 +25,9 @@ const kSettingsGroupMargin = EdgeInsets.fromLTRB(16, 0, 16, 24);
 /// `test/settings/settings_geometry_test.dart` together.
 ///
 /// ```
-/// |16| (32) |12| 标题 / 副标题 …… 值 |4| ›   |16 到字形|
-/// |16| (32) |12| 标题 …………………………  [ 开关轨道 ] |16|
-/// |16| 标签 ………………………………………………………… 值 |16|
+/// |16| (32) |12| title / subtitle …… value |4| ›   |16 to glyph|
+/// |16| (32) |12| title …………………………  [ switch track ] |16|
+/// |16| label ………………………………………………………… value |16|
 /// ```
 abstract final class SettingsMetrics {
   /// Card edge → icon disc / plain label on the left, and → switch track,
@@ -329,7 +329,7 @@ class SettingsSection extends StatelessWidget {
   final String? title;
   final List<Widget> children;
 
-  /// The card as one place in the settings index (界面's 网页版): its rows
+  /// The card as one place in the settings index (Interface's Web app): its rows
   /// light together, inside the card's rounded edge.
   final SettingSpot? spot;
 
@@ -383,9 +383,9 @@ class SettingsSection extends StatelessWidget {
   }
 }
 
-/// 设置里的分段选择行(主题、字号这类二到四选一):放得下就和标题排一行、
-/// 控件靠右;放不下(窄屏、系统大字号)就把控件放到标题下面整行显示,
-/// 选项不会被挤成竖排。左右内边距与 [SettingsTile] 相同,胶囊右缘与开关轨道对齐。
+/// A segmented choice row in Settings (two-to-four options like theme, font size): when it fits, controls share the title's row,
+/// right-aligned; when it doesn't (narrow screen, large system font) the controls drop under the title on their own full-width line,
+/// so options never get squeezed into a vertical stack. Side insets match [SettingsTile]; the capsule's right edge aligns with the switch track.
 class SettingsSegmentTile<T> extends StatelessWidget {
   const SettingsSegmentTile({
     super.key,

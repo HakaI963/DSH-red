@@ -1,6 +1,6 @@
-// 设置 › 主题 › 宠物 (docs/design/pets.md §2.1): which pet (with live
+// Settings › Theme › Pets (docs/design/pets.md §2.1): which pet (with live
 // previews), its size, quiet mode, and the out-of-app overlay's group.
-// Entry: [PetEntryTile] on the 主题 page.
+// Entry: [PetEntryTile] on the Theme page.
 
 import 'dart:async';
 
@@ -20,7 +20,7 @@ import '../shell/page_frame.dart';
 import 'overlay_settings_tile.dart';
 import 'pet_picker.dart';
 
-/// 设置 › 宠物: the chosen pet (or 不显示) on the right; opens
+/// Settings › Pets: the chosen pet (or Don't show) on the right; opens
 /// [PetSettingsPage].
 class PetEntryTile extends ConsumerWidget {
   const PetEntryTile({super.key, this.tint = 0});
@@ -43,7 +43,7 @@ class PetEntryTile extends ConsumerWidget {
   }
 }
 
-/// 宠物设置.
+/// Pet settings.
 class PetSettingsPage extends ConsumerWidget {
   const PetSettingsPage({super.key});
 
@@ -93,7 +93,7 @@ class PetSettingsPage extends ConsumerWidget {
                     ),
                 ],
               ),
-              // App 外显示 (the overlay).
+              // Show outside the app (the overlay).
               const PetOverlaySettingsSection(),
             ],
           ),

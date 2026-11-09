@@ -1,4 +1,4 @@
-// First run, step 2 of 3 on this phone: 选择外观, while the runtime unpacks
+// First run, step 2 of 3 on this phone: Choose appearance, while the runtime unpacks
 // (docs/design/onboarding-parallel-setup.md).
 
 import 'dart:async';
@@ -13,24 +13,24 @@ import '../settings/settings_widgets.dart';
 import '../theme/app_icons.dart';
 import 'onboarding_scaffold.dart';
 
-/// Light or dark and one of the six palettes, the same pickers as 设置 › 主题;
-/// on a low-end phone, also whether to stay in 轻量模式 (on by default there).
+/// Light or dark and one of the six palettes, the same pickers as Settings › Theme;
+/// on a low-end phone, also whether to stay in Lite mode (on by default there).
 ///
 /// ```
-///   ▣  选择外观
-///      随时可以在设置里更改
+///   ▣  Choose appearance
+///      You can change this anytime in Settings
 ///   ╭──────────────────────────────────╮
-///   │  [浅色]   [深色]   [跟随系统]       │
+///   │  [Light]    [Dark]    [System]          │
 ///   │   ●   ●   ●   ●   ●   ●          │
 ///   ╰──────────────────────────────────╯
 ///   ╭──────────────────────────────────╮   low-end phones only
-///   │  轻量模式                    (●)  │
+///   │  Lite mode                     (●)  │
 ///   ╰──────────────────────────────────╯
-///   (               继续               )
+///   (               Continue               )
 /// ```
 ///
 /// Every choice applies at once, so the page is its own preview, and
-/// 「继续」 with nothing touched keeps the defaults: no separate 「跳过」.
+/// "Continue" with nothing touched keeps the defaults: no separate "Skip".
 class AppearanceStepPage extends ConsumerWidget {
   const AppearanceStepPage({super.key, required this.onDone});
 
@@ -71,7 +71,7 @@ class AppearanceStepPage extends ConsumerWidget {
                 key: const ValueKey('setup-light-mode'),
                 title: l10n.setupLightMode,
                 subtitle: l10n.performanceLightHint,
-                // 自动 on a low-end phone is light.
+                // Auto on a low-end phone is light.
                 value: mode != PerformanceMode.full,
                 onChanged: (on) => unawaited(
                   ref.read(performancePrefsProvider.notifier).setMode(on ? PerformanceMode.light : PerformanceMode.full),

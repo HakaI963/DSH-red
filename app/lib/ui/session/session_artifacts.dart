@@ -1,4 +1,4 @@
-// Every file a session delivered or generated, on the 对话详情 「文件」 tab and its own
+// Every file a session delivered or generated, on the Chat details "Files" tab and its own
 // page (the chat shows them turn by turn).
 
 import 'package:flutter/material.dart';
@@ -23,7 +23,7 @@ List<Artifact> latestArtifacts(List<TurnArtifacts> groups) {
   ];
 }
 
-/// The block atop the 「文件」 tab: the latest few delivered files, and the way
+/// The block atop the "Files" tab: the latest few delivered files, and the way
 /// to the full list. Takes no room while the conversation has delivered none.
 class SessionArtifactsSection extends ConsumerWidget {
   const SessionArtifactsSection({super.key, required this.sessionId});

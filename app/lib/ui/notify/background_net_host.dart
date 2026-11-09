@@ -1,6 +1,6 @@
 // The chat's one quiet line about background running
 // (runtime/background_net.dart decides when): a glass capsule under the chat
-// header, 「后台联网被系统限制」 + 「去放行」, gone with a tap.
+// header, "Background network limited by the system" + "Allow it", gone with a tap.
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -126,7 +126,7 @@ class BackgroundNetLayer extends ConsumerWidget {
   }
 }
 
-/// One line in a glass capsule: glyph, what happened, 「去放行」. A tap anywhere else dismisses.
+/// One line in a glass capsule: glyph, what happened, "Allow it". A tap anywhere else dismisses.
 class BackgroundNetPill extends StatelessWidget {
   const BackgroundNetPill({super.key, required this.reason, required this.onDismiss, required this.onOpen});
 

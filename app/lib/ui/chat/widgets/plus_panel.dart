@@ -1,17 +1,17 @@
-// The composer's ＋ panel (docs/design/settings-ia.md §4.4, media-generation
-// §4.2): the attachment tiles (相册 · 拍照 · 文件, and 生成 where the host can
-// generate), then what applies to this conversation (本对话: permissions and
+// The composer's + panel (docs/design/settings-ia.md §4.4, media-generation
+// §4.2): the attachment tiles (Gallery · Camera · Files, and Generate where the host can
+// generate), then what applies to this conversation (This chat: permissions and
 // plan mode) and, while phone control is on, how it confirms.
 //
 // ```
 //                  ───
 //  ╭──────╮  ╭──────╮  ╭──────╮  ╭──────╮
-//  │ 相册 │  │ 拍照 │  │ 文件 │  │ 生成 │     equal, 8 apart, 16 from the sides
+//  │ Gallery │  │ Camera │  │ Files │  │ Generate │  equal, 8 apart, 16 from the sides
 //  ╰──────╯  ╰──────╯  ╰──────╯  ╰──────╯
-//   本对话
+//   This chat
 //  ╭────────────────────────────────────╮   card edges = the tiles' edges
-//  │ 权限               工作区内修改  › │
-//  │ 计划模式                     [○  ] │
+//  │ Permissions          Edits in workspace › │
+//  │ Plan mode                      [○  ] │
 //  ╰────────────────────────────────────╯
 // ```
 
@@ -44,7 +44,7 @@ import '../../theme/theme.dart';
 /// Where a picked attachment comes from.
 enum AttachSource { gallery, camera, files }
 
-/// What the ＋ panel was closed with.
+/// What the + panel was closed with.
 sealed class PlusChoice {
   const PlusChoice();
 }
@@ -55,7 +55,7 @@ final class AttachChoice extends PlusChoice {
   final AttachSource source;
 }
 
-/// 「生成」: into generation mode.
+/// "Generate": into generation mode.
 final class GenerateChoice extends PlusChoice {
   const GenerateChoice();
 }
@@ -78,8 +78,8 @@ abstract final class PlusPanelMetrics {
   static const square = 60.0;
 }
 
-/// The ＋ panel. [files] false (DSH Remote stages no files) leaves 文件 out;
-/// [generate] adds 生成; [sessionId] adds 本对话 (a new chat has no
+/// The + panel. [files] false (DSH Remote stages no files) leaves Files out;
+/// [generate] adds Generate; [sessionId] adds This chat (a new chat has no
 /// conversation to set yet).
 Future<PlusChoice?> showPlusPanel(BuildContext context, {bool files = true, bool generate = false, String? sessionId}) {
   return showAppSheet<PlusChoice>(
@@ -96,7 +96,7 @@ Future<PlusChoice?> showPlusPanel(BuildContext context, {bool files = true, bool
   );
 }
 
-/// 本对话的权限 on its own (the permission pill above the composer).
+/// This chat's permissions on its own (the permission pill above the composer).
 Future<void> showPermissionSheet(BuildContext context, String sessionId) {
   return showAppSheet<void>(
     context,
@@ -237,7 +237,7 @@ class PlusTile extends StatelessWidget {
   }
 }
 
-/// 本对话: the preset (opens its page) and plan mode.
+/// This chat: the preset (opens its page) and plan mode.
 class _ThisChatCard extends ConsumerStatefulWidget {
   const _ThisChatCard({required this.sessionId});
 
@@ -298,7 +298,7 @@ class _ThisChatCardState extends ConsumerState<_ThisChatCard> {
   }
 }
 
-/// 手机操控: how phone actions are confirmed.
+/// Phone control: how phone actions are confirmed.
 class _PhoneCard extends ConsumerWidget {
   const _PhoneCard();
 
@@ -320,7 +320,7 @@ class _PhoneCard extends ConsumerWidget {
   }
 }
 
-/// 本对话的权限: the four presets, then what new conversations start with.
+/// This chat's permissions: the four presets, then what new conversations start with.
 class SessionPermissionPage extends ConsumerStatefulWidget {
   const SessionPermissionPage({super.key, required this.sessionId});
 
@@ -453,7 +453,7 @@ class _SessionPermissionPageState extends ConsumerState<SessionPermissionPage> {
   }
 }
 
-/// 确认方式 inside the panel: the three modes; 始终免确认 asks first.
+/// Confirmation mode inside the panel: the three modes; "always skip confirmation" asks first.
 class _ConfirmModePage extends ConsumerWidget {
   const _ConfirmModePage();
 

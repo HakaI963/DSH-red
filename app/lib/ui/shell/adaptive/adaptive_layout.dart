@@ -53,7 +53,7 @@ enum LeftPane {
   /// Nothing persistent: the conversation list is the pull-over drawer.
   none,
 
-  /// A column of round keys (open the list, search, host, 网页版, 设置).
+  /// A column of round keys (open the list, search, host, Web app, Settings).
   rail,
 
   /// The conversation list itself, always shown.
@@ -111,7 +111,7 @@ abstract final class AdaptiveMetrics {
 ///
 /// Pure: [resolve] turns the window, the system insets and the person's
 /// choices (sidebar / panel unfolded) into columns. Everything that has to
-/// agree — the scaffold, the header keys, where 对话详情 opens — reads the
+/// agree — the scaffold, the header keys, where Chat details opens — reads the
 /// same value.
 @immutable
 class AdaptiveLayout {
@@ -211,7 +211,7 @@ class AdaptiveLayout {
     LeftPane.rail => sidebarFits ? MenuAction.expand : MenuAction.overlay,
   };
 
-  /// Where 对话详情 opens.
+  /// Where Chat details opens.
   DetailPresentation get detail => panelAvailable
       ? DetailPresentation.panel
       : windowClass == WindowClass.compact

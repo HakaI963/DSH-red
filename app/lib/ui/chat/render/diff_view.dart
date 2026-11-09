@@ -16,7 +16,7 @@ class DiffLine {
   final String text;
 }
 
-/// 文本像不像 unified diff(有 @@ hunk 头,或 ---/+++ 文件头后混有 +/- 行)。
+/// Whether the text looks like a unified diff (an @@ hunk header, or +/- lines mixed after a ---/+++ file header).
 bool looksLikeUnifiedDiff(String text) {
   if (text.contains(RegExp(r'^@@ -\d', multiLine: true))) return true;
   if (!text.contains(RegExp(r'^(---|\+\+\+) ', multiLine: true))) return false;
@@ -49,7 +49,7 @@ List<DiffLine> parseUnifiedDiff(String text) {
   return lines;
 }
 
-/// 行级 LCS diff(old/new 文本兜底)。规模过大时退化为整段替换。
+/// Line-level LCS diff (the old/new text fallback). Beyond scale it degrades to a whole-block replace.
 List<DiffLine> computeLineDiff(String oldText, String newText) {
   final a = oldText.isEmpty ? <String>[] : oldText.split('\n');
   final b = newText.isEmpty ? <String>[] : newText.split('\n');
@@ -92,7 +92,7 @@ List<DiffLine> computeLineDiff(String oldText, String newText) {
   return lines;
 }
 
-/// 新增 / 删除行数(工具行尾部的 `+18 −4`)。
+/// Added / removed line counts (the `+18 −4` at a tool row's tail).
 ({int added, int removed}) diffStats(List<DiffLine> lines) {
   var added = 0;
   var removed = 0;
@@ -103,7 +103,7 @@ List<DiffLine> computeLineDiff(String oldText, String newText) {
   return (added: added, removed: removed);
 }
 
-/// 彩色 diff:增删整行着色,@@ hunk 头浅底,横向滚动。
+/// The colored diff: added/removed lines tinted whole, @@ hunk headers a sheer bottom, horizontal scrolling.
 class DiffView extends StatelessWidget {
   const DiffView({super.key, this.diffText, this.lines, this.maxHeight, this.embedded = false})
     : assert(diffText != null || lines != null);
@@ -112,7 +112,7 @@ class DiffView extends StatelessWidget {
   final List<DiffLine>? lines;
   final double? maxHeight;
 
-  /// 嵌在工具行详情里:不画外框(外层已有井底)。
+  /// Embedded in a tool row's details: no frame (the outer layer already has the well bottom).
   final bool embedded;
 
   @override
@@ -132,7 +132,7 @@ class DiffView extends StatelessWidget {
       };
       return Container(
         color: bg,
-        // 12:与工具详情里的小标题("改动")左缘对齐。
+        // 12: aligned with the small title ("Changes") left edge in tool details.
         padding: const EdgeInsets.symmetric(horizontal: 12),
         child: Text(line.text.isEmpty ? ' ' : line.text, style: style.copyWith(color: fg), softWrap: false),
       );

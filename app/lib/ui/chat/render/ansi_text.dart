@@ -4,16 +4,16 @@ import 'package:flutter/material.dart';
 
 import '../../theme/semantic_colors.dart';
 
-/// CSI 序列(ESC[ ... 终结字节)。非 SGR(终结字节非 m)一律剥离不渲染。
+/// CSI sequence (ESC[ ... final byte). Everything non-SGR (final byte ≠ m) is stripped, never rendered.
 final _csi = RegExp('\x1B\\[([0-9;?]*)([A-Za-z])');
 
-/// OSC 序列(ESC] ... BEL / ESC\),如终端标题、超链接。直接剥离。
+/// OSC sequence (ESC] ... BEL / ESC\), e.g. terminal title, hyperlinks. Stripped outright.
 final _osc = RegExp('\x1B\\][^\x07\x1B]*(?:\x07|\x1B\\\\)');
 
-/// 去掉所有 ANSI 转义(复制 / 纯文本场景用)。
+/// Strip all ANSI escapes (for copy / plain-text use).
 String stripAnsi(String input) => input.replaceAll(_osc, '').replaceAll(_csi, '');
 
-/// 文本里有没有 ANSI 转义(没有就走纯文本快路径)。
+/// Whether the text holds any ANSI escapes (if none, take the plain-text fast path).
 bool hasAnsi(String input) => input.contains('\x1B');
 
 class _SgrState {
@@ -40,7 +40,7 @@ class _SgrState {
   );
 }
 
-/// 解析 SGR 着色文本为 TextSpan。[ansi16] 为 SGR 30-37 / 90-97 色板。
+/// Parse SGR-colored text into TextSpans. [ansi16] is the palette for SGR 30-37 / 90-97.
 TextSpan parseAnsi(String input, TextStyle base, List<Color> ansi16) {
   final source = input.replaceAll(_osc, '');
   if (!hasAnsi(source)) return TextSpan(text: source, style: base);
@@ -106,7 +106,7 @@ TextSpan parseAnsi(String input, TextStyle base, List<Color> ansi16) {
   return TextSpan(style: base, children: children);
 }
 
-/// 38;5;n(xterm256)/ 38;2;r;g;b(truecolor)。返回 (颜色, 额外消耗的参数个数)。
+/// 38;5;n (xterm256) / 38;2;r;g;b (truecolor). Returns (color, extra parameters consumed).
 (Color?, int) _extendedColor(List<int> params, int i, List<Color> ansi16) {
   if (i + 1 >= params.length) return (null, 0);
   switch (params[i + 1]) {
@@ -128,7 +128,7 @@ Color? _xterm256(int n, List<Color> ansi16) {
   if (n < 0 || n > 255) return null;
   if (n < 16) return ansi16[n];
   if (n < 232) {
-    // 6×6×6 色立方
+    // 6×6×6 color cube
     final v = n - 16;
     const steps = [0, 95, 135, 175, 215, 255];
     return Color.fromARGB(255, steps[v ~/ 36], steps[(v % 36) ~/ 6], steps[v % 6]);
@@ -137,9 +137,9 @@ Color? _xterm256(int n, List<Color> ansi16) {
   return Color.fromARGB(255, gray, gray, gray);
 }
 
-/// 带 ANSI 着色的可选中文本;按 (text, 色板) 记忆化解析结果。
+/// Selectable text with ANSI coloring; parse results memoized by (text, palette).
 ///
-/// 只能铺在代码井([DshColors.codeWellBg])上:ANSI 色板是按井底调的对比度。
+/// Only ever lay this on a code well ([DshColors.codeWellBg]): the ANSI palette is tuned for contrast against the well bottom.
 class AnsiText extends StatefulWidget {
   const AnsiText({super.key, required this.text, required this.style});
 

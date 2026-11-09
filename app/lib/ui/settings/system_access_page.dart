@@ -1,4 +1,4 @@
-// 设置 › 系统权限: the list first run walks, all of it, by feature, with where
+// Settings › System permissions: the list first run walks, all of it, by feature, with where
 // each item stands; a row that isn't on opens the same step first run shows.
 
 import 'dart:async';
@@ -15,18 +15,18 @@ import '../shell/page_frame.dart';
 import 'settings_widgets.dart';
 
 /// ```
-///   系统权限
-///   各项功能用到的系统权限
-///   读写手机里的文件
-///   ╭ ▢ 允许访问文件                已开启 ╮
-///   手机操控
-///   ╭ ▢ 打开无障碍                未开启 › ╮
-///   │ ▢ 允许通知                  已开启   │
-///   ╰ ▢ 允许后台弹出界面          已去设置 › ╯   (vivo, Xiaomi)
+///   System permissions
+///   OS permissions used by each feature
+///   Read & write phone files
+///   ╭ ▢ Allow file access             Enabled  ╮
+///   Phone control
+///   ╭ ▢ Open Accessibility          Not enabled › ╮
+///   │ ▢ Allow notifications           Enabled    │
+///   ╰ ▢ Allow background pop-up view   Went to settings › ╯   (vivo, Xiaomi)
 ///   …
 /// ```
 ///
-/// An item two features need (通知) shows under both, with one state.
+/// An item two features need (notifications) shows under both, with one state.
 class SystemAccessPage extends ConsumerStatefulWidget {
   const SystemAccessPage({super.key});
 

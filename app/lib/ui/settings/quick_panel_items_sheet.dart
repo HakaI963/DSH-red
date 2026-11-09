@@ -1,4 +1,4 @@
-// What 快捷入口 lists: every destination it can, ticked or not, with a handle
+// What Quick entries lists: every destination it can, ticked or not, with a handle
 // to put them in order.
 
 import 'dart:async';

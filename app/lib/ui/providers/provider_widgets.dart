@@ -1,4 +1,4 @@
-// Pieces shared by the 模型渠道 pages: how a provider's state reads, its
+// Pieces shared by the Model channels pages: how a provider's state reads, its
 // glyph, and the form's field anatomy.
 
 import 'package:flutter/material.dart';
@@ -38,7 +38,7 @@ String providerSummary(CustomProvider provider, ProviderHealth health) {
 }
 
 /// A model row's second line: its id when it has a name, then what it can do
-/// (「上下文 256K · 识图 · 思考」). Empty when there is nothing to say.
+/// ("context 256K · vision · thinking"). Empty when there is nothing to say.
 String modelSummary(BuildContext context, ProviderModelSpec model, {ModelDefaults defaults = const ModelDefaults()}) {
   final l10n = context.l10n;
   return [
@@ -58,7 +58,7 @@ class Monogram extends StatelessWidget {
   final String name;
   final double size;
 
-  /// Overrides the first letter (「G」 for ChatGPT).
+  /// Overrides the first letter ("G" for ChatGPT).
   final String? letter;
 
   static String letterOf(String name) {

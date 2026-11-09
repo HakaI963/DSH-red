@@ -1,4 +1,4 @@
-// The chat page's 「插件」 sheet (docs/design/plugin-ui-v3.md §3.4): the
+// The chat page's "Plugins" sheet (docs/design/plugin-ui-v3.md §3.4): the
 // conversation's native `chat.panel` panels, sorted by plugin name, then the
 // web plugins' chat-page parts (the seven slots of [Slots.chatPanel]) in one
 // panel island under a line naming whose they are. The entry is the last
@@ -9,7 +9,7 @@
 // island on its own (this phone's route guard, the bridge's occupancy, no
 // ui.json asking for the web) and the budget has room; it gets 8 s to show
 // (IslandTiming.sheetReady).
-// Anything else — and an island that gives up — is one 「在网页版打开」 row.
+// Anything else — and an island that gives up — is one "Open in the web app" row.
 //
 // Under the island every web plugin gets its ways into the app as rows: the
 // conversation tabs it registered (`sidebar.right.pane.tab`, its own page)
@@ -93,7 +93,7 @@ class ChatWebPlugins {
   /// Their entries, in page order ([chatSheetSlots]).
   final List<SeatItem> items;
 
-  /// The one island for all of them; null: 「在网页版打开」.
+  /// The one island for all of them; null: "Open in the web app".
   final IslandSpec? island;
 
   bool get isEmpty => items.isEmpty;
@@ -219,7 +219,7 @@ class ChatWebPluginsPane extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final web = ref.watch(chatWebPluginsProvider(sessionId));
-    // What 对话详情's tab holds. A conversation's own pages of these plugins are rows under
+    // What Chat details' tab holds. A conversation's own pages of these plugins are rows under
     // their parts; global pages (the tab's fallback, no session) are listed nowhere here.
     final plan = ref.watch(sessionPluginPlanProvider(sessionId));
     final others = plan.visible.where(

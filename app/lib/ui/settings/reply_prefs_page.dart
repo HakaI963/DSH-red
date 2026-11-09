@@ -1,4 +1,4 @@
-// 个人偏好: the person's own AGENTS.md in the guest's shared agents root,
+// Preferences: the person's own AGENTS.md in the guest's shared agents root,
 // the same file a share-code import replaces.
 
 import 'dart:async';

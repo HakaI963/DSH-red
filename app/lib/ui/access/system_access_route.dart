@@ -1,4 +1,4 @@
-// One item's step on its own page: from 设置 › 系统权限 and from first run's
+// One item's step on its own page: from Settings › System permissions and from first run's
 // summary, the same step first run walks.
 
 import 'package:flutter/material.dart';
@@ -10,8 +10,8 @@ import '../shell/page_frame.dart';
 import '../theme/app_icons.dart';
 import 'access_walk.dart';
 
-/// Pushes [item]'s step; it closes itself once the item is on (or 设好了,
-/// or 跳过), and back closes it any time.
+/// Pushes [item]'s step; it closes itself once the item is on (or the person said done,
+/// or skipped), and back closes it any time.
 Future<void> openAccessItem(BuildContext context, AccessItem item) => Navigator.of(
   context,
 ).push(MaterialPageRoute<void>(builder: (_) => AccessItemPage(item: item)));

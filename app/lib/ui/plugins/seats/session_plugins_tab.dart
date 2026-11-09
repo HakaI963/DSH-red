@@ -1,4 +1,4 @@
-// 对话详情 › 插件: the conversation's plugin tabs (`sidebar.right.pane.tab`,
+// Chat details › Plugins: the conversation's plugin tabs (`sidebar.right.pane.tab`,
 // docs/design/plugin-seams.md §3) and its plugin views (`conversation.view`,
 // docs/design/plugin-ui-v3.md §3.3). One fills the page under its name;
 // several are a list, each opening a page of its own.
@@ -35,7 +35,7 @@ class SessionPluginsTab extends ConsumerWidget {
 
   final String sessionId;
 
-  /// The seat behind the tab; 对话详情 shows the tab only while it has
+  /// The seat behind the tab; Chat details shows the tab only while it has
   /// something to show.
   static SeatRequest requestFor(String sessionId) =>
       SeatRequest(slot: Slots.rightPaneTab, placement: SeatPlacement.page, sessionId: sessionId);

@@ -1,5 +1,5 @@
 // What a reply inside the replay page belongs to, for the actions that would
-// otherwise look at the open chat (「分享」).
+// otherwise look at the open chat ("Share").
 
 import 'package:flutter/widgets.dart';
 

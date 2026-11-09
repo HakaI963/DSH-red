@@ -1,9 +1,9 @@
-// 设置 › 能力 › 图像与视频 (docs/design/media-generation.md §5.8): the curated
+// Settings › Capabilities › Images & video (docs/design/media-generation.md §5.8): the curated
 // page over the media plugin's settings (ui/settings/media/), found under the
 // namespace whose schema carries the catalogue (the host may rename the
 // instance), else the plugin's own name. The schema form is not drawn here
 // any more: services, keys, defaults and the cost guard are curated rows.
-// Without the plugin on this host: 「在此主机上安装」, which installs the
+// Without the plugin on this host: "Install on this host", which installs the
 // official market's media plugin (docs/design/plugin-market.md §6).
 
 import 'dart:async';
@@ -47,7 +47,7 @@ class MediaSettingsPage extends ConsumerWidget {
   }
 }
 
-/// 「图像与视频」 · 「这台主机还没有图像与视频插件」 · 「在此主机上安装」, which
+/// "Images & video" · "This host has no images & video plugin yet" · "Install on this host", which
 /// installs the official market's media plugin on this host, its progress in
 /// place. Where that can't happen from here (a relay host, safe mode, an app
 /// too old for it) the plugin's market page says why; without a market entry,
@@ -142,7 +142,7 @@ class MediaInstallPrompt extends ConsumerWidget {
 Future<void> openMediaPluginMarket(BuildContext context, {PluginsTab tab = PluginsTab.market}) =>
     Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => PluginsScreen(initialTab: tab)));
 
-/// 生成 where the plugin runs but its catalogue is missing, damaged or of a
+/// Generate where the plugin runs but its catalogue is missing, damaged or of a
 /// version this app doesn't know (§4.3): no generation mode, and a word that
 /// chat works as usual. The installed plugins (to update it) are one tap away.
 Future<void> showMediaUnavailableSheet(BuildContext context) => showAppSheet<void>(
@@ -166,7 +166,7 @@ Future<void> showMediaUnavailableSheet(BuildContext context) => showAppSheet<voi
   ),
 );
 
-/// 生成 on a host without the plugin (§2.2, M7): the same prompt as a sheet,
+/// Generate on a host without the plugin (§2.2, M7): the same prompt as a sheet,
 /// closed once the plugin is installed.
 Future<void> showMediaInstallSheet(BuildContext context) => showAppSheet<void>(
   context,

@@ -57,7 +57,7 @@ import 'system_entry_host.dart';
 /// rebuilds per frame; the chat underneath never does.
 ///
 /// From 840dp wide ([AdaptiveLayout]) the list stays on screen as a rail or a
-/// sidebar and 对话详情 is a column beside the chat; ≡ then folds and unfolds
+/// sidebar and Chat details is a column beside the chat; ≡ then folds and unfolds
 /// the list, and the drawer is only pulled over when the sidebar doesn't fit.
 ///
 /// A left swipe pulls [QuickPanel] over from the right the same way, wherever
@@ -97,7 +97,7 @@ class _HomeShellState extends ConsumerState<HomeShell> with TickerProviderStateM
   /// The pulled-over drawer's identity bar height: its notices stand above it.
   final _identityBar = ValueNotifier<double>(0);
 
-  /// 「宠物设置」 from the floating pet's menu (every tap, not deduplicated).
+  /// "Pet settings" from the floating pet's menu (every tap, not deduplicated).
   StreamSubscription<void>? _petSettings;
 
   @override
@@ -321,7 +321,7 @@ class _HomeShellState extends ConsumerState<HomeShell> with TickerProviderStateM
           },
           child: AnnotatedRegion<SystemUiOverlayStyle>(
             value: dshSystemOverlay(Theme.of(context).brightness),
-            // 首页 / 对话 and the drawer: the custom wallpaper when one is in use.
+            // Home / chat and the drawer: the custom wallpaper when one is in use.
             child: WallpaperBackdrop(
               child: _DrawerNoticeTheme(
                 drawer: _drawer,
@@ -342,11 +342,11 @@ class _HomeShellState extends ConsumerState<HomeShell> with TickerProviderStateM
                       const UpdateLaunchCheck(),
                       // The voice model chosen during setup: download, resume, ready / failed notices (draws nothing).
                       const VoiceModelHost(),
-                      // 公测版: once in a while, an invitation to star the project (draws nothing).
+                      // Public beta: once in a while, an invitation to star the project (draws nothing).
                       StarPromptHost(drawer: _drawer, quickPanel: _quickPanel),
                       // App links / shared files: routes them to their feature (draws nothing).
                       const LinkHost(),
-                      // Share codes (分享码): registers its links and files with the router.
+                      // Share codes: registers its links and files with the router.
                       const ShareCodeHost(),
                       // Share sheet, launcher shortcuts, the tile: into the chat (draws nothing).
                       SystemEntryHost(onReveal: _revealChat),
@@ -368,7 +368,7 @@ class _HomeShellState extends ConsumerState<HomeShell> with TickerProviderStateM
                             body: RawGestureDetector(
                               // translucent: join the hit chain without swallowing taps
                               // meant for the chat; wraps the whole chat column so empty
-                              // areas still drag. Not 对话详情 beside it: its tabs swipe.
+                              // areas still drag. Not Chat details beside it: its tabs swipe.
                               // No drawer to pull while the sidebar shows.
                               behavior: HitTestBehavior.translucent,
                               gestures: {if (!sidebar) ..._drawerGestures, if (quickPanelOn) ..._quickPanelGestures},
@@ -560,8 +560,8 @@ class _DrawerOverlay extends StatelessWidget {
                 ),
               ),
             ),
-            // 面板位置用 Transform 走(paint-only):每帧改 Positioned.left 会让
-            // Stack 和整块抽屉重新布局,拖动时白白多一层成本。
+            // Panel position moves via Transform (paint-only): setting Positioned.left each frame would relayout
+            // the Stack and the whole drawer — wasted cost while dragging.
             Positioned(
               left: fromRight ? null : 0,
               right: fromRight ? 0 : null,

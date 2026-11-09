@@ -11,7 +11,7 @@ import '../sessions_drawer.dart' show sessionSelectionColor;
 
 /// One conversation row: 44 high, the highlight on the 10 line, the title on
 /// the 20 line (plus [indent] inside a folder). At the end, one marker at
-/// most: what it waits for (待确认 / 待回答), a breathing dot while it works,
+/// most: what it waits for (awaiting review / awaiting answer), a breathing dot while it works,
 /// or a quiet dot when it moved on since it was last seen. In multi-select a
 /// check slides in before the title.
 class SessionTile extends StatelessWidget {
@@ -40,7 +40,7 @@ class SessionTile extends StatelessWidget {
   final PendingKind? pending;
   final bool unread;
 
-  /// Shown as a small pin (inside folders; elsewhere 置顶 says it).
+  /// Shown as a small pin (inside folders; elsewhere the pinned state says it).
   final bool pinned;
 
   /// Content inset from the 20 line (folder members: [folderIndent]).

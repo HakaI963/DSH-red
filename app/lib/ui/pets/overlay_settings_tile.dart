@@ -1,6 +1,6 @@
-// 宠物设置's 「App 外显示」 group (docs/design/pets.md §2.7, §6.4, §8): the
-// switch, 有事时显示 / 一直显示, 「未授权」 with a way back to the permission,
-// the restricted-settings guide on Android 13+, and 今天不再显示. Mounted by
+// Pet settings' "Show outside the app" group (docs/design/pets.md §2.7, §6.4, §8): the
+// switch, show when there's news / always show, "Not granted" with a way back to the permission,
+// the restricted-settings guide on Android 13+, and "Don't show again today". Mounted by
 // `PetSettingsPage`.
 
 import 'dart:async';
@@ -15,7 +15,7 @@ import '../common/risk_notice.dart';
 import '../phone/restricted_settings_guide.dart';
 import '../settings/settings_widgets.dart';
 
-/// 「App 外显示」. Nothing without the native side (tests, desktop).
+/// "Show outside the app". Nothing without the native side (tests, desktop).
 class PetOverlaySettingsSection extends ConsumerStatefulWidget {
   const PetOverlaySettingsSection({super.key});
 
@@ -54,7 +54,7 @@ class _PetOverlaySettingsSectionState extends ConsumerState<PetOverlaySettingsSe
     final overlay = ref.read(petOverlayProvider.notifier);
     final on = s.working;
     // Sideloaded on Android 13+: the system switch may be greyed out until
-    // 「允许受限制的设置」. Offered once a trip there came back empty.
+    // "Allow restricted settings". Offered once a trip there came back empty.
     final restricted = s.refused && s.sdk >= 33 && s.permission != PetOverlayPermission.blocked;
     return SettingsSection(
       children: [

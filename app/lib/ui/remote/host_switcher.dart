@@ -19,7 +19,7 @@ import '../theme/theme.dart';
 import 'host_key_dialog.dart';
 import 'host_status.dart';
 
-/// Drawer-header chip: `● 本机 · 运行中 ⌄` / `● 电脑 · 已连接 ⌄`. Opens the
+/// Drawer-header chip: `● Local device · running ⌄` / `● PC · connected ⌄`. Opens the
 /// host sheet.
 class HostChip extends ConsumerWidget {
   const HostChip({super.key, required this.onTap});
@@ -67,7 +67,7 @@ class HostChip extends ConsumerWidget {
   }
 }
 
-/// "切换主机": 本机, saved SSH hosts and the DSH Remote account's hosts, each
+/// "Switch host": Local device, saved SSH hosts and the DSH Remote account's hosts, each
 /// with its state; picking one makes it active. [onManage] opens the remote
 /// page.
 Future<void> showHostSheet(BuildContext context, {required VoidCallback onManage}) {
@@ -97,7 +97,7 @@ class HostSheet extends ConsumerWidget {
       if (ok && navigator.mounted) navigator.pop();
     }
 
-    // 本机 without its runtime: the row installs it, and switches to it once
+    // Local device without its runtime: the row installs it, and switches to it once
     // installed (leaving the install page keeps the current host).
     final localMissing = ref.watch(localRuntimeProvider.select((s) => s.status.runtimeMissing));
     void installLocal() {
@@ -210,7 +210,7 @@ class _HostRow extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final scheme = Theme.of(context).colorScheme;
-    // Live state for 本机 and the active remote host; presence for relay
+    // Live state for Local device and the active remote host; presence for relay
     // hosts; nothing for idle SSH hosts (connecting just to show a dot
     // would cost a login).
     final HostStatusView? view = host.isLocal || active

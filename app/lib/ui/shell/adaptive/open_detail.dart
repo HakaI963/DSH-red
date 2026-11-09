@@ -1,5 +1,5 @@
-// One way into 对话详情 for every entry (the header's
-// title pill, the progress strip, 全部功能), whatever form the window gives
+// One way into Chat details for every entry (the header's
+// title pill, the progress strip, All features), whatever form the window gives
 // it.
 
 import 'package:flutter/material.dart';
@@ -12,7 +12,7 @@ import 'adaptive_layout.dart';
 import 'adaptive_scaffold.dart';
 import 'detail_sheet.dart';
 
-/// Shows 对话详情 of [sessionId]:
+/// Shows Chat details of [sessionId]:
 ///
 /// - wide window, the open conversation: the panel beside the chat — shown
 ///   (back on the chat first, if a page covers it), or folded away when

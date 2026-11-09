@@ -216,7 +216,7 @@ String formatBytes(num bytes) {
   return appL10n.engineFieldByteCount(b);
 }
 
-/// `60000` ms → `60 秒`, `90` s → `1.5 分钟`, `3600` s → `1 小时`.
+/// `60000` ms → `60 s`, `90` s → `1.5 min`, `3600` s → `1 h`.
 String formatSeconds(num seconds) {
   if (seconds >= 3600 && seconds % 3600 == 0) return appL10n.engineFieldHours(_trim(seconds / 3600));
   if (seconds >= 60 && seconds % 60 == 0) return appL10n.engineFieldMinutes(_trim(seconds / 60));
@@ -418,14 +418,14 @@ class FieldCopy {
   /// The field-specific "format" error.
   final String? patternMessage;
 
-  /// One item of a list (「索引源」 → 「地址」).
+  /// One item of a list ("Index sources" → "URL").
   final String? itemLabel;
 
-  /// Counted unit of a plain number (「层」「个」「次」).
+  /// Counted unit of a plain number ("layers", "items", "times").
   final String? suffix;
   final FieldCountUnit? countUnit;
 
-  /// How a stored text reads on its row (`auto` → 「跟随界面语言」).
+  /// How a stored text reads on its row (`auto` → "Follow the interface language").
   final Map<String, String> shown;
 }
 
@@ -541,7 +541,7 @@ String humanizeKey(String key) {
 
 /// A description's Markdown as plain text, for a one-line title or hint:
 /// links keep their text, `**strong**`, `__strong__` and `` `code` `` lose
-/// their marks, and so does a leading heading or list marker. 字段说明 shows
+/// their marks, and so does a leading heading or list marker. Field notes shows
 /// the Markdown itself.
 String plainSchemaText(String text) => text
     .replaceAllMapped(RegExp(r'\[([^\]]+)\]\([^)\s]*\)'), (m) => m[1]!)
@@ -576,8 +576,8 @@ String _firstSentence(String text) {
 
 /// A long description that opens with a name: Chinese text before an
 /// opening bracket, a colon, a semicolon, a line break or the end of its
-/// first sentence, and the rest that explains it (「兼容接口返回格式（按模型目录；
-/// GPT Image 留空）」 → 「兼容接口返回格式」 / 「按模型目录；GPT Image 留空」).
+/// first sentence, and the rest that explains it ("compatible API response format (per
+/// model catalogue; leave empty for GPT Image)" → the two halves split as label / note).
 /// Null when that text is not 2–18 characters of Chinese: an English clause
 /// seldom reads as a name, and a comma usually ends a condition, not a name.
 ({String title, String rest})? leadingPhrase(String text) {
@@ -665,7 +665,7 @@ String? _optionLabel(SchemaNode? node, Object? value) {
 
 /// A constant in words: page copy, the option's own description in [node],
 /// a well-known value, then the value itself (nothing and the empty string
-/// read 「未设置」).
+/// read "Not set").
 String valueLabel(Object? value, FieldCopy copy, {SchemaNode? node}) {
   final v = copy.aliases[value] ?? value;
   return copy.choices[v] ??

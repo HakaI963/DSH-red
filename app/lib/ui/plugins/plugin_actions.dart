@@ -21,7 +21,7 @@ import '../common/undo_notice_window.dart';
 /// the outcome is still reported after the sheet that started them closed.
 
 /// Queues [request] on the active host and reports the outcome: a toast for
-/// 「已安装」, a restart offer for `restart-required` or an update, the reason
+/// "Installed", a restart offer for `restart-required` or an update, the reason
 /// otherwise.
 Future<PluginInstallJob> runPluginInstall(BuildContext context, PluginInstallRequest request) async {
   final l10n = context.l10n;
@@ -90,7 +90,7 @@ Future<void> updateMarketEntry(BuildContext context, MarketEntry entry, {String?
   }
 }
 
-/// 「安装前确认」 for a medium or high risk entry: each flag in plain words
+/// "Confirm before install" for a medium or high risk entry: each flag in plain words
 /// and the note that they are features, not a verdict. True straight away
 /// for everything else.
 Future<bool> confirmMarketRisk(BuildContext context, MarketEntry entry) async {
@@ -342,10 +342,10 @@ Future<bool> confirmPluginUpdate(
   return original != null && original.version == from && sameBundle();
 }
 
-/// Confirms, hides [bundle] and shows 「已卸载…」 with 撤销; the Host removes it
+/// Confirms, hides [bundle] and shows "Uninstalled…" with Undo; the Host removes it
 /// when the undo window ends (undo sends nothing). Afterwards only what makes
 /// that notice untrue, or incomplete, is reported: a restart still needed, a
-/// failure, or a plan dropped without 撤销. True once the Host removed it.
+/// failure, or a plan dropped without Undo. True once the Host removed it.
 Future<bool> removePluginBundle(BuildContext context, PluginBundle bundle, {Route<dynamic>? ownerRoute}) async {
   final l10n = context.l10n;
   final container = ProviderScope.containerOf(context, listen: false);
@@ -469,8 +469,8 @@ Future<bool> removePluginBundle(BuildContext context, PluginBundle bundle, {Rout
     messenger.removeCurrentSnackBar();
     messenger.showSnackBar(resultNotice);
   });
-  // A failure, or a plan dropped without 撤销 before sending, brings the row
-  // back after the notice said 已卸载: say so on this Host's page, even across
+  // A failure, or a plan dropped without Undo before sending, brings the row
+  // back after the notice said Uninstalled: say so on this Host's page, even across
   // a reconnect.
   bool samePage() =>
       messenger.mounted &&
@@ -485,7 +485,7 @@ Future<bool> removePluginBundle(BuildContext context, PluginBundle bundle, {Rout
   try {
     final result = await pending.done;
     if (result == null) {
-      // Dropped before sending: by 撤销, or by a reconnect or the plugin
+      // Dropped before sending: by Undo, or by a reconnect or the plugin
       // changing on the Host.
       if (!pending.undone && !pending.sent) await publishFailure(l10n.pluginsUninstallFailed);
       return false;
@@ -569,7 +569,7 @@ Future<void> togglePluginBundle(BuildContext context, PluginBundle bundle, bool 
   }
 }
 
-/// 「没能卸载：原因」; an unknown failure has no reason worth showing.
+/// "Couldn't uninstall: reason"; an unknown failure has no reason worth showing.
 String _failed(String action, PluginFailure failure) =>
     failure.kind == PluginFailureKind.unknown ? action : appL10n.pluginsActionFailure(action, failure.message);
 

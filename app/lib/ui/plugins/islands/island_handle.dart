@@ -44,7 +44,7 @@ abstract final class IslandTiming {
   /// first open come up instead of falling back.
   static const viewReady = Duration(seconds: 12);
 
-  /// The chat page's 「插件」 sheet island (`recipes.json` "ready":
+  /// The chat page's "Plugins" sheet island (`recipes.json` "ready":
   /// "sheet"). The same measurements (0.8–3.4 s typically, 11.3 s at
   /// worst); a sheet is a glance, so past 8 s it is the way to DSH Web.
   static const sheetReady = Duration(seconds: 8);

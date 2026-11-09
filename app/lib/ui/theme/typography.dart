@@ -2,48 +2,48 @@
 
 import 'package:flutter/material.dart';
 
-/// 字体规范:**系统无衬线负责一切文字,等宽只给代码**。
+/// Typography contract: **system sans carries all text; monospace is for code only**.
 ///
-/// ## 为什么不打包中文字体、也不用衬线标题
+/// ## Why no bundled CJK font and no serif headings
 ///
-/// - 思源黑体 / 宋体单字重 10–20 MB,APK 已经背着 Linux 运行时,不能再加;
-/// - 国产 ROM(MIUI/HyperOS、ColorOS、OriginOS、HarmonyOS)把系统字体换成了
-///   MiSans、OPPO Sans、vivo Sans、HarmonyOS Sans,质量都很好,而且自带配套的
-///   拉丁字形 —— 跟着系统走就是最协调的;
-/// - 这些 ROM 普遍**没有** Noto Serif CJK,衬线标题在它们上面会变成
-///   "拉丁是衬线、中文是黑体"的拼盘。所以标题用无衬线 + 字号 / 颜色分层。
+/// - Source Han Sans / Serif cost 10–20 MB per weight; the APK already carries a Linux runtime — no room for more;
+/// - Chinese ROMs (MIUI/HyperOS, ColorOS, OriginOS, HarmonyOS) swap the system font
+///   for MiSans, OPPO Sans, vivo Sans or HarmonyOS Sans — all high quality, with
+///   matching Latin glyphs — following the system is the most harmonious choice;
+/// - these ROMs generally **lack** Noto Serif CJK, so serif headings would render as
+///   a mixed plate: "Latin serif, Chinese sans". Headings therefore use sans + size / colour layers.
 ///
-/// ## 字重只用两档
+/// ## Only two weights
 ///
-/// AOSP / Pixel 只带 Noto Sans CJK **Regular** 一个字重,w500 会被就近映射回
-/// Regular,w600+ 走合成加粗。所以层级只靠 400 / 600 两档 + 字号 + 颜色,
-/// 不要指望 500 和 400 在中文上看得出区别。大号展示字用 300(在有多字重的
-/// 系统上更轻盈,没有时退回 400,不影响阅读)。
+/// AOSP / Pixel ship only Noto Sans CJK **Regular**; w500 rounds back to Regular and
+/// w600+ becomes synthetic bold. Hierarchy therefore comes only from 400 / 600 plus
+/// size and colour — never expect 500 vs 400 to read differently in Chinese. Large
+/// display text uses 300 (airier on multi-weight systems, falls back to 400 without hurting readability).
 ///
-/// ## 等宽
+/// ## Monospace
 ///
-/// JetBrains Mono(OFL,Regular + Medium + Bold 约 0.8 MB)。Android 的
-/// `monospace` 在不同机型上是 Droid Sans Mono / Cutive Mono,观感参差,代码
-/// 是这个 App 的主要内容之一,值得打包。缺失时回退系统等宽。
+/// JetBrains Mono (OFL, Regular + Medium + Bold, about 0.8 MB). Android's
+/// `monospace` is Droid Sans Mono / Cutive Mono depending on the device, with uneven
+/// results; code is one of this app's main content types, so bundling is worth it. Falls back to system mono when missing.
 ///
-/// ## 汉字字形
+/// ## Han glyph shapes
 ///
-/// 中日韩统一码同一个码位在不同地区字形不同(如「直」「写」)。务必在
-/// `MaterialApp` 里声明 `supportedLocales: [Locale('zh', 'CN'), ...]` 并接入
-/// `GlobalMaterialLocalizations`,否则在非中文系统语言下会取到日文字形。
+/// One CJK code point takes different regional glyphs (e.g. 「直」「写」). Always declare
+/// `supportedLocales: [Locale('zh', 'CN'), ...]` in `MaterialApp` and wire up
+/// `GlobalMaterialLocalizations`, or non-Chinese system languages will pick Japanese glyph shapes.
 abstract final class AppType {
-  /// 无衬线族。`null` = 系统默认(Android:Roboto + 系统中文字体)。
-  /// 将来若打包拉丁 UI 字体,只改这一处。
+  /// Sans family. `null` = system default (Android: Roboto + the system CJK font).
+  /// If a Latin UI font is ever bundled, this is the only place to change.
   static const String? sansFamily = null;
 
-  /// 打包的等宽族名(pubspec `fonts:` 里的 family)。
+  /// Bundled mono family name (the family under pubspec `fonts:`).
   static const monoFamily = 'JetBrainsMono';
 
   /// Source operators remain separate glyphs (<=, !=, ->), not programming
   /// ligatures. This changes shaping only, never the text copied or selected.
   static const monoFeatures = [FontFeature.disable('calt'), FontFeature.disable('liga')];
 
-  /// 等宽回退:系统等宽 → 中文(代码注释里的中文落到系统黑体)。
+  /// Monospace fallbacks: system mono → CJK (Chinese in code comments falls back to system sans).
   static const monoFallback = <String>['monospace', 'Noto Sans Mono CJK SC', 'Noto Sans CJK SC'];
 
   /// [t] with every style's glyph locale set to [locale] (null: unchanged).
@@ -72,7 +72,7 @@ abstract final class AppType {
     );
   }
 
-  /// 等宽样式统一出口 —— 业务代码禁止再写 fontFamily 字面量。
+  /// The single gateway for monospace styles — business code must no longer write fontFamily literals.
   static TextStyle mono({double size = 13, FontWeight? weight, Color? color, double height = 1.55}) {
     return TextStyle(
       fontFamily: monoFamily,
@@ -86,23 +86,23 @@ abstract final class AppType {
     );
   }
 
-  /// 工具 / 终端输出正文。
+  /// Tool / terminal output body.
   static TextStyle monoSmall({Color? color}) => mono(size: 12, color: color, height: 1.5);
 
-  /// 参数摘要、命令行、路径 chip、diff 统计。
+  /// Argument digests, command lines, path chips, diff stats.
   static TextStyle monoLabel({Color? color, FontWeight? weight}) =>
       mono(size: 12, color: color, weight: weight, height: 1.35);
 
-  /// 聊天正文(用户气泡与助手正文同源,流式 → 渲染完成不跳字号)。
+  /// Chat body (user bubble and assistant text share one source; streaming → finished render never jumps size).
   ///
-  /// [scale] / [height] 来自用户设置(建议 scale 0.85–1.3,height 1.5–1.9);
-  /// 主题本身不依赖任何状态。
+  /// [scale] / [height] come from user settings (suggest scale 0.85–1.3, height 1.5–1.9);
+  /// the theme itself depends on no state.
   static TextStyle chatBody(BuildContext context, {double scale = 1, double? height, Color? color}) {
     final base = Theme.of(context).textTheme.bodyLarge ?? textTheme.bodyLarge!;
     return base.copyWith(fontSize: (base.fontSize ?? 16) * scale, height: height ?? base.height, color: color);
   }
 
-  /// 欢迎语 / 空状态大字:大而轻,不靠粗。
+  /// Welcome / empty-state headline: big and light, not bold.
   static TextStyle display({double size = 28, Color? color}) => TextStyle(
     fontFamily: sansFamily,
     fontSize: size,
@@ -112,7 +112,7 @@ abstract final class AppType {
     leadingDistribution: TextLeadingDistribution.even,
   );
 
-  /// 字标「DSH」:无衬线粗体 + 轻微字距。
+  /// Wordmark 「DSH」: sans bold + slight letter-spacing.
   static TextStyle wordmark({double size = 18, Color? color}) => TextStyle(
     fontFamily: sansFamily,
     fontSize: size,
@@ -122,7 +122,7 @@ abstract final class AppType {
     color: color,
   );
 
-  /// 分区小标题(「最近会话」「引擎」):小字号 + 字距,替代粗分割线。
+  /// Section eyebrows (「最近会话」「引擎」): small size + letter-spacing, in place of heavy dividers.
   static TextStyle eyebrow({Color? color}) => TextStyle(
     fontFamily: sansFamily,
     fontSize: 12,
@@ -133,27 +133,27 @@ abstract final class AppType {
     leadingDistribution: TextLeadingDistribution.even,
   );
 
-  /// 等宽数字(计时器、token 计数、百分比),防止数字跳动导致宽度抖。
+  /// Tabular figures (timers, token counts, percentages) so changing digits never jitters width.
   static TextStyle tabular(TextStyle style) => style.copyWith(fontFeatures: const [FontFeature.tabularFigures()]);
 
   static const _even = TextLeadingDistribution.even;
 
-  /// Material 3 字阶(颜色在 app_theme 里按方案统一 apply)。
+  /// Material 3 type scale (colours applied per scheme in app_theme).
   ///
-  /// | 角色 | 字号 / 行高 | 用途 |
+  /// | Role | Size / leading | Used for |
   /// |---|---|---|
-  /// | displaySmall | 28 / 1.25 w300 | 欢迎语、安装完成大字 |
-  /// | headlineMedium | 22 / 1.3 w600 | 页面标题(设置、引擎) |
-  /// | headlineSmall | 20 / 1.35 w600 | 对话框标题 |
-  /// | titleLarge | 18 / 1.4 w600 | 弹层标题、顶栏会话名(展开态) |
-  /// | titleMedium | 16 / 1.45 w600 | 卡片 / 列表标题、正文小标题 |
-  /// | titleSmall | 14 / 1.45 w600 | 工具行名、分组名 |
-  /// | bodyLarge | 16 / 1.65 | 聊天正文 |
-  /// | bodyMedium | 14 / 1.55 | 界面正文 |
-  /// | bodySmall | 12 / 1.5 | 说明、元信息 |
-  /// | labelLarge | 14 / 1.4 w600 | 按钮 |
-  /// | labelMedium | 12 / 1.35 w600 | Chip、胶囊 |
-  /// | labelSmall | 11 / 1.35 | 时间戳、角标 |
+  /// | displaySmall | 28 / 1.25 w300 | welcome, install-finished headline |
+  /// | headlineMedium | 22 / 1.3 w600 | page titles (settings, engine) |
+  /// | headlineSmall | 20 / 1.35 w600 | dialog titles |
+  /// | titleLarge | 18 / 1.4 w600 | sheet titles, top-bar session name (expanded) |
+  /// | titleMedium | 16 / 1.45 w600 | card / list titles, body subheads |
+  /// | titleSmall | 14 / 1.45 w600 | tool row names, group names |
+  /// | bodyLarge | 16 / 1.65 | chat body |
+  /// | bodyMedium | 14 / 1.55 | UI body |
+  /// | bodySmall | 12 / 1.5 | captions, meta info |
+  /// | labelLarge | 14 / 1.4 w600 | buttons |
+  /// | labelMedium | 12 / 1.35 w600 | Chips, capsules |
+  /// | labelSmall | 11 / 1.35 | timestamps, badges |
   static const textTheme = TextTheme(
     displayLarge: TextStyle(fontSize: 36, fontWeight: FontWeight.w300, height: 1.2, leadingDistribution: _even),
     displayMedium: TextStyle(fontSize: 32, fontWeight: FontWeight.w300, height: 1.2, leadingDistribution: _even),

@@ -2,7 +2,7 @@
 // are unit-tested on their own): what a person comes for first — what must be
 // filled in, keys, switches and choices, what the plugin tunes live — then
 // the rest in the plugin's own order, and the plumbing (timeouts, limits,
-// paths, endpoints with a working default) folded under 「高级」 once a form
+// paths, endpoints with a working default) folded under "Advanced" once a form
 // is long — unless the schema folds groups of its own, whose layout stands.
 // A search over titles, descriptions, keys and choices shows every match,
 // folded or not.
@@ -23,7 +23,7 @@ enum ConfigTier {
   /// In the plugin's own order.
   regular,
 
-  /// Under 「高级」 on a long form.
+  /// Under "Advanced" on a long form.
   advanced,
 }
 
@@ -87,7 +87,7 @@ class PluginConfigLayout {
   /// What shows, groups in schema order, each group's fields by tier.
   final List<SchemaFormSection> sections;
 
-  /// Under 「高级」, by the group they came from.
+  /// Under "Advanced", by the group they came from.
   final List<SchemaFormSection> advanced;
 
   /// Fields the form draws (a search counts them all).

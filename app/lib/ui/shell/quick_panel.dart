@@ -1,7 +1,7 @@
-// 快捷入口: the panel a left swipe over the chat pulls in from the right, the
+// Quick entries: the panel a left swipe over the chat pulls in from the right, the
 // sessions drawer's mirror. It lists destinations the drawer already has and
 // opens them the way the drawer does; what each page requires stays with the
-// page. Which ones and in what order: 设置 › 界面 (quick_panel_items_sheet.dart).
+// page. Which ones and in what order: Settings › Interface (quick_panel_items_sheet.dart).
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -13,7 +13,7 @@ import '../theme/app_icons.dart';
 import '../theme/theme.dart';
 import 'drawer/drawer_destination.dart';
 
-/// A destination as 快捷入口 and its settings show it, by the name and the
+/// A destination as Quick entries and its settings show it, by the name and the
 /// glyph its other ways in use.
 extension DrawerDestinationLook on DrawerDestination {
   IconData get icon => switch (this) {

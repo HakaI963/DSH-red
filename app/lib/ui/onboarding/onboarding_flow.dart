@@ -49,16 +49,16 @@ class OnboardingFlow extends StatefulWidget {
   /// ([RuntimeSetupPage.choose]); false installs (resume, upgrade, reset).
   final bool chooseRuntime;
 
-  /// Picked 「远程主机」 (or gave up on a failed install for one).
+  /// Picked "Remote host" (or gave up on a failed install for one).
   final VoidCallback? onRemote;
 
-  /// Picked 「本机」: the caller starts the unpack and moves on to
+  /// Picked "Local device": the caller starts the unpack and moves on to
   /// [OnboardingStep.appearance]. Null: the runtime page installs itself.
   final VoidCallback? onLocal;
 
   final VoidCallback? onAppearanceDone;
 
-  /// Past 想让 DSH Go 帮你做哪些事 (picked and walked, or skipped).
+  /// Past What should DSH Go do for you? (picked and walked, or skipped).
   final VoidCallback? onAccessDone;
 
   /// The unpack [OnboardingStep.finishing] waited for is done.

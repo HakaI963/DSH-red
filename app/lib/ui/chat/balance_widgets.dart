@@ -18,13 +18,13 @@ import 'usage_sheet.dart' show UsageFigure;
 /// `¥110.00`
 String formatMoney(DeepSeekBalance b, [double? amount]) => '${b.symbol}${(amount ?? b.total).toStringAsFixed(2)}';
 
-/// `¥5`、`¥0.5`
+/// `¥5`, `¥0.5`
 String formatThreshold(double value, [String symbol = '¥']) {
   final text = value == value.roundToDouble() ? value.toStringAsFixed(0) : value.toStringAsFixed(1);
   return '$symbol$text';
 }
 
-/// 打开 DeepSeek 开放平台的充值页(外部浏览器)。
+/// Opens the DeepSeek open platform's top-up page (external browser).
 Future<void> openTopUp() async {
   try {
     await launchUrl(Uri.parse(deepSeekTopUpUrl), mode: LaunchMode.externalApplication);
@@ -33,10 +33,10 @@ Future<void> openTopUp() async {
   }
 }
 
-/// 设置 → 模型与密钥里、API Key 下面的一行余额。
+/// The balance line under API Key, in Settings → Models & keys.
 ///
-/// 只在有话可说时出现:查到余额 → "余额 ¥110.00";Key 无效 → 一句警告;
-/// 没联网 / 还没查到 → 什么也不画(安静失败)。点它打开余额弹层(提醒线、充值)。
+/// Appears only when it has something to say: balance found → "Balance ¥110.00"; invalid key → a warning line;
+/// offline / not fetched yet → draws nothing (fails quietly). Tapping it opens the balance sheet (reminder line, top-up).
 class BalanceSettingsLine extends ConsumerStatefulWidget {
   const BalanceSettingsLine({super.key});
 
@@ -107,7 +107,7 @@ class _BalanceSettingsLineState extends ConsumerState<BalanceSettingsLine> {
   }
 }
 
-/// 余额弹层(设置页进入):余额卡片 + 提醒线。
+/// The balance sheet (entered from the settings page): balance card + reminder line.
 Future<void> showBalanceSheet(BuildContext context) {
   return showAppSheet<void>(
     context,
@@ -129,23 +129,23 @@ Future<void> showBalanceSheet(BuildContext context) {
   );
 }
 
-/// 余额卡片:金额、构成、去充值、低余额提醒线。用量弹层和余额弹层共用。
+/// The balance card: amount, breakdown, top-up, low-balance reminder line. Shared by the usage sheet and the balance sheet.
 ///
 /// ```
-///     DeepSeek 余额
+///     DeepSeek balance
 ///   ╭──────────────────────────────────╮
-///   │ ¥110.00                 去充值 ↗ │
-///   │ 充值 ¥100.00 · 赠送 ¥10.00         │
-///   │ 低余额提醒               低于 ¥5 ⇕ │
+///   │ ¥110.00                 Top up ↗ │
+///   │ Top-up ¥100.00 · bonus ¥10.00         │
+///   │ Low-balance alert        Below ¥5 ⇕ │
 ///   ╰──────────────────────────────────╯
 /// ```
 class BalanceCard extends ConsumerStatefulWidget {
   const BalanceCard({super.key, this.title, this.margin = const EdgeInsets.symmetric(horizontal: AppSpace.gutter)});
 
-  /// 卡片上方的小标题(用量弹层里是"DeepSeek 余额")。
+  /// The small title above the card ("DeepSeek balance" in the usage sheet).
   final String? title;
 
-  /// 卡片离两边的距离;小标题再往里 8。
+  /// The card's distance from both sides; the small title sits 8 further in.
   final EdgeInsets margin;
 
   @override
@@ -309,7 +309,7 @@ class _BalanceCardState extends ConsumerState<BalanceCard> {
   }
 }
 
-/// "去充值 ↗":外部浏览器打开 DeepSeek 开放平台的充值页。
+/// "Top up ↗": opens the DeepSeek open platform's top-up page in an external browser.
 class _TopUpButton extends StatelessWidget {
   const _TopUpButton();
 
@@ -322,11 +322,11 @@ class _TopUpButton extends StatelessWidget {
   );
 }
 
-/// 输入条上方的低余额提示:一颗安静的玻璃胶囊(和输入条上方的活动胶囊同一族),钱包图标
-/// 与金额用警示色;右端「去充值」和关闭(本次运行不再出现)。
+/// The low-balance hint above the input bar: a quiet glass pill (same family as the activity pill above the input bar); wallet icon
+/// and amount in the warning color; at the right end "Top up" and close (gone for this run).
 ///
 /// ```
-/// ( ▣ 余额仅剩 ¥3.20 · 低于 ¥5            去充值  × )
+/// ( ▣ Balance down to ¥3.20 · below ¥5            Top up  × )
 /// ```
 class LowBalanceBanner extends ConsumerWidget {
   const LowBalanceBanner({super.key});
@@ -392,7 +392,7 @@ class LowBalanceBanner extends ConsumerWidget {
                   onPressed: () {
                     final balance = ref.read(balanceProvider.notifier);
                     balance.dismissBanner();
-                    // For good: the same as 「不提醒」 in the balance sheet.
+                    // For good: the same as "Don't remind" in the balance sheet.
                     ScaffoldMessenger.maybeOf(context)?.showSnackBar(
                       SnackBar(
                         content: Text(l10n.viewBalanceBannerHidden),

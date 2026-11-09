@@ -5,10 +5,10 @@ import 'package:flutter/material.dart';
 
 import 'motion.dart';
 
-/// 按压光晕:从指尖亮起的一团柔光,松手淡掉。灵动档的主题默认水波(见 `app_theme.dart`)。
+/// Press glow: a soft halo that lights up from the fingertip and fades when released — the fluid-mode ink (see `app_theme.dart`).
 ///
-/// 只在按压时画一个径向渐变,比系统默认的 InkSparkle(逐像素噪点着色器)便宜,
-/// 没有离屏层,也不模糊。
+/// Draws only a radial gradient while pressed — cheaper than the stock
+/// InkSparkle (a per-pixel noise shader), with no offscreen layer and no blur.
 class AppInkGlow extends InteractiveInkFeature {
   AppInkGlow({
     required MaterialInkController controller,
@@ -44,7 +44,7 @@ class AppInkGlow extends InteractiveInkFeature {
   static const _confirmFade = Duration(milliseconds: 260);
   static const _cancelFade = Duration(milliseconds: 160);
 
-  /// 指尖处比主题给的水波色亮这么多:渐变往外淡,平均下来和原来差不多。
+  /// How much brighter than the theme's splash colour at the fingertip: the gradient fades outward, so the average stays about the same.
   static const _coreBoost = 1.9;
 
   final Offset _position;
@@ -57,14 +57,14 @@ class AppInkGlow extends InteractiveInkFeature {
   late final AnimationController _grow;
   late final AnimationController _fade;
 
-  /// 手指已经抬起或被滚动抢走,淡入结束后接着淡出的时长。
+  /// Fade-out duration once the fade-in completes, when the finger already lifted or a scroll took the gesture over.
   Duration? _pendingFade;
 
   static double _reach(RenderBox box, Offset position, bool contained, RectCallback? rectCallback) {
     final rect = rectCallback?.call() ?? Offset.zero & box.size;
     final corners = [rect.topLeft, rect.topRight, rect.bottomLeft, rect.bottomRight];
     final far = corners.map((corner) => (corner - position).distance).reduce(math.max);
-    // 只照亮按到的那一片,大块卡片不至于整张亮起来。
+    // Only light up the pressed region, so big cards don't glow all over.
     return contained ? math.min(far, 220.0) : Material.defaultSplashRadius;
   }
 
@@ -162,6 +162,6 @@ class _AppInkGlowFactory extends InteractiveInkFeatureFactory {
   );
 }
 
-/// 给原本不要水波的行([NoSplash]):灵动档换成光晕,标准档还是没有。
+/// For rows that want no splash ([NoSplash]): fluid mode swaps in the glow, standard mode still gets none.
 InteractiveInkFeatureFactory rowSplash(BuildContext context) =>
     AppMotion.fluid(context) ? AppInkGlow.splashFactory : NoSplash.splashFactory;

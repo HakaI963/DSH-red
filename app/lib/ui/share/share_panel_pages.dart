@@ -1,13 +1,13 @@
 // The share panel's pages: the first one (what to share, then where it goes),
-// 「链接」 and 「文件」. 「图片」 is share_image_page.dart; 「选中消息」 the message
+// "Link" and "File". "Image" is share_image_page.dart; "Selected messages" the message
 // picker. docs/design/share-redesign.md §4.
 //
-//   分享
-//   (( 这条回复 )  选中消息   整段对话 )
-//   (✓ 思考过程) (✓ 工具调用) (✓ 图片)
+//   Share
+//   (( This reply )  Selected msgs  Whole chat )
+//   (✓ Thinking process) (✓ Tool calls) (✓ Images)
 //   [ card ]
-//   ⛨ 2 条消息 · 3 次工具调用 · 密钥已隐藏          调整
-//     (链接)    (图片)    (文件)    (文字)
+//   ⛨ 2 messages · 3 tool calls · keys hidden          Adjust
+//     (Link)    (Image)    (File)    (Text)
 
 import 'dart:async';
 
@@ -198,14 +198,14 @@ class _Placeholder extends StatelessWidget {
   }
 }
 
-/// 「⛨ 2 条消息 · 3 次工具调用 · 密钥已隐藏  调整」: what goes out, in one
+/// "⛨ 2 messages · 3 tool calls · keys hidden  Adjust": what goes out, in one
 /// line; a file's kind and size for a delivered file.
 class _Summary extends StatelessWidget {
   const _Summary({this.onAdjust});
 
   final VoidCallback? onAdjust;
 
-  /// The row's height: the 「调整」 button's, so the row keeps its place when
+  /// The row's height: the "Adjust" button's, so the row keeps its place when
   /// the button comes and goes.
   static const height = 40.0;
 
@@ -269,11 +269,11 @@ class _Summary extends StatelessWidget {
   }
 }
 
-/// 「预览」: the replay the receiver gets (no 「接着聊」).
+/// "Preview": the replay the receiver gets (no "Keep chatting").
 void _previewReplay(BuildContext context, ShareBuild built) =>
     unawaited(openConversationReplay(context, DecodedConversation(built.share, built.assets, code: ''), preview: true));
 
-/// What goes out as a file: its name, its size, and 「预览」 when it replays.
+/// What goes out as a file: its name, its size, and "Preview" when it replays.
 class _FileTile extends StatelessWidget {
   const _FileTile({required this.name, this.size, this.onPreview});
 
@@ -304,17 +304,17 @@ class _FileTile extends StatelessWidget {
   );
 }
 
-// ── 链接 ───────────────────────────────────────────────────────────────────
+// ── Link ───────────────────────────────────────────────────────────────────
 
-/// 「链接」: how long it lives, then the link and what to do with it.
+/// "Link": how long it lives, then the link and what to do with it.
 ///
 /// ```
-/// ‹ 链接
-/// (  7 天  (( 30 天 ))  永久  )
-/// 🔒 端到端加密，服务器看不到内容
-/// ┌ 🔗 go.dshtui.com/c/a1B2c3D4e5 · 11 月 24 日到期 ┐
-/// (复制链接) (二维码) (分享) (停止分享)       or  [ 生成链接 ]
-///               我的分享链接
+/// ‹ Link
+/// (  7 days  (( 30 days ))  Forever  )
+/// 🔒 End-to-end encrypted; the server can't see the content
+/// ┌ 🔗 go.dshtui.com/c/a1B2c3D4e5 · expires Nov 24 ┐
+/// (Copy link) (QR code) (Share) (Stop sharing)       or  [ Generate link ]
+///               My share links
 /// ```
 class ShareLinkPage extends StatefulWidget {
   const ShareLinkPage({super.key});
@@ -526,10 +526,10 @@ class _ShareLinkPageState extends State<ShareLinkPage> {
   }
 }
 
-// ── 文件 ───────────────────────────────────────────────────────────────────
+// ── File ───────────────────────────────────────────────────────────────────
 
-/// 「文件」: a conversation as a dsh-go file, a web page or Markdown; a
-/// delivered file as itself. Then 「保存」 / 「分享」.
+/// "File": a conversation as a dsh-go file, a web page or Markdown; a
+/// delivered file as itself. Then "Save" / "Share".
 class ShareFilePage extends StatefulWidget {
   const ShareFilePage({super.key});
 

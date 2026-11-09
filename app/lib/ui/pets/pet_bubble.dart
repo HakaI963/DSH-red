@@ -1,5 +1,5 @@
 // The pet's speech bubble (docs/design/pets.md §2.6): one glass capsule over
-// its head — 「做完了」, 「标题 · 等你确认」, 「3 个对话做完了」. Only the (masked) title, never the
+// its head — "All done", "Title · waiting for your OK", "3 chats finished". Only the (masked) title, never the
 // conversation's text, never buttons. It replaces the glass banner while the
 // pet is on screen, so it carries the banner's accessibility: a live region,
 // focusable, tappable.

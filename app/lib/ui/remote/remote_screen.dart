@@ -29,9 +29,9 @@ import 'relay_credit.dart';
 import 'relay_login_sheet.dart';
 import 'ssh_host_form.dart';
 
-/// 远程主机 (a list page): the computers and servers this phone can drive.
+/// Remote hosts (a list page): the computers and servers this phone can drive.
 ///
-/// Two ways in, side by side: a DSH Remote account (李国宝's ds-harness-remote,
+/// Two ways in, side by side: a DSH Remote account (liguobao's ds-harness-remote,
 /// end-to-end encrypted relay, no network setup) and SSH hosts (self-contained:
 /// dsh-app starts `dsh web` over SSH and tunnels to it). Picking a host makes
 /// it the active one; the chat and the session list follow. The old Remote
@@ -162,7 +162,7 @@ class RemoteScreen extends ConsumerWidget {
 }
 
 /// What the chat is talking to right now (only for a remote host), with live
-/// state, the way back to 本机, and the failure with its one fix.
+/// state, the way back to Local device, and the failure with its one fix.
 class _ActiveCard extends ConsumerWidget {
   const _ActiveCard({required this.active});
 
@@ -186,7 +186,7 @@ class _ActiveCard extends ConsumerWidget {
         (error?.kind == HostLinkErrorKind.hostKeyMismatch || error?.kind == HostLinkErrorKind.hostKeyUnverified);
     void reconnect() => ref.read(remoteConnectionProvider(active).notifier).retry();
     final failed = status.phase == HostLinkPhase.failed && error != null;
-    // No runtime on this phone: 本机 is nowhere to go back to.
+    // No runtime on this phone: Local device is nowhere to go back to.
     final canGoLocal = ref.watch(localRuntimeProvider.select((s) => !s.status.runtimeMissing));
     return OverviewCard(
       leading: OverviewGlyph(hostKindIcon(active.kind), tint: hostKindTint(active.kind)),

@@ -1,6 +1,6 @@
 // The shared pieces of the multi-agent pages: agent
 // avatars, the state chip, and the lineage tree used by the conversation
-// details' 子代理 tab and the header's lineage sheet.
+// details' Subagents tab and the header's lineage sheet.
 
 import 'package:flutter/material.dart';
 
@@ -21,7 +21,7 @@ StatusTone agentTone(AgentRunState state) => switch (state) {
   AgentRunState.idle => StatusTone.idle,
 };
 
-/// 智能体的头像:中性色圆 + 名字的首字(圆是"人"的语言,和工具的方块区分开)。
+/// Agent avatar: a neutral-colored circle + the first letter of the name (circles are the visual language of "people", kept apart from tools' squares).
 class AgentAvatar extends StatelessWidget {
   const AgentAvatar(this.name, {super.key, this.size = 28, this.ring});
 
@@ -67,7 +67,7 @@ class AgentAvatar extends StatelessWidget {
   }
 }
 
-/// 一行的副标题:模式 · 用时 · 下级。运行中的用时每秒走。
+/// A row's subtitle: mode · elapsed time · subagents. While running, the elapsed time ticks every second.
 class _NodeSubtitle extends StatelessWidget {
   const _NodeSubtitle({required this.node});
 
@@ -96,8 +96,8 @@ class _NodeSubtitle extends StatelessWidget {
   }
 }
 
-/// 一个智能体的一行(谱系和团队成员共用):左头像、标题(可带小标签)、
-/// 副标题,右边状态胶囊和 ›;不能点的行在 › 的位置留白,胶囊仍在一列。
+/// A row for one agent (shared by the lineage and the team roster): avatar at left, title (may carry a small badge),
+/// subtitle, and at the right a status pill and ›; rows that can't be tapped leave ›'s slot empty, pills still aligned in one column.
 class AgentRow extends StatelessWidget {
   const AgentRow({
     super.key,
@@ -118,7 +118,7 @@ class AgentRow extends StatelessWidget {
   final StatusTone tone;
   final String stateLabel;
 
-  /// Small widget right after the title (「当前」).
+  /// Small widget right after the title ("current").
   final Widget? badge;
 
   /// Tree level: each one indents by [indent].
@@ -200,7 +200,7 @@ class AgentRow extends StatelessWidget {
   }
 }
 
-/// 谱系里的一行:缩进表示层级。
+/// A row in the lineage: indentation shows the depth.
 class SubagentRow extends StatelessWidget {
   const SubagentRow({super.key, required this.node, this.depth = 0, this.current = false, this.onOpen});
 
@@ -229,8 +229,8 @@ class SubagentRow extends StatelessWidget {
   }
 }
 
-/// 一棵谱系:直接下级在前,下级的下级缩进跟在各自下面(都展开;默认委派深度
-/// 只有一层,深树很少见)。
+/// A lineage tree: direct children first, each child's own children indented under it (all expanded; the default delegation depth
+/// is only one level, so deep trees are rare).
 class SubagentTreeCard extends StatelessWidget {
   const SubagentTreeCard({
     super.key,
@@ -269,7 +269,7 @@ class SubagentTreeCard extends StatelessWidget {
   }
 }
 
-/// 「3 个子代理」「其中 1 个运行中」。
+/// "3 subagents", "1 of them running".
 String lineageTitle(List<SubagentNode> nodes) => appL10n.botsSubagentCount(nodes.length);
 
 String? lineageSubtitle(List<SubagentNode> nodes) {

@@ -12,7 +12,7 @@ import '../settings/settings_widgets.dart' show SettingsLineIcon, SettingsMetric
 import '../theme/app_icons.dart';
 import '../theme/theme.dart';
 
-/// 「已修改」: a quiet tag after a title whose value is the user's own.
+/// "Modified": a quiet tag after a title whose value is the user's own.
 class FieldBadge extends StatelessWidget {
   const FieldBadge(this.text, {super.key});
 
@@ -91,9 +91,9 @@ class FieldHeading extends StatelessWidget {
 /// One field row:
 ///
 /// ```
-/// |16| (32) |12| 标题 [已修改] / 副标题 ……… 值 |4| › |12|
-/// |16| 标题 ………………………………………………… [ 开关 ] |12|
-/// |16| 标题 ………………………………………………………… 值 |16|
+/// |16| (32) |12| Title [Modified] / subtitle ……… value |4| › |12|
+/// |16| Title ………………………………………………… [ switch ] |12|
+/// |16| Title ………………………………………………………… value |16|
 /// ```
 ///
 /// 52 tall with one line, 64 with two; the whole row is the tap target.
@@ -172,7 +172,7 @@ class EngineFieldRow extends StatelessWidget {
     }
 
     final style = settingsTitleStyle(context);
-    // The 已修改 tag sits beside the title's last line, in its room.
+    // The Modified tag sits beside the title's last line, in its room.
     final tag = switch (badge) {
       null => 0.0,
       final FieldBadge badge =>
@@ -353,7 +353,7 @@ class FieldSegmentRow<T> extends StatelessWidget {
   final T selected;
   final ValueChanged<T>? onChanged;
 
-  /// Room kept for the 已修改 tag whether or not it shows, so a row does
+  /// Room kept for the Modified tag whether or not it shows, so a row does
   /// not change layout when its value becomes the user's.
   static const badgeRoom = 56.0;
 

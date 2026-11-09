@@ -10,8 +10,8 @@ import '../settings/settings_widgets.dart';
 import '../theme/app_icons.dart';
 import 'safe_mode_actions.dart';
 
-/// Settings entries for safe mode: a manual "以安全模式启动" / "恢复正常模式" and the
-/// "自动进入安全模式" switch, which lives natively so the decision can be made with no
+/// Settings entries for safe mode: a manual "Start in safe mode" / "Restore normal mode" and the
+/// "Auto-enter safe mode" switch, which lives natively so the decision can be made with no
 /// UI attached. Settings rows, placed inside the settings screen's own group.
 class SafeModeSettingsTiles extends ConsumerWidget {
   const SafeModeSettingsTiles({
@@ -22,13 +22,13 @@ class SafeModeSettingsTiles extends ConsumerWidget {
     this.icon = true,
   });
 
-  /// The "自动进入安全模式" switch under the manual row. The settings hub
+  /// The "Auto-enter safe mode" switch under the manual row. The settings hub
   /// leaves it to the engine page ([SafeModeAutoSwitch]).
   final bool showAutoSwitch;
   final int tint;
   final bool tinted;
 
-  /// False: plain rows (本机引擎, where the rows beside it have none).
+  /// False: plain rows (local engine, where the rows beside it have none).
   final bool icon;
 
   @override
@@ -70,7 +70,7 @@ class SafeModeSettingsTiles extends ConsumerWidget {
   }
 }
 
-/// "自动进入安全模式": decided natively, so it works with no UI attached.
+/// "Auto-enter safe mode": decided natively, so it works with no UI attached.
 class SafeModeAutoSwitch extends ConsumerWidget {
   const SafeModeAutoSwitch({super.key, this.icon = AppIcons.autoSwitch, this.tint = 3, this.tinted = true});
 

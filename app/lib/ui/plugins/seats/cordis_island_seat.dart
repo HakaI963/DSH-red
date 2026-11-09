@@ -1,7 +1,7 @@
 // Cordis › one plugin › its interactive region (`tool.view.cordis`,
 // docs/design/plugin-seams.md §3): the list stays native, the region the
 // plugin draws in DSH Web shows here as a page island in a card. Nothing when
-// it can't be one — the sheet's own 「在网页版打开」 sits right under it.
+// it can't be one — the sheet's own "Open in the web app" sits right under it.
 
 import 'package:dsh_client/dsh_client.dart' show CordisPlugin;
 import 'package:flutter/material.dart';

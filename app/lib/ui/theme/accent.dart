@@ -8,16 +8,16 @@ import '../../l10n/l10n.dart';
 import 'oklch.dart';
 import 'palette.dart';
 
-/// 一套配色:强调色的浅深两套色阶,加上中性色(页面、玻璃、文字)往哪个
-/// 色调上染。枚举不了的(自定义、跟随壁纸)由 [AppAccent.derive] 现推。
+/// One palette: the accent's light/dark colour scales, plus which tint the neutrals (page, glass, text)
+/// get dyed towards. What cannot be enumerated (custom, follow-wallpaper) is derived on the spot by [AppAccent.derive].
 ///
-/// ## 推导规则(OKLCH,所有色相同一把尺子)
+/// ## Derivation rules (OKLCH, one ruler for every hue)
 ///
-/// DeepSeek 品牌蓝 `#4D6BFE` 是 OKLCH(0.59, 0.22, 270):饱和度几乎顶格,
-/// 大面积看久了刺眼。默认 [mist] 保留它的色相(267°),彩度压到 0.125,
-/// 明度 0.53,白字 5.39。其余每套只换色相和彩度,明度照抄:
+/// DeepSeek's brand blue `#4D6BFE` is OKLCH(0.59, 0.22, 270): saturation nearly maxed out,
+/// harsh over large areas and long looking. The default [mist] keeps its hue (267°), presses
+/// chroma down to 0.125, lightness 0.53, white text at 5.39. Every other preset only swaps hue and chroma and copies the lightness:
 ///
-/// | 角色 | 明度 L | 彩度(× 强调彩度) |
+/// | Role | Lightness L | Chroma (× accent chroma) |
 /// |---|---|---|
 /// | seed / pressed | 0.53 / 0.47 | 1 / 0.95 |
 /// | container / onContainer | 0.93 / 0.33 | 0.26 / 0.70 |
@@ -27,12 +27,12 @@ import 'palette.dart';
 /// | containerDark / onContainerDark | 0.361 / 0.909 | 0.51 / 0.24 |
 /// | bubbleDark / glowDark | 0.314 / 0.52 | 0.29 / 0.72 |
 ///
-/// - 浅色主色上用白字(≥ 4.5),深色主色上用同色相的深墨字(≥ 7)。
-/// - 中性色:雾蓝那条中性色阶原样转到 [tintHue],彩度乘 [tintChroma]
-///   (见 `NeutralTones`)。明度不动,所以各级文字的对比度不随配色变。
-/// - [haze]:页面左下角那团光,配主色的邻近色,给玻璃一点可透的颜色。
+/// - Light primary carries white text (≥ 4.5); the dark primary carries a same-hue deep ink (≥ 7).
+/// - Neutrals: the mist-blue neutral ramp rotates as-is onto [tintHue], chroma multiplied by [tintChroma]
+///   (see `NeutralTones`). Lightness stays, so no text level's contrast changes with the palette.
+/// - [haze]: the glow at the page's bottom-left, a neighbour of the primary, giving the glass something to transmit.
 ///
-/// 每套预设都在 `test/theme/palette_contrast_test.dart` 里逐条验对比度。
+/// Every preset's contrasts are verified item by item in `test/theme/palette_contrast_test.dart`.
 @immutable
 class AppAccent {
   const AppAccent({
@@ -57,10 +57,10 @@ class AppAccent {
     required this.hazeDark,
   });
 
-  /// 持久化键:预设名,或 [customId] / [wallpaperId]。
+  /// Persistence key: the preset name, or [customId] / [wallpaperId].
   final String id;
 
-  /// 设置页展示名。
+  /// Display name in the settings page.
   final String? _label;
 
   String get label =>
@@ -75,24 +75,24 @@ class AppAccent {
         _ => appL10n.phoneAccentCustom,
       };
 
-  /// 浅色主色(色板上显示的颜色)。白字 ≥ 4.5。
+  /// Light primary (the colour shown on the swatch). White text ≥ 4.5.
   final Color seed;
 
-  /// 浅色按下态。
+  /// Light pressed state.
   final Color pressed;
 
-  /// 浅色:强调容器 / 其上前景(≥ 7)。
+  /// Light: accent container / its foreground (≥ 7).
   final Color container;
   final Color onContainer;
 
-  /// 浅色用户气泡:比页面深一档(OKLCH L 0.918),像轻轻按进纸里的一块。
-  /// 气泡里只用主文字 / 次级文字(≥ 5.8),三级文字和主色在这里不过 AA。
+  /// Light user bubble: one step deeper than the page (OKLCH L 0.918), like a patch gently pressed into the paper.
+  /// Inside the bubble only primary / secondary text (≥ 5.8); tertiary text and the primary fail AA here.
   final Color bubble;
 
-  /// 浅色背景光晕(使用时再乘透明度)。
+  /// Light background glow (multiply an alpha in when used).
   final Color glow;
 
-  /// 深色主色:提亮版,配 [onSeedDark] 深墨字。
+  /// Dark primary: the lightened seed, paired with [onSeedDark] deep ink text.
   final Color seedDark;
   final Color pressedDark;
   final Color onSeedDark;
@@ -101,25 +101,25 @@ class AppAccent {
   final Color bubbleDark;
   final Color glowDark;
 
-  /// 中性色转到的色相(度)。雾蓝的中性色在 [NeutralTones.baseHue]。
+  /// The hue neutrals rotate onto (degrees). Mist blue's neutrals sit at [NeutralTones.baseHue].
   final double tintHue;
 
-  /// 中性色的彩度倍数(雾蓝 = 1;石墨接近 0)。
+  /// Neutrals' chroma multiplier (mist blue = 1; graphite near 0).
   final double tintChroma;
 
-  /// 左下角光晕(浅 / 深;使用时再乘透明度)。
+  /// Bottom-left glow (light / dark; multiply an alpha in when used).
   final Color haze;
   final Color hazeDark;
 
-  /// 浅色主色上的文字。所有配色都是白字。
+  /// Text on the light primary. White in every palette.
   Color get onSeed => const Color(0xFFFFFFFF);
 
-  /// 按亮度取主色。
+  /// The primary for a brightness.
   Color seedFor(Brightness brightness) => brightness == Brightness.dark ? seedDark : seed;
 
-  // ══ 预设 ══════════════════════════════════════════════════════════════
+  // ══ Presets ══════════════════════════════════════════════════════════════
 
-  /// 默认:雾蓝。DeepSeek 色相,低彩度。
+  /// Default: Mist. DeepSeek's hue at low chroma.
   static const mist = AppAccent(
     id: 'mist',
     seed: Color(0xFF4B67B4),
@@ -141,8 +141,8 @@ class AppAccent {
     hazeDark: Color(0xFF514765),
   );
 
-  /// 黛青:墨蓝偏青(238°),比雾蓝沉一档(L 0.47),彩度收到 0.085。
-  /// 中性色带一点湖青,光晕配长春花蓝。
+  /// Daiqing: ink blue leaning cyan (238°), one step deeper than mist (L 0.47), chroma reined to 0.085.
+  /// Neutrals carry a touch of lake teal; the glow pairs with periwinkle.
   static const daiqing = AppAccent(
     id: 'daiqing',
     seed: Color(0xFF236185),
@@ -164,7 +164,7 @@ class AppAccent {
     hazeDark: Color(0xFF444C66),
   );
 
-  /// 暮紫:灰调薰衣草(300°,彩度 0.075)。光晕配一点灰玫瑰。
+  /// Dusk: grey-toned lavender (300°, chroma 0.075). The glow pairs with a touch of grey rose.
   static const dusk = AppAccent(
     id: 'dusk',
     seed: Color(0xFF726291),
@@ -186,8 +186,8 @@ class AppAccent {
     hazeDark: Color(0xFF5F4353),
   );
 
-  /// 松石:低饱和青绿(186°,彩度 0.068)。中性色只带三成青,免得发绿发灰;
-  /// 光晕配天青。
+  /// Turquoise: low-saturation green-cyan (186°, chroma 0.068). Neutrals carry only thirty percent cyan, so they don't go green or grey;
+  /// the glow pairs with sky blue.
   static const turquoise = AppAccent(
     id: 'turquoise',
     seed: Color(0xFF34766F),
@@ -209,8 +209,8 @@ class AppAccent {
     hazeDark: Color(0xFF34525E),
   );
 
-  /// 琥珀:克制的金棕(70°,彩度 0.082,L 0.54)。页面转成米白纸、深色转成
-  /// 暖炭,彩度只留七成半;光晕配杏粉。
+  /// Amber: restrained golden brown (70°, chroma 0.082, L 0.54). The page turns to oat paper and dark mode to
+  /// warm charcoal, keeping seventy-five percent of the chroma; the glow pairs with apricot pink.
   static const amber = AppAccent(
     id: 'amber',
     seed: Color(0xFF8D6636),
@@ -232,8 +232,8 @@ class AppAccent {
     hazeDark: Color(0xFF64443D),
   );
 
-  /// 石墨:中性灰。主色在浅色里近黑(L 0.30)、深色里近白(L 0.93),
-  /// 中性色只留一丝冷调。像系统设置那样的黑白。
+  /// Graphite: neutral grey. The primary runs near-black in light (L 0.30) and near-white in dark (L 0.93),
+  /// neutrals keep just a chill note. Black-and-white like a system settings app.
   static const graphite = AppAccent(
     id: 'graphite',
     seed: Color(0xFF2C2E32),
@@ -255,13 +255,13 @@ class AppAccent {
     hazeDark: Color(0xFF4A4D52),
   );
 
-  /// 设置页里的顺序。
+  /// Order in the settings page.
   static const presets = [mist, daiqing, dusk, turquoise, amber, graphite];
 
   static const customId = 'custom';
   static const wallpaperId = 'wallpaper';
 
-  /// 按 [id] 取预设;未知 / 缺失回退雾蓝(向前兼容旧值)。
+  /// The preset with [id]; unknown / missing falls back to mist (forward-compatible with old values).
   static AppAccent preset(String? id) {
     for (final p in presets) {
       if (p.id == id) return p;
@@ -269,22 +269,22 @@ class AppAccent {
     return mist;
   }
 
-  // ══ 现推:自定义、跟随壁纸 ═══════════════════════════════════════════
+  // ══ Derived: custom colours and follow-the-wallpaper ═══════════════════════════════════════════
 
-  /// 强调彩度上限:再高就不"静"了(雾蓝 0.125)。
+  /// Accent chroma cap: beyond this it stops feeling quiet (mist blue 0.125).
   static const maxChroma = 0.13;
 
-  /// 色相条、推荐色的明度(与雾蓝相同)。
+  /// Lightness of hue-bar and suggested colours (same as mist blue).
   static const lightSeedL = 0.53;
 
-  /// 深色主色比浅色主色亮多少(雾蓝 0.53 → 0.764)。
+  /// How much lighter the dark primary is than the light one (mist blue 0.53 → 0.764).
   static const darkLift = 0.234;
 
-  /// 由任意一个颜色推出整套配色:取它的色相、彩度(封顶 [maxChroma])和
-  /// 明度(限在 0.30–0.60,深色再提 [darkLift]),按上面那张表推出各个
-  /// 角色;浅色、深色主色各过一次 [guard],离原色最近地调到达标。
+  /// Derives the whole palette from any single colour: take its hue, chroma (capped at [maxChroma]) and
+  /// lightness (clamped to 0.30–0.60, dark lifted further by [darkLift]), compute each role
+  /// from the table above; the light and dark primaries each pass through [guard], nudged to compliance by the shortest move from the pick.
   ///
-  /// 中性色转到同一色相,彩度按强调彩度折算(近灰的颜色得到近灰的页面)。
+  /// Neutrals rotate onto the same hue, chroma scaled from the accent's (a near-grey pick yields a near-grey page).
   factory AppAccent.derive(Color pick, {String id = customId, String? label}) {
     final key = (pick.toARGB32(), id, label);
     final hit = _derived[key];
@@ -343,25 +343,25 @@ class AppAccent {
     );
   }
 
-  /// 强调色在底面上的最低对比度(WCAG 1.4.11 非文字)。
+  /// Minimum contrast of the accent against its floor (WCAG 1.4.11 non-text).
   static const minOnSurface = 3.0;
 
-  /// 强调色上文字的最低对比度(WCAG 1.4.3 正文)。
+  /// Minimum contrast of text on the accent (WCAG 1.4.3 body).
   static const minText = 4.5;
 
-  /// 对比度守卫:色相、彩度不动,只沿明度移动 [start],直到
+  /// Contrast guard: hue and chroma stay put, only [start]'s lightness moves until
   ///
-  /// - 强调色对 [surface] ≥ [minOnSurface](3:1),且
-  /// - [onAccent] 对强调色 ≥ [minText](4.5:1)。
+  /// - accent vs [surface] ≥ [minOnSurface] (3:1), and
+  /// - [onAccent] vs accent ≥ [minText] (4.5:1).
   ///
-  /// 浅色往暗处走(白字在上),深色往亮处走(深墨字在上);已经达标就原样
-  /// 返回。二分 24 步,停在离起点最近的达标明度上。
+  /// Light walks darker (white text on top), dark walks brighter (deep ink on top); already
+  /// compliant returns untouched. A 24-step bisection landing on the passing lightness closest to the start.
   static Color guard(Oklch start, {required Brightness brightness, required Color surface, required Color onAccent}) {
     bool ok(Color c) => contrastRatio(c, surface) >= minOnSurface && contrastRatio(onAccent, c) >= minText;
     final first = start.toColor();
     if (ok(first)) return first;
     final dark = brightness == Brightness.dark;
-    // 浅色:在 [0, start.l] 里找最大的达标明度;深色:在 [start.l, 1] 里找最小的。
+    // Light: find the largest passing lightness in [0, start.l]; dark: the smallest in [start.l, 1].
     var pass = dark ? 1.0 : 0.0;
     var fail = start.l;
     for (var i = 0; i < 24; i++) {
@@ -375,10 +375,10 @@ class AppAccent {
     return start.copyWith(l: pass).toColor();
   }
 
-  /// [pick] 在 [brightness] 下守卫后的主色:设置页的色块和色相条直接画它。
+  /// [pick]'s guarded primary under [brightness]: the settings page paints swatches and the hue bar with it directly.
   static Color guardedSeed(Color pick, Brightness brightness) => AppAccent.derive(pick).seedFor(brightness);
 
-  /// 色相条 / 推荐色用的颜色:[hue] 度、雾蓝的彩度和明度。
+  /// Colour for the hue bar / suggestions: [hue] degrees, mist blue's chroma and lightness.
   static Color hueColor(double hue, {double chroma = 0.11}) => Oklch(lightSeedL, chroma, hue).toColor();
 
   @override

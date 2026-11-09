@@ -17,16 +17,16 @@ import '../page_frame.dart' show GlassIconButton;
 import 'adaptive_layout.dart';
 
 /// The rail: ≡ (the whole list) and search on top, level with the chat
-/// header's keys; the host, 网页版 and 设置 at the bottom, level with the
+/// header's keys; the host, Web app and Settings at the bottom, level with the
 /// composer's lower edge — the same three the drawer's identity bar holds.
 ///
 /// ```
-///  (≡)  ( 修复登录重复提交 )
+///  (≡)  ( Fix duplicate login submits )
 ///  (⌕)
 ///
 ///  (▢)
 ///  (◎)
-///  (⚙)  ( 输入消息…        )
+///  (⚙)  ( Message…            )
 /// ```
 ///
 /// No strip behind the keys: they float on the page like the header's.

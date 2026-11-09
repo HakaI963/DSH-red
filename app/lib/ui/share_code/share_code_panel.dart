@@ -1,6 +1,6 @@
-// The second half of every 「分享…」 sheet — the code made, then its ways out in
-// one row of round keys, as on the share panel: 复制链接 · 二维码 · (图片) · 分享,
-// and for a profile 存为文件. A plugin's link always fits, so it has no file key;
+// The second half of every "Share…" sheet — the code made, then its ways out in
+// one row of round keys, as on the share panel: Copy link · QR code · (Image) · Share,
+// and for a profile Save as file. A plugin's link always fits, so it has no file key;
 // a profile too large for a link goes out as a `.dshgo` file, or as a Gist link
 // when a GitHub token is given.
 
@@ -36,7 +36,7 @@ class ShareCodePanel extends ConsumerStatefulWidget {
   /// What the link is called in the share text and under the QR code.
   final String title;
 
-  /// 「图片」: a picture card of it (a plugin the market knows).
+  /// "Image": a picture card of it (a plugin the market knows).
   final VoidCallback? onImage;
 
   /// A link of its own (a plugin's page in the official market) copied,
@@ -268,7 +268,7 @@ class _ShareCodePanelState extends ConsumerState<ShareCodePanel> {
   }
 }
 
-/// For a profile too large to inline: 「生成链接」 through a secret Gist with
+/// For a profile too large to inline: "Generate link" through a secret Gist with
 /// the person's GitHub token (kept for this app session only).
 class _GistLink extends ConsumerStatefulWidget {
   const _GistLink({required this.fileName, required this.fileText, required this.made, required this.onMade});

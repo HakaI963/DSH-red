@@ -1,10 +1,10 @@
-// 按住确认: the main key of 解除限制's confirmation page. A tap does nothing;
+// Hold to confirm: the main key of the Lift restrictions confirmation page. A tap does nothing;
 // holding it for [HoldToConfirmButton.hold] fills it from the left and then
 // confirms. Letting go early drains it back.
 //
 // ```
 // ╭──────────────────────────────────────────╮
-// │████████████  我了解风险，开启              │  52, stadium, danger
+// │████████████  I understand the risks — enable        │  52, stadium, danger
 // ╰──────────────────────────────────────────╯
 // ```
 //
@@ -31,7 +31,7 @@ class HoldToConfirmButton extends StatefulWidget {
 
   final String label;
 
-  /// Read with the label: how to use it (「按住按钮约 1.5 秒」).
+  /// Read with the label: how to use it ("hold the button for about 1.5 s").
   final String hint;
   final VoidCallback onConfirmed;
   final bool enabled;
@@ -46,7 +46,7 @@ class HoldToConfirmButton extends StatefulWidget {
 }
 
 class _HoldToConfirmButtonState extends State<HoldToConfirmButton> with SingleTickerProviderStateMixin {
-  // preserve: with the system's 移除动画 on, a normal controller runs at 5% (a 75 ms "hold").
+  // preserve: with the system's Remove animations on, a normal controller runs at 5% (a 75 ms "hold").
   late final AnimationController _fill = AnimationController(
     vsync: this,
     duration: HoldToConfirmButton.hold,

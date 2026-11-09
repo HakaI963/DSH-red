@@ -278,7 +278,7 @@ class BulletLines extends StatelessWidget {
   }
 }
 
-/// One fact row with a state word: "已安装 Shizuku · 是".
+/// One fact row with a state word: "Shizuku installed · yes".
 class CheckRow extends StatelessWidget {
   const CheckRow({super.key, required this.label, required this.done, this.unknown = false});
 
@@ -331,7 +331,7 @@ class PageFootnote extends StatelessWidget {
   }
 }
 
-/// 闲置时不透明度: the row with its percent, the slider under the title (from
+/// Opacity when idle: the row with its percent, the slider under the title (from
 /// the title's left edge to the value's right one). Neutral, like every slider
 /// in settings: the page's accent stays with the switches.
 class OverlayOpacityRow extends StatelessWidget {
@@ -370,7 +370,7 @@ class OverlayOpacityRow extends StatelessWidget {
             ListPageRow.horizontal,
             12,
           ),
-          // One node: "闲置时不透明度, 70%".
+          // One node: "Opacity when idle, 70%".
           child: MergeSemantics(
             child: Semantics(
               label: title,

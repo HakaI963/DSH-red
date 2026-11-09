@@ -1,4 +1,4 @@
-// The pet's long-press menu (换宠物 · 藏起来 1 小时 · 宠物设置), in the same sheet as the
+// The pet's long-press menu (change pet · hide for 1 hour · pet settings), in the same sheet as the
 // message menu.
 
 import 'dart:async';
@@ -36,7 +36,7 @@ enum PetMenuAction {
   };
 }
 
-/// How long 「藏起来」 lasts.
+/// How long "Hide" lasts.
 const petHideFor = Duration(hours: 1);
 
 Future<void> showPetMenu(BuildContext context, {required PetPack pack}) async {
@@ -75,7 +75,7 @@ Future<void> showPetMenu(BuildContext context, {required PetPack pack}) async {
             children: [
               SheetTitleBar(context.l10n.botsPetChange),
               // Brought pets add rows: past the sheet's height the grid
-              // scrolls under the title instead of pushing 不显示 off.
+              // scrolls under the title instead of pushing Don't show off.
               Flexible(
                 child: SingleChildScrollView(
                   child: PetPicker(

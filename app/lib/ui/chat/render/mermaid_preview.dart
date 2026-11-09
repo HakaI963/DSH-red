@@ -70,7 +70,7 @@ load(0);
 </script></body></html>''';
 }
 
-/// 全屏预览一张 Mermaid 图表:可双指缩放;没网或语法有误时一句话说明。
+/// Full-screen preview of a Mermaid diagram: pinch-zoomable; one line of explanation when offline or on bad syntax.
 class MermaidPreviewPage extends StatefulWidget {
   const MermaidPreviewPage({super.key, required this.source});
 

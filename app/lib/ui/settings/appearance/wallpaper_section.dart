@@ -1,4 +1,4 @@
-// 设置 › 主题 › 壁纸: the default backdrop or the user's own picture, side by side as two small
+// Settings › Theme › Wallpaper: the default backdrop or the user's own picture, side by side as two small
 // phones (the launch screen's card, same grid); where the picture sits, how soft and how calm,
 // replace it, preview it.
 //
@@ -6,14 +6,14 @@
 //          │ ◖══◗ │    │▒◖══◗▒│      two phones the screen's shape, centred as a pair 12
 //          │  ▭▭  │    │▒ ▭▭ ▒│      apart, each a third of the card's inner width, a sketch
 //          ╰──────╯    ╰──────╯      of the chat on each; the one in use ringed in the accent
-//            默认         自定义
-//   调整位置                                 ›     ┐
-//   模糊                                   30%     │
+//            Default      Custom
+//   Adjust position                            ›     ┐
+//   Blur                                     30%     │
 //   ━━━━━━━━━●──────────────────────────────       │ only while the custom one is in use
-//   提亮 (light) / 压暗 (dark)              20%     │
+//   Brighten (light) / darken (dark)          20%     │
 //   ━━━━━━●─────────────────────────────────       │
-//   更换图片                                 ›     ┘
-//   预览                                     ›
+//   Change picture                           ›     ┘
+//   Preview                                    ›
 //
 // The custom phone shows the real bake (small), redone as a slider moves; the backdrop behind
 // the app is baked again once the slider is let go.
@@ -271,7 +271,7 @@ class WallpaperSliderRow extends StatelessWidget {
   }
 }
 
-/// 默认 and 自定义 as two small phones, centred as a pair: the launch screen card's geometry
+/// Default and Custom as two small phones, centred as a pair: the launch screen card's geometry
 /// ([LaunchScreenPicker]'s ring, radius and shape).
 class WallpaperPicker extends StatelessWidget {
   const WallpaperPicker({

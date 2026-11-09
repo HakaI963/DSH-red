@@ -93,7 +93,7 @@ class ActionLogRow extends StatelessWidget {
   }
 }
 
-/// 操作记录: every step DSH took on the phone (no screen contents).
+/// Action log: every step DSH took on the phone (no screen contents).
 class PhoneActionLogPage extends ConsumerStatefulWidget {
   const PhoneActionLogPage({super.key});
 

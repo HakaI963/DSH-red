@@ -59,16 +59,16 @@ extension PhoneConfirmModeText on PhoneConfirmMode {
   };
 }
 
-/// Where a row of 确认方式's 「这些由你来操作」 goes.
+/// Where a row of Confirmation mode's "You handle these" goes.
 enum _ConfirmLink { appRules, unlocks }
 
-/// 设置 → 手机操控: the master switch behind
-/// the 显著披露, permission status with fixes, a test read, 不打扰模式, the app
+/// Settings → Phone control: the master switch behind
+/// the prominent disclosure, permission status with fixes, a test read, Do Not Disturb mode, the app
 /// list and the action log.
 class PhoneControlScreen extends ConsumerStatefulWidget {
   const PhoneControlScreen({super.key});
 
-  /// Entries shown in 「最近操作」 on this page.
+  /// Entries shown in "Recent actions" on this page.
   static const recentCount = 3;
 
   @override
@@ -149,8 +149,8 @@ class _PhoneControlScreenState extends ConsumerState<PhoneControlScreen> {
       ..showSnackBar(SnackBar(content: Text(text)));
   }
 
-  /// 确认方式: the three ways, then what stays with the person whichever is
-  /// picked (so 全程自动 stopping at a password isn't taken for a fault),
+  /// Confirmation mode: the three ways, then what stays with the person whichever is
+  /// picked (so fully-automatic stopping at a password isn't taken for a fault),
   /// with the two places those are changed.
   Future<void> _pickConfirmMode(PhoneConfirmMode current) async {
     final picked = await showAppSheet<Object>(
@@ -204,7 +204,7 @@ class _PhoneControlScreenState extends ConsumerState<PhoneControlScreen> {
     }
     final next = picked is PhoneConfirmMode ? picked : null;
     if (next == null || next == current) return;
-    // 本任务免确认 needs no notice: each task still asks once, at its start.
+    // "No confirmation for this task" needs no notice: each task still asks once, at its start.
     if (next == PhoneConfirmMode.always) {
       final ok = await confirmRisk(context, RiskNotices.phoneConfirmAlways);
       if (!ok || !mounted) return;
@@ -623,7 +623,7 @@ class _PhoneControlScreenState extends ConsumerState<PhoneControlScreen> {
 
   Future<void> _setAutoCollapse(bool on) => ref.read(phoneOverlayPrefsProvider.notifier).setAutoCollapse(on);
 
-  /// 悬浮条: 闲置时不透明度, 闲置时自动收起, 完成后返回 dsh-go.
+  /// The floating bar: opacity when idle, auto-hide when idle, return to dsh-go when done.
   Widget _floatingBar() {
     final overlay = ref.watch(phoneOverlayPrefsProvider);
     final returnAfterDone = ref.watch(phoneReturnPrefProvider);
@@ -810,8 +810,8 @@ class _WhatItDoes extends StatelessWidget {
   }
 }
 
-/// 确认方式's 「这些由你来操作」: the hard rules still in place (a lifted one
-/// drops out), the 不碰 list, and where each is changed. The lines start where
+/// Confirmation mode's "You handle these": the hard rules still in place (a lifted one
+/// drops out), the don't-touch list, and where each is changed. The lines start where
 /// the rows' titles do.
 class _YoursGroup extends ConsumerWidget {
   const _YoursGroup({required this.onLink});

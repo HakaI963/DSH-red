@@ -9,12 +9,12 @@ import '../common/smooth_size.dart';
 import '../theme/app_icons.dart';
 import '../theme/theme.dart';
 
-/// 指令面板显示什么。
+/// What the command panel displays.
 sealed class PaletteContent {
   const PaletteContent();
 
-  /// 输入框里的内容需要面板吗(以 `/` 开头,且还在打指令名,或者首行的
-  /// 已知指令有提示文案、参数还未填写)。
+  /// Does the input field's content need the panel (starts with `/` and the command name is still being typed, or the
+  /// first line's known command has hint text with arguments not filled in yet).
   static PaletteContent? of(List<SlashCommand> commands, String text, {int? caret}) {
     final draft = text;
     if (caret != null) {
@@ -43,7 +43,7 @@ sealed class PaletteContent {
   }
 }
 
-/// 还在打指令名:候选列表(可能为空)。第一行是"发送"会选中的那一条。
+/// Still typing the command name: the candidate list (possibly empty). Row one is what "send" would pick.
 final class PaletteMatches extends PaletteContent {
   const PaletteMatches(this.commands, {this.typed = false});
   final List<SlashCommand> commands;
@@ -53,25 +53,25 @@ final class PaletteMatches extends PaletteContent {
   final bool typed;
 }
 
-/// 指令名已完整、正在输参数:只提示参数格式。
+/// Command name complete, arguments being typed: hint the argument format only.
 final class PaletteHint extends PaletteContent {
   const PaletteHint(this.command);
   final SlashCommand command;
 }
 
-/// 输入框上方的玻璃指令面板:和输入条同宽、同样 28 的圆角,浮在它上方 6。
+/// The glass command panel above the input field: as wide as the input bar, the same 28 radius, floating 6 above it.
 ///
 /// ```
 /// ╭──────────────────────────────────────╮
-/// │ ⊞  压缩  /compact                  ↵ │   ← 打了半个名字时,发送会选中第一行
-/// │    压缩以上对话内容,腾出上下文         │
-/// │ ⛉  权限  /permission <预设名>          │
-/// │    切换权限预设(沙箱模式与审批策略)     │
+/// │ ⊞  compress  /compact                  ↵ │   ← with half a name typed, send picks the first row
+/// │    compress the conversation to free up context │
+/// │ ⛉  permissions  /permission <preset name>       │
+/// │    switch the permission preset (sandbox mode & approval policy) │
 /// ╰──────────────────────────────────────╯
 /// ```
 ///
-/// 行首图标的中心与输入条里 ＋ 键的中心对齐;图标是 20 号线性图标、次要色,
-/// 不带底色。
+/// The row's leading icon centre aligns with the + key's centre in the input bar; the icon is a 20-size line icon in
+/// secondary color, no fill behind it.
 class SlashPalette extends StatelessWidget {
   const SlashPalette({super.key, required this.content, required this.onPick});
 
@@ -155,7 +155,7 @@ class _CommandTile extends StatelessWidget {
   final SlashCommand command;
   final bool highlighted;
 
-  /// 参数提示态:不可点,描述换成"输入参数后发送"。
+  /// Argument-hint state: not tappable; the description becomes "type an argument to send".
   final bool showHintOnly;
   final VoidCallback? onTap;
 
@@ -199,7 +199,7 @@ class _CommandTile extends StatelessWidget {
                 shape: _shape,
               ),
               constraints: const BoxConstraints(minHeight: 52),
-              // 6 + 6 + half of 32 = 28: the icon's centre over the ＋ key's.
+              // 6 + 6 + half of 32 = 28: the icon's centre over the + key's.
               padding: const EdgeInsets.fromLTRB(2, 8, 12, 8),
               child: Row(
                 children: [
@@ -265,7 +265,7 @@ class _CommandTile extends StatelessWidget {
   }
 }
 
-/// 指令图标:内置指令各一个,其他(插件)统一用拼图。
+/// Command icons: one per built-in command; everything else (plugins) uses the puzzle piece.
 IconData slashIcon(SlashCommand command) =>
     command.kind == SlashCommandKind.skill ? AppIcons.skill : slashIconFor(command.name);
 

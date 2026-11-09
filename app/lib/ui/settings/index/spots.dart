@@ -30,10 +30,10 @@ enum SpotCondition {
   /// Only with this phone's engine in use.
   localHost,
 
-  /// Only while 手机操控 is on.
+  /// Only while Phone control is on.
   phoneControlOn,
 
-  /// Not in 网页模式 (the native chat takes the question).
+  /// Not in Web mode (the native chat takes the question).
   nativeUi,
 
   /// Only when the host's engine has the setting.
@@ -135,7 +135,7 @@ class SettingsPageMeta {
   final List<String> links;
   final SpotCondition? condition;
 
-  /// Whether [parent] draws a row for it. 全部功能 has none: the drawer opens
+  /// Whether [parent] draws a row for it. All features has none: the drawer opens
   /// it, and search still finds it.
   final bool row;
 
@@ -192,8 +192,8 @@ class SettingSpot {
   /// The engine setting it shows, on pages drawn from the engine's schema.
   final SpotField? field;
 
-  /// The title the row shows in its other state (安全模式: 以安全模式启动 /
-  /// 恢复正常模式).
+  /// The title the row shows in its other state (Safe mode: Start in safe mode /
+  /// Restore normal mode).
   final Label? altTitle;
 
   bool get isEntry => opens != null;
@@ -248,15 +248,15 @@ abstract final class SettingsIndex {
     return out;
   }
 
-  /// The way there by name, as the guide writes it: 设置 › 手机操控 ›
-  /// 确认方式. A page's own trail ends with its title.
+  /// The way there by name, as the guide writes it: Settings › Phone control ›
+  /// Confirmation mode. A page's own trail ends with its title.
   static List<String> trail(SettingSpot spot, L10n l10n) => [
     for (final p in chain(spot.isEntry ? spot.opens! : spot.page)) page(p).title(l10n),
     if (!spot.isEntry) spot.title(l10n),
   ];
 
   /// What a search result shows under its title: the pages it sits in, with
-  /// the hub group after 设置 (设置 › AI › 权限). A page shows its own title
+  /// the hub group after Settings (Settings › AI › Permissions). A page shows its own title
   /// last; a row shows the page it is on.
   static List<String> path(SettingSpot spot, L10n l10n) {
     final pages = chain(spot.isEntry ? spot.opens! : spot.page);
@@ -273,7 +273,7 @@ abstract final class SettingsIndex {
   }
 }
 
-/// A plugin's own settings form on 引擎设置: known only once the host says
+/// A plugin's own settings form on Engine settings: known only once the host says
 /// which plugins it has, so not in the table (search adds them from the
 /// engine's settings). [title] in each language, as search matches both.
 SettingSpot pluginFormSpot(String ns, String Function(L10n l10n) title) => SettingSpot(
@@ -336,7 +336,7 @@ final _pages = <SettingsPageMeta>[
     keywords: (l) => l.searchKwAgentPresets,
     links: const ['agent-presets'],
   ),
-  // 能力
+  // Capabilities
   SettingsPageMeta(
     SettingsPageId.phone,
     title: (l) => l.phoneControlTitle,
@@ -363,7 +363,7 @@ final _pages = <SettingsPageMeta>[
     title: (l) => l.phoneUnlockTitle,
     parent: SettingsPageId.phone,
     keywords: (l) => l.searchKwPhoneUnlock,
-    // The overlay's 「已解除限制」 tag opens it through this link.
+    // The overlay's "Restrictions lifted" tag opens it through this link.
     links: const ['phone-unlocks'],
   ),
   SettingsPageMeta(
@@ -390,7 +390,7 @@ final _pages = <SettingsPageMeta>[
     freq: Freq.medium,
     links: const ['plugins'],
   ),
-  // 外观
+  // Appearance
   SettingsPageMeta(
     SettingsPageId.appearance,
     title: (l) => l.pluginsTheme,
@@ -407,7 +407,7 @@ final _pages = <SettingsPageMeta>[
     freq: Freq.medium,
     links: const ['pets'],
   ),
-  // 通用
+  // General
   SettingsPageMeta(
     SettingsPageId.interface,
     title: (l) => l.hubSettingsInterface,
@@ -467,7 +467,7 @@ final _pages = <SettingsPageMeta>[
     keywords: (l) => l.searchKwSharedLinks,
     links: const ['shared-links'],
   ),
-  // 主机
+  // Hosts
   SettingsPageMeta(
     SettingsPageId.engine,
     title: (l) => l.hubSettingsEngine,
@@ -526,7 +526,7 @@ final _pages = <SettingsPageMeta>[
     links: const ['all-features'],
     row: false,
   ),
-  // 帮助与关于
+  // Help & about
   SettingsPageMeta(
     SettingsPageId.diagnostics,
     title: (l) => l.phoneEngineDiagnostics,
@@ -555,7 +555,7 @@ final _pages = <SettingsPageMeta>[
 
 /// Rows by name, for the pages that draw them.
 abstract final class Spots {
-  // 设置 (the hub).
+  // Settings (the hub).
   static final chatTextSize = SettingSpot(
     'chat-text-size',
     page: SettingsPageId.hub,
@@ -595,7 +595,7 @@ abstract final class Spots {
     keywords: (l) => l.searchKwCommunity,
   );
 
-  // 模型.
+  // Models.
   static final addProvider = SettingSpot(
     'add-provider',
     page: SettingsPageId.models,
@@ -603,7 +603,7 @@ abstract final class Spots {
     keywords: (l) => l.searchKwAddProvider,
   );
 
-  // 权限.
+  // Permissions.
   static final permissionCurrent = SettingSpot(
     'permission-current',
     page: SettingsPageId.permission,
@@ -634,7 +634,7 @@ abstract final class Spots {
     keywords: (l) => l.searchKwPhoneConfirmEntry,
   );
 
-  // 个性化.
+  // Personalization.
   static final visualReplies = SettingSpot(
     'visual-replies',
     page: SettingsPageId.personalization,
@@ -643,7 +643,7 @@ abstract final class Spots {
     condition: SpotCondition.localHost,
   );
 
-  // 手机操控.
+  // Phone control.
   static final phoneA11yRestore = SettingSpot(
     'phone-a11y-restore',
     page: SettingsPageId.phone,
@@ -681,7 +681,7 @@ abstract final class Spots {
     condition: SpotCondition.phoneControlOn,
   );
 
-  // 插件 (its 插件市场 tab; the page opens on its first tab).
+  // Plugins (its Plugin market tab; the page opens on its first tab).
   static final pluginsMarket = SettingSpot(
     'plugins-market',
     page: SettingsPageId.plugins,
@@ -689,7 +689,7 @@ abstract final class Spots {
     keywords: (l) => l.searchKwPluginsMarket,
   );
 
-  // 联网搜索 (drawn from the engine's schema).
+  // Web search (drawn from the engine's schema).
   static final webSearchKey = SettingSpot(
     'web-search-key',
     page: SettingsPageId.webSearch,
@@ -699,7 +699,7 @@ abstract final class Spots {
     condition: SpotCondition.engineField,
   );
 
-  // 主题.
+  // Theme.
   static final darkMode = SettingSpot(
     'dark-mode',
     page: SettingsPageId.appearance,
@@ -745,7 +745,7 @@ abstract final class Spots {
     keywords: (l) => l.searchKwWallpaper,
   );
 
-  // 宠物.
+  // Pets.
   static final petSize = SettingSpot(
     'pet-size',
     page: SettingsPageId.pets,
@@ -771,7 +771,7 @@ abstract final class Spots {
     keywords: (l) => l.searchKwPetDisplayWhen,
   );
 
-  // 界面.
+  // Interface.
   static final uiMode = SettingSpot(
     'ui-mode',
     page: SettingsPageId.interface,
@@ -801,7 +801,7 @@ abstract final class Spots {
     page: SettingsPageId.interface,
     title: (l) => l.commonWeb,
     keywords: (l) => l.searchKwGeneral,
-    // 通用设置 (gone: its web app fields live here now).
+    // General settings (gone: its web app fields live here now).
     link: 'general',
   );
   static final openWeb = SettingSpot(
@@ -841,7 +841,7 @@ abstract final class Spots {
     condition: SpotCondition.engineField,
   );
 
-  // 性能.
+  // Performance.
   static final refreshRate = SettingSpot(
     'refresh-rate',
     page: SettingsPageId.performance,
@@ -868,7 +868,7 @@ abstract final class Spots {
     condition: SpotCondition.animationsOn,
   );
 
-  // 通知.
+  // Notifications.
   static final notifyEnabled = SettingSpot(
     'notify-enabled',
     page: SettingsPageId.notifications,
@@ -912,7 +912,7 @@ abstract final class Spots {
     keywords: (l) => l.searchKwNotifySystem,
   );
 
-  // 隐私与分享.
+  // Privacy & sharing.
   static final shareConfig = SettingSpot(
     'share-config',
     page: SettingsPageId.privacy,
@@ -935,7 +935,7 @@ abstract final class Spots {
     condition: SpotCondition.engineField,
   );
 
-  // 本机引擎.
+  // Local engine.
   static final autoStart = SettingSpot(
     'auto-start',
     page: SettingsPageId.engine,
@@ -975,7 +975,7 @@ abstract final class Spots {
     keywords: (l) => l.searchKwEngineUninstall,
   );
 
-  // 远程主机.
+  // Remote hosts.
   static final addSshHost = SettingSpot(
     'add-ssh-host',
     page: SettingsPageId.remote,
@@ -996,7 +996,7 @@ abstract final class Spots {
     keywords: (l) => l.searchKwRemoteCompactHistory,
   );
 
-  // 引擎参数 and its pages (drawn from the engine's schema).
+  // Engine parameters and its pages (drawn from the engine's schema).
   static final subagentDepth = SettingSpot(
     'subagent-depth',
     page: SettingsPageId.subagent,
@@ -1022,7 +1022,7 @@ abstract final class Spots {
     condition: SpotCondition.engineField,
   );
 
-  // 关于 dsh-go.
+  // About dsh-go.
   static final version = SettingSpot(
     'version',
     page: SettingsPageId.about,

@@ -13,15 +13,15 @@ import 'access_widgets.dart';
 import 'system_access_route.dart';
 
 /// ```
-///   ▣  还有 1 项没开
-///      随时可在「设置 › 系统权限」补开
+///   ▣  1 item still not enabled
+///      Enable it anytime in Settings › System permissions
 ///   ╭──────────────────────────────────╮
-///   │ ▢ 允许使用麦克风          已开启   │
-///   │ ▢ 允许通知               未开启 › │
-///   │ ▢ 允许后台高耗电          已去设置 › │
+///   │ ▢ Allow microphone use     Enabled  │
+///   │ ▢ Allow notifications    Not enabled › │
+///   │ ▢ Allow high background use  Went to settings › │
 ///   ╰──────────────────────────────────╯
-///   语音模型（约 241 MB）会在引擎就绪后开始下载…
-///   (               继续               )
+///   The voice model (~241 MB) starts downloading once the engine is ready…
+///   (               Continue              )
 /// ```
 class AccessSummaryPage extends ConsumerWidget {
   const AccessSummaryPage({super.key, required this.items, required this.voice, required this.onDone});
@@ -29,7 +29,7 @@ class AccessSummaryPage extends ConsumerWidget {
   /// What the picked features need, in walk order.
   final List<AccessItem> items;
 
-  /// 语音输入 was picked: its model downloads once the engine is up.
+  /// Voice input was picked: its model downloads once the engine is up.
   final bool voice;
   final VoidCallback onDone;
 

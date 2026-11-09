@@ -63,7 +63,7 @@ List<String> _cellsOf(String row) {
 ///
 /// A table may not interrupt a paragraph: a header row written straight under
 /// a text line is read as one more paragraph line, so the pipes show as
-/// literal text (`② 按症状查的清单` followed by `| 症状 | … |`). The blank line
+/// literal text (`② the symptom lookup list` followed by `| symptom | … |`). The blank line
 /// ends the paragraph first, and the table is recognised.
 ///
 /// Only a table at the left margin, or inside a `>` quote, is moved: one

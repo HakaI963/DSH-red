@@ -1,23 +1,23 @@
-// 设置 › 手机操控 › 解除限制: the hard rules a person may lift, one by one, at
-// their own risk (docs/guide 手机操控 › 解除限制). All off by default.
+// Settings › Phone control › Lift restrictions: the hard rules a person may lift, one by one, at
+// their own risk (docs/guide Phone control › Lift restrictions). All off by default.
 // Turning one on goes through a full confirmation page — what AI may then do,
 // what can go wrong, the disclaimer — and a 1.5 s hold; turning it off is one
 // tap. Nothing can be turned on while a task runs: the agent driving the
 // phone must not be able to widen its own reach.
 //
 // ```
-//   解除限制
-//   让 AI 去做默认由你来做的事
+//   Lift restrictions
+//   Let the AI do things you'd normally do yourself
 //   ╭──────────────────────────────────╮
-//   │ ⚙ 系统设置                   ( ●) │
-//   │   含权限页、安装器、安全中心、通知栏 │
-//   │ ⚿ 密码和验证码               ( ●) │
-//   │ ▭ DSH Go 自身                ( ●) │
+//   │ ⚙ System settings                ( ●) │
+//   │   incl. permission pages, installer, security center, notification shade
+//   │ ⚿ Passwords and codes            ( ●) │
+//   │ ▭ DSH Go itself                  ( ●) │
 //   ╰──────────────────────────────────╯
 //   ╭──────────────────────────────────╮
-//   │ ☰ 银行、支付类 App               › │
+//   │ ☰ Banking & payment apps           › │
 //   ╰──────────────────────────────────╯
-//   开启后的后果由你承担。…
+//   You bear the consequences once enabled. …
 // ```
 
 import 'dart:async';
@@ -57,7 +57,7 @@ extension PhoneUnlockText on PhoneUnlock {
     PhoneUnlock.ownApp => AppIcons.unlockOwnApp,
   };
 
-  /// What stays with the person while this rule holds (确认方式's list).
+  /// What stays with the person while this rule holds (Confirmation mode's list).
   String yours(L10n l10n) => switch (this) {
     PhoneUnlock.systemPages => l10n.phoneYoursSystem,
     PhoneUnlock.secretFields => l10n.phoneYoursSecrets,
@@ -70,14 +70,14 @@ extension PhoneUnlockText on PhoneUnlock {
     PhoneUnlock.ownApp => l10n.phoneUnlockConfirmOwnAppTitle,
   };
 
-  /// 开启后，AI 可以.
+  /// "Once enabled, the AI can".
   List<String> can(L10n l10n) => switch (this) {
     PhoneUnlock.systemPages => [l10n.phoneUnlockSystemCan1, l10n.phoneUnlockSystemCan2, l10n.phoneUnlockSystemCan3],
     PhoneUnlock.secretFields => [l10n.phoneUnlockSecretsCan1, l10n.phoneUnlockSecretsCan2, l10n.phoneUnlockSecretsCan3],
     PhoneUnlock.ownApp => [l10n.phoneUnlockOwnAppCan1, l10n.phoneUnlockOwnAppCan2],
   };
 
-  /// 可能出什么事.
+  /// "What could go wrong".
   List<String> risks(L10n l10n) => switch (this) {
     PhoneUnlock.systemPages => [l10n.phoneUnlockSystemRisk1, l10n.phoneUnlockSystemRisk2],
     PhoneUnlock.secretFields => [l10n.phoneUnlockSecretsRisk1, l10n.phoneUnlockSecretsRisk2],
@@ -94,7 +94,7 @@ List<String> phoneUnlockDisclaimer(L10n l10n) => [
   l10n.phoneUnlockDisclaimer5,
 ];
 
-/// The row value for 解除限制: 未开启 / 已开启 2 项; null while unread.
+/// The row value for Lift restrictions: Off / 2 enabled; null while unread.
 String? phoneUnlockSummary(L10n l10n, PhonePolicies? policies) {
   if (policies == null) return null;
   final n = policies.unlocks.length;
@@ -233,7 +233,7 @@ class _UnlockRow extends StatelessWidget {
 }
 
 /// The confirmation before one rule is lifted: what AI may then do, what can
-/// go wrong, the disclaimer, and 「我了解风险，开启」 held for 1.5 s. Pops true
+/// go wrong, the disclaimer, and "I understand the risks — enable" held for 1.5 s. Pops true
 /// once the rule is lifted.
 class PhoneUnlockConfirmPage extends ConsumerStatefulWidget {
   const PhoneUnlockConfirmPage({super.key, required this.unlock});
@@ -326,7 +326,7 @@ class _PhoneUnlockConfirmPageState extends ConsumerState<PhoneUnlockConfirmPage>
   }
 }
 
-/// 免责声明: a card in the danger tone, the same five lines for every rule.
+/// Disclaimer: a card in the danger tone, the same five lines for every rule.
 class _Disclaimer extends StatelessWidget {
   const _Disclaimer({required this.lines});
 
@@ -399,8 +399,8 @@ class _Disclaimer extends StatelessWidget {
   }
 }
 
-/// 「已解除限制」 under 手机操控's overview: a small tag while any rule is
-/// lifted, opening 解除限制.
+/// "Restrictions lifted" under Phone control's overview: a small tag while any rule is
+/// lifted, opening Lift restrictions.
 class UnlockedTag extends StatelessWidget {
   const UnlockedTag({super.key, required this.onTap});
 

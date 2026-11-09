@@ -1,4 +1,4 @@
-// 扫码配对电脑: the camera reads the code the computer's Remote plugin shows,
+// Scan to pair a computer: the camera reads the code the computer's Remote plugin shows,
 // the person confirms the computer, the phone shows an 8-digit code to type
 // into the computer, and once the computer confirmed it the phone connects.
 //

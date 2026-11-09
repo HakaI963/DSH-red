@@ -2,38 +2,38 @@
 //
 // There is no PageView behind the chat here, so a leftward swipe while the
 // drawer is closed is simply rejected and left to whatever else wants it: a
-// code block's scroll, or the 快捷入口 panel's [QuickPanelDragRecognizer].
+// code block's scroll, or the Quick entries panel's [QuickPanelDragRecognizer].
 
 import 'package:flutter/gestures.dart';
 import 'package:flutter/widgets.dart';
 
-/// 抽屉拖动手势识别器:**同一根手指全程由抽屉持有,右滑拉开、左滑推回**。
+/// The drawer drag gesture recognizer: **one finger, held by the drawer throughout — swipe right to pull open, left to push back**.
 ///
-/// 为什么要自己写而不用 `Scaffold.drawer` 那套:
+/// Why write it instead of using `Scaffold.drawer`'s machinery:
 ///
-/// 手势竞技场(gesture arena)的胜负在手势**开始阶段**就决出了。监听 `PageView`
-/// 的前缘过卷再调 `openDrawer()` 不够:那只是播一段 fling 动画,这根手指早已被
-/// `PageView` 的横向 drag 识别器赢走,不松手继续滑,位移全部喂给 `PageView`。
+/// The gesture arena is decided during the gesture's **start phase**. Watching `PageView`'s
+/// leading overscroll and then calling `openDrawer()` is not enough: that only plays a fling animation while
+/// this finger was already won by `PageView`'s horizontal drag recognizer — keep sliding without lifting and every pixel feeds `PageView`.
 ///
-/// 中途补救也不成立:切 `PageView.physics`、动态放宽 `drawerEdgeDragWidth`、
-/// 或事后 `openDrawer()`,都无法把**已在飞的** pointer 转交给另一个识别器 ——
-/// 放宽拖动区只影响之后新建的识别器。
+/// Mid-gesture repairs fail too: swapping `PageView.physics`, widening `drawerEdgeDragWidth` on the fly,
+/// or calling `openDrawer()` afterwards can never hand an **already flying** pointer to another recognizer —
+/// widening the drag zone only affects recognizers created after that.
 ///
-/// 所以正确做法是从一开始就参与竞争:本识别器挂在 `PageView` **页面内部**
-/// (作为其后代),按方向自己决定去留 ——
-/// - 抽屉关着:横向位移超过 slop 后看方向。**向左立刻 reject**,把手势让给
-///   `PageView` 翻页;**向右才 accept**,开始拉开抽屉。
-/// - 抽屉已开、或本次手势已被 accept:左右两个方向都由它持有,`PageView`
-///   拿不到这根手指。于是同一根手指反向左滑时,进度连续从 1 降到 0。
-/// - 竖向为主的位移一律 reject,交给聊天列表或抽屉内部的会话列表滚动。
+/// So the right move is to compete from the start: this recognizer lives **inside** `PageView`'s pages
+/// (as their descendant) and decides by direction on its own —
+/// - drawer closed: once horizontal travel passes the slop, look at direction. **Left: reject immediately**, handing
+///   the gesture to `PageView` for paging; **only right accepts**, starting to pull the drawer open.
+/// - drawer open (or this gesture already accepted): the holder owns both directions and `PageView`
+///   never gets this finger. So one finger swiping back left glides the progress smoothly from 1 to 0.
+/// - Predominantly vertical travel always rejects, ceding to the chat list or the drawer's own list scroll.
 ///
-/// 时序上有一条铁律:**任何方向判定都必须等位移真正发生之后**,绝不能
-/// 在 pointer 落下瞬间(pointer down)就表态。竞技场里谁先 `resolve(accepted)`,
-/// 其余成员全部收到 `rejectGesture` —— 抽屉开着时若在 down 事件就宣布
-/// 胜利,抽屉里 InkWell 的 TapGestureRecognizer 会当场被拒,点击切换会话
-/// 失灵;抽屉内列表的竖向滚动也一样被杀。Scrollable 之所以能和 Tap
-/// 共存,靠的就是 drag 识别器耐心等过 slop、让 Tap 在松手时先赢。
-/// 本识别器遵守同一时序:松手前手指没动过,就什么都不声明,点击完整放行。
+/// One iron law of timing: **every direction call must wait until travel actually happens**, never
+/// declare at the pointer-down instant. In the arena, whoever first `resolve(accepted)` makes
+/// every other member receive `rejectGesture` — declaring victory at the down event while the drawer
+/// is open would reject the drawer's InkWell TapGestureRecognizer on the spot, breaking taps on
+/// conversations; vertical list scrolling inside dies the same way. Scrollable coexists with Tap
+/// precisely because drag recognizers patiently wait past the slop, letting Tap win at release.
+/// This recognizer keeps the same timing: if the finger never moved before release, declare nothing and the tap passes through whole.
 class DrawerDragRecognizer extends OneSequenceGestureRecognizer {
   DrawerDragRecognizer({
     required this.isOpen,
@@ -43,44 +43,44 @@ class DrawerDragRecognizer extends OneSequenceGestureRecognizer {
     super.debugOwner,
   });
 
-  /// 抽屉当前是否已经打开(哪怕只开了一部分)。
+  /// Whether the drawer is currently open (even partially).
   ///
-  /// 已开时不再做方向筛选:两个方向都归抽屉,否则左滑关到一半又往右推
-  /// 就会被 `PageView` 夺走手势。
+  /// When open, drop the direction filter: the drawer holds both directions, otherwise a left-swipe closing
+  /// halfway, then pushed right again, would have its gesture seized by `PageView`.
   final ValueGetter<bool> isOpen;
 
   final VoidCallback onStart;
 
-  /// 横向位移增量(像素,向右为正)。
+  /// Horizontal delta (pixels, positive to the right).
   final ValueChanged<double> onDelta;
 
-  /// 手势结束:带横向速度(像素/秒,向右为正),用来决定落到全开还是全关。
+  /// Gesture end: carries the horizontal velocity (px/s, positive right) used to settle open or closed.
   final ValueChanged<double> onEnd;
 
-  /// 判定横向意图前要累计的位移。
+  /// Travel to accumulate before judging horizontal intent.
   ///
-  /// **必须小于 `kTouchSlop`(18px)**。`PageView` 的横向 drag 识别器到 18px
-  /// 就向竞技场宣布胜利,谁先表态谁拿走这根 pointer。用 `kPanSlop`(36px)的话,
-  /// 真机上手指每帧只挪 5~20px,走到 18px 时手势已经归 `PageView`,永远等不到
-  /// 36px。测试要按真机节奏分小步走:一步 50px 会首个 move 就越线,掩盖问题。
+  /// **Must be below `kTouchSlop` (18px)**. `PageView`'s horizontal drag recognizer
+  /// declares victory at 18px, and whoever speaks first takes the pointer. With `kPanSlop` (36px),
+  /// a real finger moving 5–20px per frame is already `PageView`'s at 18px and will never reach
+  /// 36px. Tests must step like a real finger: a single 50px step crosses the line on the first move and hides the problem.
   ///
-  /// 取 8px:既赶在 `PageView` 之前表态,又足以过滤指尖落下时的抖动。
-  /// 提前宣布是安全的 —— 对话页右侧没有页面,向右滑本来也只会回弹。
+  /// 8px: speaks before `PageView`, yet enough to filter fingertip jitter at touchdown.
+  /// Declaring early is safe — there is no page right of the chat, and swiping right only overscrolls anyway.
   static const double _slop = 8.0;
 
-  /// 竖向让位的阈值。列表滚动用的是系统 touch slop,比横向判定宽松一点,
-  /// 确保「想滚列表」不会被误判成开抽屉。
+  /// The vertical yield threshold. List scrolling uses the system touch slop, kept slightly looser than the horizontal call
+  /// so "want to scroll the list" is never mistaken for opening the drawer.
   static const double _verticalSlop = kTouchSlop;
 
-  /// 手指朝哪边滑算「拉开」:抽屉在左,向右。
+  /// Which way the finger slides counts as "pull open": the drawer is on the left, so right.
   @protected
   double get openingSign => 1;
 
-  /// 关着时,朝拉开方向滑了 [distance] 是否够表态(已过 [_slop])。
+  /// While closed: is [distance] of pull-direction travel enough to speak (past [_slop])?
   @protected
   bool opensAfter(double distance, PointerDeviceKind kind) => true;
 
-  /// 手势结束([PointerUpEvent] 或 [PointerCancelEvent])时交给 [onEnd] 的速度。
+  /// The velocity [onEnd] receives at gesture end ([PointerUpEvent] or [PointerCancelEvent]).
   @protected
   double endVelocity(PointerEvent event) => _velocity?.getVelocity().pixelsPerSecond.dx ?? 0;
 
@@ -97,9 +97,9 @@ class DrawerDragRecognizer extends OneSequenceGestureRecognizer {
     _accepted = false;
     _velocity = VelocityTracker.withKind(event.kind);
     startTrackingPointer(event.pointer, event.transform);
-    // 抽屉开着也**不能**在这里表态:立刻 accept 会让竞技场当场拒掉同一点位上
-    // 的 TapGestureRecognizer,抽屉里的会话项就点不动了(见类文档)。方向判定
-    // 一律推迟到第一个 PointerMoveEvent,松手前没位移的点击完整放行。
+    // Even with the drawer open you **must not** speak here: accepting immediately makes the arena reject
+    // the TapGestureRecognizer at the same point, and drawer rows stop responding (see the class docs). Direction
+    // is always deferred to the first PointerMoveEvent; taps without travel before release pass through untouched.
   }
 
   @override
@@ -112,15 +112,15 @@ class DrawerDragRecognizer extends OneSequenceGestureRecognizer {
         return;
       }
       _accum += event.delta;
-      // 竖向为主:这是在滚聊天列表(或抽屉内的会话列表),让给它。
+      // Predominantly vertical: scrolling the chat list (or the drawer's list) — yield.
       if (_accum.dy.abs() > _verticalSlop && _accum.dy.abs() > _accum.dx.abs()) {
         resolve(GestureDisposition.rejected);
         stopTrackingPointer(event.pointer);
         return;
       }
       if (_accum.dx.abs() < _slop) return;
-      // 横向意图成立。抽屉已开时左右都归抽屉(右继续拉开、左推回),
-      // 关着时只认向右 —— 向左那是翻页,让给 PageView。
+      // Horizontal intent established. With the drawer open both directions are the drawer's (right keeps opening, left pushes back);
+      // while closed only right counts — left is paging, give it to PageView.
       final open = isOpen();
       final towards = _accum.dx * openingSign;
       if (open || towards > 0) {
@@ -128,7 +128,7 @@ class DrawerDragRecognizer extends OneSequenceGestureRecognizer {
         _accepted = true;
         onStart();
         resolve(GestureDisposition.accepted);
-        // slop 期间攒下的位移不能丢,否则抽屉起手会「跳一下」才跟上手指。
+        // Travel banked during the slop must not be dropped, or the drawer "jumps" before catching the finger.
         onDelta(_accum.dx);
       } else {
         resolve(GestureDisposition.rejected);
@@ -146,15 +146,15 @@ class DrawerDragRecognizer extends OneSequenceGestureRecognizer {
     }
   }
 
-  /// 竞技场判我们赢(可能是别人退出后默认胜出)。
+  /// The arena declared us the winner (possibly by default after others bowed out).
   ///
-  /// **不能在这里兼职「开始跟手」**。微小位移或单纯点击时,横向意图还没
-  /// 判定出来,PageView 那边也因为不够 slop 而放弃 —— 竞技场于是把胜利
-  /// 默认判给唯一剩下的我们;在这里开始跟手的话,轻轻一点屏幕、松手后抽屉
-  /// 就会自己弹开。
+  /// **Must not double as "start tracking" here.** With tiny travel or a plain click the horizontal intent
+  /// hasn't been judged; PageView also gave up for lack of slop — the arena awards victory
+  /// by default to us, the only member left. Starting to track here would fling the drawer open
+  /// after a light tap and release.
   ///
-  /// 所以只认 [handleEvent] 里真正判定过向右意图(或抽屉已开)那一条路径;
-  /// 被动获胜一律不做事。
+  /// So we only act on paths in [handleEvent] that actually judged rightward intent (or the drawer was open);
+  /// a passive win does nothing.
   @override
   void acceptGesture(int pointer) {}
 
@@ -168,18 +168,18 @@ class DrawerDragRecognizer extends OneSequenceGestureRecognizer {
   void didStopTrackingLastPointer(int pointer) {}
 }
 
-/// 右侧快捷入口面板的拖动:镜像抽屉,**向左**拉开、向右推回,同一根手指全程
-/// 归它,竖向让位和「绝不在 pointer down 表态」都一样。
+/// The right quick-entry panel's drag: the drawer mirrored — **pulls open leftward**, pushes back right, one finger
+/// held throughout; vertical yielding and "never speak at pointer down" are the same.
 ///
-/// 只有一处不同:关着时向左要滑过设备的 touch slop(严格大于)才表态。横向
-/// 滚动的代码块、表格,图表和卡片堆的横滑用的是同一个阈值和同一个比较,而
-/// 事件先发给更靠里的识别器,所以手指下只要有这样的内容,一定是它先赢:向左
-/// 滑一直是它们的,不能被面板抢走。识别器不用知道手指下是什么。Android 的
-/// slop 约 8dp,和抽屉的判定距离相同;[gestureSettings] 要和 `Scrollable`
-/// 一样取自 MediaQuery,否则两边阈值不一致。
+/// One difference: while closed, a left pull must pass the device's touch slop (strictly greater) before speaking. Horizontal
+/// scrolling code blocks, tables, charts and card stacks use the same threshold and the same comparison, and events
+/// go to the innermost recognizer first — so whenever such content is under the finger, it wins first: leftward
+/// pans stay theirs and must not be stolen by the panel. The recognizer needn't know what's under the finger. Android's
+/// slop is ~8dp, the same as the drawer's call distance; [gestureSettings] must come from MediaQuery like `Scrollable`'s,
+/// or the two thresholds disagree.
 ///
-/// 系统把手指收走时(边缘返回手势)没有「甩」这回事:只看拉到了哪儿,否则向左
-/// 的速度会把面板甩开。
+/// When the system takes the finger away (edge-back gesture) there is no "flick": look only at how far it pulled, otherwise leftward
+/// velocity would fling the panel open.
 class QuickPanelDragRecognizer extends DrawerDragRecognizer {
   QuickPanelDragRecognizer({
     required super.isOpen,

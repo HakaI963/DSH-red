@@ -1,4 +1,4 @@
-// 设置 › 能力 › 图像与视频 › 服务详情 (media-generation §5.8): one service of
+// Settings › Capabilities › Images & video › Service details (media-generation §5.8): one service of
 // the media plugin — its key (or the key another service of the provider
 // already holds), whether it is on, the models the catalogue serves for its
 // protocol, the advanced values a preset usually fills, and deleting it.

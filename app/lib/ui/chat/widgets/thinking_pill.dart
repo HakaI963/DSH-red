@@ -22,30 +22,30 @@ import '../render/markdown_body.dart';
 import 'stream_pacer.dart';
 import 'stream_row.dart';
 
-/// 思考过程:**和工具行同一套解剖的一行**。
+/// The thinking process: **one row with the very anatomy tool rows use**.
 ///
 /// ```
-/// ⚛ 思考中                                  ⌄   ← 轨道在转,下面是实时窗口
-/// │ 正在写的一段话,自然折行,一行接一行往上走     ← 最多三行,只跟最新的字
-/// ⚛ 思考 · 用户想把工具调用折叠起来…          ⌄   ← 结束后收起:预览全文首行
-/// │ 全文(次级排版)
+/// ⚛ Thinking                                 ⌄   ← the orbit spins; below is the live window
+/// │ a paragraph being written, wrapping naturally, lines scrolling up   ← at most three lines, always on the newest text
+/// ⚛ Thought · the user wants tool calls folded back…     ⌄   ← after finishing: preview of the full text's first line
+/// │ full text (secondary typography)
 /// ```
 ///
-/// 流式思考时下面是一段**最多三行的连续文字**:跟着最新写出来的字走,写满
-/// 一行就轻轻往上滑一行,高度固定,列表不会因为思考长了几行而跳。点这一行
-/// 展开全文,再点收回三行;一轮结束后手动展开的全文也自动收回去。
+/// While thinking streams, below is **a continuous run of at most three lines**: it follows the newest characters written;
+/// each completed line nudges gently up, height stays fixed, and the list never jumps because thinking grew a few lines. Tap this row
+/// to expand the full text; tap again to fall back to three lines; manually expanded full text also auto-collapses when the turn ends.
 ///
-/// 实时窗口和全文**共用同一个槽**:同一时刻只有一块内容,切换时不会一段
-/// 淡出、一段淡入地叠在一起。
+/// The live window and the full text **share one slot**: one block of content at a time, so switching never leaves
+/// one fading out while another fades in, stacked.
 ///
-/// 图形块是品牌蓝(思考是 DeepSeek 的品牌时刻),其余都是过程行的次级色。
+/// The glyph block is brand blue (thinking is DeepSeek's brand moment); the rest keeps the process row's secondary color.
 ///
-/// 收起时的行内预览照官方 Web:完成后取全文第一行,都去掉 `**`。展开是
-/// 次级排版的 Markdown。
+/// The folded inline preview follows official Web: once done, take the full text's first line, both with `**` stripped. Expanded
+/// view is Markdown in secondary typography.
 ///
-/// 引擎开着「思考过程机器翻译」插件时,展开的全文上方多一颗「翻译」:
-/// 译文就地替换原文,随时「查看原文」切回去(官方 cot-translation 的行为)。
-/// DeepSeek 品牌蓝(与鲸尾同色)。
+/// With the engine's "thinking-process machine translation" plugin on, a "Translate" pill joins above the expanded full text:
+/// the translation replaces the source in place, with "View original" to switch back anytime (official cot-translation's behavior).
+/// DeepSeek brand blue (the whale tail's own color).
 const _brandBlue = Color(0xFF4D6BFE);
 
 class ThinkingPill extends StatefulWidget {
@@ -59,21 +59,21 @@ class ThinkingPill extends StatefulWidget {
 
   final String reasoning;
 
-  /// 模型此刻还在思考(流式中且正文还没开始)。
+  /// The model is thinking right now (streaming, body not started yet).
   final bool active;
 
-  /// 这条回复还在流式输出:一轮(streaming 结束)时把展开的全文收回去。
+  /// This reply is still streaming: when the turn ends (streaming done) retract any expanded full text.
   final bool streaming;
 
-  /// 接在等待的三个点后面出现:三行实时窗口从 0 长出来,而不是一帧多出来 ——
-  /// 这一行的高度三个点已经占好了,窗口没法提前占。
+  /// Appears right after the waiting three dots: the three-line live window grows from 0, not materializing in one frame —
+  /// this row's height was already reserved by the three dots; the window can't reserve it any earlier.
   final bool growIn;
 
   @override
   State<ThinkingPill> createState() => _ThinkingPillState();
 }
 
-/// 收起时的一行预览(官方 ReasoningRow 的规则):全文第一行,去掉 `**`。
+/// The one-line preview when folded (official ReasoningRow's rule): the full text's first line, `**` removed.
 String thinkingPreview(String text) => _firstLine(text).replaceAll('**', '').trim();
 
 String _firstLine(String text) {
@@ -85,14 +85,14 @@ String _firstLine(String text) {
 class _ThinkingPillState extends State<ThinkingPill> {
   bool _expanded = false;
 
-  /// 收起动画期间还要画的那块内容:收起时它已经不该在树上了,但高度收回
-  /// 去的过程里得先留着,不能啪地消失留下一块空白。
+  /// The block painted during the collapse animation: folded, it should already be off the tree, but while the height
+  /// retracts it must stay a bit longer, never blink out leaving a blank.
   Widget? _body;
 
-  /// 译文与"看译文还是原文":收起再展开也还在。
+  /// The translation and "translation or original": survives collapse and re-expansion.
   final _translation = _TranslationHolder();
 
-  /// 第一帧窗口先关着,下一帧打开,[ExpandReveal] 才有得展开。
+  /// The first frame holds the window closed; it opens on the next so [ExpandReveal] has something to expand.
   late bool _windowHeld = widget.growIn;
 
   @override
@@ -107,7 +107,7 @@ class _ThinkingPillState extends State<ThinkingPill> {
   @override
   void didUpdateWidget(ThinkingPill oldWidget) {
     super.didUpdateWidget(oldWidget);
-    // 一轮结束:过程收进摘要,亲手展开的全文也不留在外面。
+    // Turn ended: the process folds into the summary; even full text expanded by hand doesn't stay outside.
     if (oldWidget.streaming && !widget.streaming) _expanded = false;
   }
 
@@ -122,10 +122,10 @@ class _ThinkingPillState extends State<ThinkingPill> {
     final l10n = context.l10n;
     final theme = Theme.of(context);
     final dark = theme.brightness == Brightness.dark;
-    // 深色底上品牌蓝提一档亮度,图形才不发闷。
+    // On dark grounds, brand blue gets a brightness boost so the glyph doesn't look muffled.
     final brand = dark ? Color.lerp(_brandBlue, Colors.white, 0.3)! : _brandBlue;
     final active = widget.active;
-    // 思考中或展开了全文:内容在下面,行内不再重复一行预览。
+    // Thinking, or the full text is expanded: content lives below; the inline row doesn't repeat a preview line.
     final open = active || _expanded;
     final preview = open ? '' : thinkingPreview(widget.reasoning);
     final detail = StreamRow.detail(context);
@@ -140,7 +140,7 @@ class _ThinkingPillState extends State<ThinkingPill> {
               shape: Squircle.border(StreamRow.lead * 0.32),
             ),
             child: Center(
-              // 自己一层:转动只重绘这个图形,不重绘整行。
+              // Its own layer: spinning repaints this glyph only, not the whole row.
               child: RepaintBoundary(
                 child: ThinkGlyph(size: 15, color: brand, spinning: active),
               ),
@@ -148,7 +148,7 @@ class _ThinkingPillState extends State<ThinkingPill> {
           ),
         ),
         const SizedBox(width: StreamRow.gap),
-        // 标签直接换字,不做淡入淡出:两个词叠在同一个位置上闪一下更难看。
+        // The label swaps text directly, no crossfade: two words flashing in one spot would look worse.
         ThinkingLabel(active ? l10n.chatThinkingActive : l10n.chatThinking, active: active),
         if (preview.isNotEmpty) ...[
           const StreamDot(),
@@ -171,8 +171,8 @@ class _ThinkingPillState extends State<ThinkingPill> {
 
     Widget reasoningBody() {
       if (!_expanded) return ThinkingTicker(text: widget.reasoning);
-      // 展开后,点正文本身和点头部一样收起。只在展开态挂这层手势:实时窗口
-      // 还要能长按选字/随列表滚动,不该多一个点击目标。
+      // Once expanded, tapping the body collapses just like tapping the header. The gesture layer mounts only in the expanded state: the live
+      // window must still allow long-press selection and list scrolling — no extra tap target there.
       void collapse() => setState(() => _expanded = false);
       return _hasProviderScope(context)
           ? _TranslatableReasoning(
@@ -187,12 +187,12 @@ class _ThinkingPillState extends State<ThinkingPill> {
             );
     }
 
-    // 实时窗口和展开的全文共用同一个槽:同一时刻只画一块内容。两块各自
-    // 做动画会一段淡出、一段淡入,两段文字叠在一起闪。
+    // The live window and the expanded full text share one slot: only one block paints at a time. Animating the two separately
+    // would fade one out as the other fades in, two runs of text stacking and flickering.
     if (open) {
       _body = SmoothSize(
-        // 流式思考的块高按行瞬长。高度再做一次动画会和文字上滑、列表追底叠在
-        // 一起 —— 文字越快，看起来越像在上下抖。展开全文、收起时才要动画。
+        // The streaming block's height jumps instantly per line. A height animation on top would combine with the text's upward
+        // slide and the list's bottom-chasing — the faster the text, the more it reads as vertical jitter. Animate only when expanding / collapsing the full text.
         duration: active && !_expanded ? Duration.zero : AppMotion.of(context, AppMotion.quick),
         alignment: AlignmentDirectional.topCenter,
         child: StreamThread(
@@ -210,23 +210,23 @@ class _ThinkingPillState extends State<ThinkingPill> {
           expanded: _expanded,
           child: StreamRowFrame(onTap: () => setState(() => _expanded = !_expanded), child: header),
         ),
-        // 一个槽:思考中是实时窗口,点开换成全文,一轮结束收起。
+        // One slot: live window while thinking, full text when tapped, collapsed when the turn ends.
         ExpandReveal(open: open && !_windowHeld, child: _body ?? const SizedBox.shrink()),
       ],
     );
   }
 }
 
-/// 思考行的标签。思考中一道亮度慢慢扫过文字:只在标签的灰和正文的深之间走,
-/// 不换颜色、不位移。
+/// The thinking row's label. While thinking, a band of brightness sweeps the text slowly: travelling only between the label's grey and the body's deep,
+/// never changing hue, never shifting position.
 ///
-/// 节奏照 OpenAI 公开的 Codex 说明(和它的桌面端一致):开始思考 [lead] 后第一次,
-/// 每次扫 [sweep],每 [period] 一次。其余时间控制器是停的,标签不重绘,也不挂
-/// [ShaderMask]。屏幕上同一时刻只扫一条:后开始思考的那条接过去。系统关了动画
-/// 就是静止的字。
+/// Cadence follows OpenAI's published Codex notes (matching its desktop): the first sweep [lead] after thinking starts,
+/// each sweep lasting [sweep], one every [period]. Otherwise the controller is parked: no label repaints, no
+/// [ShaderMask] mounted. Only one row sweeps on screen at a time: the one that started thinking later takes over. With system animations off,
+/// it's simply static text.
 ///
-/// 一起动的还有转圈的图形和滚动的实时窗口。三样同时抢眼就廉价了:窗口是信息,
-/// 不能动它;这道扫光是这一行的主角;图形退一步,转得很慢(见 [ThinkGlyph])。
+/// Also moving are the spinning glyph and the scrolling live window. Three things competing for attention reads cheap: the window is information and
+/// must not be touched; this sweep is the row's protagonist; the glyph steps back and turns very slowly (see [ThinkGlyph]).
 class ThinkingLabel extends StatefulWidget {
   const ThinkingLabel(this.text, {super.key, this.active = false});
 
@@ -242,7 +242,7 @@ class ThinkingLabel extends StatefulWidget {
 }
 
 class _ThinkingLabelState extends State<ThinkingLabel> with SingleTickerProviderStateMixin {
-  /// 现在归谁扫。
+  /// Who holds the sweep right now.
   static _ThinkingLabelState? _owner;
 
   AnimationController? _sweep;
@@ -255,7 +255,7 @@ class _ThinkingLabelState extends State<ThinkingLabel> with SingleTickerProvider
       _sweep ??= AnimationController(vsync: this, duration: ThinkingLabel.sweep);
       _timer = Timer(ThinkingLabel.lead, () {
         _timer = Timer.periodic(ThinkingLabel.period, (_) => _play());
-        // 在计时器里接手,不在 build 里:停别人的控制器会标脏别人的子树。
+        // Hand over inside the timer, not in build: parking someone else's controller dirties their subtree.
         _owner?._sweep?.reset();
         _owner = this;
         _play();
@@ -269,7 +269,7 @@ class _ThinkingLabelState extends State<ThinkingLabel> with SingleTickerProvider
   }
 
   void _play() {
-    // 接手的那条结束了,轮到还在思考的这条。
+    // The holder finished: the sweep falls to this one, still thinking.
     _owner ??= this;
     if (identical(_owner, this)) _sweep!.forward(from: 0);
   }
@@ -314,7 +314,7 @@ class _ThinkingLabelState extends State<ThinkingLabel> with SingleTickerProvider
           if (!sweep.isAnimating) return child!;
           return ShaderMask(
             blendMode: BlendMode.srcIn,
-            // 亮带和标签一样宽,从标签左外走到右外:两头都是静止时的颜色,起止不跳。
+            // The bright band is exactly as wide as the label and travels from just outside its left to just outside its right: both ends rest in the static color, so start and stop never jump.
             shaderCallback: (rect) =>
                 LinearGradient(colors: [muted, bright, muted])
                     .createShader(Rect.fromLTWH((2 * sweep.value - 1) * rect.width, 0, rect.width, rect.height)),
@@ -326,14 +326,14 @@ class _ThinkingLabelState extends State<ThinkingLabel> with SingleTickerProvider
   }
 }
 
-/// 展开的全文:整块正文都是收起的落点,等价于再点一次头部。
+/// The expanded full text: the whole body is a collapse target, equivalent to tapping the header again.
 ///
-/// 包法有讲究:正文自带文本选择([MarkdownBody] 的 `selectable`),而选择区
-/// 自己装了一个 tap 手势,并且比外层包装更先摸到指针 —— 直接把手势包在选择
-/// 区外面,单击会被选择区吃掉。所以这里让正文**不带**选择区,由本层把
-/// [SelectionArea] 套在收起手势的外面:收起的单击更靠里,先赢;正文里的
-/// 链接、代码复制按钮在更里层,仍然各自优先;长按选词、横向滑动交给选择区
-/// 和滚动自己判定。
+/// The wrapping is deliberate: the body ships with text selection ([MarkdownBody]'s `selectable`), and the selection area
+/// installs its own tap gesture and reaches pointers before outer wrappers — putting the gesture outside the selection
+/// area directly means the selection area eats the tap. So here the body renders **without** the selection area, and this layer wraps
+/// [SelectionArea] outside the collapse gesture: the collapse tap sits deeper and wins first; links and code-copy buttons in the body sit
+/// deeper still and keep their own priority; long-press word selection and horizontal panning are left to the selection area
+/// and scrolling to arbitrate.
 class _CollapsibleReasoningBody extends StatelessWidget {
   const _CollapsibleReasoningBody({required this.onCollapse, required this.child});
 
@@ -347,7 +347,7 @@ class _CollapsibleReasoningBody extends StatelessWidget {
       hint: context.l10n.commonCollapse,
       onTap: onCollapse,
       child: GestureDetector(
-        // 正文不满一行时右侧留白也算正文:点那儿也该收起。
+        // When the body is shorter than a line, the whitespace right of it counts as body too: tapping there collapses as well.
         behavior: HitTestBehavior.opaque,
         excludeFromSemantics: true,
         onTap: onCollapse,
@@ -357,18 +357,18 @@ class _CollapsibleReasoningBody extends StatelessWidget {
   );
 }
 
-/// 流式思考的实时窗口:一段**连续的文字**,窗口恒高三行,写出来的字从底部
-/// 进来,写满一行整段匀速往上滑一行。不拆行、不做逐行动效 —— 相邻两帧不会
-/// 各画一份文字叠在一起,读的时候也不用横着找。
+/// The live window for streaming thinking: **one continuous run of text**, a window always three lines tall, characters entering from the
+/// bottom; each completed line slides the whole run up at constant speed. No row splitting, no per-line effects — adjacent frames never
+/// paint two copies of text stacked, and reading needs no horizontal hunting.
 ///
-/// 块高从头到尾不变:流式期间列表不会一行一行地追底,写得再快也不会抖。
-/// 不足三行时文字贴在窗口顶上,后面空着,写满就自然开始往上走。
+/// The block height never changes: the list doesn't chase the bottom line by line while streaming, and fast writing never jitters.
+/// Under three lines the text sits at the window's top with empty space after; once a line fills, upward motion starts naturally.
 class ThinkingTicker extends StatelessWidget {
   const ThinkingTicker({super.key, required this.text});
 
   final String text;
 
-  /// 窗口行数(TUI 的 PREVIEW_ROWS)。
+  /// The window's line count (the TUI's PREVIEW_ROWS).
   static const rows = 3;
 
   @override
@@ -381,20 +381,20 @@ class ThinkingTicker extends StatelessWidget {
     return LayoutBuilder(
       builder: (context, constraints) {
         final width = constraints.maxWidth;
-        // 量一遍:窗口高度取「内容高度」和「三行」的较小值。
+        // Measure once: window height = min(content height, three lines).
         final painter = TextPainter(
           text: TextSpan(text: shown, style: style),
           textDirection: Directionality.of(context),
           textScaler: scaler,
         )..layout(maxWidth: width);
         final textHeight = painter.height;
-        // 每次发布都量一遍:排版对象持有原生资源,不能等 GC。
+        // Measure on every publish: layout objects hold native resources and must not wait for GC.
         painter.dispose();
         final window = lineHeight * ThinkingTicker.rows;
-        // 恒高三行:流式期间块高不变,列表就不会一行一行地追底,快写时也不抖。
+        // Always three lines tall: block height constant while streaming, so no line-by-line bottom chasing and no jitter under fast writing.
         final height = window;
-        // 多出来的部分往上推,露出来的永远是最后三行。写满一行时目标只
-        // 挪一行,由 AnimatedContainer 平滑推上去 —— 不换内容、不叠字。
+        // The overflow pushes upward; what shows is always the last three lines. Completing a line moves the target by
+        // exactly one line, nudged smoothly by AnimatedContainer — no content swap, no stacked glyphs.
         final shift = (textHeight - window).clamp(0.0, double.infinity);
         return SizedBox(
           width: width,
@@ -402,8 +402,8 @@ class ThinkingTicker extends StatelessWidget {
           child: ClipRect(
             child: AnimatedContainer(
               duration: AppMotion.of(context, AppMotion.quick),
-              // 匀速上移:每次换行都重新给目标，缓动会在每一行开头重新缓起、结尾
-              // 重新缓停，连起来就是一顿一顿的。
+              // Constant-speed rise: retarget on every line change — an easing curve would restart its ramp at each line's beginning and settle again at each end,
+              // which stitched together looks like a stutter.
               curve: Curves.linear,
               transform: Matrix4.translationValues(0, -shift, 0),
               child: OverflowBox(
@@ -423,16 +423,16 @@ class ThinkingTicker extends StatelessWidget {
   }
 }
 
-/// 实时窗口里显示的文字:去掉加粗标记、压掉空行、掐掉首尾空白。
+/// The text shown in the live window: bold markers removed, blank runs compressed, leading and trailing whitespace trimmed.
 ///
-/// 只留最后一段:更早的字在窗口外,不必参与排版(思考再长也不会拖慢每帧)。
+/// Keep only the last paragraph: earlier characters sit outside the window and needn't take part in layout (however long thinking runs, every frame stays fast).
 String thinkingTickerText(String text) {
   var tail = text.trimRight();
   if (tail.length > _tickerChars) tail = tail.substring(tail.length - _tickerChars);
   return tail.replaceAll('**', '').replaceAll(_blankRun, '\n').trimLeft();
 }
 
-/// 尾部最多排这么多字。
+/// At most this many characters from the tail are laid out.
 const _tickerChars = 2000;
 
 /// The fluid window's text. [thinkingTickerText] drops a character off the front for
@@ -624,7 +624,7 @@ class _FluidTickerState extends State<_FluidTicker> with SingleTickerProviderSta
   }
 }
 
-/// 连着几个空行压成一个。
+/// Several consecutive blank lines collapse into one.
 final _blankRun = RegExp(r'\n[ \t]*(\n[ \t]*)+');
 
 /// Golden and geometry tests pump the pill without a ProviderScope; there is
@@ -638,15 +638,15 @@ bool _hasProviderScope(BuildContext context) {
   }
 }
 
-/// 一段思考的翻译状态,挂在 [_ThinkingPillState] 上(展开区收起时子树会被
-/// 拿掉,译文不能跟着丢)。
+/// The translation state of one thinking stretch, kept on [_ThinkingPillState] (collapsing tears down the expanded
+/// subtree; the translation must not vanish with it).
 class _TranslationHolder {
   ReasoningTranslation? controller;
 
-  /// [controller] 开始翻译时的界面语言;界面语言一变,旧译文就不再沿用。
+  /// The UI language when [controller] started translating; once the UI language changes, the old translation stops being reused.
   String? language;
 
-  /// 正在看译文(false = 用户切回了原文)。
+  /// Currently viewing the translation (false = the user switched back to the original).
   bool showTranslation = false;
 
   void reset() {
@@ -658,8 +658,8 @@ class _TranslationHolder {
   void dispose() => controller?.dispose();
 }
 
-/// 展开后的全文 + 翻译工具条。插件没开、当前模型的思考本来就是中文、或者
-/// 没连上引擎时,只有全文。
+/// The expanded full text + translation toolbar. When the plugin is off, the current model's thinking is already in Chinese, or
+/// the engine isn't connected, there's only the full text.
 class _TranslatableReasoning extends ConsumerStatefulWidget {
   const _TranslatableReasoning({
     required this.text,
@@ -672,7 +672,7 @@ class _TranslatableReasoning extends ConsumerStatefulWidget {
   final bool active;
   final _TranslationHolder holder;
 
-  /// 点正文收起(等价于点头部);工具栏上的按钮不受这层手势影响。
+  /// Tap the body to collapse (equivalent to tapping the header); toolbar buttons aren't affected by this gesture layer.
   final VoidCallback onBodyTap;
 
   @override
@@ -746,7 +746,7 @@ class _TranslatableReasoningState extends ConsumerState<_TranslatableReasoning> 
         text: showing ? controller.text.trim() : widget.text,
         streaming: widget.active,
         secondary: true,
-        // 选择区由 _CollapsibleReasoningBody 套在收起手势的外面,单击才收得起来。
+        // The SelectionArea is wrapped outside the collapse gesture by _CollapsibleReasoningBody, so single taps can collapse.
         selectable: false,
       ),
     );
@@ -793,7 +793,7 @@ class _TranslatableReasoningState extends ConsumerState<_TranslatableReasoning> 
   }
 }
 
-/// 工具条上的小胶囊:左右等距 10,图标 14、字 12.5。
+/// The mini pill on the toolbar: equal 10 insets both sides, icon 14, text 12.5.
 class _TranslateChip extends StatelessWidget {
   const _TranslateChip({required this.icon, required this.label, required this.onTap});
 
@@ -801,7 +801,7 @@ class _TranslateChip extends StatelessWidget {
   final String label;
   final VoidCallback onTap;
 
-  /// Held down: 翻译设置 (target language, translation service).
+  /// Held down: Translation settings (target language, translation service).
   void _settings(BuildContext context) => unawaited(openSettingsPage(context, 'cot-translation'));
 
   static const height = 26.0;

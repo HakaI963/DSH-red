@@ -1,4 +1,4 @@
-// 基础信息: what a phone's header has no room for. The whole title, where the conversation
+// Basics: what a phone's header has no room for. The whole title, where the conversation
 // runs and with which model, and how far it has come.
 
 import 'package:dsh_client/dsh_client.dart';

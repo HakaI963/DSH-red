@@ -1,4 +1,4 @@
-// 设置 › 能力 › 图像与视频 (media-generation §5.8): the curated page over the
+// Settings › Capabilities › Images & video (media-generation §5.8): the curated page over the
 // media plugin's own settings namespace — the default model per kind, the
 // services, and the cost guard. Services start from the provider presets the
 // catalogue publishes (plugin 0.3.0), or the app's fallback list for 0.2.x,
@@ -118,7 +118,7 @@ class MediaSettingsHome extends ConsumerWidget {
     // A 0.3.0 plugin still keeps the old general pair for older clients and
     // still fails closed when its service disappears. Surface it when it is
     // set, so an upgraded host can see and clear a stale target instead of
-    // showing 「自动」 while generation keeps refusing.
+    // showing "Auto" while generation keeps refusing.
     Widget legacyCompatibilityRow() {
       final pair = mediaDefaultPairLegacy(defaults)!;
       final entry = catalog.entries
@@ -316,7 +316,7 @@ class MediaSettingsHome extends ConsumerWidget {
   }
 }
 
-/// 请求与存储上限, kept off the main page but not removed: the old generated
+/// Requests & storage caps, kept off the main page but not removed: the old generated
 /// form exposed them and a low-bandwidth host may need them. The plugin's own
 /// descriptions are Chinese; these labels follow the app language.
 class _MediaLimitsPage extends ConsumerWidget {

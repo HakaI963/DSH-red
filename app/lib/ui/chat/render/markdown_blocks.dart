@@ -600,7 +600,7 @@ class _RenderListItem extends RenderShiftedBox implements ListItemGeometry {
 class MarkdownDisclosure extends StatefulWidget {
   const MarkdownDisclosure({super.key, required this.title, required this.child, this.initiallyOpen = false});
 
-  /// The summary as spans; null shows 「详情」.
+  /// The summary as spans; null shows "Details".
   final List<InlineSpan>? title;
   final Widget child;
   final bool initiallyOpen;

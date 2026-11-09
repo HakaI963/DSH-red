@@ -71,7 +71,7 @@ import '../../theme/theme.dart';
 import 'diff_view.dart' show DiffLineKind, parseUnifiedDiff;
 import 'mermaid_preview.dart';
 
-/// 超过该长度不做语法高亮(纯等宽渲染),避免大输出卡顿。
+/// Past this length, skip syntax highlighting (plain monospace) so large output doesn't stutter.
 const _kHighlightMaxChars = 20000;
 
 final Highlight _hl = Highlight()
@@ -215,7 +215,7 @@ String? _normalizeLanguage(String? language) {
   return _hl.listLanguages().contains(resolved) ? resolved : null;
 }
 
-/// 按文件扩展名推断高亮语言;未知返回 null。
+/// Infer the highlight language from the file extension; null when unknown.
 String? languageForPath(String path) {
   final name = path.split('/').last;
   if (name == 'Dockerfile') return 'dockerfile';
@@ -225,10 +225,10 @@ String? languageForPath(String path) {
   return _normalizeLanguage(name.substring(dot + 1));
 }
 
-/// 语法高亮为 TextSpan;语言未知时是纯文本 span。
+/// Syntax highlight into TextSpans; plain-text spans when the language is unknown.
 ///
-/// 长代码按 [codeChunks] 分块高亮、按块缓存:流式追加时前面的块原样复用,
-/// 只重算最后一块;单块超长才退化为纯文本。
+/// Long code is chunked by [codeChunks], highlighted and cached per chunk: streaming appends reuse earlier chunks and
+/// recompute only the last; a single overlong chunk degrades to plain text.
 TextSpan highlightCode(
   String code,
   String? language,
@@ -247,7 +247,7 @@ TextSpan highlightCode(
   );
 }
 
-/// 最近高亮过的块(LRU)。
+/// The most recently highlighted chunks (LRU).
 final _chunkSpans = <(String, String, Brightness, TextStyle, AppAccent), TextSpan>{};
 
 TextSpan _highlightChunk(String code, String language, Brightness brightness, TextStyle base, AppAccent accent) {
@@ -268,11 +268,11 @@ TextSpan _highlightChunk(String code, String language, Brightness brightness, Te
   return span;
 }
 
-/// 把长代码切成能各自高亮的块,拼起来和原文一字不差。
+/// Cut long code into chunks that can each be highlighted; joined they equal the original character for character.
 ///
-/// 不超过 200 行、8000 字是一块。更长的从上一刀起满 200 行后,切在「空行
-/// 之后顶格的一行」前面(多半是下一个声明),块注释和多行字符串里不切;
-/// 满 400 行还没找到就硬切。
+/// Up to 200 lines / 8000 characters is one chunk. Longer text: from the last cut, once 200 lines pass, cut before
+/// "a column-0 line right after a blank line" (usually the next declaration); never inside block comments or multiline strings;
+/// after 400 lines without a candidate, hard-cut.
 @visibleForTesting
 List<String> codeChunks(String code) {
   final lines = <String>[];
@@ -296,7 +296,7 @@ List<String> codeChunks(String code) {
       chunks.add(lines.sublist(start, line).join());
       start = line;
     }
-    // 粗扫一遍这一行,记下块注释和字符串有没有跨到下一行。
+    // Rough scan of the line, noting whether block comments and strings carry to the next line.
     for (var i = 0; i < text.length;) {
       final open = quote;
       if (comments > 0) {
@@ -331,17 +331,17 @@ List<String> codeChunks(String code) {
         i++;
       }
     }
-    // 单引号、双引号的字符串不跨行(撇号、Rust 的生命周期也别把后面全吞了)。
+    // Single- and double-quoted strings don't span lines (and apostrophes, Rust lifetimes shouldn't swallow everything after them).
     if (quote == '"' || quote == "'") quote = null;
   }
   chunks.add(lines.sublist(start).join());
   return chunks;
 }
 
-/// 代码井:语言标签 + 复制键的标题条 + 横向滚动的高亮代码,可选行号。
+/// The code well: title bar with language tag + copy key, horizontally scrolling highlighted code, optional line numbers.
 ///
-/// 所有等宽前景(语法色、行号)只铺在 [DshColors.codeWellBg] 上 —— 那是
-/// 唯一对它们做过对比度核查的底色。
+/// All monospace foregrounds (syntax colors, line numbers) only sit on [DshColors.codeWellBg] — the one
+/// background whose contrast against them has been checked.
 class CodeBlock extends StatefulWidget {
   const CodeBlock({
     super.key,
@@ -361,14 +361,14 @@ class CodeBlock extends StatefulWidget {
   final int firstLineNumber;
   final double? maxHeight;
 
-  /// 嵌在工具行详情里:不画外框与标题条,只出代码(外层已有井底)。
+  /// Embedded in a tool row's details: no frame, no title bar, code only (the outer layer already has the well bottom).
   final bool embedded;
 
-  /// 回复正文里的代码:标题条多一个「自动换行」开关;Mermaid 图表多一个
-  /// 「预览」。
+  /// Code in reply bodies: the title bar gains an "Auto-wrap" toggle; a Mermaid diagram gains
+  /// a "Preview".
   final bool replyActions;
 
-  /// 工具详情里的代码:12 号字,上边贴着小标题,左右与小标题对齐。
+  /// Code inside tool details: size 12 text, top flush with the small title, left/right aligned with it.
   final bool dense;
 
   @override
@@ -383,10 +383,10 @@ class _CodeBlockState extends State<CodeBlock> {
   AppAccent? _cachedAccent;
   bool? _cachedDense;
 
-  /// 复制成功后图标原地闪成对勾再回退 —— 比 SnackBar 轻。
+  /// After a copy succeeds the icon flashes a check in place and back — lighter than a SnackBar.
   bool _copied = false;
 
-  /// 长行折回显示,而不是横向滚动。
+  /// Long lines wrap back into view instead of scrolling horizontally.
   bool _wrap = false;
 
   bool get _mermaid => widget.language?.trim().toLowerCase() == 'mermaid';
@@ -451,9 +451,9 @@ class _CodeBlockState extends State<CodeBlock> {
         );
       }
     }
-    // 长按选字,选区包在横滑外面:手势场里横滑先到,拖动归滚动(放在里面的
-    // SelectableText 会吃掉 Android 上的横向拖动)。外面已有选区(选择文字
-    // 页)时并进那一个。
+    // Long-press to select text; the selection sits outside the horizontal pan: in the gesture arena the horizontal pan
+    // arrives first and drag goes to scrolling (a SelectableText inside would eat horizontal drags on Android). When an
+    // outer selection exists (the Select-text page), merge into that one.
     if (SelectionContainer.maybeOf(context) == null) {
       body = SelectionArea(child: body);
     }
@@ -480,7 +480,7 @@ class _CodeBlockState extends State<CodeBlock> {
     if (widget.maxHeight != null) {
       body = ConstrainedBox(
         constraints: BoxConstraints(maxHeight: widget.maxHeight!),
-        // 纵向滚到头后让路给外层消息列表。
+        // Once vertical scroll reaches its end, yield to the outer message list.
         child: OverscrollForwarder(child: SingleChildScrollView(child: body)),
       );
     }
@@ -503,8 +503,8 @@ class _CodeBlockState extends State<CodeBlock> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              // 标题条:左边语言名、右边「复制」,两端各留 16(复制键自带 8
-              // 的点按边,所以条的右内边距是 8)。
+              // Title bar: language tag at left, "Copy" at right, 16 at both ends (the copy key carries its own 8
+              // of tap padding, so the bar's right inner padding is 8).
               ColoredBox(
                 color: dsh.codeWellHeader,
                 child: SizedBox(
@@ -558,11 +558,11 @@ class _CodeBlockState extends State<CodeBlock> {
   }
 }
 
-/// 标题条上带字的按钮高:28,字号放大时跟着长,字不被裁。
+/// Height of the text-bearing buttons on the title bar: 28; grows with larger fonts so text is never clipped.
 double _headerButtonHeight(BuildContext context) => math.max(28, MediaQuery.textScalerOf(context).scale(12) * 1.35 + 8);
 
-/// 代码井标题条上的小按钮(「自动换行」开关、「预览」):28 高、与「复制」
-/// 同一套留白;只有图标时是 28 的方形点按区。
+/// The small buttons on the code well's title bar (the "Auto-wrap" toggle, "Preview"): 28 tall, same padding as "Copy";
+/// icon-only, a 28 square tap area.
 class _HeaderButton extends StatelessWidget {
   const _HeaderButton({required this.icon, required this.onTap, this.label, this.tooltip, this.selected = false});
 
@@ -611,8 +611,8 @@ class _HeaderButton extends StatelessWidget {
   }
 }
 
-/// ```diff 代码块:增删整行着色(与改动卡同一套 diff 色),hunk 头浅底;
-/// 不换行时横向滚动,行底色铺满最宽的一行。
+/// The ```diff code block: added/removed whole lines colored (the same diff colors as the change card), hunk headers a sheer bottom;
+/// unwrapped it scrolls horizontally, line backgrounds spanning the widest line.
 class _DiffLines extends StatelessWidget {
   const _DiffLines({required this.code, required this.style, required this.wrap});
 
@@ -667,7 +667,7 @@ class _DiffLines extends StatelessWidget {
   }
 }
 
-/// 代码井标题条上的「⧉ 复制」→「✓ 已复制」,图标与文字一起交叉淡变。
+/// The code well's title-bar "⧉ Copy" → "✓ Copied", icon and text crossfading together.
 class _CopyButton extends StatelessWidget {
   const _CopyButton({required this.copied, required this.onTap});
 

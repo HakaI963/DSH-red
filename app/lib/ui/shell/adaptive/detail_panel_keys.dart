@@ -1,4 +1,4 @@
-// The two keys that fold and unfold 对话详情 beside the
+// The two keys that fold and unfold Chat details beside the
 // chat. They take turns on one spot — the window's top-right corner — so the
 // key stays under the finger: the panel's own key while it shows, the chat
 // header's corner key once it is folded (DSH Web's expand button lives in
@@ -19,7 +19,7 @@ import 'adaptive_scaffold.dart';
 /// The glyph of both keys: a frame with a column on its right.
 const detailPanelIcon = AppIcons.sidebar;
 
-/// The chat header's corner key: unfolds 对话详情 again. Draws nothing on
+/// The chat header's corner key: unfolds Chat details again. Draws nothing on
 /// phones, without a conversation, or while the panel shows. Goes last in
 /// the header row, after the new-chat key.
 class DetailPanelKey extends ConsumerWidget {

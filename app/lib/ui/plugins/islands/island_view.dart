@@ -95,7 +95,7 @@ class _IslandViewState extends ConsumerState<IslandView> {
   /// fallback, until the pool changes.
   bool _noRoom = false;
 
-  /// The renderer died under this view: 「插件界面已关闭」 until reopened.
+  /// The renderer died under this view: "Plugin UI closed" until reopened.
   bool _closed = false;
   Uri? _url;
   int _generation = 0;
@@ -354,7 +354,7 @@ class _IslandViewState extends ConsumerState<IslandView> {
   );
 }
 
-/// 「插件界面已关闭」: the WebView renderer died and took every island
+/// "Plugin UI closed": the WebView renderer died and took every island
 /// with it. One tap brings them back.
 class _Closed extends StatelessWidget {
   const _Closed({required this.onReopen});
@@ -382,7 +382,7 @@ class _Closed extends StatelessWidget {
   }
 }
 
-/// 「在浏览器打开 example.com？」
+/// "Open example.com in the browser?"
 Future<bool> _confirmLink(BuildContext context, Uri url) async {
   final l10n = context.l10n;
   final ok = await showAppDialog<bool>(

@@ -1,6 +1,6 @@
 // The home screen's frame on tablets and foldables:
 // the conversation list as a rail or a sidebar on the left, the chat in the
-// middle, 对话详情 as a column on the right (DSH Web's AppFrame, `push`
+// middle, Chat details as a column on the right (DSH Web's AppFrame, `push`
 // presentation: the chat gives way, the panel's left edge moves with it).
 
 import 'dart:math' as math;
@@ -17,7 +17,7 @@ import 'adaptive_layout.dart';
 /// The resolved [AdaptiveLayout] for everything under the home frame.
 ///
 /// The chat header reads it to drop its ≡ key next to the rail, to name what
-/// ≡ does, and to show the corner key that brings a folded panel back; 对话详情
+/// ≡ does, and to show the corner key that brings a folded panel back; Chat details
 /// reads it to choose page, sheet or panel.
 class AdaptiveChrome extends InheritedWidget {
   const AdaptiveChrome({super.key, required this.layout, required super.child});
@@ -42,7 +42,7 @@ class AdaptiveChrome extends InheritedWidget {
     MenuAction.overlay => appL10n.shellChatList,
   };
 
-  /// The chat header shows the key that unfolds 对话详情 again.
+  /// The chat header shows the key that unfolds Chat details again.
   bool get showsPanelKey => layout.panelAvailable && !layout.panelShown;
 
   @override
@@ -93,7 +93,7 @@ class AdaptiveScaffold extends StatefulWidget {
   /// The folded list ([LeftPane.rail]).
   final Widget? rail;
 
-  /// 对话详情 in panel form, for the open conversation (null without one).
+  /// Chat details in panel form, for the open conversation (null without one).
   /// The last one is kept while it slides away.
   final Widget? panel;
 
@@ -225,7 +225,7 @@ class _AdaptiveScaffoldState extends State<AdaptiveScaffold> with TickerProvider
             child: widget.body,
           ),
         ),
-        // 对话详情: full width while it slides, its left edge with the chat's.
+        // Chat details: full width while it slides, its left edge with the chat's.
         Positioned(
           left: window.width - panelExtent,
           top: 0,

@@ -1,6 +1,6 @@
 // A plugin's native panel (docs/design/native-plugins.md §3.3 `panel`): its
 // view and live data from the host's stream, drawn by the plugin view renderer,
-// always under the plugin's name (§3.7 署名外框). Taps on its controls go back to
+// always under the plugin's name (§3.7 signed frame). Taps on its controls go back to
 // the plugin and their data effects land here.
 
 import 'package:dsh_client/dsh_client.dart' show DshGoScope;

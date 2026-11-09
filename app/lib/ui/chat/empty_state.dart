@@ -10,7 +10,7 @@ import '../theme/theme.dart';
 import 'empty_actions.dart';
 import 'widgets/whale_tail.dart';
 
-/// 一条建议:一枚带色底的线性小图标 + 标题 + 一行说明,点了把 [prompt] 填进输入条。
+/// One suggestion: a tinted line icon + title + one-line description; tapping fills [prompt] into the input bar.
 class ChatSuggestion {
   const ChatSuggestion(this.icon, String label, String prompt, {this._detail, this.tint = SuggestionTint.blue})
     : _label = label,
@@ -98,11 +98,11 @@ List<String> defaultTips() => [
   appL10n.viewTipWallpaper,
 ];
 
-/// 当前时间的来源(测试里固定它,让问候语可复现)。
+/// Source of the current time (fixed in tests so the greeting is reproducible).
 @visibleForTesting
 DateTime Function() chatClock = DateTime.now;
 
-/// 问候语:按本地时间。
+/// The greeting: by local time.
 String greetingFor(DateTime now) {
   final h = now.hour;
   if (h >= 5 && h < 11) return appL10n.viewGreetingMorning;
@@ -112,32 +112,32 @@ String greetingFor(DateTime now) {
   return appL10n.viewGreetingNight;
 }
 
-/// 新对话的空状态:居中偏上,一尾很淡的鲸尾 + 按时段的问候 + 一句短副标题,
-/// 下面是几档控件(empty_actions.dart):
+/// The new chat's empty state: centred slightly high, a faint whale tail + a time-of-day greeting + a short subtitle,
+/// then tiers of controls below (empty_actions.dart):
 ///
-/// - 主操作至多一个,只在这一屏自己有出路时出现(连不上引擎:「重新连接」);
-/// - 同一规格的安静胶囊:工作区胶囊,以及这次对话的选项(文件夹、预设、权限);
-/// - 2×2 的建议卡片:带色底的小图标 + 标题 + 一行说明;
-/// - 最下面一行小技巧,点一下换下一条。
+/// - at most one primary action, appearing only when this screen itself has a way out (engine unreachable: "Reconnect");
+/// - quiet pills of one spec: the workspace pill and this chat's options (folder, preset, permissions);
+/// - a 2×2 grid of suggestion cards: tinted small icon + title + one-line description;
+/// - a tips line at the very bottom, tap to cycle to the next tip.
 ///
-/// 输入条才是这一屏的主角,这里只是安静地递几个起点。
+/// The input bar is the real star of this screen; these are just quiet starting points handed over gently.
 ///
 /// ```
 ///                 ⌒)
-///               下午好
-///           今天想做点什么？
-///         ( ▢ 在「dsh-app」中 ⌄ )        ← 断线时这里换成主色「重新连接」
-///      ( ⚒ 标准模式 ⌄ ) ( ⛨ 完全权限 ⌄ )
+///               Good afternoon
+///           What shall we do today?
+///         ( ▢ In "dsh-app" ⌄ )         ← when disconnected this becomes a tinted "Reconnect"
+///      ( ⚒ Standard mode ⌄ ) ( ⛨ Full access ⌄ )
 ///
-///   ┌ ▣ 看看工作区   ┐ ┌ ▣ 写个小脚本    ┐
-///   └ 列出文件和项目 ┘ └ 统计词频并跑一次 ┘
-///   ┌ ▣ 新建项目     ┐ ┌ ▣ 讲讲 Git      ┐
-///   └ Node.js + TS   ┘ └ rebase 和 merge ┘
-///    💡 输入 @ 可以引用工作区里的文件…   3/12 ›
+///   ┌ ▣ Tour the workspace ┐ ┌ ▣ Write a tiny script ┐
+///   └ list files & folders ┘ └ count words, run it  ┘
+///   ┌ ▣ New project    ┐ ┌ ▣ Git explained  ┐
+///   └ Node.js + TS   ┘ └ rebase & merge ┘
+///    💡 Type @ to reference files in the workspace…   3/12 ›
 /// ```
 ///
-/// 左右与顶栏、输入条一样离屏幕 12,宽屏时与输入条同宽居中;第一次出现时
-/// 由上到下依次淡入。连不上引擎时建议、选项和小技巧都收起,只留「重新连接」。
+/// Left/right sit 12 from the screen like the header and input bar; on wide screens it matches the input bar's width, centred; on first
+/// appearance it fades in top to bottom. With the engine unreachable, suggestions, options and tips all fold away, leaving only "Reconnect".
 class ChatEmptyState extends StatelessWidget {
   const ChatEmptyState({
     super.key,
@@ -166,13 +166,13 @@ class ChatEmptyState extends StatelessWidget {
   /// Booting includes the one-time tidy of plugin files (RuntimeStatus.tidyingFiles).
   final bool tidying;
 
-  /// The engine could not be reached: the one primary pill, 「重新连接」,
+  /// The engine could not be reached: the one primary pill, "Reconnect",
   /// where the workspace chip goes; the suggestions fold away.
   final VoidCallback? onReconnect;
 
-  /// 本机 is down and won't come up by itself (not installed, or stopped
-  /// with 打开 App 时自动启动 off): the subtitle says so and the one primary
-  /// pill fixes it (「安装运行环境」 / 「启动引擎」).
+  /// The local device is down and won't come up by itself (not installed, or stopped
+  /// with "start automatically when the app opens" off): the subtitle says so and the one primary
+  /// pill fixes it ("Install the runtime" / "Start the engine").
   final ChatIdleAction? idle;
   final ValueChanged<ChatSuggestion> onSuggestion;
 
@@ -192,7 +192,7 @@ class ChatEmptyState extends StatelessWidget {
   /// The first tip shown (tests); defaults to a random one.
   final int? tipStart;
 
-  /// 测试注入;默认取当前时间。
+  /// Injected by tests; defaults to the current time.
   final DateTime? now;
   final List<ChatSuggestion> suggestions;
 

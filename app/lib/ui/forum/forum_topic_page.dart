@@ -345,7 +345,7 @@ class _ForumTopicPageState extends ConsumerState<ForumTopicPage> {
   }
 }
 
-/// The floating 「写回复…」 pill at the bottom (12 from the screen's edges,
+/// The floating "Write a reply…" pill at the bottom (12 from the screen's edges,
 /// like the chat composer).
 class _ReplyBar extends StatelessWidget {
   const _ReplyBar({required this.label, required this.onTap, this.enabled = true});
@@ -536,7 +536,7 @@ class _PostAction extends StatelessWidget {
   }
 }
 
-/// 「置顶了话题」 and other moderator actions: one quiet centred line.
+/// "Topic pinned" and other moderator actions: one quiet centred line.
 class _SmallAction extends StatelessWidget {
   const _SmallAction({required this.post});
 

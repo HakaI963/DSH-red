@@ -1,4 +1,4 @@
-// What a share card shows (晒成果), built from the conversation, and the text work
+// What a share card shows (showing off results), built from the conversation, and the text work
 // done before it is drawn: the same redaction as a shared file or link
 // (credentials, home folders, app storage), visual replies summarised,
 // pictures gathered into galleries, long code lines folded and long answers cut
@@ -53,7 +53,7 @@ final class ShareFile extends ShareBlock {
 
   final String name;
 
-  /// `图片 · PNG · 84.2 KB`.
+  /// `Image · PNG · 84.2 KB`.
   final String typeLabel;
   final String? description;
   final ImageProvider? image;
@@ -138,7 +138,7 @@ final class ShareProvidedImage extends ShareImage {
 
 /// How the pictures of one message are laid out: one at its own aspect
 /// ratio, two side by side, three as one tall and two stacked, four and more
-/// as a 2 × 2 grid with 「+N」 on the fourth.
+/// as a 2 × 2 grid with "+N" on the fourth.
 abstract final class ShareGalleryLayout {
   /// Between cells.
   static const gap = 4.0;
@@ -190,7 +190,7 @@ abstract final class ShareGalleryLayout {
 
 // ── The card's content ──────────────────────────────────────────────────────
 
-/// One kind of work in the turns behind a card: 「联网搜索 3」.
+/// One kind of work in the turns behind a card: "web search 3".
 @immutable
 class ShareProcessItem {
   const ShareProcessItem(this.label, this.count, {required this.tool});
@@ -232,7 +232,7 @@ class ShareContent {
   /// `deepseek-v4-pro`.
   final String? model;
 
-  /// `53 秒 · 8 步`: one capsule per part.
+  /// `53 s · 8 steps`: one capsule per part.
   final String? stats;
 
   /// What the agent did on the way (most frequent first), under the meta.
@@ -458,7 +458,7 @@ class ShareLayout {
   const ShareLayout(this.blocks, {required this.truncated});
   final List<ShareBlock> blocks;
 
-  /// Something was left out: the card ends with 「…」.
+  /// Something was left out: the card ends with "…".
   final bool truncated;
 }
 
@@ -714,7 +714,7 @@ int _codeRows(Iterable<String> lines) =>
 
 // ── From the conversation ────────────────────────────────────────────────────
 
-/// `53 秒 · 8 步` for the turn [trace].
+/// `53 s · 8 steps` for the turn [trace].
 String? shareStats(TurnTrace? trace) {
   if (trace == null) return null;
   final parts = [
@@ -903,7 +903,7 @@ ShareContent shareContentForItems(
 }
 
 /// The reply and the question above it: what a card that starts from one
-/// reply shows, and the picks it starts 「选中消息」 with.
+/// reply shows, and the picks it starts "Selected messages" with.
 Set<String> initialSelection(List<ChatItem> items, AssistantChatItem reply) => {
   ?questionFor(items, reply)?.key,
   reply.key,

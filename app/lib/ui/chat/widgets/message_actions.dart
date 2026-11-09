@@ -27,7 +27,7 @@ Future<void> copyMessage(BuildContext context, String text, {bool toast = true})
 }
 
 /// Quiet icons under the last reply of a turn: copy, share ([onShare], the
-/// share panel), branch ([onBranch]), 「重新回答」 ([onRegenerate], the
+/// share panel), branch ([onBranch]), "Answer again" ([onRegenerate], the
 /// conversation's last reply only) and ⋯ ([onMore]), which opens the same
 /// menu as a long-press (select, quote…). [trailing] (the turn footnote)
 /// sits at the row's right end.
@@ -46,17 +46,17 @@ class ReplyActionRow extends StatefulWidget {
 
   final String text;
 
-  /// 「分享」: the share panel for this reply.
+  /// "Share": the share panel for this reply.
   final VoidCallback? onShare;
   final VoidCallback? onBranch;
 
-  /// 正在分叉:分叉键转圈,不能再点。
+  /// Branching right now: the branch key spins and can't be tapped again.
   final bool branching;
 
-  /// 「重新回答」; null leaves the key out.
+  /// "Answer again"; null leaves the key out.
   final VoidCallback? onRegenerate;
 
-  /// 正在准备重新回答(读原图、分叉):重答键转圈,不能再点。
+  /// Preparing Answer again (reading the original images, forking): the regenerate key spins and can't be tapped again.
   final bool regenerating;
 
   /// ⋯: the message menu.
@@ -83,8 +83,8 @@ class _ReplyActionRowState extends State<ReplyActionRow> {
     final l10n = context.l10n;
     final colors = Theme.of(context).colorScheme;
     final muted = DshColors.of(context).textTertiary;
-    // 36 的圆钮、20 的图标:图标四周各 8,和 Bleed 的 8 一起让第一个图标
-    // 贴正文左缘、脚注的箭头贴正文右缘。
+    // 36 round keys, 20 icons: 8 around each icon; together with the Bleed's 8 this makes the first icon
+    // flush with the body's left edge and the footnote's arrow flush with its right.
     final style = IconButton.styleFrom(
       minimumSize: const Size.square(_button),
       maximumSize: const Size.square(_button),
@@ -93,7 +93,7 @@ class _ReplyActionRowState extends State<ReplyActionRow> {
       foregroundColor: muted,
       iconSize: 20,
     );
-    // 图标原地换(对勾、转圈):淡入并从 0.7 放大。
+    // In-place icon swap (check, spinner): fades in scaling from 0.7.
     Widget swap(Widget child) => AnimatedSwitcher(
       duration: AppMotion.of(context, AppMotion.quick),
       transitionBuilder: (child, animation) => FadeTransition(
@@ -102,7 +102,7 @@ class _ReplyActionRowState extends State<ReplyActionRow> {
       ),
       child: child,
     );
-    // 进行中:原地转圈,键不能再点。
+    // In progress: the spinner in place; the key can't be tapped.
     Widget busyKey(MessageAction action, VoidCallback onTap, bool busy) => IconButton(
       tooltip: action.label,
       onPressed: busy

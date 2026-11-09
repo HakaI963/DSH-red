@@ -1,5 +1,5 @@
 // What the drawer's folder and multi-select controls do:
-// the flows behind the sheets, bulk 归档 / 置顶 / 移到文件夹, and the undo
+// the flows behind the sheets, bulk archive / pin / move-to-folder, and the undo
 // toasts. Archiving follows the single-row archive in sessions_drawer.dart
 // (hide at once; stop running work and archive when the undo window ends).
 // Permanent session deletion lives in session_deletion.dart and has no undo;
@@ -35,7 +35,7 @@ void _toast(ScaffoldMessengerState? messenger, String text, {String? undoLabel, 
   );
 }
 
-/// 「对话列表」: the sheet, then what was picked in it.
+/// "Conversation list": the sheet, then what was picked in it.
 Future<void> openDrawerViewOptions(BuildContext context, WidgetRef ref, {VoidCallback? onClose}) async {
   final action = await showDrawerViewSheet(context);
   if (!context.mounted || action == null) return;
@@ -54,7 +54,7 @@ Future<void> openDrawerViewOptions(BuildContext context, WidgetRef ref, {VoidCal
   }
 }
 
-/// 新建文件夹, filing [sessionIds] in it. Returns the new folder's id.
+/// New folder, filing [sessionIds] in it. Returns the new folder's id.
 Future<String?> createFolderFlow(BuildContext context, WidgetRef ref, {List<String> sessionIds = const []}) async {
   final container = ProviderScope.containerOf(context, listen: false);
   final owner = container.read(activeHostProvider);
@@ -79,7 +79,7 @@ Future<String?> createFolderFlow(BuildContext context, WidgetRef ref, {List<Stri
   }
 }
 
-/// 编辑 a folder's name and mark.
+/// Edit a folder's name and mark.
 Future<void> editFolderFlow(BuildContext context, WidgetRef ref, DrawerFolder folder) async {
   final view = ref.read(drawerViewProvider.notifier);
   final draft = await showFolderEditor(
@@ -147,7 +147,7 @@ Future<void> folderActionsFlow(
   }
 }
 
-/// 移到文件夹 for [ids] (one row, or the multi-select). Ends multi-select
+/// Move to folder for [ids] (one row, or the multi-select). Ends multi-select
 /// once something moved.
 Future<void> moveToFolderFlow(BuildContext context, WidgetRef ref, List<String> ids) async {
   if (ids.isEmpty) return;
@@ -192,7 +192,7 @@ Future<void> moveToFolderFlow(BuildContext context, WidgetRef ref, List<String> 
   );
 }
 
-/// Bulk 置顶: pins the chosen conversations, or unpins them when all are
+/// Bulk pin: pins the chosen conversations, or unpins them when all are
 /// pinned already.
 Future<void> pinSelectionFlow(BuildContext context, WidgetRef ref) async {
   final container = ProviderScope.containerOf(context, listen: false);
@@ -275,7 +275,7 @@ Future<void> pinSelectionFlow(BuildContext context, WidgetRef ref) async {
   }
 }
 
-/// Bulk 归档: one undo window for the selected batch; running work stops when
+/// Bulk archive: one undo window for the selected batch; running work stops when
 /// it is archived.
 Future<void> archiveSelectionFlow(BuildContext context, WidgetRef ref) async {
   final selection = ref.read(drawerSelectionProvider);

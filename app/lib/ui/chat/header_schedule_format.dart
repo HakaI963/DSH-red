@@ -1,7 +1,7 @@
 // Wording of the header clock and its sheet. The official surfaces pair each
 // run's time on the reader's clock with its distance (`nextRunParts`:
-// `9月19日 15:51（3小时后）`); here in the app's own voice: `今天 21:30`,
-// `3 小时后`, `已逾期 5 分钟`.
+// `Sep 19, 15:51 (in 3 h)`); here in the app's own voice: `Today 21:30`,
+// `in 3 h`, `overdue by 5 min`.
 
 import 'dart:math' as math;
 
@@ -13,9 +13,9 @@ import '../features/schedule_editor/time_zones.dart';
 
 String _two(int v) => v.toString().padLeft(2, '0');
 
-/// A run on this phone's clock, relative to [now]: `今天 21:30`,
-/// `明天 09:00`, `昨天 21:15`, `周五 09:00` (later this week), `10月30日 09:00`,
-/// `2027年1月4日 09:00`.
+/// A run on this phone's clock, relative to [now]: `Today 21:30`,
+/// `Tomorrow 09:00`, `Yesterday 21:15`, `Fri 09:00` (later this week), `Oct 30, 09:00`,
+/// `Jan 4, 2027, 09:00`.
 String scheduleStamp(DateTime at, DateTime now) {
   final local = at.toLocal();
   final today = now.toLocal();
@@ -58,13 +58,13 @@ int _calendarDays(DateTime from, DateTime to) {
   return math.max(1, days);
 }
 
-/// How far [at] is from [now]: `3 小时后`, `45 分钟后`, `已逾期 5 分钟`;
-/// `即将运行` on the dot.
+/// How far [at] is from [now]: `in 3 h`, `in 45 min`, `overdue by 5 min`;
+/// `about to run` on the dot.
 ///
 /// Under a day it is the official `formatScheduleRelative`: the largest whole
 /// unit, a distance ahead rounded up, an overdue one down, never below one.
-/// From a day on it counts calendar days (`3 天后`), so it agrees with
-/// [scheduleStamp]'s 「明天 / 周二」 instead of rounding 30 hours to two days.
+/// From a day on it counts calendar days (`in 3 days`), so it agrees with
+/// [scheduleStamp]'s "tomorrow / Tue" instead of rounding 30 hours to two days.
 String scheduleRelative(DateTime at, DateTime now) {
   final ms = at.difference(now).inMilliseconds;
   if (ms == 0) return appL10n.viewScheduleDue;
@@ -123,8 +123,8 @@ List<DateTime> scheduleNextRuns(ScheduleTask task, {required String deviceZone, 
   return [first, ...draft.nextRuns(first, count: count - 1, anchor: task.kind == 'every' ? first : null)];
 }
 
-/// The rule as the editor words it (`每天 09:00`, `每 2 小时`), naming its
-/// zone when that clock isn't this phone's: `每天 09:00（东京 · UTC+09:00）`.
+/// The rule as the editor words it (`Daily 09:00`, `every 2 hours`), naming its
+/// zone when that clock isn't this phone's: `Daily 09:00 (Tokyo · UTC+09:00)`.
 String scheduleRuleLine(ScheduleTask task, {String? deviceZone, DateTime? at}) {
   final rule = taskRuleText(task);
   final zone = task.timeZone;
@@ -135,8 +135,8 @@ String scheduleRuleLine(ScheduleTask task, {String? deviceZone, DateTime? at}) {
   return appL10n.viewScheduleZone(rule, zoneCity(zone), formatUtcOffset(offset));
 }
 
-/// What the header clock reads out: `自动化任务：日报提醒，下次今天 21:30`,
-/// or `2 个自动化任务，下次今天 21:30`.
+/// What the header clock reads out: `Automated tasks: daily report reminder, next today 21:30`,
+/// or `2 automated tasks, next today 21:30`.
 String headerScheduleLabel(List<ScheduleTask> tasks, DateTime now) {
   final next = tasks.firstOrNull?.scheduledAt;
   if (tasks.length == 1) {

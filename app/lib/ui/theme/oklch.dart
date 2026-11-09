@@ -6,10 +6,10 @@ import 'dart:math' as math;
 import 'package:flutter/foundation.dart' show immutable;
 import 'package:flutter/painting.dart';
 
-/// 一个 OKLCH 颜色:明度 [l](0–1)、彩度 [c]、色相 [h](度)。
+/// An OKLCH colour: lightness [l] (0–1), chroma [c], hue [h] (degrees).
 ///
-/// 整套配色都在这里推:同一个明度在任何色相上看起来一样亮,所以「换色相、
-/// 留明度」就能让六套配色的对比度落在同一档。
+/// Every palette is derived here: the same lightness looks equally bright at any hue, so "change the hue,
+/// keep the lightness" lands all six palettes' contrast at the same level.
 @immutable
 class Oklch {
   const Oklch(this.l, this.c, this.h);
@@ -35,7 +35,7 @@ class Oklch {
 
   Oklch copyWith({double? l, double? c, double? h}) => Oklch(l ?? this.l, c ?? this.c, h ?? this.h);
 
-  /// 转回 sRGB。超出色域时**只降彩度**(明度和色相不动),所以对比度不受影响。
+  /// Back to sRGB. Out of gamut, **only the chroma drops** (lightness and hue untouched), so contrast is unaffected.
   Color toColor({double alpha = 1}) {
     final l = this.l.clamp(0.0, 1.0);
     var c = math.max(0.0, this.c);
@@ -97,11 +97,11 @@ class Oklch {
   String toString() => 'Oklch(${l.toStringAsFixed(3)}, ${c.toStringAsFixed(4)}, ${h.toStringAsFixed(1)})';
 }
 
-/// 把 [color] 换到另一种色调上:明度不变,色相转 [hueShift] 度,彩度乘
-/// [chromaScale]。透明度保留。
+/// Moves [color] to another tint: lightness unchanged, hue rotated by [hueShift] degrees,
+/// chroma multiplied by [chromaScale]. Alpha is preserved.
 ///
-/// 中性色(页面、文字、玻璃)跟着配色走就靠它:雾蓝的整条中性色阶原样
-/// 转到别的色相上,明度一点不动,各级文字的对比度也就跟着不动。
+/// This is how neutrals (pages, text, glass) follow a palette: the whole Mist-blue
+/// neutral ramp rotates to another hue as-is, lightness untouched, so every text level's contrast holds.
 Color retint(Color color, {required double hueShift, required double chromaScale}) {
   if (hueShift == 0 && chromaScale == 1) return color;
   final o = Oklch.fromColor(color);

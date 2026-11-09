@@ -31,7 +31,7 @@ class SchemaDocumentationStep {
   /// 1-based.
   final int? option;
 
-  /// The step as the form names it: a key in words, 每一项, 第 2 项, 选项 2.
+  /// The step as the form names it: a key in words, each item, item 2, option 2.
   String get label {
     if (key case final key?) return commonKeyLabels[key] ?? humanizeKey(key);
     if (position case final position?) return appL10n.schemaDocumentationPosition(position);
@@ -53,7 +53,7 @@ class SchemaDocumentationEntry {
   /// [path] as steps; empty for the root.
   final List<SchemaDocumentationStep> steps;
 
-  /// The heading the sheet shows: the steps in words, or 概述 for the root.
+  /// The heading the sheet shows: the steps in words, or Overview for the root.
   String get heading => steps.isEmpty ? appL10n.schemaDocumentationOverview : steps.map((s) => s.label).join(' › ');
 }
 
@@ -181,7 +181,7 @@ class SchemaDocumentationButton extends StatelessWidget {
   }
 }
 
-/// The page's field descriptions in full, like every field sheet: × and 完成.
+/// The page's field descriptions in full, like every field sheet: × and Done.
 class SchemaDocumentationSheet extends StatelessWidget {
   const SchemaDocumentationSheet({super.key, required this.title, required this.entries, this.launcher = _launch});
   final String title;

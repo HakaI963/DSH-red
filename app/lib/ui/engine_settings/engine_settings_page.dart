@@ -70,7 +70,7 @@ const curatedNamespaces = {
   'ui-chat',
   'ui-conversation',
   'session-log-deepseek',
-  // 设置 › 图像与视频.
+  // Settings › Images & video.
   'dsh-media',
   'media',
 };

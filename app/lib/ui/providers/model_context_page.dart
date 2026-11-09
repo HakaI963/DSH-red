@@ -1,4 +1,4 @@
-// 模型上下文长度 (a form page): how much one model of a subscription route
+// Model context length (a form page): how much one model of a subscription route
 // holds. The installed pi-ai catalog sizes every model it ships; this page
 // writes a field-by-field override at
 // `llm-pi-ai.providers.<route>.modelOverrides.<modelId>.contextWindow` — the
@@ -23,7 +23,7 @@ import '../theme/theme.dart';
 import 'provider_model_page.dart' show CapsuleGrid, ChoiceCapsule, contextPresets;
 import 'provider_widgets.dart';
 
-/// 订阅渠道里一个模型的「上下文长度」：空着用渠道目录的值，填了就覆盖。
+/// One model of a subscription route, its "context length": empty uses the channel catalogue's value; filled in overrides it.
 class ModelContextPage extends ConsumerStatefulWidget {
   const ModelContextPage({
     super.key,
@@ -69,7 +69,7 @@ class _ModelContextPageState extends ConsumerState<ModelContextPage> {
     });
   }
 
-  /// 点一次填上；再点一次清空（回到目录值）。
+  /// One tap fills it; a second tap clears it (back to the catalogue value).
   void _pick(int preset) {
     setState(() {
       _context = _context == preset ? null : preset;
@@ -89,7 +89,7 @@ class _ModelContextPageState extends ConsumerState<ModelContextPage> {
     }
     final backend = ref.read(providerBackendProvider);
     if (backend == null) return;
-    // 保留这条覆盖上的其他字段（名称、输出上限……），只改上下文长度。
+    // Keep this override's other fields (name, output cap…), change only the context length.
     final next = (widget.current ?? const ModelOverride()).withContextWindow(value);
     final profile = ref.read(subscriptionProfileProvider(widget.subscription)).value;
     final last = (profile?.modelOverrides.length ?? 2) <= 1;

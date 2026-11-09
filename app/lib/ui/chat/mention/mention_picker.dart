@@ -12,21 +12,21 @@ import '../slash_palette.dart';
 import 'mention_chip.dart';
 import 'mention_controller.dart';
 
-/// 输入框上方的引用面板:和指令面板同一个玻璃浮层、同样的行解剖。
+/// The mention panel above the input field: the same glass overlay and the same row anatomy as the command panel.
 ///
 /// ```
 /// ╭──────────────────────────────────────╮
-/// │      文件                             │
-/// │ ▤    main.dart                     ↵ │   ← 打了字时,发送会选中第一行
+/// │      Files                            │
+/// │ ▤    main.dart                     ↵ │   ← once text is typed, send picks the first row
 /// │      lib                             │
-/// │ ▢    ui/                           › │   ← 文件夹:点行选中,点 › 进入
-/// │      子代理 / 对话                    │
-/// │ ▭    修复登录问题                      │
-/// │      3小时                            │
+/// │ ▢    ui/                           › │   ← folders: tap the row to pick, tap › to enter
+/// │      Subagents / conversations       │
+/// │ ▭    Fix the login issue               │
+/// │      3 hours                          │
 /// ╰──────────────────────────────────────╯
 /// ```
 ///
-/// 分组标题与行文字左对齐;行首图标的中心和 ＋ 键的中心对齐。
+/// Group titles and row text share one left alignment; the row-start icon's center lines up with the + key's center.
 class MentionPicker extends StatelessWidget {
   const MentionPicker({super.key, required this.controller});
 

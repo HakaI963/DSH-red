@@ -22,7 +22,7 @@ import '../common/discard_guard.dart';
 import '../common/smooth_size.dart';
 import '../common/brief_notice.dart';
 
-/// Add or edit an SSH host, with a "测试连接" that runs the real connect flow
+/// Add or edit an SSH host, with a "Test connection" that runs the real connect flow
 /// and shows each step.
 class SshHostFormPage extends ConsumerStatefulWidget {
   const SshHostFormPage({super.key, this.existing, this.initialStatus});
@@ -300,7 +300,7 @@ class _SshHostFormPageState extends ConsumerState<SshHostFormPage> {
         actions: [
           TextButton(onPressed: () => Navigator.pop(dialog, false), child: Text(context.l10n.commonCancel)),
           // Weakens the one check against an impostor: the danger colour, as
-          // 「重新信任」 has.
+          // "Re-trust" has.
           FilledButton(
             style: FilledButton.styleFrom(
               backgroundColor: DshColors.of(dialog).danger,

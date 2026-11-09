@@ -17,7 +17,7 @@ import 'market_tab.dart';
 
 enum PluginsTab { installed, market }
 
-/// 插件: what is installed on the active host (switch, remove) and the
+/// Plugins: what is installed on the active host (switch, remove) and the
 /// market (dshfind's format-1 index) to install from.
 ///
 /// Installs go to the host picked in the host switcher, into the `web`

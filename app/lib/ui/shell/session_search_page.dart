@@ -20,7 +20,7 @@ import '../theme/theme.dart';
 import 'page_frame.dart';
 import 'sessions_drawer.dart' show sessionSelectionColor, sessionTitle;
 
-/// "搜索对话" at the top of the sessions drawer. Opens [SessionSearchPage];
+/// "Search chats" at the top of the sessions drawer. Opens [SessionSearchPage];
 /// picking a result opens that conversation and closes the drawer.
 class SessionSearchBar extends ConsumerWidget {
   const SessionSearchBar({super.key, required this.onClose, this.padding = const EdgeInsets.fromLTRB(10, 2, 10, 6)});
@@ -612,7 +612,7 @@ class HighlightedText extends StatelessWidget {
   }
 }
 
-/// Short date for a result: the time today, 昨天, `M月d日` this year, else
+/// Short date for a result: the time today, yesterday, `M/d` this year, else
 /// `yyyy/M/d`.
 String searchDateLabel(DateTime at, DateTime now) {
   final local = at.toLocal();

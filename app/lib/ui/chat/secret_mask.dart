@@ -11,9 +11,9 @@ import 'package:flutter/rendering.dart';
 import '../../l10n/l10n.dart';
 import '../theme/theme.dart';
 
-/// 已发送用户文本里的一段可识别凭据:原文 `text[start, end)` 和它的显示形式。
+/// One recognizable credential inside sent user text: the original `text[start, end)` and its display form.
 ///
-/// 遮挡只改显示:消息原文、复制、编辑、发给模型的内容都不变。
+/// Masking changes only the display: the message's source, copying, editing and what the model receives never change.
 @immutable
 class SecretSpan {
   const SecretSpan(this.start, this.end, this.masked);
@@ -21,8 +21,8 @@ class SecretSpan {
   final int start;
   final int end;
 
-  /// 密钥 / 令牌保留前八个字符,私钥块保留 BEGIN / END 两行,地址里的密码
-  /// 全遮;换行原样保留,其余每个字符(代码点)一个 `*`。
+  /// Keys / tokens keep their first eight characters; private key blocks keep the BEGIN / END lines; passwords in
+  /// URLs are fully masked; newlines stay as-is, every other character (code point) becomes one `*`.
   final String masked;
 
   @override
@@ -36,16 +36,16 @@ class SecretSpan {
   String toString() => 'SecretSpan($start, $end, $masked)';
 }
 
-/// [text] 里所有可识别的凭据,按位置排列、互不重叠。
+/// All recognizable credentials in [text], in positional order, never overlapping.
 ///
-/// 范围同官方:`sk-…`(至少一个数字)、`AIza…`、`ghp_` `github_pat_`
-/// `glpat-` `npm_` `hf_`、`AKIA` `ASIA` `LTAI` `AKID`、`xoxb-` `sk_live_`
-/// `rk_test_` `whsec_`、JWT、`-----BEGIN … PRIVATE KEY-----` 块、
-/// `scheme://user:password@host` 的密码。`password=…` 这类赋值没有公开格式,
-/// 不遮。
+/// Same ranges as the official version: `sk-…` (at least one digit), `AIza…`, `ghp_` `github_pat_`
+/// `glpat-` `npm_` `hf_`, `AKIA` `ASIA` `LTAI` `AKID`, `xoxb-` `sk_live_`
+/// `rk_test_` `whsec_`, JWTs, `-----BEGIN … PRIVATE KEY-----` blocks,
+/// and the password in `scheme://user:password@host`. Assignments like `password=…` have no public format,
+/// so they aren't masked.
 ///
-/// 线性:字面量扫描找候选起点,格式检查只做有界比较和"一类字符的连续段",
-/// 段尾、下一个数字、下一个 `END` 行按文本记忆,没有可回溯的部分。
+/// Linear: a literal scan finds candidate starts; format checks do only bounded comparisons and "runs of one character class";
+/// run ends, the next digit and the next `END` line are memoized per text — nothing backtracks.
 List<SecretSpan> findSecrets(String text) {
   final spans = <SecretSpan>[];
   final scanner = _Scanner(text);
@@ -55,8 +55,8 @@ List<SecretSpan> findSecrets(String text) {
   return spans;
 }
 
-/// [text] 的显示形式:每段凭据换成 [SecretSpan.masked],遮挡的字符画成
-/// [mark]。
+/// The display form of [text]: each credential run becomes [SecretSpan.masked]; the hidden characters are drawn as
+/// [mark].
 String maskSecrets(String text, {List<SecretSpan>? secrets, String mark = '*'}) {
   secrets ??= findSecrets(text);
   if (secrets.isEmpty) return text;
@@ -73,7 +73,7 @@ String maskSecrets(String text, {List<SecretSpan>? secrets, String mark = '*'}) 
 }
 
 // ---------------------------------------------------------------------------
-// 格式表
+// Format table
 
 // ASCII code unit classes, as bits.
 const _key = 1; // [A-Za-z0-9_-]
@@ -551,7 +551,7 @@ class _Scanner {
   }
 
   // -------------------------------------------------------------------------
-  // 遮挡
+  // Masking
 
   /// The display form of `text[start, end)`, whose earliest candidate has
   /// [kind]; [plain]: the range holds only prefixed-format characters (ASCII
@@ -614,14 +614,14 @@ class _Scanner {
 }
 
 // ---------------------------------------------------------------------------
-// 显示
+// Display
 
-/// 用户文本,可识别的凭据遮挡显示;没有凭据时就是一个 [Text]。
+/// User text with recognizable credentials shown masked; plain [Text] when there are none.
 ///
-/// 每段遮挡值用等宽字体画成一个行内块,显示 / 隐藏都不挪动周围文字。
-/// [interactive](已发送的消息)时值后面带一个眼睛,点一下显示 / 隐藏这一段;
-/// 每次挂载都从遮挡开始,同一位置换成另一个值也重新遮挡。乐观回显(发送中、
-/// 排队中)只遮挡,不带控件。
+/// Each masked value paints as one inline block in a monospaced font; showing / hiding never nudges surrounding text.
+/// With [interactive] (sent messages) an eye follows each value; one tap shows / hides that span;
+/// every mount starts masked, and a new value at the same position re-masks. Optimistic echoes (sending,
+/// queued) mask only, with no controls.
 class SecretText extends StatefulWidget {
   const SecretText(this.text, {super.key, required this.style, this.interactive = false});
 
@@ -636,8 +636,8 @@ class SecretText extends StatefulWidget {
 class _SecretTextState extends State<SecretText> {
   late List<SecretSpan> _secrets = findSecrets(widget.text);
 
-  /// 已显示的值:起点 → 当时的原文。记原文而不是开关,同一位置换了值就
-  /// 从遮挡开始。
+  /// Revealed values: start → the source text at the time. Storing the text rather than a flag, so a changed value
+  /// at the same start begins masked.
   final _revealed = <int, String>{};
 
   @override
@@ -688,8 +688,8 @@ class _SecretTextState extends State<SecretText> {
   }
 }
 
-/// 一段遮挡值:等宽,字号是正文的 0.875,行高与正文同一个像素值;交互时
-/// 最后一个字符后面跟着眼睛。
+/// One masked value: monospaced, 0.875 of the body size, line height the same pixel value as the body; when interactive,
+/// the eye trails the last character.
 class _SecretValue extends StatelessWidget {
   const _SecretValue({
     required this.raw,
@@ -717,7 +717,7 @@ class _SecretValue extends StatelessWidget {
         text: revealed ? raw : masked,
         masked: !revealed,
         style: AppType.mono(size: size, color: style.color, height: line / size),
-        // 图标一个字高;点按区域左右各留 3,上下占满一行。
+        // The icon is one em tall; its tap area adds 3 at the sides and spans the full line height.
         eye: onToggle == null ? null : Size(size + 6, line),
         child: onToggle == null ? null : _EyeButton(revealed: revealed, size: size, onTap: onToggle),
       ),
@@ -725,7 +725,7 @@ class _SecretValue extends StatelessWidget {
   }
 }
 
-/// 眼睛:显示 / 隐藏这一段。
+/// The eye: show / hide this span.
 class _EyeButton extends StatelessWidget {
   const _EyeButton({required this.revealed, required this.size, required this.onTap});
 
@@ -762,10 +762,10 @@ class _EyePainter extends CustomPainter {
 
   final Color color;
 
-  /// 显示中:划掉的眼睛,去掉瞳孔,小字号下才分得清。
+  /// While revealed: a slashed eye with the pupil removed — distinguishable at small sizes.
   final bool crossed;
 
-  // viewBox 0 0 16 16,官方的 EYE_CONTOUR / EYE_PATH / EYE_OFF_PATH。
+  // viewBox 0 0 16 16; the official EYE_CONTOUR / EYE_PATH / EYE_OFF_PATH.
   static final _contour = Path()
     ..moveTo(1.5, 8)
     ..cubicTo(2.9, 5.25, 5.25, 3.5, 8, 3.5)
@@ -807,11 +807,11 @@ class _EyePainter extends CustomPainter {
   bool shouldRepaint(_EyePainter old) => old.color != color || old.crossed != crossed;
 }
 
-/// 遮挡值的文字,[child](眼睛)排在最后一个字符后面,跟着换行走。
+/// The masked value's text; [child] (the eye) trails the last character and wraps along with it.
 ///
-/// `*` 照常排版(换行、宽度、读屏都和字符一致),但不画字体自带的星号(它
-/// 贴着大写字母顶部),而是在每格画官方的六角标记,垂直居中。不读
-/// [MediaQuery] 的字号缩放:[WidgetSpan] 已经把整块按外层字号缩放过。
+/// `*` lays out as usual (line breaks, widths, screen reading all match a character), but the font's own asterisk isn't drawn (it
+/// hugs the tops of capitals); instead the official six-point mark is painted per cell, vertically centred. Not reading
+/// [MediaQuery]'s text scaling: [WidgetSpan] has already scaled the whole block by the outer font size.
 class _MaskedValue extends SingleChildRenderObjectWidget {
   const _MaskedValue({required this.text, required this.masked, required this.style, this.eye, super.child})
     : assert((eye == null) == (child == null));
@@ -820,7 +820,7 @@ class _MaskedValue extends SingleChildRenderObjectWidget {
   final bool masked;
   final TextStyle style;
 
-  /// [child] 占的格子;null = 没有眼睛。
+  /// The cell [child] occupies; null = no eye.
   final Size? eye;
 
   @override
@@ -852,7 +852,7 @@ class _RenderMaskedValue extends RenderBox with RenderObjectWithChildMixin<Rende
   Size? eye;
   final TextPainter _painter;
 
-  /// `*` 连续段的位置,画标记用。
+  /// Positions of the `*` runs, used to paint the marks.
   List<TextRange> _runs = const [];
 
   set textDirection(TextDirection value) {
@@ -888,7 +888,7 @@ class _RenderMaskedValue extends RenderBox with RenderObjectWithChildMixin<Rende
       }
     }
     _runs = runs;
-    // 星号本身透明:保留它的排版,标记另外画。
+    // The asterisk itself stays transparent: its layout is kept, the mark is painted separately.
     final hidden = style.copyWith(color: const Color(0x00000000));
     final children = <InlineSpan>[];
     var at = 0;
@@ -902,7 +902,7 @@ class _RenderMaskedValue extends RenderBox with RenderObjectWithChildMixin<Rende
     if (at < text.length) children.add(TextSpan(text: text.substring(at)));
     final eye = this.eye;
     if (eye != null) {
-      // 占位与一行等高、按文字中线对齐:正好填满这一行,不撑高。
+      // The placeholder is as tall as the line and centred on the text's midline: fills the line exactly, never adds height.
       children.add(const WidgetSpan(alignment: PlaceholderAlignment.middle, child: SizedBox.shrink()));
     }
     _painter.text = TextSpan(style: style, children: children);
@@ -977,15 +977,15 @@ class _RenderMaskedValue extends RenderBox with RenderObjectWithChildMixin<Rende
     return _painter.computeDistanceToActualBaseline(baseline);
   }
 
-  /// 标记中心在基线以上多高(em):小写字母的中部,和官方相同。
+  /// How far above the baseline a mark's center sits (in ems): the lowercase mid-height, same as the official version.
   static const _markLift = 0.25;
 
-  /// 所有标记,相对本框左上角;每次排版后重算,绘制时只画这一条路径。
+  /// All marks, relative to this box's top-left corner; recomputed after each layout, painted as one path at draw time.
   Path _marks = Path();
   double _markStroke = 0;
 
-  /// 官方 SVG 标记:视图框 12×20,`M6 5.6v8.8 M2.19 7.8l7.62 4.4
-  /// M2.19 12.2l7.62-4.4`,线宽 1.5;一格(一个字符宽)是 12 个单位。
+  /// The official SVG mark: view box 12×20, `M6 5.6v8.8 M2.19 7.8l7.62 4.4
+  /// M2.19 12.2l7.62-4.4`, stroke width 1.5; one cell (one character width) is 12 units.
   void _layoutMarks() {
     final marks = Path();
     if (_runs.isNotEmpty) {
@@ -993,7 +993,7 @@ class _RenderMaskedValue extends RenderBox with RenderObjectWithChildMixin<Rende
       final lines = _painter.computeLineMetrics();
       for (final run in _runs) {
         final boxes = _painter.getBoxesForSelection(TextSelection(baseOffset: run.start, extentOffset: run.end));
-        // 等宽字体:每个 `*` 一格,格宽 = 总宽 / 个数。
+        // Monospaced font: each `*` takes one cell; cell width = total width / count.
         var width = 0.0;
         for (final box in boxes) {
           width += box.right - box.left;

@@ -1,8 +1,8 @@
 // The phone's take on the official file panel (`dsh-client-ui-sidebar-files`):
 // one folder at a time under path capsules, a name search over the workspace,
 // rows with a type glyph, size and time, long-press actions, and every open
-// folder kept current by the Host's change feed. Shared by the 文件 page and the
-// 对话详情 「文件」 tab.
+// folder kept current by the Host's change feed. Shared by the Files page and the
+// Chat details "Files" tab.
 
 import 'dart:async';
 import 'dart:math' as math;
@@ -33,7 +33,7 @@ import '../theme/app_icons.dart';
 import '../theme/theme.dart';
 import 'file_glyph.dart';
 
-/// `14:20` today, `昨天 14:20`, `10月3日` this year, else `2025/1/3`.
+/// `14:20` today, `Yesterday 14:20`, `Oct 3` this year, else `2025/1/3`.
 String fileTimeLabel(DateTime at, DateTime now) {
   final local = at.toLocal();
   String two(int v) => v.toString().padLeft(2, '0');
@@ -354,7 +354,7 @@ class WorkspaceSearchField extends StatelessWidget {
 
 // ── Path capsules ───────────────────────────────────────────────────────────
 
-/// Path capsules, 「工作区 › app › lib」: the current level in a heavier weight,
+/// Path capsules, "Workspace › app › lib": the current level in a heavier weight,
 /// parents tappable. One horizontally scrolling line, aligned (16) with the
 /// search field and the list card.
 class WorkspaceCrumbs extends StatelessWidget {

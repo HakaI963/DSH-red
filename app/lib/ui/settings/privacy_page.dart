@@ -1,4 +1,4 @@
-// 隐私与分享: what leaves this phone — the links you shared, a configuration
+// Privacy & sharing: what leaves this phone — the links you shared, a configuration
 // to share, anonymous usage statistics, and (when the host has it) the chat
 // log upload to DeepSeek.
 

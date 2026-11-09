@@ -1,15 +1,15 @@
-// 设置 › 主题 › 启动画面: the default launch screen or the user's own picture, side by side as
+// Settings › Theme › Launch screen: the default launch screen or the user's own picture, side by side as
 // two small phones; how the picture sits, the colour around it, replace it, preview the launch.
 //
 //          ╭──────╮    ╭──────╮
 //          │  ◖●  │    │ ▒▒▒▒ │      two phones the screen's shape, centred as a pair 12
 //          │DSH Go│    │ ▒▒▒▒ │      apart, each a third of the card's inner width; the one
 //          ╰──────╯    ╰──────╯      in use ringed in the accent
-//            默认         自定义
-//   适配方式                    ( 填满 | 居中 )     ┐
-//   背景色                        ◐ ● ○ ●         │ only while the custom one is in use
-//   更换图片或视频                         ›     ┘
-//   预览                                     ›
+//            Default      Custom
+//   Fit                         ( Fill | Center )      ┐
+//   Background color              ◐ ● ○ ●              │ only while the custom one is in use
+//   Change picture or video                ›           ┘
+//   Preview                                    ›
 
 import 'dart:async';
 import 'dart:math' as math;
@@ -123,7 +123,7 @@ class _LaunchScreenSectionState extends ConsumerState<LaunchScreenSection> {
   }
 }
 
-/// 默认 and 自定义 as two small phones, centred as a pair.
+/// Default and Custom as two small phones, centred as a pair.
 class LaunchScreenPicker extends StatelessWidget {
   const LaunchScreenPicker({
     super.key,
@@ -472,7 +472,7 @@ final launchThumbProvider = FutureProvider.autoDispose.family<ui.Image?, String>
   }
 });
 
-/// 自动 · 取自图片 · 白 · 黑, as small discs; the chosen one ringed.
+/// Auto · From image · White · Black, as small discs; the chosen one ringed.
 class LaunchBackdropSwatches extends StatelessWidget {
   const LaunchBackdropSwatches({super.key, required this.custom, required this.onChanged});
 
@@ -487,7 +487,7 @@ class LaunchBackdropSwatches extends StatelessWidget {
     final l10n = context.l10n;
     final custom = this.custom;
     final chosen = custom?.backdrop ?? LaunchBackdrop.auto;
-    // 取自图片 without a colour to take is 自动.
+    // From image without a colour to take is Auto.
     final effective = chosen == LaunchBackdrop.edge && custom?.edge == null ? LaunchBackdrop.auto : chosen;
     final choices = [
       (LaunchBackdrop.auto, l10n.launchBackdropAuto),

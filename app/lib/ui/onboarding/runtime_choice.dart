@@ -1,4 +1,4 @@
-// The first-run question 「DSH 在哪里运行？」 — on this phone (install the runtime) or
+// The first-run question "Where should DSH run?" — on this phone (install the runtime) or
 // on a remote host — with what each costs.
 
 import 'package:flutter/material.dart';
@@ -15,22 +15,22 @@ import 'onboarding_scaffold.dart';
 /// Where DSH runs.
 enum RuntimeOption { local, remote }
 
-/// Two option cards and one 「继续」:
+/// Two option cards and one "Continue":
 ///
 /// ```
-///   ▣  DSH 在哪里运行？
-///      之后可以在设置里更改
+///   ▣  Where should DSH run?
+///      You can change this later in Settings
 ///
 ///   ╭──────────────────────────────────╮
-///   │ [▯]  本机                     ◉  │   ring + filled radio when chosen
-///   │      约 750 MB 存储 · …          │
+///   │ [▯]  Local device               ◉  │   ring + filled radio when chosen
+///   │      ~750 MB storage · …         │
 ///   ╰──────────────────────────────────╯
 ///   ╭──────────────────────────────────╮
-///   │ [▭]  远程主机  推荐           ○  │   「推荐」 only on a phone short of
-///   │      连接电脑或服务器上的 DSH    │    memory or storage
+///   │ [▭]  Remote host  Recommended   ○  │   "Recommended" only on a phone short of
+///   │      Connect to DSH on a PC or server   │    memory or storage
 ///   ╰──────────────────────────────────╯
 ///
-///   (            继续            )
+///   (            Continue            )
 /// ```
 ///
 /// The figures come from the device and the bundled manifest
@@ -112,7 +112,7 @@ class _RuntimeChoiceViewState extends ConsumerState<RuntimeChoiceView> {
   }
 }
 
-/// One choice: a 40 glyph tile, title (with an optional 「推荐」 tag) over
+/// One choice: a 40 glyph tile, title (with an optional "Recommended" tag) over
 /// one line of detail, and a radio mark. [pad] on every side, so the glyph
 /// and the mark sit the same distance from their edges; the ring is drawn
 /// inside the edge and moves nothing.
@@ -232,7 +232,7 @@ class RuntimeOptionCard extends StatelessWidget {
   }
 }
 
-/// A small soft tag beside a title (小标签, radius 8).
+/// A small soft tag beside a title (mini badge, radius 8).
 class _Tag extends StatelessWidget {
   const _Tag(this.text);
 

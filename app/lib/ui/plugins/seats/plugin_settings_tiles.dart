@@ -1,4 +1,4 @@
-// 设置 › 引擎与扩展, under 「插件」: a row per settings section and general
+// Settings › Engine & extensions, under "Plugins": a row per settings section and general
 // settings item the host's plugins add to DSH Web (`settings.section`,
 // `settings.general.item`; docs/design/plugin-seams.md §3). Nothing without
 // them, so the hub is unchanged.
@@ -21,7 +21,7 @@ import 'seat_links.dart';
 /// The slots the hub seats, in order.
 const pluginSettingsSlots = [Slots.settingsSection, Slots.generalItem];
 
-/// The rows, for the 「插件」 group's card; watches the seats' plans. [tint]
+/// The rows, for the "Plugins" group's card; watches the seats' plans. [tint]
 /// is the group's hue.
 List<Widget> pluginSettingsTiles(WidgetRef ref, {int tint = 0}) => [
   for (final slot in pluginSettingsSlots)
@@ -40,7 +40,7 @@ Iterable<(SeatContext, SeatItem)> _items(WidgetRef ref, String slot) {
 }
 
 /// One plugin section as a hub row: its settings form, its island page, or
-/// 「网页版」 when it only opens there.
+/// "Web app" when it only opens there.
 class PluginSettingsTile extends ConsumerWidget {
   const PluginSettingsTile({super.key, required this.seat, required this.item, this.tint = 0});
 

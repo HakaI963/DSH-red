@@ -1,5 +1,5 @@
 // The forum's account sheet — sign in with a Discourse User API Key (signed
-// out), who you are and your numbers (signed in) — and 论坛设置, where the forum
+// out), who you are and your numbers (signed in) — and Forum settings, where the forum
 // address can be changed.
 
 import 'dart:async';
@@ -21,13 +21,13 @@ import 'forum_notifications_page.dart';
 import 'forum_post_body.dart' show openForumLink;
 import 'forum_widgets.dart';
 
-/// The forum's glyph colour (the 社区 hub's forum row uses the same slot).
+/// The forum's glyph colour (the Community hub's forum row uses the same slot).
 const forumTint = 2;
 
 Future<void> showForumAccountSheet(BuildContext context) =>
     showAppSheet<void>(context, isScrollControlled: true, builder: (_) => const ForumAccountSheet());
 
-/// Signed out: 「登录论坛」. Signed in: the account, notifications, sign out.
+/// Signed out: "Sign in to the forum". Signed in: the account, notifications, sign out.
 class ForumAccountSheet extends ConsumerWidget {
   const ForumAccountSheet({super.key});
 
@@ -242,7 +242,7 @@ class _SignedIn extends ConsumerWidget {
   }
 }
 
-// ── 论坛设置 ─────────────────────────────────────────────────────────────────
+// ── Forum settings ─────────────────────────────────────────────────────────────────
 
 Future<void> showForumSettingsSheet(BuildContext context) => showAppSheet<void>(
   context,

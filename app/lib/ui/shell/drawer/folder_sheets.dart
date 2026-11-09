@@ -1,6 +1,6 @@
 // The drawer's sheets for folders and the list's
-// options — 对话列表 (sort, new folder, manage, multi-select), the folder
-// editor (name and mark), 移到文件夹, a folder's actions and 管理文件夹
+// options — Conversation list (sort, new folder, manage, multi-select), the folder
+// editor (name and mark), Move to folder, a folder's actions and Manage folders
 // (drag to reorder).
 
 import 'package:flutter/material.dart';
@@ -18,11 +18,11 @@ import 'folder_mark.dart';
 
 const _groupMargin = EdgeInsets.fromLTRB(SheetTitleBar.inset, 0, SheetTitleBar.inset, 12);
 
-// ── 对话列表 ─────────────────────────────────────────────────────────────────
+// ── Conversation list ─────────────────────────────────────────────────────────────────
 
 enum DrawerViewAction { newFolder, manageFolders, select, archived }
 
-/// Sort (applies at once), then 新建文件夹 / 管理文件夹 / 多选.
+/// Sort (applies at once), then New folder / Manage folders / Multi-select.
 Future<DrawerViewAction?> showDrawerViewSheet(BuildContext context) =>
     showAppSheet<DrawerViewAction>(context, builder: (_) => const DrawerViewSheet());
 
@@ -96,7 +96,7 @@ class DrawerViewSheet extends ConsumerWidget {
 /// What the editor returns.
 typedef FolderDraft = ({String name, int? tint, String? emoji});
 
-/// 新建文件夹 / 编辑文件夹: a name and a mark (plain, a hue or an emoji).
+/// New folder / Edit folder: a name and a mark (plain, a hue or an emoji).
 /// [takenNames] can't be reused.
 Future<FolderDraft?> showFolderEditor(
   BuildContext context, {
@@ -310,9 +310,9 @@ class _MarkKey extends StatelessWidget {
   }
 }
 
-// ── 移到文件夹 ───────────────────────────────────────────────────────────────
+// ── Move to folder ───────────────────────────────────────────────────────────────
 
-/// Where 移到文件夹 sends the conversations.
+/// Where Move to folder sends the conversations.
 sealed class FolderPick {
   const FolderPick();
 }
@@ -332,7 +332,7 @@ final class PickNoFolder extends FolderPick {
 }
 
 /// The folders (a check on [currentFolder], where every chosen conversation
-/// already is), then 新建文件夹 and, when any is filed, 移出文件夹.
+/// already is), then New folder and, when any is filed, Move out of folder.
 Future<FolderPick?> showMoveToFolderSheet(
   BuildContext context, {
   required List<DrawerFolder> folders,
@@ -444,7 +444,7 @@ Future<FolderAction?> showFolderActionSheet(BuildContext context, DrawerFolder f
   ),
 );
 
-// ── 管理文件夹 ───────────────────────────────────────────────────────────────
+// ── Manage folders ───────────────────────────────────────────────────────────────
 
 /// The folders in order; drag the handle to reorder, tap one to edit it.
 Future<void> showManageFolders(BuildContext context, {required void Function(DrawerFolder folder) onEdit}) =>

@@ -58,7 +58,7 @@ class _A11yRestoreSheetState extends ConsumerState<A11yRestoreSheet> {
     });
   }
 
-  /// Only a root connection; 不打扰模式 stays as it is, and so does an Android
+  /// Only a root connection; Do Not Disturb mode stays as it is, and so does an Android
   /// version that can't run it (the grant needs no virtual display).
   Future<void> _prepareRoot() async {
     if (_busy || !ref.read(phoneProvider).status.ready ||

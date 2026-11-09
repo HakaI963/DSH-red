@@ -4,9 +4,9 @@
 // its order; plugins add up to two each, up to eight in all. A tap puts text in
 // the composer or does what the capsule says; nothing is ever sent by it. The
 // row steps aside while a reply is generating (the activity strip takes the
-// place). Last, outside the eight, 「插件」 opens the conversation's plugin
+// place). Last, outside the eight, "Plugins" opens the conversation's plugin
 // sheet (chat_plugins_sheet.dart) while it has something. The chat's own
-// pills (「自动允许中」, 「完全权限」, the generation mode) lead the row, pinned
+// pills ("Auto-allowing", "Full access", the generation mode) lead the row, pinned
 // while the capsules scroll: one row above the composer, not two.
 
 import 'dart:async';

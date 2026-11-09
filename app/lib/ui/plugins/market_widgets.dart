@@ -12,7 +12,7 @@ import '../theme/app_icons.dart';
 import '../theme/theme.dart';
 import 'plugin_widgets.dart';
 
-/// 「官方」 / 「适配 DSH Go」, then the risk tag: none for low, amber for
+/// "Official" / "Adapted for DSH Go", then the risk tag: none for low, amber for
 /// medium, red for high.
 List<Widget> marketEntryBadges(BuildContext context, MarketEntry entry) {
   final l10n = context.l10n;
@@ -64,7 +64,7 @@ Color marketFlagColor(BuildContext context, String flag) {
   };
 }
 
-/// 「自动检查」: every flag explained, then the note that they are features,
+/// "Auto check": every flag explained, then the note that they are features,
 /// not a verdict.
 class MarketRiskCard extends StatelessWidget {
   const MarketRiskCard({super.key, required this.listing});

@@ -28,14 +28,14 @@ import 'tool_images.dart';
 
 const _kDetailMaxHeight = 280.0;
 
-/// 一次工具调用:**32dp 单行**,点开在下方长出代码井详情。
+/// One tool call: **a 32dp single line**; tapping grows a code-well detail below.
 ///
 /// ```
-/// ▣ 运行 · flutter test test/auth          ◌
-/// ▣ 编辑 · lib/auth/login_controller.dart   +18 −4
+/// ▣ run · flutter test test/auth          ◌
+/// ▣ edit · lib/auth/login_controller.dart   +18 −4
 /// ```
 ///
-/// 几何见 [StreamRow]:图标块贴正文左缘,行尾贴正文右缘。
+/// Geometry in [StreamRow]: the icon block hugs the body's left edge, the row tail hugs the right.
 /// Opens the subagent conversation [id]; false when it isn't known yet.
 typedef SubagentOpener = bool Function(String id);
 
@@ -73,17 +73,17 @@ class ToolRow extends StatefulWidget {
   final ToolChatItem item;
   final ApprovalResponder onRespond;
 
-  /// 带原生卡片(`meta["dsh-go/view"]`)时卡片画在哪,见 [ToolCardPlacement]。
-  /// 不带卡片的调用不受影响。
+  /// With a native card (`meta["dsh-go/view"]`), where the card draws; see [ToolCardPlacement].
+  /// Calls without cards are unaffected.
   final ToolCardPlacement card;
 
-  /// 审批卡上的"本对话都允许";null 时不显示。
+  /// The approval card's "Allow for this chat"; hidden when null.
   final ApprovalAllowAll? onAllowAll;
 
-  /// 本机已自动允许、正等 Host 撤回的审批:不再出卡片,行尾按运行中显示。
+  /// An approval auto-allowed locally, waiting for the Host to retract: no card anymore, the row tail shows it as running.
   final Set<String> autoAnswered;
 
-  /// 「子代理 · …」行:点开那个子代理的对话(还不认识它时照常展开详情)。
+  /// The "Subagent · …" row: opens that subagent's conversation (expands details as usual while it isn't known yet).
   final SubagentOpener? onOpenSubagent;
 
   @override
@@ -93,8 +93,8 @@ class ToolRow extends StatefulWidget {
 class _ToolRowState extends State<ToolRow> {
   ToolView? _view;
 
-  /// 用户点过之后的展开状态;没点过时按内容定:带原生卡片的默认展开
-  /// (结果到了、卡片出现时也随之展开),其余默认收起。
+  /// Expanded state once the user tapped; before any tap it follows content: native-card calls default to expanded
+  /// (and expand along when the result arrives and the card appears); everything else defaults to folded.
   bool? _toggled;
 
   ToolView get view => _view = ToolView.of(widget.item, _view);
@@ -105,7 +105,7 @@ class _ToolRowState extends State<ToolRow> {
   @override
   Widget build(BuildContext context) {
     final v = view;
-    // 一轮折叠后:只露卡片本身,工具行收在过程里。
+    // After a turn folds: only the card itself shows; the tool row is inside the process.
     if (widget.card == ToolCardPlacement.cardOnly) {
       if (v.media case final media?) {
         return Padding(
@@ -136,7 +136,7 @@ class _ToolRowState extends State<ToolRow> {
           autoAllowing: auto,
           expanded: expanded,
           opens: child != null,
-          // 卡片正摊开在下面(标题就在卡片上):行里照旧写参数摘要。
+          // The card is spread below (its title is the card itself): the row still carries the argument summary.
           titled: !(expanded && widget.card == ToolCardPlacement.inline && v.pluginView is DshUiParsed),
           onTap: () {
             if (child != null && opener!(child)) return;
@@ -148,10 +148,10 @@ class _ToolRowState extends State<ToolRow> {
           child: Padding(
             padding: const EdgeInsets.only(top: 4, bottom: 8),
             child: switch (v.pluginView) {
-              // 生成的图片 / 视频:媒体卡(折进过程里的那一行不画,卡片在外面)。
+              // Generated image / video: the media card (rows folded into the process don't paint it — the card is outside).
               _ when v.media != null && widget.card == ToolCardPlacement.inline => MediaCard(meta: v.media!),
-              // 插件工具带了原生卡片(meta["dsh-go/view"]);折进过程里的
-              // 那一行不再画卡片(卡片在外面)。
+              // The plugin tool brought a native card (meta["dsh-go/view"]); the row folded into
+              // the process no longer paints the card (the card is outside).
               final parse? when widget.card == ToolCardPlacement.inline => PluginToolCard(
                 parse: parse,
                 fallback: ToolDetail(view: v),
@@ -195,7 +195,7 @@ class _ToolHeader extends StatelessWidget {
   /// A tap opens another conversation: a chevron at the row's end.
   final bool opens;
 
-  /// 摘要用原生卡片的标题(有的话)。
+  /// The summary uses the native card's title (if present).
   final bool titled;
   final VoidCallback onTap;
 
@@ -263,7 +263,7 @@ class _ToolHeader extends StatelessWidget {
   }
 }
 
-/// 被拒的第一次尝试:中性的锁,不是红叉。
+/// The refused first attempt: a neutral lock, not a red cross.
 class _LockGlyph extends StatelessWidget {
   const _LockGlyph();
 
@@ -342,8 +342,8 @@ class _FluidTrailState extends State<_FluidTrail> {
   }
 }
 
-/// 行尾画的是哪一种:只有换了种类才淡入淡出,streaming → running 还是
-/// 同一个小环,不闪。
+/// Which kind the row tail draws: only kind changes crossfade — streaming → running is still
+/// the same little spinner, no flash.
 String _trailKind(ToolView view, bool autoAllowing) => switch (view.item.status) {
   ToolStatus.streaming || ToolStatus.running => 'spinner',
   ToolStatus.awaitingApproval when autoAllowing => 'spinner',
@@ -352,13 +352,13 @@ String _trailKind(ToolView view, bool autoAllowing) => switch (view.item.status)
   final status => status.name,
 };
 
-/// 行尾状态:运行中小环 / 失败 ✕ / 已拒绝 / 已取消 / diff 统计。成功默认安静。
+/// Row-tail status: running spinner / failure ✕ / refused / cancelled / diff stats. Success stays quiet by default.
 class _StatusTrail extends StatelessWidget {
   const _StatusTrail({super.key, required this.view, this.autoAllowing = false});
 
   final ToolView view;
 
-  /// 等待确认但已被"本对话都允许"自动放行:看起来就是在运行。
+  /// Waiting for confirmation but auto-passed by "Allow for this chat": it simply looks like it's running.
   final bool autoAllowing;
 
   @override
@@ -393,8 +393,8 @@ class _StatusTrail extends StatelessWidget {
   }
 }
 
-/// 工具详情:参数 + 结果,铺在代码井里。按工具类型选渲染:
-/// read 行号、edit/write diff、write 新文件代码、bash ANSI 输出。
+/// Tool details: arguments + result, laid out in code wells. Rendering is picked per tool type:
+/// read line numbers, edit/write diff, write's new-file code, bash ANSI output.
 class ToolDetail extends StatelessWidget {
   const ToolDetail({super.key, required this.view});
 
@@ -435,7 +435,7 @@ class ToolDetail extends StatelessWidget {
       ),
     );
 
-    // —— 参数 ——
+    // —— Arguments ——
     if (view.command case final command?) {
       section(
         l10n.chatCommand,
@@ -455,13 +455,13 @@ class ToolDetail extends StatelessWidget {
         ),
       );
     } else if (view.isFileTool && view.path != null) {
-      // 文件类工具:参数里的大段 old/new 文本已经体现在下面的 diff 里,
-      // 这里只给路径(read 再带上行号范围)。
+      // File-family tools: the big old/new texts in arguments already surface in the diff below,
+      // so only the path shows here (read adds the line range too).
       final window = view.readWindow;
       final last = window == null ? 0 : window.firstLine + '\n'.allMatches(window.code).length;
-      // 「· 第 40–44 行」整段不折开,也不和路径断开(折行时整段连同路径的
-      // 末一节换到下一行,行首不会是「·」):不断行空格,连接号两边加 word
-      // joiner。
+      // "· lines 40–44" never breaks apart on its own, nor splits from the path (when wrapping,
+      // the whole run moves with the path's last segment to the next line; no line may start with "·"):
+      // non-breaking spaces, word joiners on both sides of the dash.
       final lines = window == null ? '' : l10n.chatToolLineRange(window.firstLine, last);
       section(
         l10n.chatFile,
@@ -485,11 +485,11 @@ class ToolDetail extends StatelessWidget {
       section(l10n.chatParameters, scrollWell(SelectableText(view.prettyArguments, style: monoStyle)));
     }
 
-    // —— 结果 ——
+    // —— Result ——
     var imagesShown = false;
     final resultTitle = view.isTerminal ? l10n.chatOutput : l10n.chatResult;
     if (view.sandboxBlocked) {
-      // 被沙箱拦下的第一次尝试:行首的锁已经说明了,不另起一段。
+      // The sandbox-stopped first attempt: the leading lock already says it, so no extra paragraph.
     } else if (view.failureText case final failure?) {
       section(
         l10n.chatError,
@@ -613,10 +613,10 @@ class ToolDetail extends StatelessWidget {
   }
 }
 
-/// 连续 ≥ 3 次工具调用:**一行摘要**,"执行 2 条命令 · 读了 3 个文件"。
+/// Runs of ≥ 3 tool calls: **a one-line summary** — "ran 2 commands · read 3 files".
 ///
-/// 正在运行 / 等待确认的那一行始终露在摘要下面(实时进度不能藏);
-/// 展开后所有行挂在左边细线下([StreamThread])。
+/// The running / awaiting-confirmation line always stays visible below the summary (live progress can't hide);
+/// expanded, all rows hang under a left hairline ([StreamThread]).
 class ToolGroup extends StatefulWidget {
   const ToolGroup({
     super.key,
@@ -642,8 +642,8 @@ class ToolGroup extends StatefulWidget {
 class _ToolGroupState extends State<ToolGroup> {
   bool _expanded = false;
 
-  /// 收起时露在外面的那一批:新来的调用和还在跑的。这一批都结束了也先
-  /// 留着,下一批来了再平滑换掉,而不是先缩回去、再长出来。
+  /// The batch left outside when folded: the newest calls and still-running ones. Even when this batch finishes it stays
+  /// until the next batch arrives and swaps out smoothly, instead of retracting first and growing back.
   late List<String> _liveKeys = [
     for (final tool in widget.tools)
       if (_active(tool)) tool.key,
@@ -735,7 +735,7 @@ class _ToolGroupState extends State<ToolGroup> {
             ),
           ),
         ),
-        // 收起时露在外面的实时行;展开时它们在细线下面,这里随之收起。
+        // The live rows outside while folded; when expanded they sit under the hairline, so this layer retracts.
         ExpandReveal(
           open: !_expanded && (active.isNotEmpty || (widget.live && shown.isNotEmpty)),
           child: SmoothSize(
@@ -760,8 +760,8 @@ class _ToolGroupState extends State<ToolGroup> {
   }
 }
 
-/// 胶囊前面的类别方块:摘要第一段对应的那一类(摘要按命令 → 改文件 →
-/// 读文件 → … 排),同一类里取第一个调用。数量与其他类别已经写在文字里。
+/// The category square before the summary: the category of the summary's first span (the summary orders commands → file edits →
+/// file reads → …), first call within that category. Counts are already spelled out with the other categories in text.
 String _leadingTool(List<ToolChatItem> tools) {
   const order = [
     ToolKind.command,

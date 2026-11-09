@@ -284,9 +284,9 @@ String menuPreview(String text) => text
     .replaceAll(RegExp(r'\n\s*\n+'), '\n')
     .trim();
 
-/// 「选择文字」: the whole message, freely selectable. Replies render as
+/// "Select text": the whole message, freely selectable. Replies render as
 /// Markdown ([markdown]), prompts as plain text. With [onQuote], the
-/// selection toolbar also offers 「引用」: the sheet closes and the selected
+/// selection toolbar also offers "Quote": the sheet closes and the selected
 /// passage goes to [onQuote].
 Future<void> showSelectTextSheet(
   BuildContext context,

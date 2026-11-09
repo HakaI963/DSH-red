@@ -39,11 +39,11 @@ class TodoDockSummary {
   TodoItem? get current =>
       todos.where((t) => t.status == _inProgress).firstOrNull ?? todos.where((t) => t.status != _completed).firstOrNull;
 
-  /// 「3/7」.
+  /// "3/7".
   String get count => '$done/$total';
 
-  /// 「正在：跑测试」 while the turn runs, 「下一步：…」 once it stopped
-  /// short, 「全部完成」.
+  /// "Now: running tests" while the turn runs, "Next: …" once it stopped
+  /// short, or "All done".
   String get label {
     if (allDone) return appL10n.chatTodoAllDone;
     final item = current!;
@@ -64,9 +64,9 @@ class TodoDockSummary {
 const _completed = 'completed';
 const _inProgress = 'in_progress';
 
-/// 「☑ 3/7 · 正在：跑测试 ▰▰▱ ˄」;点一下在原地展开整张清单(完成的淡、进行
-/// 中的加粗,和对话详情「进度」页一个样),再点收起。清单最多占屏幕三成高,
-/// 多了在卡片里滚动,展开时先滚到正在做的那一项。
+/// "☑ 3/7 · now: running tests ▰▰▱ ˄"; one tap expands the whole list in place (completed items faded, the running
+/// one bold, like the Chat details "Progress" page), another tap collapses it. The list takes at most 30% of screen height,
+/// scrolls inside the card when longer, and on expanding first scrolls to the item being worked on.
 class TodoBar extends StatefulWidget {
   const TodoBar({super.key, required this.summary, this.initiallyOpen = false});
 
@@ -172,7 +172,7 @@ class _TodoBarState extends State<TodoBar> {
   }
 }
 
-/// 「3/7 · 正在：跑测试」,换项时交叉淡变。
+/// "3/7 · now: running tests", crossfading as the item changes.
 class _Line extends StatelessWidget {
   const _Line({required this.summary});
 
@@ -201,7 +201,7 @@ class _Line extends StatelessWidget {
   }
 }
 
-/// 清单里的一项:图形格和标题行的图形格对齐,正文和标题的字对齐。
+/// One list item: its glyph cell aligns with the header row's glyph cell, its text aligns with the header's text.
 class TodoDockRow extends StatelessWidget {
   const TodoDockRow({super.key, required this.todo});
 

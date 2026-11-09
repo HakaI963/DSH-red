@@ -434,7 +434,7 @@ class BundleSheet extends ConsumerWidget {
               ),
               if (blocked) ...[
                 const SizedBox(height: 16),
-                // 卸载 is this sheet's own button.
+                // Uninstall is this sheet's own button.
                 MarketBlockedBox(version: bundle.version!),
               ],
               if (summary != null) ...[

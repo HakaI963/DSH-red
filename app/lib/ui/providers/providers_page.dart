@@ -1,7 +1,7 @@
-// 模型渠道 (a list page): where the chat's models come from. DeepSeek (account or
+// Model channels (a list page): where the chat's models come from. DeepSeek (account or
 // API Key, kept by the app) first, then the ChatGPT / Claude subscriptions
 // (when the engine has the sign-in bridge), then the custom providers of the
-// active engine (llm-pi-ai routes) and 「添加渠道」.
+// active engine (llm-pi-ai routes) and "Add channel".
 
 import 'package:dsh_client/dsh_client.dart';
 import 'package:flutter/material.dart';
@@ -110,8 +110,8 @@ class ProvidersPage extends ConsumerWidget {
   }
 }
 
-/// 「4 个渠道 · 2 个可用」(prefixed with the host when it is a remote one):
-/// every row but 「添加渠道」, and those ready to serve. Null until the
+/// "4 channels · 2 available" (prefixed with the host when it is a remote one):
+/// every row but "Add channel", and those ready to serve. Null until the
 /// custom providers are read, so the figures never jump.
 String? _summary(WidgetRef ref, HostConnection? conn, ProvidersSnapshot? snapshot) {
   if (conn == null || snapshot == null) return null;
@@ -135,7 +135,7 @@ String? _summary(WidgetRef ref, HostConnection? conn, ProvidersSnapshot? snapsho
   return remote ? '${conn.label} · $counts' : counts;
 }
 
-/// DeepSeek: the app's own account / API Key on 本机, the engine's catalog on
+/// DeepSeek: the app's own account / API Key on the local device, the engine's catalog on
 /// a remote host (whose DeepSeek setup lives on that host).
 class _DeepSeekCard extends ConsumerWidget {
   const _DeepSeekCard();
@@ -181,7 +181,7 @@ class _DeepSeekCard extends ConsumerWidget {
   }
 }
 
-/// 「订阅」: ChatGPT and Claude, signed in through the engine's bridge. Left
+/// "Subscriptions": ChatGPT and Claude, signed in through the engine's bridge. Left
 /// out entirely when the engine has no bridge (older DSH, a remote host
 /// without it) or is not connected.
 class _SubscriptionAccounts extends ConsumerWidget {
@@ -243,7 +243,7 @@ class _SubscriptionRow extends StatelessWidget {
   }
 }
 
-/// The small 「登录」 capsule at the end of a row; its right edge is the row's
+/// The small "Sign in" capsule at the end of a row; its right edge is the row's
 /// 16dp edge, like the label on the left.
 class LoginCapsule extends StatelessWidget {
   const LoginCapsule({super.key, required this.onPressed, this.semanticLabel});

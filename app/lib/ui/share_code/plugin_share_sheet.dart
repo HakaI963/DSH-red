@@ -1,7 +1,7 @@
-// 「分享插件」 — a plugin as a link, a QR code, a picture card (when the market
+// "Share plugin" — a plugin as a link, a QR code, a picture card (when the market
 // knows it) or plain text. Entry points for the plugin pages:
 // [shareMarketPlugin] (a market entry) and [shareInstalledPlugin] (an
-// installed bundle). The card's page is the share panel's 「图片」.
+// installed bundle). The card's page is the share panel's "Image".
 
 import 'dart:async';
 
@@ -23,8 +23,8 @@ import '../share/share_image_page.dart';
 import 'share_code_panel.dart';
 import 'share_code_widgets.dart';
 
-/// 「分享插件」 from a market entry ([version] defaults to the newest); [card]
-/// adds 「图片」. [webLink] (the official market's page for it) is the link
+/// "Share plugin" from a market entry ([version] defaults to the newest); [card]
+/// adds "Image". [webLink] (the official market's page for it) is the link
 /// copied, shown as a QR code and shared in place of the share code's.
 Future<void> shareMarketPlugin(
   BuildContext context,
@@ -38,8 +38,8 @@ Future<void> shareMarketPlugin(
   return showSharePluginSheet(context, plugin: shared, icon: plugin.icon, card: card, webLink: webLink);
 }
 
-/// 「分享插件」 from an installed bundle (local installs can't be shared);
-/// [card] (the market's entry for it) adds 「图片」.
+/// "Share plugin" from an installed bundle (local installs can't be shared);
+/// [card] (the market's entry for it) adds "Image".
 Future<void> shareInstalledPlugin(BuildContext context, PluginBundle bundle, {MarketEntry? card}) {
   final shared = sharedPluginFromBundle(bundle);
   if (shared == null) return _cannotShare(context);
@@ -80,7 +80,7 @@ class PluginShareSheet extends ConsumerStatefulWidget {
   final SharedPlugin plugin;
   final String? icon;
 
-  /// The market's entry: its picture card is 「图片」.
+  /// The market's entry: its picture card is "Image".
   final MarketEntry? card;
 
   /// The official market's page, in place of the share code's link.

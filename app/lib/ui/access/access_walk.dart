@@ -1,6 +1,6 @@
 // One item at a time: why in a line, one key to where it is turned on, a
 // check when the person comes back with it on. First run walks everything
-// the picked features need; 设置 › 系统权限 walks one item.
+// the picked features need; Settings › System permissions walks one item.
 
 import 'dart:async';
 
@@ -20,21 +20,21 @@ import 'access_widgets.dart';
 
 /// ```
 ///   ▣                               2 / 5
-///   打开无障碍
-///   手机操控靠它看屏幕、点按
-///                                         ← 还没开启 / 在那一页打开了吗？
-///   ╭ 先允许受限制的设置 ────────────────╮   only while it stands in the way
-///   │ ① 在无障碍里点一下「DSH 手机操控」…  │
-///   │ ② 在应用信息里点右上角 ⋮ …          │
-///   │ ③ 回到无障碍，打开「DSH 手机操控」    │
+///   Open Accessibility
+///   Phone control uses it to read the screen and tap
+///                                         ← not enabled yet / did you enable it on that page?
+///   ╭ Allow restricted settings first ────────────────╮   only while it stands in the way
+///   │ ① In Accessibility, tap "DSH Phone control"…  │
+///   │ ② In App info, tap the ⋮ at the top right …          │
+///   │ ③ Back to Accessibility, enable "DSH Phone control"    │
 ///   ╰──────────────────────────────────╯
-///   (              去开启              )
-///   (     看图示     )(      跳过      )
+///   (              Enable it              )
+///   (     View guide     )(      Skip      )
 /// ```
 ///
 /// Coming back to the app reads everything again: an item that is on now
 /// shows its check and moves along. A maker's switch can't be read, so after
-/// the trip the person says 「设好了」 (shown as 「已去设置」, never as on).
+/// the trip the person says "set up" (shown as "went to settings", never as on).
 class AccessWalk extends ConsumerStatefulWidget {
   const AccessWalk({
     super.key,
@@ -94,7 +94,7 @@ class _AccessWalkState extends ConsumerState<AccessWalk> {
   Timer? _doneTimer;
   bool _finished = false;
 
-  /// 「受限制的设置」 was seen standing in the way during this walk.
+  /// "Restricted settings" was seen standing in the way during this walk.
   bool _wasRestricted = false;
   bool _appInfoVisited = false;
 
@@ -172,7 +172,7 @@ class _AccessWalkState extends ConsumerState<AccessWalk> {
 
   Future<void> _go(AccessItem item, {bool appInfo = false}) async {
     if (item == AccessItem.accessibility && !ref.read(phoneProvider).disclosureAccepted) {
-      // Opened from settings without 手机操控 ever turned on: its disclosure first.
+      // Opened from settings without Phone control ever turned on: its disclosure first.
       if (!await showPhoneDisclosure(context) || !mounted) return;
       await ref.read(phoneProvider.notifier).acceptDisclosure();
     }
@@ -341,7 +341,7 @@ class _AccessWalkState extends ConsumerState<AccessWalk> {
   }
 }
 
-/// 「先允许受限制的设置」: three short steps, the one to do now in full
+/// "Allow restricted settings first": three short steps, the one to do now in full
 /// colour, those done with a check, the rest quiet.
 class _RestrictedSteps extends StatelessWidget {
   const _RestrictedSteps({required this.step, this.manufacturer});
@@ -356,7 +356,7 @@ class _RestrictedSteps extends StatelessWidget {
     final theme = Theme.of(context);
     final scheme = theme.colorScheme;
     final colors = DshColors.of(context);
-    // Xiaomi keeps the option under 「高级设置」, not behind ⋮.
+    // Xiaomi keeps the option under "Advanced settings", not behind ⋮.
     final advanced = RomFamily.of(manufacturer) == RomFamily.xiaomi;
     final steps = [
       l10n.accessRestrictedTap,

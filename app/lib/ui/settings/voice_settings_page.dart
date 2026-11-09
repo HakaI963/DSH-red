@@ -33,8 +33,8 @@ String voiceModelFailureText(L10n l10n, VoiceModelFailure? failure, {int? needed
   VoiceModelFailure.unknown || null => l10n.voiceModelFailUnknown,
 };
 
-/// A download the person asked for: the card's 下载, 继续下载, 重试 and 重新下载
-/// ([again]: the whole model comes again) and the failure notice's 重试. All of
+/// A download the person asked for: the card's Download, Resume download, Retry and Re-download
+/// ([again]: the whole model comes again) and the failure notice's Retry. All of
 /// them ask the same way before using mobile data. (The download chosen during
 /// setup, and one going on after the app was killed, start by themselves: the
 /// size was shown when the person chose it.)

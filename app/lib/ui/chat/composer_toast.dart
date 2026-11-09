@@ -28,7 +28,7 @@ typedef ComposerToast = void Function(String message, {String? actionLabel, Void
 /// keyboard that is coming up (the gesture-bar inset is gone then): [gap]
 /// with it up, a little more for the moment before.
 ///
-/// With an action ([actionLabel] / [onAction], 「返回原对话」) it stays
+/// With an action ([actionLabel] / [onAction], "Return to original chat") it stays
 /// [composerToastActionDuration], then goes like any other.
 void showComposerToast(
   BuildContext context,

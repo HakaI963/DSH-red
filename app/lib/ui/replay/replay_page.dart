@@ -1,12 +1,12 @@
-// 「对话回放」 — a shared conversation, read-only, played back the way it happened.
-// Opened from a `.dshgo` file (system share, 「打开方式」) or as the share sheet's
+// "Conversation replay" — a shared conversation, read-only, played back the way it happened.
+// Opened from a `.dshgo` file (system share, "Open with") or as the share sheet's
 // preview.
 //
-//   (‹) (  修复登录重复提交      ) (≡)     ← back · title · 全文
+//   (‹) (  Fix duplicate sign-in submits    ) (≡)     ← back · title · Full text
 //   ( ▶  ━━━━━●─────────  0:42 / 3:10  1× )
 //   … the conversation, drawn by the chat's own rows …
 //   [ todo / goal bars, as in the chat ]
-//   [              接着聊              ]
+//   [             Keep chatting              ]
 
 import 'dart:async';
 import 'dart:math' as math;
@@ -38,7 +38,7 @@ import 'replay_list.dart';
 import 'replay_scope.dart';
 
 /// Opens the replay of [conversation] over the current page. [preview]: the
-/// sharer looking before sending (no 「接着聊」).
+/// sharer looking before sending (no "Keep chatting").
 Future<void> openConversationReplay(BuildContext context, DecodedConversation conversation, {bool preview = false}) {
   HapticFeedback.selectionClick();
   return Navigator.of(context).push(
@@ -66,7 +66,7 @@ class ReplayPage extends ConsumerStatefulWidget {
   /// Start playing once the page is up.
   final bool autoplay;
 
-  /// Speeds 「1×」「2×」「4×」.
+  /// Speeds "1×" "2×" "4×".
   static const speeds = [1, 2, 4];
 
   @override
@@ -324,7 +324,7 @@ class _ReplayPageState extends ConsumerState<ReplayPage> with SingleTickerProvid
     canChange: false,
   );
 
-  /// 「10 月 24 日 · 12 分钟」, or the rounds of a part.
+  /// "Oct 24 · 12 min", or the rounds of a part.
   static String _subtitle(ConversationShare share) {
     final start = share.start.toLocal();
     final parts = [appL10n.viewReplayDate(start.month.toString(), start.day)];
@@ -337,7 +337,7 @@ class _ReplayPageState extends ConsumerState<ReplayPage> with SingleTickerProvid
   }
 }
 
-/// 「12 秒」「12 分钟」「1 小时 5 分钟」.
+/// "12 s" "12 min" "1 h 5 min".
 String formatReplaySpan(Duration d) {
   if (d.inSeconds < 60) return appL10n.viewReplaySeconds(math.max(1, d.inSeconds));
   final minutes = (d.inSeconds / 60).round();
@@ -346,13 +346,13 @@ String formatReplaySpan(Duration d) {
   return rest == 0 ? appL10n.viewReplayHours(minutes ~/ 60) : appL10n.viewReplayHoursMinutes(minutes ~/ 60, rest);
 }
 
-/// 「0:42」.
+/// "0:42".
 String formatReplayClock(double ms) {
   final s = (ms / 1000).round();
   return '${s ~/ 60}:${(s % 60).toString().padLeft(2, '0')}';
 }
 
-/// The top of the replay: back, the title, 「全文」; under them the transport
+/// The top of the replay: back, the title, "Full text"; under them the transport
 /// capsule — play / pause, the progress bar, the time, the speed.
 class ReplayHeader extends StatelessWidget {
   const ReplayHeader({
@@ -656,7 +656,7 @@ class _Progress extends StatelessWidget {
   }
 }
 
-/// The 对话字号 setting on the conversation only (as the chat does).
+/// The chat font size setting on the conversation only (as the chat does).
 class _ChatTextScale extends ConsumerWidget {
   const _ChatTextScale({required this.child});
 

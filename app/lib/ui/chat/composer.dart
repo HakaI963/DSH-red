@@ -24,15 +24,15 @@ import 'voice/voice_widgets.dart';
 /// The editor's line height, as a multiple of its font size.
 const _lineHeight = 1.45;
 
-/// 输入条:chrome 玻璃 + 28 圆角,1–6 行自动增高,右下角发送 / 停止。
+/// The input bar: chrome glass + 28 radius, auto-grows from 1 to 6 lines, send / stop at the bottom right.
 ///
-/// 两颗 36 圆键是胶囊的"端盖":四周都留 [_keyGap],单行时胶囊高 48、
-/// 圆角 28 = 键半径 20 + 8,圆键与胶囊两端同心;文字在 40 高里居中。
-/// 多行时键贴底,底边和侧边仍是 8。
+/// The two 36 round keys are the pill's "end caps": [_keyGap] all around, single line = 48 tall,
+/// radius 28 = key radius 20 + 8, so round keys share the pill's end centers; text sits centred in 40.
+/// With multiple lines the keys stick to the bottom; edges stay 8 at bottom and sides.
 ///
-/// 语音([voice]):草稿为空时发送键是麦克风(和 ＋ 键同样的淡底圆);
-/// 听写时 ＋ 换成 ✕(取消)、发送键换成主色的停止键,中间文字处显示
-/// 识别结果,停止键左边是音量条。四颗键始终同一位置、同一尺寸。
+/// Voice ([voice]): with an empty draft the send key is a microphone (a tinted round like the + key);
+/// while dictating, + becomes ✕ (cancel), the send key becomes a tinted stop key, the recognition
+/// result shows where the text is, and a volume meter sits left of stop. All four keys keep the same position and size.
 class Composer extends StatefulWidget {
   const Composer({
     super.key,
@@ -65,13 +65,13 @@ class Composer extends StatefulWidget {
   final TextEditingController controller;
   final FocusNode? focusNode;
 
-  /// 已连上 DSH。没连上时可以先打字,但发不出去。
+  /// DSH is connected. While disconnected you can still type, but not send.
   final bool connected;
 
-  /// 本轮正在生成:输入为空时发送键变成停止键。
+  /// A turn is generating: with empty input the send key becomes the stop key.
   final bool running;
 
-  /// 正在建会话 / 提交中:挡住连点。
+  /// Creating the session / submitting: blocks rapid re-taps.
   final bool busy;
 
   /// Stop was asked for: the stop key turns busy until the turn ends.
@@ -82,29 +82,29 @@ class Composer extends StatefulWidget {
   final VoidCallback onSend;
   final VoidCallback onStop;
 
-  /// 发送键左边的小件(上下文环),40dp 高,底对齐。
+  /// The small piece left of the send key (the context ring), 40dp tall, bottom-aligned.
   final Widget? accessory;
 
-  /// 输入框左边的 40dp 件(＋ 附件)。
+  /// The 40dp piece left of the input field (+ attachments).
   final Widget? leading;
 
-  /// 输入框上方的一条(引文、待发送的附件):出现时展开,拿掉时收起。
+  /// The strip above the input field (quote, attachments pending send): expands when present, collapses when removed.
   final Widget? tray;
 
-  /// 有附件时,没有文字也能发送。
+  /// With attachments you can send even without text.
   final bool hasAttachments;
 
-  /// 长按发送键:生成中可选插话 / 停下先处理 / 排队。
+  /// Long-press the send key: mid-generation choose interject / stop and handle first / queue.
   final VoidCallback? onSendOptions;
 
-  /// 语音输入;null 或不可用时没有麦克风。
+  /// Voice input; no microphone when null or unavailable.
   final VoiceInputController? voice;
 
   /// Hardware keys in the text field first go here (the `@` picker's
   /// arrows / Enter / Esc).
   final FocusOnKeyEventCallback? onKeyEvent;
 
-  /// The idle hint (「给 Chief 发消息…」 in a Bot chat); 「给 DSH 发消息…」
+  /// The idle hint ("Message Chief…" in a Bot chat); "Message DSH…"
   /// by default.
   final String? placeholder;
 
@@ -113,7 +113,7 @@ class Composer extends StatefulWidget {
   /// turn is generating.
   final bool waiting;
 
-  /// What the placeholder says while [waiting] (「等你回答」); null keeps the
+  /// What the placeholder says while [waiting] ("Waiting for your answer"); null keeps the
   /// plain one.
   final String? waitHint;
 
@@ -757,8 +757,8 @@ enum _KeyMode {
   stopVoice,
 }
 
-/// 40 圆键:↑ 发送 / ■ 停止(实心主色);🎙 麦克风是 ＋ 键那样的淡底圆。
-/// 禁用时是 onSurface 12% 的底。
+/// The 40 round key: ↑ send / ■ stop (solid, tinted); 🎙 the mic is a tinted round like the + key.
+/// When disabled, a background at onSurface 12%.
 class _SendButton extends StatefulWidget {
   const _SendButton({
     required this.mode,

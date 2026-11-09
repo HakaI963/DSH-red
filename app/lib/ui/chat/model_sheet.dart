@@ -27,8 +27,8 @@ import '../providers/providers_page.dart';
 import '../theme/app_icons.dart';
 import '../theme/theme.dart';
 
-/// 模型名的短写:去掉 "DeepSeek-" 前缀,连字符换空格,首字母大写。
-/// `DeepSeek-V4-Pro` → `V4 Pro`。
+/// Short model name: drop the "DeepSeek-" prefix, hyphens become spaces, words capitalize.
+/// `DeepSeek-V4-Pro` → `V4 Pro`.
 String shortModelName(String raw) {
   final stripped = raw.replaceFirst(RegExp(r'^deepseek[-_ ]?', caseSensitive: false), '');
   final words = stripped
@@ -39,13 +39,13 @@ String shortModelName(String raw) {
   return words.isEmpty ? raw : words;
 }
 
-/// 胶囊上的模型短名;没有选择时是「选择模型」。
+/// The model short name on the chip; "Select a model" when nothing is chosen.
 String modelShortName(ModelSelection? selection, ModelCatalog? catalog) {
   if (selection == null) return appL10n.viewModelSelect;
   return shortModelName(findModel(catalog, selection)?.name ?? selection.model);
 }
 
-/// 思考深度的中文名。协议词(off/low/high/max)不直接给人看。
+/// Human-friendly thinking-depth names. Protocol words (off/low/high/max) are not shown to people directly.
 String effortLabel(String id, [String? fallback]) => switch (id) {
   'off' || 'none' => appL10n.viewModelThinkingOff,
   'minimal' => appL10n.viewModelThinkingMinimal,
@@ -113,15 +113,15 @@ class ComposerModelPill extends ConsumerWidget {
   }
 }
 
-/// 顶栏右侧的模型胶囊:"✦ V4 Pro · 高 ⌄"。换模型时宽度平滑过渡、文字淡变。
+/// The model chip at the header's right: "✦ V4 Pro · High ⌄". Widths glide and text crossfades on model change.
 ///
-/// 位置不够时依次让出:先收起「· 高」(读屏照读),再截短模型名,最后只留
-/// ✦ 和 ⌄。给多宽由顶栏量了再定([ChatHeader]),胶囊自己不猜屏宽:它的
-/// 最小固有宽度是「完整模型名、不带深度」,最大固有宽度是「名字加深度」。
+/// When space runs short it yields in order: first drop "· High" (screen readers still say it), then truncate the model name,
+/// finally keep only ✦ and ⌄. The width offered is measured by the header ([ChatHeader]); the chip doesn't guess screen width: its
+/// minimum intrinsic width is "full name without depth", its maximum is "name plus depth".
 class ModelChip extends ConsumerWidget {
   const ModelChip({super.key, required this.selection, required this.onSelected, this.grouped = false});
 
-  /// 当前生效的选择;null 时显示目录默认值。
+  /// The currently effective choice; shows the catalogue default when null.
   final ModelSelection? selection;
   final ValueChanged<ModelSelection> onSelected;
   final bool grouped;
@@ -387,8 +387,8 @@ class _RenderChipLabel extends RenderBox
   }
 }
 
-/// 模型弹层:点模型卡立即生效(深度沿用或取默认);选思考深度立即生效,
-/// 滑块落位后弹层自己收起。
+/// The model sheet: tapping a model card applies it at once (depth carried over or defaulted); picking a thinking depth applies
+/// at once too, and the sheet closes itself after the slider settles.
 Future<void> showModelSheet(
   BuildContext context, {
   required ModelSelection? current,
@@ -404,20 +404,20 @@ Future<void> showModelSheet(
 
 /// ```
 ///                    ───
-///   选择模型                               (×)
+///   Select a model                               (×)
 ///
-///   ((  DeepSeek  )   OpenRouter            )    渠道多于一个时
+///   ((  DeepSeek  )   OpenRouter            )    when more than one channel
 ///
 ///   ╭─────────────────╮  ╭─────────────────╮
 ///   │ V4 Pro       (✓)│  │ V41 Flash    ( )│
-///   │ 更强的推理与编码  │  │ 更快、更省        │
+///   │ Stronger reasoning & coding │  │ Faster, cheaper      │
 ///   ╰─────────────────╯  ╰─────────────────╯
 ///
-///   思考深度
-///   (( 不思考 )  低      ( 高 )     最高   )
+///   Thinking depth
+///   (( No thinking )  Low     ( High )     Max   )
 /// ```
 ///
-/// 渠道条只是筛选,不改当前选择;打开时停在当前模型所在的渠道。
+/// The channel strip only filters; it never changes the current choice. It opens on the channel of the current model.
 class _ModelSheet extends ConsumerStatefulWidget {
   const _ModelSheet({required this.current, required this.onSelected, required this.confirmSelection});
 
@@ -564,7 +564,7 @@ class _ModelSheetState extends ConsumerState<_ModelSheet> {
                   child: Text(l10n.commonSave),
                 ),
               ),
-            // 「管理模型 ›」: 设置 › 模型, over the sheet (back returns here).
+            // "Manage models ›": Settings › Models, over the sheet (back returns here).
             if (picking) ...[const SizedBox(height: 12), const ManageModelsLink()],
           ],
         ),
@@ -658,7 +658,7 @@ class _ModelSheetState extends ConsumerState<_ModelSheet> {
   }
 }
 
-/// 选择模型底部的「管理模型 ›」:居中的文字键,去 设置 › 模型。
+/// The "Manage models ›" at the bottom of the picker: a centred text key going to Settings › Models.
 class ManageModelsLink extends StatelessWidget {
   const ManageModelsLink({super.key});
 
@@ -681,8 +681,8 @@ class ManageModelsLink extends StatelessWidget {
   }
 }
 
-/// 渠道筛选:放得下就是一条整宽的 [SegmentedPill];渠道多、放不下时换成
-/// 横向可滑的一排胶囊(两端与内容对齐,滑动时可以出到弹层边缘)。
+/// Channel filter: one full-width [SegmentedPill] when it fits; when channels overflow the width, a row
+/// of side-scrolling pills (ends flush with the content, sliding out to the sheet's edge while scrolling).
 class _ChannelBar extends StatelessWidget {
   const _ChannelBar({required this.groups, required this.shown, required this.onChanged});
 
@@ -732,8 +732,8 @@ class _ChannelBar extends StatelessWidget {
   }
 }
 
-/// 一颗渠道胶囊:选中的和 [SegmentedPill] 的滑块同一种料(浅色白、深色亮灰,
-/// 带一点投影),没选中的是底槽色。
+/// One channel pill: the selected one shares [SegmentedPill]'s slider material (white in light, bright grey in
+/// dark, with a touch of shadow); unselected ones take the trough color.
 class _ChannelChip extends StatelessWidget {
   const _ChannelChip({required this.label, required this.selected, required this.style, required this.onTap});
 
@@ -785,7 +785,7 @@ class _ChannelChip extends StatelessWidget {
   }
 }
 
-/// 两列等宽的模型卡,同一行等高、间距 12;单数时最后一张占满整行。
+/// Two equal-width model columns; same height per row, 12 apart; odd count, the last card spans the full row.
 class _ModelGrid extends StatelessWidget {
   const _ModelGrid({super.key, required this.models, required this.selected, required this.onPick});
 
@@ -828,8 +828,8 @@ class _ModelGrid extends StatelessWidget {
   }
 }
 
-/// 一张模型卡:短名(最多两行)+ 一行描述,右上角选择圈。选中时卡面染一层
-/// 很淡的主色、描一圈主色细边、圈里是实心对勾 —— 这一屏唯一的实心主色。
+/// One model card: short name (up to two lines) + a one-line description, with a selection circle top right. Selected, the card takes a sheer
+/// tint of the main color, a hairline ring of it, and a solid check in the circle — the only solid main color on this screen.
 class _ModelCard extends StatelessWidget {
   const _ModelCard({super.key, required this.model, required this.selected, required this.onTap});
 
@@ -918,7 +918,7 @@ class _ModelCard extends StatelessWidget {
   }
 }
 
-/// 20 的选择圈:没选中是一道细环,选中是实心主色 + 白对勾(缩放淡入)。
+/// The 20 selection circle: a hairline ring when unselected; solid main color + white check when selected (a scaled fade-in).
 class _CheckMark extends StatelessWidget {
   const _CheckMark({required this.selected});
 
@@ -965,7 +965,7 @@ class _CheckMark extends StatelessWidget {
 /// Room around an empty / failed catalog inside the sheet.
 const _emptyPadding = EdgeInsets.fromLTRB(32, 16, 32, 8);
 
-/// 目录还在路上:一颗安静的小环,高度和一排模型卡差不多,来了不跳。
+/// The catalogue is still coming: a quiet little spinner about as tall as a row of model cards, so nothing jumps when it arrives.
 class _Loading extends StatelessWidget {
   const _Loading();
 
@@ -985,9 +985,9 @@ class _Loading extends StatelessWidget {
   );
 }
 
-/// 目录是空的:DSH 0.2.1 在没有可用凭据时不列任何模型。什么都没配就引导去填
-/// DeepSeek 的 Key,或者添加别的渠道;配了还是空,多半是 Key 还没同步到引擎或者
-/// 无效,去「模型渠道」看。
+/// The catalogue is empty: DSH 0.2.1 lists no models without a usable credential. With nothing configured, guide the user to fill in a
+/// DeepSeek key or add another channel; if configured yet still empty, the key most likely hasn't synced to the engine or
+/// is invalid — go look under "Model channels".
 class _EmptyCatalog extends StatelessWidget {
   const _EmptyCatalog({required this.configured, this.failure});
 

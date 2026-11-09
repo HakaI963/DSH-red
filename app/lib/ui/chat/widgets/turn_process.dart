@@ -11,21 +11,21 @@ import '../../theme/theme.dart';
 import '../chat_rows.dart';
 import 'stream_row.dart';
 
-/// 一轮结束后收起的过程:一行安静的摘要,点开在下面按原样列出思考、
-/// 工具调用和中间消息,左边一道细线表示"属于这一轮"([StreamThread])。
+/// The collapsed process after a finished turn: one quiet summary line; tapping lists thinking,
+/// tool calls and intermediate messages below as they were, under a left hairline saying "belongs to this turn" ([StreamThread]).
 ///
 /// ```
-/// ✓ 已完成 · 7 次工具调用 · 1 条消息  ⌄
-/// │ ⚛ 思考 · 先看 pubspec…
-/// │ ▣ 读取 · lib/main.dart
+/// ✓ Done · 7 tool calls · 1 message  ⌄
+/// │ ⚛ thought · first look at pubspec…
+/// │ ▣ read · lib/main.dart
 /// ```
 ///
-/// 用时不写在这里:回答下面的回合脚注已经有了。
+/// Elapsed time isn't written here: the turn footnote below the answer already has it.
 ///
-/// 打开会话时已有的行在列表里是"往上长"的(见 ChatList 的两段 sliver),
-/// 直接展开会把摘要行顶上去。这里自己驱动展开动画,每一帧在布局之前把
-/// 滚动位置补回长出来的高度:摘要行不动,内容向下展开。上面的内容不够
-/// 一屏时滚到顶就停(不留空白),摘要行只上移到顶上内容允许的位置。
+/// Rows already present when opening the conversation "grow upward" inside the list (see ChatList's two sliver segments);
+/// expanding naively would shove the summary line up. Here the expand animation is self-driven, and each frame, before layout,
+/// adds the grown height back to the scroll position: the summary row stays put, content opens downward. When there isn't
+/// a screenful above, scrolling tops out at the top (no blank left behind), and the summary only shifts up as far as content allows.
 class TurnProcess extends StatefulWidget {
   const TurnProcess({
     super.key,
@@ -37,20 +37,20 @@ class TurnProcess extends StatefulWidget {
 
   final TurnProcessRow row;
 
-  /// 这一轮刚在眼前结束:先按展开的样子出现,再收成摘要。
+  /// The turn just ended in plain view: appear first fully expanded, then collapse into the summary.
   final bool settle;
 
-  /// 展开后每一行怎么画(就是列表自己的行)。
+  /// How each row paints once expanded (it's the list's own rows).
   final Widget Function(ChatRow row) buildRow;
 
-  /// 行与行之间的间距(列表的规则)。
+  /// Spacing between rows (the list's rules).
   final double Function(ChatRow row, ChatRow? previous) gapBefore;
 
   @override
   State<TurnProcess> createState() => _TurnProcessState();
 }
 
-/// 摘要:`已完成 · 12 次工具调用 · 2 条消息`;只有几段思考时 `已完成 · 3 段思考`。
+/// Summary: `Done · 12 tool calls · 2 messages`; with only a few thinking stretches, `Done · 3 thinking stretches`.
 String turnProcessLabel(TurnProcessRow row) {
   final thoughts = row.rows.whereType<AssistantRow>().where((r) => r.item.reasoning.trim().isNotEmpty).length;
   return [
@@ -65,20 +65,20 @@ class _TurnProcessState extends State<TurnProcess> with SingleTickerProviderStat
   late final AnimationController _reveal = AnimationController(vsync: this, duration: AppMotion.collapse)
     ..addListener(_holdHeader)
     ..addStatusListener((status) {
-      // 收完了:把内容从树上拿掉。
+      // Collapse finished: take the content off the tree.
       if (status == AnimationStatus.dismissed && mounted) setState(() {});
     });
   late final CurvedAnimation _factor = CurvedAnimation(parent: _reveal, curve: AppMotion.collapseCurve);
   late final Animation<double> _summaryFactor = ReverseAnimation(_factor);
 
-  // 展开时先让出空间再淡入,收起时先淡出再收高度(同 ExpandReveal)。
+  // Expanding vacates space before fading in; collapsing fades out before shrinking the height (same as ExpandReveal).
   late final CurvedAnimation _fade = CurvedAnimation(
     parent: _reveal,
     curve: const Interval(0.3, 1, curve: Curves.easeOut),
   );
   final _body = GlobalKey();
 
-  /// 已经补进滚动位置的高度(内容在动画途中还可能变高,按高度记账)。
+  /// Height already compensated in the scroll position (content can grow taller mid-animation, so account by height).
   double _held = 0;
 
   /// Automatic completion follows ChatList's content boundary, without the
@@ -126,8 +126,8 @@ class _TurnProcessState extends State<TurnProcess> with SingleTickerProviderStat
     setState(() {});
   }
 
-  /// 动画的每一帧(布局之前):在往上长的那段里,把长出来的高度从滚动
-  /// 位置里扣掉。内容高度要等第一次布局后才知道,那之前先记着,帧后再补。
+  /// Each animation frame (before layout): in the upward-growing segment, subtract the height that grew from the scroll
+  /// position. Content height is only known after the first layout; until then keep the debt, settle it post-frame.
   void _holdHeader() {
     if (!mounted || _settling) return;
     final box = _body.currentContext?.findRenderObject() as RenderBox?;

@@ -5,28 +5,28 @@ import 'package:flutter/material.dart';
 import 'accent.dart';
 import 'palette.dart';
 
-/// re_highlight 的 scope → TextStyle 映射("Mist" 主题,深浅两套)。
+/// re_highlight scope → TextStyle map (the "Mist" theme, light and dark).
 ///
-/// 键名对应 highlight.js scope(无 `hljs-` 前缀)。
+/// Keys are highlight.js scopes (no `hljs-` prefix).
 ///
-/// 方向:**安静的彩色**。每个角色一个色相、彩度 0.09–0.13(Xcode / GitHub
-/// 主题约 0.2),明度统一到对代码井 ≥ 4.5,所以没有哪一类 token 特别跳:
+/// Direction: **quiet colour**. One hue per role, chroma 0.09–0.13 (Xcode / GitHub
+/// themes are around 0.2); lightness is levelled so every colour clears ≥ 4.5 against the code well — no token class stands out:
 ///
-/// | 角色 | 色相 | 浅色 | 深色 |
+/// | Role | Hue | Light | Dark |
 /// |---|---|---|---|
-/// | keyword | 紫 300° | #6A499B | #C4ACF2 |
-/// | string | 绿 150° | #336F43 | #97D2A2 |
-/// | number / literal | 琥珀 62° | #90561A | #F2BB8A |
-/// | comment(斜体) | 灰蓝 | #636975 | #868C97 |
-/// | function / title | 蓝 258° | #2C5CA3 | #95BDF8 |
-/// | type / class / built_in | 青 205° | #006E77 | #85CFD8 |
-/// | attr / property | 玫 15° | #97464F | #ECA4A9 |
-/// | meta / 装饰器 | 土 80° | #726042 | #BFAF95 |
+/// | keyword | purple 300° | #6A499B | #C4ACF2 |
+/// | string | green 150° | #336F43 | #97D2A2 |
+/// | number / literal | amber 62° | #90561A | #F2BB8A |
+/// | comment (italic) | grey-blue | #636975 | #868C97 |
+/// | function / title | blue 258° | #2C5CA3 | #95BDF8 |
+/// | type / class / built_in | cyan 205° | #006E77 | #85CFD8 |
+/// | attr / property | rose 15° | #97464F | #ECA4A9 |
+/// | meta / decorators | earth 80° | #726042 | #BFAF95 |
 ///
-/// 变量、参数、标点不上色(或只用次级文字色)—— 满屏彩色是噪音。
+/// Variables, parameters and punctuation get no colour (or just the secondary text colour) — a screenful of colour is noise.
 ///
-/// 角色色相是语义,不随配色变;正文、注释、标点这几格中性色跟 [accent]
-/// 的中性色走(同明度,对代码井的对比度不变)。
+/// Role hues are semantic and never follow the palette; the neutral slots —
+/// body, comments, punctuation — track [accent]'s neutrals (same lightness, so contrast against the code well is unchanged).
 Map<String, TextStyle> dshHighlightTheme(Brightness brightness, [AppAccent accent = AppAccent.mist]) {
   final dark = brightness == Brightness.dark;
   final base = dark ? _dark : _light;

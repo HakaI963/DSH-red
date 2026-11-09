@@ -7,52 +7,52 @@ import '../../common/expand_reveal.dart';
 import '../../pets/pet_perch.dart';
 import '../../theme/theme.dart';
 
-/// 停靠在输入条上方的一组条:和思考胶囊同高、同字号、同左右边,一根接一根
-/// 往上叠,间距都是 [gap]。
+/// A group of bars docked above the input bar: same height, font size and side margins as the thinking pill, stacked
+/// upward one after another with [gap] between.
 ///
 /// ```
-/// ( ☑  3/7 · 正在：跑测试                ▰▰▱  ˄ )   待办
-/// ( ⚑  目标  把登录迁到新接口…                ⋯ )   目标
-/// ( 🐋 跑  flutter test test/auth          0:19 )   思考胶囊
-/// [ ＋  给 DSH 发消息…                      🎤 ]    输入条
+/// ( ☑  3/7 · now: run tests             ▰▰▱  ˄ )   todo
+/// ( ⚑  Goal  migrate login to the new API…  ⋯ )   goal
+/// ( 🐋 run  flutter test test/auth          0:19 )   thinking pill
+/// [ +  Message DSH…                       🎤 ]    input bar
 /// ```
 ///
-/// 胶囊两端的图形都放在 [glyph] 见方的格子里,格子离胶囊边 [edge]:
-/// 图形中心正好落在端盖圆心上(离边 [height] / 2),左右镜像。正文从
-/// [textStart] 起,和思考胶囊的正文左边对齐。
+/// Both ends' glyphs sit in a [glyph]-square cell, the cell [edge] from the pill's edge:
+/// the glyph's center lands exactly on the end-cap circle's center ([height] / 2 from the edge), mirrored left/right. Body text starts at
+/// [textStart], aligning with the thinking pill's text left edge.
 abstract final class DockMetrics {
-  /// 一根条的高度(= 思考胶囊)。
+  /// One bar's height (= the thinking pill).
   static const height = 36.0;
 
-  /// 端盖半径;展开的待办卡片也用它。
+  /// The end-cap radius; the expanded todo card uses it too.
   static const radius = height / 2;
 
-  /// 两端图形的格子。
+  /// The glyph cell at both ends.
   static const glyph = 20.0;
 
-  /// 图形格子到胶囊边。
+  /// Gap from the glyph cell to the pill's edge.
   static const edge = (height - glyph) / 2;
 
-  /// 正文左边(= 思考胶囊:9 + 鲸尾 25 + 6)。
+  /// Text left edge (= the thinking pill: 9 + whale tail 25 + 6).
   static const textStart = 40.0;
 
-  /// 图形到正文。
+  /// Gap from glyph to text.
   static const glyphGap = textStart - edge - glyph;
 
-  /// 正文与右端件之间。
+  /// Gap between text and the right piece.
   static const trailingGap = 10.0;
 
-  /// 上下相邻两根条之间(= 思考胶囊到输入条)。
+  /// Between vertically adjacent bars (= thinking pill to input bar).
   static const gap = 6.0;
 
   static const shape = BorderRadius.all(Radius.circular(radius));
 }
 
-/// 条两端的图形格子([DockMetrics.glyph] 见方,内容居中)。
+/// The bar ends' glyph cell ([DockMetrics.glyph] square, content centered).
 class DockGlyph extends StatelessWidget {
   const DockGlyph({super.key, required this.child});
 
-  /// 一个 [iconSize] 的图标。
+  /// One icon of [iconSize].
   DockGlyph.icon(IconData icon, {Key? key, required Color color})
     : this(
         key: key,
@@ -70,18 +70,18 @@ class DockGlyph extends StatelessWidget {
   );
 }
 
-/// 一根条的一行:左图形 · 正文 · 右端件 · 右图形,高 [DockMetrics.height]
-/// (随系统字号可以长高)。
+/// One bar's row: left glyph · text · right piece · right glyph, [DockMetrics.height] tall
+/// (may grow taller with the system font size).
 class DockRow extends StatelessWidget {
   const DockRow({super.key, required this.leading, required this.content, this.accessory, this.trailing});
 
   final Widget leading;
   final Widget content;
 
-  /// 右图形左边的小件(进度细条、状态字)。
+  /// The small piece left of the right glyph (progress sliver, status word).
   final Widget? accessory;
 
-  /// 右端的图形(展开箭头、更多)。
+  /// The end glyph (expand chevron, more).
   final Widget? trailing;
 
   @override
@@ -109,7 +109,7 @@ class DockRow extends StatelessWidget {
   }
 }
 
-/// 条里的字:标题(12 / 600)+ 第二段(12 / 次要色),和思考胶囊一样的两档。
+/// Text in a bar: title (12 / 600) + second line (12 / secondary color), the same two tiers as the thinking pill.
 abstract final class DockText {
   static TextStyle title(BuildContext context, {Color? color}) {
     final theme = Theme.of(context);
@@ -122,7 +122,7 @@ abstract final class DockText {
   }
 }
 
-/// 一根细进度条:3 高的胶囊槽,完成时变成功色;数值变化时平滑走过去。
+/// A thin progress bar: a 3-tall pill trough, success color on completion; glides smoothly as the value changes.
 class DockProgressLine extends StatelessWidget {
   const DockProgressLine({super.key, required this.fraction, this.width = 28});
 
@@ -160,9 +160,9 @@ class DockProgressLine extends StatelessWidget {
   }
 }
 
-/// 停靠条的位置:有内容时长出来(内容先让出空间再淡入,从下面那根条的背后
-/// 升起),没有时收回去;收回的过程里仍画着最后的内容。节奏和思考胶囊同步
-/// ([AppMotion.standard] / [AppMotion.std])。
+/// A dock bar's position: grows when it has content (content vacates space first, then fades in, rising from behind
+/// the bar below); retracts when empty, still painting the last content while retracting; the pacing syncs with the thinking pill
+/// ([AppMotion.standard] / [AppMotion.std]).
 class DockSlot extends StatefulWidget {
   const DockSlot({super.key, this.child});
 

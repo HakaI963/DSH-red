@@ -408,7 +408,7 @@ class _ForumImageViewerState extends State<ForumImageViewer> {
 
 // ── Share codes ──────────────────────────────────────────────────────────────
 
-/// A dsh-go share link inside a post: what it is and a one-tap 「安装」.
+/// A dsh-go share link inside a post: what it is and a one-tap "Install".
 class ForumShareCard extends ConsumerWidget {
   const ForumShareCard({super.key, required this.link, this.label});
 

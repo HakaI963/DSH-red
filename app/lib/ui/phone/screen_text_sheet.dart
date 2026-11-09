@@ -9,7 +9,7 @@ import '../theme/app_icons.dart';
 import '../theme/theme.dart';
 import 'phone_widgets.dart';
 
-/// Shows what 「读一下当前屏幕」 got back: the text form the model would see, in
+/// Shows what "Read the current screen" got back: the text form the model would see, in
 /// a code well, or why reading failed.
 Future<void> showScreenTextSheet(BuildContext context, ScreenTestResult result) => showAppSheet<void>(
   context,

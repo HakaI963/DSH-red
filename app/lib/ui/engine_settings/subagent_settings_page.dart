@@ -1,4 +1,4 @@
-// 「子代理」, after `dsh-client-ui-settings-subagent`: the delegation limits
+// "Subagents", after `dsh-client-ui-settings-subagent`: the delegation limits
 // (`subagent`: recursion depth, how many run at once) and which models an
 // agent may pick for the subagents it starts
 // (`subagent-model-selection-settings`: a switch and the allowed routes from

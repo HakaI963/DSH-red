@@ -9,7 +9,7 @@ import '../../state/hosts_state.dart';
 import '../common/app_dialog.dart';
 import '../theme/theme.dart';
 
-/// "信任这台主机？" — trust on first use. Shows the fingerprint to compare and
+/// "Trust this host?" — trust on first use. Shows the fingerprint to compare and
 /// how to read it on the computer. Returns true to pin and continue.
 Future<bool> confirmHostKey(BuildContext context, HostKeyPrompt prompt) async {
   final ok = await showAppDialog<bool>(

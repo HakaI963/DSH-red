@@ -15,7 +15,7 @@ import '../engine/log_view.dart';
 import '../theme/app_icons.dart';
 import '../theme/theme.dart';
 
-/// "今天" is decided against this clock; tests pin it.
+/// "today" is decided against this clock; tests pin it.
 DateTime Function() safeModeClock = DateTime.now;
 
 /// The safe-mode flows behind the buttons. Each takes a [BuildContext] for its dialogs
@@ -259,7 +259,7 @@ abstract final class SafeModeActions {
     );
   }
 
-  /// `10月23日 15:30`, or `今天 15:30`.
+  /// `Oct 23, 15:30`, or `Today 15:30`.
   static String formatWhen(DateTime at, {DateTime? now}) {
     final today = now ?? safeModeClock();
     String two(int n) => n.toString().padLeft(2, '0');

@@ -1,4 +1,4 @@
-// 社区: the community hub. Curated content from community.json: picked plugins
+// Community: the community hub. Curated content from community.json: picked plugins
 // (installed through the plugin market), prompt ideas that open a new
 // conversation, group links with QR codes, and news. Nothing users write is
 // hosted here.
@@ -30,7 +30,7 @@ import 'community_widgets.dart';
 class CommunityPage extends ConsumerWidget {
   const CommunityPage({super.key, this.onOpenForum});
 
-  /// 「论坛」 at the top of the hub, opening the forum's home; null shows the
+  /// "Forum" at the top of the hub, opening the forum's home; null shows the
   /// project card there instead.
   final VoidCallback? onOpenForum;
 
@@ -108,7 +108,7 @@ class _Overview extends StatelessWidget {
   }
 }
 
-/// 精选插件: the picks found in the market index, each opening the market's
+/// Featured plugins: the picks found in the market index, each opening the market's
 /// detail sheet.
 class _Plugins extends ConsumerWidget {
   const _Plugins({required this.picks});
@@ -140,7 +140,7 @@ class _Plugins extends ConsumerWidget {
   }
 }
 
-/// 玩法: two columns of prompt tiles; a tap opens a new conversation with the
+/// Recipes: two columns of prompt tiles; a tap opens a new conversation with the
 /// prompt in the composer (not sent).
 class _Prompts extends ConsumerWidget {
   const _Prompts({required this.prompts});
@@ -188,7 +188,7 @@ class _Prompts extends ConsumerWidget {
   }
 }
 
-/// 更新动态: newest first; a row with a link opens it.
+/// What's new: newest first; a row with a link opens it.
 class _Updates extends StatelessWidget {
   const _Updates({required this.updates});
 

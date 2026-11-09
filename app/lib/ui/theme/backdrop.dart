@@ -8,27 +8,27 @@ import 'package:flutter/material.dart';
 import 'backdrop_frame.dart';
 import 'surfaces.dart';
 
-/// 全屏页面背景:**竖向雾蓝渐变 + 两团极淡的光**。
+/// Full-screen page background: **vertical mist-blue gradient + two very faint glows**.
 ///
-/// - 底层:`backdropTop → backdropBottom` 竖向渐变(浅色彩度 ≤ 0.019)。
-/// - 右上:主色光晕(跟随 accent)。左下:暮紫光晕。透明度都在 0.25–0.42,
-///   画在大半径径向渐变里,肉眼只觉得"有点透亮",看不出是两个圆。
-/// - 光晕的作用是给玻璃一点可"透"的颜色;纯平背景上的玻璃看起来只是白块。
+/// - Base layer: a `backdropTop → backdropBottom` vertical gradient (light-mode chroma ≤ 0.019).
+/// - Top right: a primary-colour glow (follows the accent). Bottom left: a dusk-purple glow. Alphas stay
+///   in 0.25–0.42, painted in large-radius radial gradients — the eye reads "a bit of luminosity", not two circles.
+/// - The glows give the glass something to "transmit"; on a flat background glass looks like a white block.
 ///
-/// **同一主题内所有页共用同一张背景**,
-/// 切 tab 时背景不动,只有前景内容在变 —— 切换顺滑的关键。
+/// **Every page in one theme shares the same backdrop** —
+/// switching tabs leaves the background still and only the foreground changes; that is the key to smooth transitions.
 ///
-/// 内部自带一个透明 `Material`:子树里的 `InkWell` 水波画在背景**之上**。
-/// (若水波宿主是背景下面的 Scaffold,不透明的渐变会把水波整个盖住。)
+/// Carries a transparent `Material` inside: `InkWell` ripples in the subtree paint **above** the background.
+/// (If the ripple host were the Scaffold under the backdrop, the opaque gradient would cover the ripples entirely.)
 ///
-/// 给了 [picture](自定义壁纸,lib/ui/wallpaper/wallpaper_backdrop.dart)就画那张
-/// 预先烘好的图,不画渐变;子树里的 [BackdropVeil] 跟着画同一张图。
+/// Given a [picture] (custom wallpaper, lib/ui/wallpaper/wallpaper_backdrop.dart) it paints that
+/// pre-baked image instead of the gradient; [BackdropVeil]s in the subtree paint the same image.
 class AppBackdrop extends StatelessWidget {
   const AppBackdrop({super.key, required this.child, this.glow = true, this.picture});
 
   final Widget child;
 
-  /// 是否画光晕。全屏 WebView、安装页等自带背景的场景可以关掉。
+  /// Whether to paint the glows. Scenes with their own background (full-screen WebView, install pages) can turn them off.
   final bool glow;
 
   /// A picture in place of the gradient; null: the gradient.
@@ -97,35 +97,35 @@ class _BackdropScope extends InheritedWidget {
   bool updateShouldNotify(_BackdropScope old) => old.picture != picture;
 }
 
-/// [AppBackdrop] 的一角:同一张背景,只画底部 [solidHeight] + [feather] 这一条,
-/// 底部 [solidHeight] 实心,往上 [feather] 缓缓淡出。
+/// A corner of the [AppBackdrop]: the same background, painting only the bottom [solidHeight] + [feather] band —
+/// solid for [solidHeight] at the bottom, easing out over [feather] going up.
 ///
-/// 叠在滚动内容之上、浮动控件(输入条、思考胶囊)之下:内容滑到控件后面时
-/// 淡出,控件之间的缝里只露背景,底色不跟着滚动内容闪、也不出现割裂的缝。
-/// 不用遮罩去裁内容本身,是因为列表里的玻璃卡片要采样真背景做模糊。
+/// Layered above the scrolling content and below the floating controls (composer, thinking pill): content fades
+/// as it slides behind them, the gaps show only the backdrop — the base colour neither flickers with the scrolled
+/// content nor leaves a hard seam. No mask cuts the content itself because glass cards must sample the real backdrop.
 ///
-/// 渐变和光晕按整屏尺寸算(与 [AppBackdrop] 相同),从页面顶端画起、只留
-/// 这一条,所以和真背景严丝合缝;键盘弹起页面变矮时也对得上。要求铺满
-/// 整页、和页面左上角对齐。分栏布局里的一栏(宽屏的聊天栏、详情栏)由
-/// [BackdropFrame] 告知它在整张背景里的位置,照样对得上。
+/// The gradient and glows are computed for the full screen size (as in [AppBackdrop]) and painted from the page
+/// top, keeping only this band, so they line up seamlessly with the real backdrop; they still match when the keyboard
+/// makes the page shorter. Requires filling the whole page, aligned to its top-left corner. In a split layout a column
+/// (wide-screen chat or detail pane) learns its place in the full backdrop from [BackdropFrame] and lines up the same way.
 class BackdropVeil extends StatelessWidget {
   const BackdropVeil({super.key, required this.solidHeight, this.feather = 14, this.glow = true}) : fromTop = false;
 
-  /// 顶部版:从顶边往下 [height] 实心,再往下 [feather] 缓缓淡出(页面顶栏
-  /// 后面)。同样要铺满整页、和页面左上角对齐。
+  /// Top variant: solid from the top edge down [height], then easing out over [feather] below (behind the page
+  /// top bar). Likewise must fill the whole page, aligned to its top-left corner.
   BackdropVeil.top({super.key, required double height, this.feather = 14, this.glow = true})
     : solidHeight = _FixedHeight(height),
       fromTop = true;
 
-  /// 从底边往上实心的高度。由页面布局在排好浮动控件时写入:遮罩画在布局
-  /// 之后,不经过重建,这一帧就按新高度画,和控件严丝合缝。
+  /// Height solid from the bottom edge. The page layout writes it as floating controls are placed: the veil
+  /// paints after layout without a rebuild, so this frame already uses the new height and fits the controls exactly.
   final ValueListenable<double> solidHeight;
 
-  /// 实心区之外(底部版在上、顶部版在下)的淡出高度。
+  /// Fade-out height beyond the solid region (above it in the bottom variant, below it in the top variant).
   final double feather;
   final bool glow;
 
-  /// 顶部版([BackdropVeil.top])。
+  /// The top variant ([BackdropVeil.top]).
   final bool fromTop;
 
   @override
@@ -174,7 +174,7 @@ class _FixedHeight implements ValueListenable<double> {
   int get hashCode => value.hashCode;
 }
 
-/// [BackdropVeil] 的一条:底部实心,往上缓缓淡出(顶部版反过来)。
+/// One band of the [BackdropVeil]: solid at the bottom, easing out upward (mirrored for the top variant).
 class _VeilPainter extends CustomPainter {
   _VeilPainter({required this.solidHeight, required this.feather, required this.backdrop, this.fromTop = false})
     : super(repaint: backdrop.picture == null ? solidHeight : Listenable.merge([solidHeight, backdrop.picture!.fade]));

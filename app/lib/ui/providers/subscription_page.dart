@@ -1,6 +1,6 @@
-// 订阅详情 (a detail page): who is signed in, the models the subscription brings
-// (its catalog group), 「退出登录」. 「暂无模型」 only when the catalog was read and
-// lists none for it; a failed read is an error with 「重试」, no connection is
+// Subscription details (a detail page): who is signed in, the models the subscription brings
+// (its catalog group), "Sign out". "No models yet" only when the catalog was read and
+// lists none for it; a failed read is an error with "Retry", no connection is
 // the offline message.
 
 import 'package:dsh_client/dsh_client.dart';
@@ -87,7 +87,7 @@ class _SubscriptionPageState extends ConsumerState<SubscriptionPage> {
         : FeatureMessage.error(title: title, error: error, onRetry: retry);
   }
 
-  /// 「上下文长度」: one model's override of the catalog's figure.
+  /// "Context length": one model's override of the catalogue's figure.
   void _openContext(ModelInfo model, ModelOverride? current) {
     Navigator.of(context).push(
       MaterialPageRoute<void>(
@@ -204,8 +204,8 @@ class _SubscriptionPageState extends ConsumerState<SubscriptionPage> {
   }
 }
 
-/// 订阅模型的一行：名字 + 渠道模型 id，右侧是它生效的上下文长度（有覆盖时
-/// 是覆盖值，没有时写「默认」= 跟随目录）。点开可改。
+/// A subscription model's row: name + channel model id, and on the right the context length in effect
+/// (the override when there is one, otherwise "Default" = follow the catalogue). Tap to edit.
 class _ModelRow extends StatelessWidget {
   const _ModelRow({required this.model, required this.modelOverride, required this.showContext, required this.onTap});
 
@@ -215,7 +215,7 @@ class _ModelRow extends StatelessWidget {
   final ModelOverride? modelOverride;
 
   /// Whether the route profile is known: only then can the row say which
-  /// context length is in effect (「默认」 or the override).
+  /// context length is in effect ("Default" or the override).
   final bool showContext;
   final VoidCallback? onTap;
 

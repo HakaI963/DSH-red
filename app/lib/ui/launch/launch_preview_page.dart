@@ -1,4 +1,4 @@
-// 设置 › 主题 › 启动画面 › 预览: the launch screen as a cold start shows it, over the whole
+// Settings › Theme › Launch screen › Preview: the launch screen as a cold start shows it, over the whole
 // screen: the system's picture, the motion (or the custom picture played once, however long),
 // a short rest, then it fades away as it would onto the app. A tap ends it early.
 

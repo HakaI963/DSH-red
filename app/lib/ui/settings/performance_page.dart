@@ -117,7 +117,7 @@ class PerformancePage extends ConsumerWidget {
               ),
           ],
         ),
-        // 大字号下最后一行也要能整个滚进视野:滚动到底时留出一点余量。
+        // Even at large font sizes the last line must scroll fully into view: leave slack at the bottom.
         const SizedBox(height: 72),
       ],
     );

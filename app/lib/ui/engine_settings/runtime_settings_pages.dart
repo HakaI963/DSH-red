@@ -1,4 +1,4 @@
-// 「Agent 循环」 and 「命令执行」: the parallel tool-call cap of `agent-loop` and
+// "Agent loop" and "Command execution": the parallel tool-call cap of `agent-loop` and
 // the shell executor's limits (`bash-sandbox`, or `pwsh-sandbox` on Windows
 // hosts), with the copy of `dsh-client-ui-settings-agent-loop` / `-shell`.
 

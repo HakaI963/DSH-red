@@ -143,7 +143,7 @@ class InstallEtaController extends Notifier<Duration?> {
 
 final installEtaProvider = NotifierProvider<InstallEtaController, Duration?>(InstallEtaController.new);
 
-/// 「48 / 120 MB · 约 30 秒」: what is under the unpack's progress.
+/// "48 / 120 MB · ~30 s": what is under the unpack's progress.
 String? installMetaLine(L10n l10n, RuntimeProgressEvent? progress, Duration? eta) {
   if (progress == null) return null;
   String mb(int bytes) => (bytes / (1024 * 1024)).toStringAsFixed(0);
@@ -309,10 +309,10 @@ class _RingPainter extends CustomPainter {
 /// in the way: a glass capsule centred at the bottom.
 ///
 /// ```
-///   ( ◌ 准备运行环境 )     asked for, no progress yet
-///   ( ◔ 运行环境 42% )     unpacking: the ring as far round as the unpack
-///   ( ✓ 运行环境已就绪 )    done: stays [readyHold], then fades
-///   ( ! 安装未完成 )        failed: stays, in the danger colour
+///   ( ◌ Preparing the runtime )  asked for, no progress yet
+///   ( ◔ Runtime 42% )            unpacking: the ring as far round as the unpack
+///   ( ✓ Runtime ready )          done: stays [readyHold], then fades
+///   ( ! Install incomplete )      failed: stays, in the danger colour
 /// ```
 ///
 /// [inset] on every side of one line; the mark, round in every state, is as
@@ -323,7 +323,7 @@ class _RingPainter extends CustomPainter {
 class SetupProgressCapsule extends ConsumerStatefulWidget {
   const SetupProgressCapsule({super.key, this.onRemote});
 
-  /// 「改用远程主机」 in the status sheet when the unpack failed.
+  /// "Use a remote host instead" in the status sheet when the unpack failed.
   final VoidCallback? onRemote;
 
   static const inset = 10.0;
@@ -440,7 +440,7 @@ class _SetupProgressCapsuleState extends ConsumerState<SetupProgressCapsule> {
 // ── Status sheet ─────────────────────────────────────────────────────────────
 
 /// Where the unpack stands, from the capsule: progress and time left, or what
-/// went wrong with 重试 / 改用远程主机; the log one tap away. A glance, not a
+/// went wrong with Retry / Use a remote host instead; the log one tap away. A glance, not a
 /// task: it sizes to its content and closes by its handle (drag or tap).
 Future<void> showSetupStatusSheet(BuildContext context, {VoidCallback? onRemote}) => showAppSheet<void>(
   context,
@@ -562,10 +562,10 @@ class _SetupStatusSheet extends ConsumerWidget {
   }
 }
 
-/// What to do about a stopped unpack: 「改用远程主机」 and 「重试」 as twins
+/// What to do about a stopped unpack: "Use a remote host instead" and "Retry" as twins
 /// side by side when both names fit on one line, as the platform's own
-/// dialogs do; else stacked full width, 重试 on top. Without a remote way,
-/// just 重试.
+/// dialogs do; else stacked full width, Retry on top. Without a remote way,
+/// just Retry.
 class _FailedActions extends StatelessWidget {
   const _FailedActions({required this.onRetry, this.onRemote});
 

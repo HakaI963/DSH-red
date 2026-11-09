@@ -35,10 +35,10 @@ import 'usage_upgrade_notice.dart';
 /// - The app runs without the runtime ([OnboardingPrefs.localDeclined]: a
 ///   remote host instead, or uninstalled) → home.
 /// - Runtime outdated → setup, which upgrades it.
-/// - Runtime missing → setup, which first asks 本机 or 远程主机 (welcome
+/// - Runtime missing → setup, which first asks Local device or Remote host (welcome
 ///   first on a truly fresh install).
 /// - Runtime ready but nothing to talk to (no DeepSeek key, no custom provider
-///   on the local engine), and the user never chose "稍后设置" → key entry.
+///   on the local engine), and the user never chose "Set up later" → key entry.
 /// - Otherwise → home (`null`).
 OnboardingStep? initialOnboardingStep({
   required RuntimeStatus status,
@@ -77,14 +77,14 @@ OnboardingStep? initialOnboardingStep({
   return null;
 }
 
-/// Whether the setup step asks 本机 or 远程主机 first: nothing to upgrade and
+/// Whether the setup step asks Local device or Remote host first: nothing to upgrade and
 /// no install underway.
 bool runtimeStepAsks(RuntimeStatus status) =>
     status.installedVersion == null && status.phase != RuntimePhase.installing;
 
 /// App root: waits for settings and the native runtime to report in, then shows
 /// onboarding or the home shell, and auto-starts the local engine once per launch
-/// (设置 › 引擎 › 打开 App 时自动启动).
+/// (Settings › Engine › Start automatically when app opens).
 class RootGate extends ConsumerStatefulWidget {
   const RootGate({super.key, this.home});
 
@@ -105,7 +105,7 @@ class _RootGateState extends ConsumerState<RootGate> {
   OnboardingStep? _step;
   bool _autoStartDone = false;
 
-  /// The setup step asks 本机 or 远程主机 first ([runtimeStepAsks]).
+  /// The setup step asks Local device or Remote host first ([runtimeStepAsks]).
   bool _chooseRuntime = false;
 
   /// The host list is open over the setup step.
@@ -164,7 +164,7 @@ class _RootGateState extends ConsumerState<RootGate> {
     unawaited(EngineControl.ensureStarted(_container));
   }
 
-  /// 「本机」: unpack in the background, set up meanwhile.
+  /// "Local device": unpack in the background, set up meanwhile.
   void _chooseLocal() {
     _beside = true;
     unawaited(_prefs.setSetupStep(SetupStep.appearance));
@@ -210,7 +210,7 @@ class _RootGateState extends ConsumerState<RootGate> {
     unawaited(_prefs.setSetupStep(null));
   }
 
-  /// 「远程主机」: the host list over the setup step. Picking a host there
+  /// "Remote host": the host list over the setup step. Picking a host there
   /// (it closes itself) finishes first run without the runtime; coming back
   /// without one returns to the choice.
   Future<void> _useRemote() async {
@@ -283,10 +283,10 @@ class _RootGateState extends ConsumerState<RootGate> {
     final runtime = ref.watch(localRuntimeProvider.select((s) => (status: s.status, loaded: s.loaded)));
     final prefs = ref.watch(onboardingPrefsProvider);
     // The last host comes back while the splash shows, so a phone without
-    // the runtime doesn't open on 本机 for a frame before its remote host.
+    // the runtime doesn't open on Local device for a frame before its remote host.
     ref.read(activeHostProvider);
 
-    // "重置运行环境" sends the user back through setup; 「卸载运行环境」
+    // "Reset the runtime" sends the user back through setup; "Uninstall the runtime"
     // (localDeclined) stays home.
     ref.listen(localRuntimeProvider.select((s) => s.status.phase), (prev, next) {
       if (_decided &&
@@ -362,13 +362,13 @@ class _RootGateState extends ConsumerState<RootGate> {
         WidgetsBinding.instance.addPostFrameCallback((_) {
           if (mounted) _maybeAutoStart();
         });
-        // The native shell or the web page, by 界面 (ui_mode_state.dart); an
+        // The native shell or the web page, by Interface (ui_mode_state.dart); an
         // install from before usage statistics is told about them there, once.
         child = UsageUpgradeNotice(child: widget.home ?? const ModeHome());
       }
     }
     if (child is! _Splash && !_launchReady) {
-      // 启动画面: the first page is up. A warm start's launch screen goes now; a cold start of
+      // Launch screen: the first page is up. A warm start's launch screen goes now; a cold start of
       // this phone's engine finishes its motion first (or goes when the engine is up).
       _launchReady = true;
       WidgetsBinding.instance.addPostFrameCallback(

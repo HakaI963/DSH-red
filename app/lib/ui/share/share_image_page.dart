@@ -1,13 +1,13 @@
-// 「图片」 (晒成果): the share card with its template and two toggles, then the
+// "Image" (showing off results): the share card with its template and two toggles, then the
 // Android share sheet or the photo album. A page of the share panel (and of the
 // plugin share sheet), and the parts other share pages reuse: the card preview,
 // the toggle capsule, the two-button bar.
 //
-//   ‹ 图片
-//   ( 浅色 │ 深色 │ 纸张 │ 玻璃 │ 卡片 )
-//   (✓ 提问) (✓ 模型与过程)
+//   ‹ Image
+//   ( Light │ Dark │ Paper │ Glass │ Card )
+//   (✓ Question) (✓ Model & process)
 //   [ card ]
-//   [ 保存图片 ] [ 分享 ]
+//   [ Save image ] [ Share ]
 
 import 'dart:async';
 
@@ -74,7 +74,7 @@ class ShareCardStyle extends ChangeNotifier {
 enum _Busy { sharing, saving }
 
 /// The image page: [content] as a card, its template and toggles, then
-/// 「保存图片」 / 「分享」. [linkText] rides along with the image to apps that
+/// "Save image" / "Share". [linkText] rides along with the image to apps that
 /// take text too; [refine] replaces the content when it resolves (a file's
 /// picture or first lines, fetched after the page is up).
 class ShareImagePage extends ConsumerStatefulWidget {
@@ -493,9 +493,9 @@ class ShareCardPreview extends StatelessWidget {
 /// What the action bar is doing.
 enum ShareActionBusy { saving, sharing }
 
-/// 「保存」 and 「分享」: two equal halves, 48 tall, 12 apart; the one at work
+/// "Save" and "Share": two equal halves, 48 tall, 12 apart; the one at work
 /// shows a small ring in place of its icon. Labels default to the image's
-/// (「保存图片」); a label too wide shrinks rather than being cut.
+/// ("Save image"); a label too wide shrinks rather than being cut.
 class ShareActionBar extends StatelessWidget {
   const ShareActionBar({
     super.key,
@@ -508,14 +508,14 @@ class ShareActionBar extends StatelessWidget {
     this.shareKey = const ValueKey('share-send'),
   });
 
-  /// Null disables 「保存」.
+  /// Null disables "Save".
   final VoidCallback? onSave;
 
-  /// Null disables 「分享」.
+  /// Null disables "Share".
   final VoidCallback? onShare;
   final ShareActionBusy? busy;
 
-  /// Just saved: 「已保存」 with a check for a moment.
+  /// Just saved: "Saved" with a check for a moment.
   final bool saved;
   final String? saveLabel;
   final Key saveKey;

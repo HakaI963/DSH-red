@@ -28,7 +28,7 @@ class AccessHeader extends StatelessWidget {
   final String title;
   final String? message;
 
-  /// 「2 / 5」, top right.
+  /// "2 / 5", top right.
   final String? counter;
   final bool done;
 
@@ -172,7 +172,7 @@ class AccessFeatureRow extends StatelessWidget {
   }
 }
 
-/// An item with where it stands: 已开启 / 未开启 / 已去设置 / 去设置. Opens its
+/// An item with where it stands: Enabled / Not enabled / Went to settings / Go to settings. Opens its
 /// step unless it is on.
 class AccessItemTile extends StatelessWidget {
   const AccessItemTile({super.key, required this.item, required this.state, this.vendor, this.onTap});

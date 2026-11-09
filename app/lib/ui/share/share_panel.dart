@@ -1,10 +1,10 @@
-// 「分享」: one panel for everything a conversation or a delivered file can
+// "Share": one panel for everything a conversation or a delivered file can
 // become — a link, a picture, a file, plain text. What to share (the scope and
 // what it includes) is set once on the first page; each way out is a page of
 // its own (share_panel_pages.dart). docs/design/share-redesign.md.
 //
 // The state lives in a [SharePanelModel] above the panel's own page stack, so
-// going into 「链接」 and back keeps the scope, the privacy choices and a link
+// going into "Link" and back keeps the scope, the privacy choices and a link
 // just made.
 
 import 'dart:async';
@@ -90,7 +90,7 @@ sealed class ShareSubject {
 }
 
 /// A conversation: one in the chat ([sessionId]) or a replayed one
-/// ([replay]). [reply] is the reply the panel was opened from (「这条回复」);
+/// ([replay]). [reply] is the reply the panel was opened from ("This reply");
 /// without it the panel starts at the whole conversation.
 final class ConversationSubject extends ShareSubject {
   const ConversationSubject({this.sessionId, this.replay, this.reply}) : assert(sessionId != null || replay != null);
@@ -263,7 +263,7 @@ class SharePanelModel extends ChangeNotifier {
   final DateTime Function() _clock;
   final ExportImageLoader? _loadImage;
 
-  /// The card's look, shared by the preview and 「图片」.
+  /// The card's look, shared by the preview and "Image".
   final style = ShareCardStyle();
 
   /// The panel's clock (a link's expiry, a file's time).
@@ -350,10 +350,10 @@ class SharePanelModel extends ChangeNotifier {
   ShareScope get scope => _scope;
   SharePrivacy get privacy => _privacy;
 
-  /// The scopes this conversation offers: 「这条回复」 only with a reply.
+  /// The scopes this conversation offers: "This reply" only with a reply.
   List<ShareScope> get scopes => [if (conversation?.reply != null) ShareScope.reply, ShareScope.picked, ShareScope.whole];
 
-  /// What 「选中消息」 starts with: the picks so far, else the reply and its
+  /// What "Selected messages" starts with: the picks so far, else the reply and its
   /// question, else the last exchange.
   Set<String> get pickStart {
     if (_picked case final picked?) return picked;
@@ -376,7 +376,7 @@ class SharePanelModel extends ChangeNotifier {
     if (scope == ShareScope.whole) unawaited(_loadHistory());
   }
 
-  /// 「选中消息」 with [keys].
+  /// "Selected messages" with [keys].
   void pick(Set<String> keys) {
     if (keys.isEmpty) return;
     _picked = {...keys};
@@ -607,9 +607,9 @@ class SharePanelModel extends ChangeNotifier {
     }
   }
 
-  // ── 文字 ─────────────────────────────────────────────────────────────────
+  // ── Text ─────────────────────────────────────────────────────────────────
 
-  /// The text 「文字」 hands to the share sheet: a reply's own words, or the
+  /// The text "Text" hands to the share sheet: a reply's own words, or the
   /// picked / whole conversation as Markdown.
   Future<String> shareTextContent() async {
     final reply = anchor;
@@ -635,7 +635,7 @@ class SharePanelModel extends ChangeNotifier {
     }
   });
 
-  // ── 链接 ─────────────────────────────────────────────────────────────────
+  // ── Link ─────────────────────────────────────────────────────────────────
 
   LinkExpiry _expiry = LinkExpiry.month;
   ConversationLink? _link;
@@ -677,7 +677,7 @@ class SharePanelModel extends ChangeNotifier {
     }
   });
 
-  /// 「停止分享」: the link stops working once the undo window passes.
+  /// "Stop sharing": the link stops working once the undo window passes.
   Future<void> stopLink() async {
     final maker = linkMaker;
     final link = this.link;
@@ -695,7 +695,7 @@ class SharePanelModel extends ChangeNotifier {
     _notify();
   }
 
-  /// Takes 「停止分享」 back.
+  /// Takes "Stop sharing" back.
   Future<void> restoreLink() async {
     final maker = linkMaker;
     final stopped = _stopped;
@@ -726,7 +726,7 @@ class SharePanelModel extends ChangeNotifier {
     }
   }
 
-  // ── 文件 ─────────────────────────────────────────────────────────────────
+  // ── File ─────────────────────────────────────────────────────────────────
 
   ConversationFormat _format = ConversationFormat.file;
   bool _fileSaved = false;
@@ -742,7 +742,7 @@ class SharePanelModel extends ChangeNotifier {
     _notify();
   }
 
-  /// Just saved: 「已保存」 for a moment.
+  /// Just saved: "Saved" for a moment.
   bool get fileSaved => _fileSaved;
 
   /// The chosen form can't go out: over the size a file can carry.

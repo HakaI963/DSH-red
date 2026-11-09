@@ -1,5 +1,5 @@
 // Settings search: one query against every page and row of the settings
-// index and every 全部功能 card, in Chinese and English at once whatever the
+// index and every All features card, in Chinese and English at once whatever the
 // app's language, by title, synonyms (old names among them) and the way
 // there. docs/design/settings-ia.md §4.5.
 
@@ -7,8 +7,8 @@ import '../../../l10n/l10n.dart';
 import '../../features/feature_catalog.dart' show FeatureItem, FeatureSection;
 import '../index/spots.dart';
 
-/// Lower case, full-width forms folded to ASCII, no spaces: 「ＡＰＩ Key」
-/// and 「apikey」 read alike.
+/// Lower case, full-width forms folded to ASCII, no spaces: a full-width "API Key"
+/// and "apikey" read alike.
 String normalizeQuery(String text) {
   final out = StringBuffer();
   for (final rune in text.runes) {
@@ -37,14 +37,14 @@ enum SearchMatch {
   bool get bySynonym => this == synonymExact || this == synonym;
 }
 
-/// One result: a settings page or row, or a 全部功能 card.
+/// One result: a settings page or row, or an All features card.
 class SearchHit {
   const SearchHit._({this.spot, this.feature, this.section, required this.match, required this.score, this.synonym});
 
   final SettingSpot? spot;
   final FeatureItem? feature;
 
-  /// The 全部功能 group a [feature] sits in.
+  /// The All features group a [feature] sits in.
   final FeatureSection? section;
   final SearchMatch match;
   final int score;
@@ -102,7 +102,7 @@ List<String> _split(String? list) => [
 const searchLimit = 20;
 
 /// The results for [query]: settings ([spots], pages and rows) and
-/// 全部功能's cards ([features]), scored by how they matched plus how often
+/// All features' cards ([features]), scored by how they matched plus how often
 /// people come for them, best first, [searchLimit] at most. Matches in [zh]
 /// and [en] alike.
 List<SearchHit> searchSettings(

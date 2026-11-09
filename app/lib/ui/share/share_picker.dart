@@ -15,7 +15,7 @@ import '../common/scroll_edge_fade.dart';
 import '../theme/app_icons.dart';
 import '../theme/theme.dart';
 
-/// 「选择消息」: every prompt and reply with a round check; returns the picked
+/// "Select messages": every prompt and reply with a round check; returns the picked
 /// `ChatItem.key`s (null when dismissed).
 ///
 /// A tap picks or drops one message. A long press picks the whole stretch
@@ -39,7 +39,7 @@ class MessagePicker extends StatefulWidget {
   final List<ChatItem> items;
   final Set<String> selected;
 
-  /// 「完成」 with the picks; null pops the route with them (a sheet of its
+  /// "Done" with the picks; null pops the route with them (a sheet of its
   /// own). The share panel pushes the picker as a page and takes them here.
   final ValueChanged<Set<String>>? onDone;
 
@@ -277,7 +277,7 @@ class MessagePickRow extends StatelessWidget {
         .replaceAll(RegExp(r'^\s{0,3}#{1,6}\s+', multiLine: true), '')
         .replaceAll(RegExp(r'\s*\n\s*'), ' ')
         .trim();
-    // A prompt's pictures lead its line: 「〔2 张图片〕 帮我调一下」.
+    // A prompt's pictures lead its line: "[2 images] tweak this for me".
     if (item is UserChatItem && item.images.isNotEmpty) {
       final n = item.images.length;
       return [

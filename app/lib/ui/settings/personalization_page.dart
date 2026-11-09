@@ -1,5 +1,5 @@
-// 个性化: what AI should know about you (个人偏好), how it answers (可视化回复)
-// and how it works (Agent 预设). The first two live in this phone's engine,
+// Personalization: what AI should know about you (Preferences), how it answers (Visual replies)
+// and how it works (Agent presets). The first two live in this phone's engine,
 // so a remote host shows only the presets.
 
 import 'dart:async';
@@ -19,12 +19,12 @@ import '../shell/page_frame.dart';
 import 'reply_prefs_page.dart';
 import 'settings_widgets.dart';
 
-/// Whether 个人偏好 can be read and written here: this phone's engine, with
+/// Whether Preferences can be read and written here: this phone's engine, with
 /// its files at hand.
 bool canEditReplyPrefs(WidgetRef ref) =>
     ref.watch(activeHostProvider).isLocal && ref.watch(guestFsProvider).value != null;
 
-/// The first line of 个人偏好, or null when there is none.
+/// The first line of Preferences, or null when there is none.
 String? replyPrefsSummary(WidgetRef ref) {
   final line = ref.watch(replyPrefsProvider).value?.trim().split('\n').first.trim();
   return line == null || line.isEmpty ? null : line;

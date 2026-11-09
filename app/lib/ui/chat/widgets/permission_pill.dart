@@ -1,7 +1,7 @@
 // The permission pill above the composer (docs/design/settings-ia.md §4.4):
-// the conversation is looser than 工作区内修改 — 「⚠ 完全权限 ›」 — and a tap
+// the conversation is looser than edits-inside-the-workspace — "⚠ Full access ›" — and a tap
 // opens its permissions. Grown out of [AutoApprovePill], which still says
-// 「自动允许中 ×」 while this client allows everything itself. While a reply
+// "Auto-allowing ×" while this client allows everything itself. While a reply
 // generates, either one sits right of the activity strip ([StripRiskChip]).
 
 import 'dart:async';
@@ -25,7 +25,7 @@ abstract final class PermissionPillMetrics {
   static const icon = 16.0;
 }
 
-/// 「⚠ 完全权限 ›」: 34 high, an icon at each end, equal insets. [compact]
+/// "⚠ Full access ›": 34 high, an icon at each end, equal insets. [compact]
 /// (beside the generation mode capsule) is the 34 round ⚠ alone.
 class PermissionPill extends StatelessWidget {
   const PermissionPill({super.key, required this.preset, required this.onTap, this.compact = false});
@@ -93,7 +93,7 @@ class PermissionPill extends StatelessWidget {
   }
 }
 
-/// 「自动允许中」 or 「完全权限」 right of the activity strip while a reply
+/// "Auto-allowing" or "Full access" right of the activity strip while a reply
 /// generates, instead of a row of its own above it: as high as the strip.
 /// Its words show for the first seconds of each run, then only its icons
 /// stay; it is read out whole all along, and a tap does what the pill's does.
@@ -107,7 +107,7 @@ class StripRiskChip extends StatefulWidget {
     this.closes = false,
   });
 
-  /// 「自动允许中 ×」: a tap switches auto-approve off.
+  /// "Auto-allowing ×": a tap switches auto-approve off.
   factory StripRiskChip.autoApprove(BuildContext context, {Key? key, required VoidCallback onDisable}) =>
       StripRiskChip(
         key: key,
@@ -118,7 +118,7 @@ class StripRiskChip extends StatefulWidget {
         closes: true,
       );
 
-  /// 「⚠ 完全权限」: a tap opens the conversation's permissions.
+  /// "⚠ Full access": a tap opens the conversation's permissions.
   factory StripRiskChip.permission(
     BuildContext context, {
     Key? key,

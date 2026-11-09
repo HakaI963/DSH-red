@@ -539,7 +539,7 @@ Future<bool> _invoke(
   // A pending acknowledgement must itself arrive in the original tap window
   // before its later result can inherit gesture effects. Data remains allowed.
   // Deferred (v1.1): the control stays at work until the result comes on
-  // the stream, or is void; a tap on it (or 取消) drops it.
+  // the stream, or is void; a tap on it (or Cancel) drops it.
   final pending = result.pending;
   if (pending == null || stream == null) return true;
   var cancelled = false;
@@ -752,7 +752,7 @@ Future<void> runComposerCommand(BuildContext context, WidgetRef ref, String line
   await ref.read(chatProvider(sessionId).notifier).runCommand(line);
 }
 
-/// An app page by its ui.json / 全部功能 id, `new-chat` or `settings`.
+/// An app page by its ui.json / All features id, `new-chat` or `settings`.
 Future<void> openNativePage(BuildContext context, WidgetRef ref, String page, {String? sessionId}) async {
   final navigator = Navigator.of(context);
   switch (page) {
@@ -766,7 +766,7 @@ Future<void> openNativePage(BuildContext context, WidgetRef ref, String page, {S
   }
   final item = [for (final section in featureSections) ...section.items].where((i) => i.id == page).firstOrNull;
   if (item == null) {
-    // Settings left 全部功能 for 设置; their ids still open the same page.
+    // Settings left All features for Settings; their ids still open the same page.
     if (settingsPageForLink(page, sessionId: sessionId) case final settings? when context.mounted) {
       await navigator.push(MaterialPageRoute<void>(builder: (_) => settings));
     }

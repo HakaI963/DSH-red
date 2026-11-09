@@ -1,4 +1,4 @@
-// The 对话详情 「文件」 tab — the conversation's deliverables over the workspace
+// The Chat details "Files" tab — the conversation's deliverables over the workspace
 // browser (ui/files/, after the official file panel) — and the preview route
 // for one workspace file.
 

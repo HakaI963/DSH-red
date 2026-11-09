@@ -1,4 +1,4 @@
-// 设置 › 主题: light / dark, the palette (six presets,
+// Settings › Theme: light / dark, the palette (six presets,
 // a custom hue, the wallpaper), the feature tile style, the launcher icon (and a
 // picture shortcut) and the launch screen.
 //
@@ -26,7 +26,7 @@ import 'launch_screen_section.dart';
 import 'tile_style_picker.dart';
 import 'wallpaper_section.dart';
 
-/// 设置首页「外观」组的第一行:当前配色的色点 + 名字 · 明暗,点开 [AppearancePage]。
+/// The first row of the settings home's "Appearance" group: the current palette's color dot + name · mode, tapping opens [AppearancePage].
 class AppearanceEntryTile extends ConsumerWidget {
   const AppearanceEntryTile({super.key, this.tint = 0});
 
@@ -60,11 +60,11 @@ class AppearanceEntryTile extends ConsumerWidget {
   }
 }
 
-/// 设置 › 主题:明暗、配色(预设 / 自定义 / 跟随壁纸)、功能图标、桌面图标。宠物在
-/// 设置首页自成一行。
+/// Settings › Theme: light/dark, palette (presets / custom / follow wallpaper), feature icons, launcher icons. Pets sits
+/// as its own row on the settings home.
 ///
-/// 选什么都即时生效:整个 App 的主题随之交叉淡变(`AppMotion.standard`),
-/// 这一页本身就是预览。
+/// Everything applies instantly: the whole app's theme crossfades along (`AppMotion.standard`);
+/// this page is itself the preview.
 class AppearancePage extends ConsumerWidget {
   const AppearancePage({super.key});
 
@@ -132,10 +132,10 @@ abstract final class PickerGrid {
   }
 }
 
-// ── 外观模式 ─────────────────────────────────────────────────────────────
+// ── Appearance mode ─────────────────────────────────────────────────────────────
 
-/// 三张小样:浅色、深色、跟随系统(左浅右深)。小样用当前配色画,换配色时
-/// 跟着淡变;选中的那张外面一圈主色环。
+/// Three mini mockups: light, dark, follow system (left light, right dark). They paint in the current palette and
+/// crossfade when it changes; the chosen one gets an accent ring outside.
 class ThemeModePicker extends ConsumerWidget {
   const ThemeModePicker({super.key});
 
@@ -404,11 +404,11 @@ class _PhonePainter extends CustomPainter {
   bool shouldRepaint(_PhonePainter old) => old.theme != theme;
 }
 
-// ── 配色 ─────────────────────────────────────────────────────────────────
+// ── Palette ─────────────────────────────────────────────────────────────────
 
-/// 一排色点:六套预设 + 自定义(色轮)。色点画的是守卫之后、当前明暗下的
-/// 主色;选中的外面一圈同色环,下面是名字。[custom] 为 false 时只有六套
-/// 预设(首次启动的外观页)。
+/// A row of color dots: six presets + custom (color wheel). Each dot shows the guarded accent under the
+/// current mode; the chosen one has a same-color ring, with its name below. With [custom] false there are only the six
+/// presets (the first-run appearance page).
 class PalettePicker extends ConsumerWidget {
   const PalettePicker({super.key, this.custom = true});
 
@@ -626,10 +626,10 @@ class AccentDot extends StatelessWidget {
   );
 }
 
-// ── 自定义 ───────────────────────────────────────────────────────────────
+// ── Custom ───────────────────────────────────────────────────────────────
 
-/// 自定义:色相条 + 几个推荐色。色相条和色块画的都是守卫后的颜色 —— 看到
-/// 的就是用上的。
+/// Custom: a hue bar plus a few suggested colors. Both the bar and the swatches paint guarded colors — what you
+/// see is what you get.
 class CustomAccentPanel extends ConsumerWidget {
   const CustomAccentPanel({super.key});
 
@@ -742,8 +742,8 @@ class _ChipPainter extends CustomPainter {
   bool shouldRepaint(_ChipPainter old) => old.color != color || old.ring != ring || old.edge != edge;
 }
 
-/// 色相条:一条守卫后的色相渐变,一颗圆钮(里面是当前色)。拖动时圆钮
-/// 跟手,主题每 ~100ms 跟一次,松手落定。
+/// The hue bar: a guarded hue gradient with one knob (holding the current color). While dragging,
+/// the knob follows the finger, the theme follows about every 100ms, and it settles on release.
 class HueSlider extends StatefulWidget {
   const HueSlider({super.key, required this.hue, required this.brightness, required this.onChanged});
 
@@ -874,7 +874,7 @@ class _HuePainter extends CustomPainter {
       old.hue != hue || old.current != current || old.knob != knob || old.colors != colors || old.shadow != shadow;
 }
 
-// ── 跟随壁纸 ─────────────────────────────────────────────────────────────
+// ── Follow wallpaper ─────────────────────────────────────────────────────────────
 
 class _WallpaperRow extends ConsumerWidget {
   const _WallpaperRow({required this.wallpaper, required this.on});

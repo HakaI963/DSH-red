@@ -1,7 +1,7 @@
-// 界面: which home the app opens to (原生 / 网页), then everything about the
+// Interface: which home the app opens to (Native / Web), then everything about the
 // web app — opening it once, its phone layout, and the display and sending
 // preferences the official General settings keep on the host's engine (only
-// the web app reads them; they were 通用设置).
+// the web app reads them; they were General settings).
 
 import 'dart:async';
 
@@ -78,7 +78,7 @@ class InterfacePage extends ConsumerWidget {
           children: [
             SettingsTile(
               spot: Spots.openWeb,
-              // In 网页模式 the web app is the home underneath.
+              // In Web mode the web app is the home underneath.
               onTap: () => mode == UiMode.web
                   ? Navigator.of(context, rootNavigator: true).popUntil((route) => route.isFirst)
                   : Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const LocalWebScreen())),
@@ -143,7 +143,7 @@ class InterfacePage extends ConsumerWidget {
                     TableTint.fill => l10n.hubTableTintFillHint,
                     TableTint.none => l10n.hubTableTintNoneHint,
                   },
-                  // 一眼看出这一档长什么样：缩略图和正文表格同一套配色。
+                  // See at a glance what a tier looks like: the thumbnail and the body table share one color set.
                   trailing: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
@@ -183,8 +183,8 @@ class InterfacePage extends ConsumerWidget {
   }
 }
 
-/// 表格底色每档的迷你示意：两列三行，表头一档、隔行一档，和正文表格
-/// 用同一套颜色，深浅主题都对得上。
+/// Mini mockups of each table-background tier: two columns, three rows — one tier for the header, one for stripes —
+/// using the same colors as the body table, matching in both light and dark themes.
 class _TableTintPreview extends StatelessWidget {
   const _TableTintPreview({required this.tint, required this.selected});
 
@@ -231,7 +231,7 @@ class _TableTintPainter extends CustomPainter {
     final row = size.height / 3;
     final outline = RRect.fromRectAndRadius(Offset.zero & size, const Radius.circular(5));
 
-    // 填充和网格都裁进圆角里，和修好之后的正文表格一个规矩。
+    // Fills and grid both clip into the corners, same rule as the fixed body table.
     canvas.save();
     canvas.clipRRect(outline);
     final fill = Paint();

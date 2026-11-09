@@ -257,7 +257,7 @@ class _SequenceFieldSheetState extends ConsumerState<SequenceFieldSheet> {
 }
 
 /// Removes an array item: a 48 target ending at the row's end, its ⊖ inked
-/// to that end — the trailing edge of 添加 under the rows — and its press
+/// to that end — the trailing edge of Add under the rows — and its press
 /// circle centred on the glyph.
 class RemoveItemKey extends StatelessWidget {
   const RemoveItemKey({super.key, required this.tooltip, required this.onPressed});

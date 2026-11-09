@@ -1,16 +1,16 @@
-// 设置 › 主题 › 桌面图标 › 图片快捷方式: the user's own picture as a home-screen shortcut
+// Settings › Theme › Launcher icon › Picture shortcut: the user's own picture as a home-screen shortcut
 // that opens the app (lib/state/icon_shortcut_state.dart says why it's a shortcut and not the
 // icon). Pick a picture, place it in the launcher's own icon shape, name it, add it.
 //
 // ╭──────────────────────────────────────────╮
-// │ 图片快捷方式                          ×  │
+// │ Picture shortcut                      ×  │
 // │              ╭────────╮                   │  the picture in the launcher's mask,
 // │              │  ▒▒▒▒  │                   │  drag / pinch inside it
 // │              ╰────────╯                   │
-// │           拖动或双指缩放 · 换一张           │
-// │  名称  [ DSH Go                       ]   │
-// │  系统不允许…部分桌面会在它的角上加一个小标  │
-// │  [            添加到桌面               ]  │
+// │           drag or pinch to zoom · pick another │
+// │  Name    [ DSH Go                       ]   │
+// │  Some launchers add a small badge to third-party icons … │
+// │  [          Add to home screen           ]  │
 // ╰──────────────────────────────────────────╯
 
 import 'dart:async';

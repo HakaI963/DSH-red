@@ -4,8 +4,8 @@ import '../../l10n/l10n.dart';
 
 /// The buttons of the failure and safe-mode cards: one full-width primary, the
 /// secondary actions two to a row when every label fits half the width (an odd
-/// one out takes the full width, last), else stacked, and a centred 「查看日志」
-/// below — beside 「导出诊断包」 when [onExport] is set, the two quiet links as
+/// one out takes the full width, last), else stacked, and a centred "View log"
+/// below — beside "Export diagnostics" when [onExport] is set, the two quiet links as
 /// mirrored halves. Buttons are at least 50 tall, 8 apart; long labels may wrap.
 class RecoveryActions extends StatelessWidget {
   const RecoveryActions({
@@ -24,7 +24,7 @@ class RecoveryActions extends StatelessWidget {
   final List<({String label, VoidCallback? onPressed})> secondary;
   final VoidCallback? onLog;
 
-  /// 「导出诊断包」, next to 「查看日志」.
+  /// "Export diagnostics", next to "View log".
   final VoidCallback? onExport;
 
   @override

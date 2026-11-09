@@ -22,8 +22,8 @@ import '../theme/theme.dart';
 import 'header_schedule.dart';
 import 'model_sheet.dart' show ModelChip;
 
-/// 顶栏状态行的内容:状态点 + 一句人话。颜色从不单独表达状态。
-/// 计时只在活动条里,这一行不走秒。
+/// The chat header's status line: a status dot + one plain sentence. Color alone never encodes the state.
+/// The timer lives only in the activity bar; this line does not tick seconds.
 class HeaderStatus {
   const HeaderStatus(this.tone, this.label, {this.spoken});
   final StatusTone tone;
@@ -34,17 +34,17 @@ class HeaderStatus {
   final String? spoken;
 }
 
-/// 聊天顶栏:**没有整条色带**(Claude 式),只有几枚浮动玻璃件;
-/// 内容滚到下面时才浮现一层页面色渐隐,与二级页面同一套做法。
-/// 打开着对话时最右是「新对话」圆键,与 ≡ 镜像。对话有进行中的自动化任务时,
-/// 标题胶囊的尾端是一颗与它同心的时钟键([HeaderScheduleCap])。
+/// The chat header: **no full-width color band** (Claude-style), only a few floating glass pieces;
+/// a page-colored fade surfaces when content scrolls beneath it, the same recipe as secondary pages.
+/// With a conversation open, the far right is a "New chat" round key, mirroring ≡. While the conversation has running automations,
+/// the title pill's tail carries a clock key concentric with it ([HeaderScheduleCap]).
 ///
 /// ```
-/// (≡) ( 修复登录重复提交 )   ( ✦ V4 Pro · 高 ⌄ ) (+)
-///     ( ● 生成中          )
+/// (≡) ( Fix duplicate sign-in submissions )   ( ✦ V4 Pro · high ⌄ ) (+)
+///     ( ● Generating…         )
 ///
-/// (≡) ( 每天的构建检查 (◷) )   ( ✦ V4 Pro ⌄ ) (+)
-///     ( ● 本机             )
+/// (≡) ( Daily build check (◷) )   ( ✦ V4 Pro ⌄ ) (+)
+///     ( ● Local device          )
 /// ```
 class ChatHeader extends ConsumerStatefulWidget {
   const ChatHeader({
@@ -65,8 +65,8 @@ class ChatHeader extends ConsumerStatefulWidget {
   /// What follows the status under the title (a phone: the workspace). Shortens first.
   final String? detail;
 
-  /// 右侧件(模型胶囊 [ModelChip])。需要传 `grouped: true` 与顶栏共享一次
-  /// 背景采样。顶栏按它的固有宽度(带不带「· 高」)和标题胶囊分地方。
+  /// The right-side piece (model chip [ModelChip]). Pass `grouped: true` to share one
+  /// background sample with the header. The header splits space by its intrinsic width (with or without "· high") and the title pill.
   /// Null: the title has the room.
   final Widget? trailing;
   final VoidCallback? onOpenDrawer;
@@ -79,7 +79,7 @@ class ChatHeader extends ConsumerStatefulWidget {
   /// when nothing scrolls (new chat): no fade.
   final ValueListenable<double>? scrolledUnder;
 
-  /// 顶栏的高度(不含状态栏),与二级页面的返回键栏一致。列表顶部留白按它算。
+  /// The header's height (excluding the status bar), matching secondary pages' back-bar. List top padding is computed from it.
   static const barHeight = 56.0;
 
   /// The title pill: 44 like the keys beside it, taller when large text
@@ -163,7 +163,7 @@ class _ChatHeaderState extends ConsumerState<ChatHeader> {
                 titleFloor: titleFloor,
                 clockExtra: clockExtra,
                 children: [
-                  // A subagent conversation shows 「‹ 上级对话」 here.
+                  // A subagent conversation shows "‹ Parent chat" here.
                   HeaderLeadSlot(
                     menu: !(chrome?.showsMenuKey ?? true)
                         ? const SizedBox.shrink()
@@ -266,7 +266,7 @@ class _ChatHeaderState extends ConsumerState<ChatHeader> {
                     },
                   ),
                   // Mirrors the menu key; gone on the new-chat screen. On a
-                  // wide window the key that unfolds 对话详情 follows it.
+                  // wide window the key that unfolds Chat details follows it.
                   Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
@@ -339,10 +339,10 @@ class _RenderChipSlot extends RenderProxyBox {}
 
 /// The bar's pieces on one line: the left key (≡ or the breadcrumb), the
 /// title pill, the trailing pieces (agents capsule, model chip) and the
-/// 新对话 key. The title pill and the model chip share what the keys leave:
+/// The "New chat" key. The title pill and the model chip share what the keys leave:
 ///
 /// 1. both whole when they fit;
-/// 2. else the chip drops its depth (「· 高」) first;
+/// 2. else the chip drops its depth ("· high") first;
 /// 3. then the title shortens, down to [titleFloor] (with the schedule clock
 ///    beside it, when the conversation has one);
 /// 4. then the chip shortens the model's name, down to ✦ ⌄;
@@ -352,7 +352,7 @@ class _RenderChipSlot extends RenderProxyBox {}
 /// The pill's content ([_PillContent]) reads step 5 off the width it gets.
 ///
 /// The title pill sits 8 after the left key; the trailing pieces end at the
-/// 新对话 key (they carry their own 8s); everything centred on one line.
+/// The "New chat" keys (they carry their own 8s); everything centred on one line.
 class _HeaderRow extends MultiChildRenderObjectWidget {
   const _HeaderRow({required this.titleFloor, required this.clockExtra, required super.children})
     : assert(children.length == 4);
@@ -620,7 +620,7 @@ class _RenderPillContent extends RenderBox
   }
 }
 
-/// 状态文字;读屏的实时区域,变了就播报 [HeaderStatus.spoken] 或文字本身。
+/// The status text; a screen-reader live region that announces [HeaderStatus.spoken] or the text itself on change.
 /// The line under the title: the status first, whatever it needs, and the detail in what
 /// is left. A flex would hold back a share for each, cutting one with room beside it.
 class _StatusLine extends MultiChildRenderObjectWidget {

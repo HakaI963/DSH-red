@@ -206,7 +206,7 @@ class IslandHost extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// After the renderer died: islands may open again (the view's 重新打开).
+  /// After the renderer died: islands may open again (the view's Reopen).
   void reopen() {
     if (!_rendererLost) return;
     _rendererLost = false;

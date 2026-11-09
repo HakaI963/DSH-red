@@ -1,6 +1,6 @@
 // A plugin's status line above the composer (docs/design/native-plugins.md §3.3
 // `composer.strip`): the plugin's icon and one short line bound to its live
-// data — 「本对话 ¥0.42 · 今日 ¥3.1」. One at a time; several plugins take turns. It
+// data — "This chat ¥0.42 · today ¥3.1". One at a time; several plugins take turns. It
 // gives way to the activity strip while a reply is generating (same place,
 // never both).
 

@@ -14,18 +14,18 @@ import 'squircle.dart';
 import 'surfaces.dart';
 import 'typography.dart';
 
-/// 浅色主题。
+/// Light theme.
 ///
-/// [accent] 是整套配色(强调色 + 中性色的色调),见 `accent.dart`。
-/// [glassBlur] 关掉后所有玻璃改用近乎不透明的填充(设置里的"减少透明效果",
-/// 或性能探测判定为低端机时)。
+/// [accent] is the whole palette (accent plus the neutral tint) — see `accent.dart`.
+/// Turning [glassBlur] off makes every glass use a near-opaque fill (the "减少透明效果"
+/// setting, or when the performance probe judges the device low-end).
 ///
 /// [glyphLocale] pins the locale CJK glyphs are picked by (the English UI
 /// passes zh_CN so Chinese content keeps Chinese shapes).
 ///
-/// [instantPages] 让二级页的推入 / 退出不花时间(动画开关关掉时)。
+/// [instantPages] makes secondary pages push / pop with no duration (when the animation switch is off).
 ///
-/// [fluid] 灵动档:默认水波换成按压光晕([AppInkGlow])。
+/// [fluid] is the fluid-motion mode: the default ripple becomes a press glow ([AppInkGlow]).
 ThemeData buildLightTheme({
   AppAccent accent = AppAccent.mist,
   bool glassBlur = true,
@@ -42,7 +42,7 @@ ThemeData buildLightTheme({
   fluid,
 );
 
-/// 深色主题。
+/// Dark theme.
 ThemeData buildDarkTheme({
   AppAccent accent = AppAccent.mist,
   bool glassBlur = true,
@@ -59,11 +59,11 @@ ThemeData buildDarkTheme({
   fluid,
 );
 
-/// 边到边(edge-to-edge)的系统栏样式:状态栏、导航栏全透明,图标随明暗。
+/// Edge-to-edge system bar style: status and navigation bars fully transparent, icons follow the brightness.
 ///
-/// 自绘顶栏的页面(聊天页没有 AppBar)要自己包一层
+/// Pages that draw their own top bar (the chat page has no AppBar) must wrap themselves in
 /// `AnnotatedRegion<SystemUiOverlayStyle>(value: dshSystemOverlay(...))`,
-/// 并在 `main()` 里 `SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge)`。
+/// and `main()` must call `SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge)`.
 SystemUiOverlayStyle dshSystemOverlay(Brightness brightness) {
   final dark = brightness == Brightness.dark;
   return SystemUiOverlayStyle(
@@ -78,14 +78,14 @@ SystemUiOverlayStyle dshSystemOverlay(Brightness brightness) {
   );
 }
 
-/// 雾蓝玻璃主题。三条铁律:
+/// The mist-blue glass theme. Three iron rules:
 ///
-/// 1. **层次靠材质,不靠阴影。** 页面是渐变,浮在内容上的(顶栏、输入条、
-///    弹层)是真模糊玻璃,躺在页面上的(卡片、胶囊)是半透明白;M3 的
-///    elevation 一律 0,`surfaceTint` 透明。唯一的投影在玻璃外沿,且很淡。
-/// 2. **细线是骨架。** 卡片、Chip、输入框、对话框都有 0.5–1px 的线;
-///    它比阴影安静,在浅色雾蓝底上又比纯色块清楚。
-/// 3. **连续圆角。** 全部走 `AppShape` 的五档 + 胶囊,不手写半径。
+/// 1. **Hierarchy comes from material, not shadow.** The page is a gradient; things floating
+///    over content (top bar, composer, sheets) are real blurred glass, things lying on the
+///    page (cards, capsules) are translucent white; M3 elevation is always 0 and `surfaceTint` transparent. The only shadow is on the glass rim, and faint.
+/// 2. **Hairlines are the skeleton.** Cards, Chips, fields and dialogs all carry a 0.5–1px line;
+///    it is quieter than shadow and, on a light mist-blue base, clearer than a solid block.
+/// 3. **Continuous corners.** Everything goes through `AppShape`'s five steps + pill; never hand-write radii.
 ThemeData _build(
   ColorScheme scheme,
   DshColors colors,
@@ -95,8 +95,8 @@ ThemeData _build(
   bool instantPages,
   bool fluid,
 ) {
-  // iOS 式水平推入,上一页左移变暗;系统预测返回与边缘右滑都跟手
-  // (见 page_transitions.dart)。全平台同一套,二级页的观感只此一处。
+  // iOS-style horizontal push, the outgoing page sliding left and dimming; the system predictive back and the edge
+  // right-swipe both track the finger (see page_transitions.dart). One builder for every platform — secondary pages' look is decided here alone.
   final pages = instantPages
       ? const AppPageTransitionsBuilder.instant()
       : fluid
@@ -106,8 +106,8 @@ ThemeData _build(
 
   final isDark = scheme.brightness == Brightness.dark;
   final hairline = scheme.outlineVariant;
-  // 开关的圆钮:平时是一颗浅色钮。主色本身就近白(石墨的深色)时,开态轨道
-  // 和浅色钮糊成一片,开态换成主色上的深墨钮,勾换回主色。
+  // Switch knob: normally one light knob. When the primary itself is near-white (graphite in dark mode) the on-state
+  // track and a light knob blur into one, so on uses a dark ink knob on the primary and puts the primary back in the check.
   final lightKnob = isDark ? scheme.onSurface : Colors.white;
   final knobBlends = contrastRatio(lightKnob, scheme.primary) < 1.6;
   final onKnob = knobBlends ? scheme.onPrimary : lightKnob;
@@ -116,9 +116,9 @@ ThemeData _build(
     AppType.textTheme,
     glyphLocale,
   ).apply(bodyColor: scheme.onSurface, displayColor: scheme.onSurface);
-  // 输入框 / Chip 的填充:与卡片玻璃同值,保证"表单是长在页面上的"。
+  // Field / Chip fill: the same value as the card glass, so forms read as growing out of the page.
   final fieldFill = surfaces.card.fallbackFill;
-  // 弹出层(对话框、菜单)用不透明面:它们压在遮罩上,不需要也不应该透。
+  // Popups (dialogs, menus) use an opaque surface: they sit on a scrim — no need to see through, and they shouldn't.
   final popupFill = isDark ? scheme.surfaceContainerHigh : scheme.surfaceContainerLowest;
 
   return ThemeData(
@@ -130,7 +130,7 @@ ThemeData _build(
     extensions: [colors, surfaces],
     pageTransitionsTheme: transitions,
     visualDensity: VisualDensity.standard,
-    // 水波保留但更含蓄。
+    // Ripples stay, but more restrained.
     splashFactory: fluid ? AppInkGlow.splashFactory : null,
     splashColor: scheme.primary.withValues(alpha: 0.08),
     highlightColor: scheme.primary.withValues(alpha: 0.04),
@@ -138,7 +138,7 @@ ThemeData _build(
     focusColor: scheme.primary.withValues(alpha: 0.12),
     iconTheme: IconThemeData(color: scheme.onSurfaceVariant, size: 22),
 
-    // 顶栏透明:页面背景就是顶栏背景,需要分隔时由玻璃或细线承担。
+    // Top bar transparent: the page background is the app bar's background; glass or a hairline provides separation where needed.
     appBarTheme: AppBarThemeData(
       backgroundColor: Colors.transparent,
       foregroundColor: scheme.onSurface,
@@ -150,7 +150,7 @@ ThemeData _build(
       systemOverlayStyle: dshSystemOverlay(scheme.brightness),
     ),
 
-    // 卡片 = 半透明白玻璃(不模糊)+ 0.5px 细线 + 零阴影。
+    // Card = translucent white glass (no blur) + 0.5px hairline + zero shadow.
     cardTheme: CardThemeData(
       color: surfaces.card.fill,
       elevation: 0,
@@ -159,8 +159,8 @@ ThemeData _build(
       shape: AppShape.outlined(hairline, width: 0.5),
     ),
 
-    // 输入框:长在页面上的玻璃片。描边用 outline(≥ 3:1,WCAG 1.4.11),
-    // 聚焦时换主色。
+    // Text field: a sliver of glass growing out of the page. Stroke uses outline (≥ 3:1, WCAG 1.4.11),
+    // switching to the primary on focus.
     inputDecorationTheme: InputDecorationThemeData(
       filled: true,
       fillColor: fieldFill,
@@ -197,7 +197,7 @@ ThemeData _build(
       suffixIconColor: scheme.onSurfaceVariant,
     ),
 
-    // 主按钮:主色实心 + 连续圆角(不是胶囊)。按下换更深一档,不只靠水波。
+    // Primary button: solid primary + continuous corner (not a pill). Pressing deepens one step, not just a ripple.
     filledButtonTheme: FilledButtonThemeData(
       style:
           // No background here: a theme colour would override every
@@ -224,8 +224,8 @@ ThemeData _build(
       ),
     ),
 
-    // 次按钮:描边是 outline 的 40%,卡片上、弹层上都看得见,又比主按钮安静
-    // (发丝色在浅色弹层上和底色几乎一样)。禁用时描边减半。
+    // Secondary button: the stroke is 40% of outline — visible on cards and popups alike, yet quieter
+    // than the primary (the hairline colour nearly matches a light popup's fill). Disabled halves the stroke.
     outlinedButtonTheme: OutlinedButtonThemeData(
       style:
           OutlinedButton.styleFrom(
@@ -289,7 +289,7 @@ ThemeData _build(
       constraints: const BoxConstraints(minHeight: 48),
     ),
 
-    // 角标默认主色:默认的 error 红会让"当前"读起来像出错。
+    // Badge defaults to the primary: the default error red makes "current" read like a failure.
     badgeTheme: BadgeThemeData(
       backgroundColor: scheme.primary,
       textColor: scheme.onPrimary,
@@ -298,7 +298,7 @@ ThemeData _build(
       textStyle: AppType.tabular(textTheme.labelSmall!.copyWith(fontWeight: FontWeight.w600)),
     ),
 
-    // 折叠面板不画框:它通常已经在一张卡里。
+    // Expansion tiles draw no frame: they usually already sit inside a card.
     expansionTileTheme: ExpansionTileThemeData(
       shape: const Border(),
       collapsedShape: const Border(),
@@ -322,8 +322,8 @@ ThemeData _build(
       contentTextStyle: textTheme.bodyMedium?.copyWith(color: scheme.onSurfaceVariant),
     ),
 
-    // 默认弹层是不透明的;要玻璃弹层用 common/app_sheet.dart 的
-    // `showAppSheet(glass: true)`(背景透明 + GlassSurface)。
+    // Sheets are opaque by default; for a glass sheet use `showAppSheet(glass: true)` from
+    // common/app_sheet.dart (transparent background + GlassSurface).
     bottomSheetTheme: BottomSheetThemeData(
       backgroundColor: surfaces.sheet.fallbackFill,
       modalBackgroundColor: surfaces.sheet.fallbackFill,
@@ -350,7 +350,7 @@ ThemeData _build(
 
     dividerTheme: DividerThemeData(color: hairline, thickness: 0.5, space: 1),
 
-    // 2024 版 M3 进度条(轨道留缝 + 端点),主色细条。
+    // The 2024 M3 progress indicator (gapped track + end caps), a thin primary bar.
     progressIndicatorTheme: ProgressIndicatorThemeData(
       color: scheme.primary,
       linearTrackColor: scheme.primary.withValues(alpha: 0.16),
@@ -402,7 +402,7 @@ ThemeData _build(
       shape: AppShape.bubble,
     ),
 
-    // 抽屉默认不透明兜底;会话抽屉自己用 sheet 玻璃画。
+    // Drawer defaults to the opaque fallback; the session drawer paints itself with sheet glass.
     drawerTheme: DrawerThemeData(
       backgroundColor: surfaces.sheet.fallbackFill,
       surfaceTintColor: Colors.transparent,
@@ -417,7 +417,7 @@ ThemeData _build(
       ),
     ),
 
-    // 底栏透明:外壳把它放进 chrome 玻璃里。
+    // Bottom bar transparent: the shell seats it inside chrome glass.
     navigationBarTheme: NavigationBarThemeData(
       backgroundColor: Colors.transparent,
       surfaceTintColor: Colors.transparent,
@@ -450,11 +450,11 @@ ThemeData _build(
       unselectedLabelStyle: textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w400),
     ),
 
-    // iOS 式开关:两态都是同一颗浅色圆钮;开 = 主色轨道,关 = 看得见的
-    // 中性轨道。禁用不另起配色,整颗淡下去,和"关"一眼分开。
+    // iOS-style switch: both states share one light round knob; on = primary track, off = a visible
+    // neutral track. Disabled starts no new palette — the whole control fades, set instantly apart from "off".
     switchTheme: SwitchThemeData(
-      // 关态也给一颗透明图标:M3 只有带图标时才把关态圆钮画得和开态一样大。
-      // 勾用主色的深一档(深色主题的 primary 太浅,在浅色圆钮上看不清)。
+      // The off state gets a transparent icon too: M3 only draws the off knob as big as the on one when there is an icon.
+      // The check uses one step deeper than the primary (the dark theme's primary is too light on a pale knob).
       thumbIcon: WidgetStateProperty.resolveWith(
         (states) => Icon(
           AppIcons.selected,
@@ -470,7 +470,7 @@ ThemeData _build(
         if (states.contains(WidgetState.selected)) {
           return scheme.primary.withValues(alpha: disabled ? 0.38 : 1);
         }
-        // 关态轨道在卡片上约 1.5:1:看得出是个开关,不像禁用。
+        // The off track is about 1.5:1 on a card: recognisable as a switch, not like a disabled one.
         return scheme.onSurface.withValues(alpha: disabled ? 0.09 : 0.22);
       }),
       thumbColor: WidgetStateProperty.resolveWith((states) {

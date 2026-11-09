@@ -1,6 +1,6 @@
-// The ways into 「分享」 (share_panel.dart): a reply (the key under it, the
+// The ways into "Share" (share_panel.dart): a reply (the key under it, the
 // long-press menu, a reply in a replay), a whole conversation (the drawer), a
-// delivered file; and the plugin card the plugin share sheet offers as 「图片」.
+// delivered file; and the plugin card the plugin share sheet offers as "Image".
 
 import 'dart:convert';
 
@@ -22,7 +22,7 @@ import '../session/workspace_files.dart' show formatBytes;
 import 'share_content.dart';
 import 'share_panel.dart';
 
-/// 「分享」 on a reply: the panel at 「这条回复」. A reply in a replayed
+/// "Share" on a reply: the panel at "This reply". A reply in a replayed
 /// conversation shares from the replay, not from the chat that happens to be
 /// open.
 Future<void> shareReply(BuildContext context, AssistantChatItem reply) async {
@@ -49,7 +49,7 @@ Future<void> shareReply(BuildContext context, AssistantChatItem reply) async {
   return showSharePanel(context, ConversationSubject(sessionId: sessionId, reply: reply));
 }
 
-/// 「分享」 on a conversation (the drawer): the panel at 「整段对话」. Works for
+/// "Share" on a conversation (the drawer): the panel at "Whole conversation". Works for
 /// a conversation that is not open yet: the panel waits for it.
 Future<void> shareConversation(BuildContext context, String sessionId) =>
     showSharePanel(context, ConversationSubject(sessionId: sessionId), scope: ShareScope.whole);
@@ -60,7 +60,7 @@ String? _sessionTitle(ProviderContainer container, String sessionId) => containe
     ? container.read(sessionsProvider).value?.where((s) => s.sessionId == sessionId).firstOrNull?.projections.title
     : null;
 
-/// 「分享」 on a delivered file: the panel with the file's card (the picture
+/// "Share" on a delivered file: the panel with the file's card (the picture
 /// for images, the first lines for Markdown and text, otherwise the file
 /// tile) and the file itself. The panel opens at once with the tile; the
 /// picture / lines arrive when fetched.
@@ -123,7 +123,7 @@ Future<ShareContent?> _artifactExtras(
   }
 }
 
-/// A market plugin as a card: what the plugin share sheet's 「图片」 draws.
+/// A market plugin as a card: what the plugin share sheet's "Image" draws.
 ShareContent pluginCardContent(BuildContext context, MarketEntry entry, {String? webLink}) {
   final plugin = entry.plugin;
   final stars = plugin.sortKeys['stars'];

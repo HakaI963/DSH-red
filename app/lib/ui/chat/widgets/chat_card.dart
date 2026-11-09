@@ -7,31 +7,31 @@ import 'package:flutter/material.dart';
 import '../../theme/app_icons.dart';
 import '../../theme/theme.dart';
 
-/// 卡片的语气:决定标题图标的颜色和外圈细线。
+/// The card's register: decides the title icon's color and the outer hairline.
 enum ChatCardTone {
-  /// 改动卡、产物卡:中性,标题图标次级色。
+  /// Change card, artifact card: neutral; the title icon in secondary color.
   neutral,
 
-  /// 审批卡:等你放行。警示色图标 + 警示色细线,醒目但不靠大色块。
+  /// Approval card: waiting for you to let it through. Warning-colored icon + warning hairline — loud without big red blocks.
   attention,
 
-  /// 提问卡:等你回答。信息色图标 + 信息色细线。
+  /// Question card: waiting for your answer. Info-colored icon + info hairline.
   ask,
 }
 
-/// 消息流里的卡片:**同一套解剖**。
+/// Cards in the message stream: **one shared anatomy**.
 ///
 /// ```
-/// ┌──────────────────────────────────┐  card 玻璃,圆角 20
-/// │ ▢ 标题                      尾注 │  上 16,图标 20 + 8 + titleSmall
-/// │                                  │  标题下 8
-/// │ 内容(行之间不画线,靠行高)       │  左右 16
-/// │ 底栏 / 按钮                      │
+/// ┌──────────────────────────────────┐  card glass, radius 20
+/// │ ▢ Title                    trailer │  top 16, icon 20 + 8 + titleSmall
+/// │                                  │  8 below the title
+/// │ content (no row dividers; row height does it) │  sides 16
+/// │ footer / buttons                     │
 /// └──────────────────────────────────┘
 /// ```
 ///
-/// [children] 自己管左右 16 与行高;整行可点的行(文件、产物、底栏)直接
-/// 用 `InkWell` 铺满卡宽,水波按卡片圆角裁剪。
+/// [children] manage their own 16 sides and row heights; full-row tappable lines (files, artifacts, footer) use
+/// an `InkWell` spanning the card width, ripple clipped to the card's corners.
 class ChatCard extends StatelessWidget {
   const ChatCard({
     super.key,
@@ -50,10 +50,10 @@ class ChatCard extends StatelessWidget {
   final List<Widget> children;
   final int titleMaxLines;
 
-  /// 卡片四周与标题行的留白。
+  /// The card's surrounding and title-row insets.
   static const inset = 16.0;
 
-  /// 语气色(标题图标、外圈细线)。
+  /// The register color (title icon, outer hairline).
   static Color toneColor(BuildContext context, ChatCardTone tone) {
     final dsh = DshColors.of(context);
     return switch (tone) {
@@ -111,7 +111,7 @@ class ChatCard extends StatelessWidget {
   }
 }
 
-/// 卡片的底栏:整行可点,左边主色文字,右边可选的说明 + 箭头。44 高。
+/// The card footer: full row tappable, accent text at left, optional note + arrow at right. 44 tall.
 class ChatCardFooter extends StatelessWidget {
   const ChatCardFooter({
     super.key,
@@ -130,10 +130,10 @@ class ChatCardFooter extends StatelessWidget {
   final IconData icon;
   final String? semanticsLabel;
 
-  /// 展开 / 收起类的底栏传当前状态。
+  /// Expand / collapse footers pass the current state.
   final bool? expanded;
 
-  /// 图标的旋转(展开类底栏:收起 0,展开 0.5),变化时平滑转过去。
+  /// Icon rotation (expand-style footer: 0 folded, 0.5 expanded), turning smoothly on change.
   final double iconTurns;
 
   @override

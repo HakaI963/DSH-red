@@ -28,28 +28,28 @@ import 'math_syntax.dart';
 import 'stream_repair.dart';
 import 'table_syntax.dart';
 
-/// 流式光标的占位符(私用区码位)。拼在正文末尾,由 [InlinePattern] 换成
-/// 光标 —— 这样光标跟着最后一段文字走,而不是孤零零掉到正文下面。
+/// The streaming cursor's placeholder (a private-use-area code point). Appended to the body's end and turned into the
+/// cursor by [InlinePattern] — so the cursor rides along with the last stretch of text instead of dropping orphaned below the body.
 const _cursorSentinel = '\uE000';
 
-/// 收进 `<details>` 之外,模型常写的 HTML 都按 gpt_markdown 的默认表
-/// 渲染(`<br>` 换行、`<sub>` / `<sup>`、`<kbd>`、`<u>`、`<mark>`…),
-/// 不认识的标签原样显示;`<details>` 换成可折叠的一块。
+/// Kept outside `<details>`: the HTML models commonly write elsewhere renders per gpt_markdown's default
+/// table (`<br>` breaks, `<sub>` / `<sup>`, `<kbd>`, `<u>`, `<mark>`…);
+/// unrecognized tags show verbatim; `<details>` becomes a collapsible block.
 final Map<String, HtmlTag?> _htmlTags = {
   'details': const HtmlTag.block(MarkdownDisclosure.build),
   'summary': const HtmlTag.block(),
 };
 
-/// 助手正文的 Markdown 渲染。
+/// Markdown rendering for assistant bodies.
 ///
-/// - 正文样式与用户气泡同源([AppType.chatBody]),流式与完成态不跳字号;
-/// - 围栏代码交给 [CodeBlock](Mist 高亮 + 复制);
-/// - 行内代码是画在文字下面的小井(gpt_markdown 1.4 的 chip),可换行、可选中;
-/// - 公式:`$…$` / `\(…\)` 行内、`$$…$$` / `\[…\]` 成块([MarkdownMath]),
-///   价格(`$5 和 $10`)不当公式([normalizeMath]);
-/// - 图片:工作区文件、网页、`data:` 都能显示([MarkdownImage]);
-/// - [streaming] 时修补正在生成的末尾([repairStreamingMarkdown]),并在
-///   最后一段末尾放呼吸光标。
+/// - Body type shares its source with the user bubble ([AppType.chatBody]); streaming and final never jump in size;
+/// - Fenced code goes to [CodeBlock] (Mist highlighting + copy);
+/// - Inline code is a tiny well painted under the text (gpt_markdown 1.4's chip); wrappable and selectable;
+/// - Math: `$…$` / `\(…\)` inline, `$$…$$` / `\[…\]` block ([MarkdownMath]);
+///   prices (`$5 and $10`) are not math ([normalizeMath]);
+/// - Images: workspace files, web URLs, `data:` all render ([MarkdownImage]);
+/// - while [streaming], patch the still-growing tail ([repairStreamingMarkdown]) and
+///   put a breathing cursor at the last span's end.
 class MarkdownBody extends StatefulWidget {
   const MarkdownBody({
     super.key,
@@ -72,23 +72,23 @@ class MarkdownBody extends StatefulWidget {
   final bool reveal;
   final bool selectable;
 
-  /// 次级排版(思考过程):小一号、次级文字色,标题也不抢眼。
+  /// Secondary typography (the thinking process): one size smaller, secondary text color, headings stay unobtrusive.
   final bool secondary;
 
-  /// 助手回复:模型把 `dsh-ui` 的 JSON 裸着写进正文时,也当成视图画
-  /// (见 [fenceBareDshUiViews])。别的 Markdown(文档、说明页)不开。
+  /// Assistant replies: when the model writes `dsh-ui` JSON bare into the body, treat it as a view too
+  /// (see [fenceBareDshUiViews]). Other Markdown (docs, explainer pages) doesn't get this.
   final bool repairBareViews;
 
-  /// 表格单列最宽多少;更长的单元格在列内换行,而不是把整表拉得很长。
+  /// Max width of a single table column; longer cells wrap inside their column rather than stretching the whole table out.
   static const _maxColumnWidth = 260.0;
 
   static final _themes = <String, Expando<GptMarkdownThemeData>>{};
   static final _secondaryThemes = <String, Expando<GptMarkdownThemeData>>{};
 
-  /// 每个 ThemeData 只建一次(工厂内部会构造整套 ThemeData,不便宜)。
+  /// Built once per ThemeData (the factory constructs a whole ThemeData internally — not cheap).
   ///
-  /// 缓存按语言 + 表格底色的组合分开:同一页里"跟随主题"和"无底色"是两份
-  /// 主题,换设置后不必把旧的丢掉再重建。
+  /// The cache keys on the language + table-background combination: "follow theme" and "no background" are two
+  /// themes on the same page, so changing the setting shouldn't discard and rebuild the old one.
   static GptMarkdownThemeData _themeFor(ThemeData theme, bool secondary, L10n l10n, TableTint tint) {
     final cache = (secondary ? _secondaryThemes : _themes).putIfAbsent(
       '${l10n.localeName}|${tint.name}',
@@ -105,8 +105,8 @@ class MarkdownBody extends StatefulWidget {
   }) {
     final colors = theme.colorScheme;
     final dsh = theme.extension<DshColors>()!;
-    // 表格底色三档只在两个填充上不同;隔行比表头再淡一档,能看出条带又不
-    // 抢文字。
+    // The three table-background tiers differ only in two fills; striping sits one notch paler than the header — bands show, yet
+    // doesn't fight the text.
     final tableFills = tableTintFills(
       tint,
       headerColor: dsh.codeWellHeader,
@@ -157,11 +157,11 @@ class MarkdownBody extends StatefulWidget {
           bulletSize: 5,
           markerTextStyle: TextStyle(color: colors.onSurfaceVariant),
         ),
-        // GitHub 提示块:状态色的浅底 + 左侧色条,标题用中文。
+        // GitHub alert blocks: pale fill in the status color + a left color bar, titles in localized words.
         alert: AlertStyle(
           borderRadius: const Radius.circular(AppShape.sm),
           padding: const EdgeInsetsDirectional.fromSTEB(12, 10, 14, 10),
-          // 和段落同一个块间距,不再额外加外边距。
+          // Same block spacing as paragraphs; no extra margin.
           margin: EdgeInsets.zero,
           titleStyle: const TextStyle(fontWeight: FontWeight.w600),
           titleGap: 4,
@@ -171,7 +171,7 @@ class MarkdownBody extends StatefulWidget {
           warning: AlertStyle(title: l10n.chatAlertWarning, color: dsh.warning, icon: AppIcons.warning),
           caution: AlertStyle(title: l10n.chatAlertCaution, color: dsh.danger, icon: AppIcons.caution),
         ),
-        // `<mark>`:荧光笔一样的暖黄底。
+        // `<mark>`: a warm highlighter-yellow ground.
         highlight: HighlightStyle(backgroundColor: dsh.warningContainer, color: dsh.onWarningContainer),
         link: LinkStyle(
           color: colors.primary,
@@ -180,16 +180,16 @@ class MarkdownBody extends StatefulWidget {
           decorationThickness: 0.6,
         ),
         hr: HrStyle(thickness: 0.5, color: colors.outlineVariant),
-        // 表格:细线网格、方角、表头加粗;列宽随内容,但单列
-        // 不超过 [_maxColumnWidth](长文字在列内换行),整表放不下时横向滚动。
-        // 方角:表头与隔行的底色是矩形填充,没有跟着圆角裁剪(gpt_markdown
-        // 1.4.0),圆角会让四角露出方形色块;上游修好后可换回 AppShape.md。
+        // Tables: fine line grid, square corners, bold header; column widths follow content but a single column
+        // never exceeds [_maxColumnWidth] (long text wraps inside the cell); when the whole table doesn't fit it scrolls horizontally.
+        // Square corners: header and striped-row fills are rectangular and aren't clipped to a radius (gpt_markdown
+        // 1.4.0); rounded corners would expose square color blobs at the four corners; switch back to AppShape.md once upstream fixes it.
         table: TableStyle(
-          // 比代码井的描边重一点:深色下行线也要看得见。
+          // A touch heavier than the code well's stroke: grid lines must stay visible in dark mode too.
           borderColor: colors.onSurface.withValues(alpha: theme.brightness == Brightness.dark ? 0.18 : 0.14),
           borderWidth: 0.5,
           borderRadius: Radius.zero,
-          // 三档底色的差别只在这两个填充(设置 → 界面 → 表格底色)。
+          // The three background tiers differ only in these two fills (Settings → Interface → Table background).
           headerBackground: tableFills.header,
           rowStripeColor: tableFills.stripe,
           cellPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
@@ -212,7 +212,7 @@ class MarkdownBody extends StatefulWidget {
       alignment: PlaceholderAlignment.middle,
       child: Padding(
         padding: const EdgeInsets.only(left: 2),
-        // 光标自己一层:呼吸动画只重绘这 2.5px,不重绘整段正文。
+        // The cursor paints on its own layer: the breathing animation repaints only these 2.5px, not the whole body.
         child: RepaintBoundary(child: StreamingCursor(height: lineHeight * 0.66)),
       ),
     );
@@ -232,7 +232,7 @@ class MarkdownBody extends StatefulWidget {
       return;
     }
     final scope = MarkdownImageScope.maybeOf(context);
-    // `[官网](example.com)`: a site written without https, unless the
+    // `[site](example.com)`: a site written without https, unless the
     // workspace really has a file by that name.
     final site = bareDomainLink(url);
     // Detached share/replay text must not borrow an unrelated active session.
@@ -462,18 +462,18 @@ class MarkdownBody extends StatefulWidget {
     }
     return CodeBlock(
       code: code.replaceAll(_cursorSentinel, ''),
-      // 围栏信息串可能带属性(```json title="…"),只取第一个 token。
+      // The fence info string may carry attributes (```json title="…"); take only the first token.
       language: language,
       replyActions: true,
     );
   }
 
-  /// 标题是读屏里能逐个跳转的 header 节点。
+  /// Headings are header nodes that screen readers can jump between one by one.
   static Widget _headingBuilder(BuildContext context, int level, Widget content, HeadingStyle style) =>
       Semantics(header: true, container: true, child: content);
 
-  /// 任务清单 `- [ ]` / `- [x]`:只读的方框图标。包里默认用 Material 的
-  /// [Checkbox],它要求祖先里有 Material,聊天列表里没有,会报错并溢出。
+  /// Task lists `- [ ]` / `- [x]`: read-only square-box icons. The package defaults to Material's
+  /// [Checkbox], which demands a Material ancestor the chat list lacks — it would error and overflow.
   static Widget _checkboxBuilder(BuildContext context, bool checked, Widget content, CheckboxStyle style) {
     final colors = Theme.of(context).colorScheme;
     // TaskBox: a bullet item that opens with this box draws no bullet.
@@ -591,11 +591,11 @@ class _MarkdownBodyState extends State<MarkdownBody> {
     );
   }
 
-  /// 这棵树里有没有 ProviderScope。只在依赖变化时向上找一次 —— 正文随流式
-  /// 每 32ms 重建一次，不必每次都走一遍 InheritedWidget 的查找。
+  /// Whether this tree contains a ProviderScope. Walks up only once when dependencies change — the body rebuilds
+  /// every 32ms while streaming, so no need to run the InheritedWidget lookup each time.
   ///
-  /// ProviderScope 挂在应用根上，装好之后不会中途消失，所以缓存到下一次
-  /// didChangeDependencies 为止是安全的。
+  /// ProviderScope sits at the app root and never vanishes once installed, so caching until the next
+  /// didChangeDependencies is safe.
   bool _scoped = true;
 
   /// Finished code blocks of a revealed reply: see [_RevealStreaming.blocks].
@@ -627,8 +627,8 @@ class _MarkdownBodyState extends State<MarkdownBody> {
         : AppType.chatBody(context, color: theme.colorScheme.onSurface);
     final source = _source;
 
-    // 表格底色是用户设置，只有主题跟着它变；正文 widget 本身保持同一个实例，
-    // 切设置时不让 gpt_markdown 重新解析一遍。
+    // The table background is a user setting; only the theme tracks it. The body widget itself stays one instance,
+    // so toggling the setting doesn't make gpt_markdown reparse everything.
     final text = GptMarkdown(
       source,
       style: body,
@@ -657,11 +657,11 @@ class _MarkdownBodyState extends State<MarkdownBody> {
     Widget withTint(TableTint tint) =>
         GptMarkdownTheme(gptThemeData: MarkdownBody._themeFor(theme, widget.secondary, l10n, tint), child: text);
 
-    // Golden 和几何测试不套 ProviderScope:那时按默认那一档画。
+    // Goldens and geometry tests don't wrap a ProviderScope: then it paints at the default tier.
     Widget markdown = _scoped
         ? Consumer(builder: (context, ref, _) => withTint(ref.watch(tableTintProvider)))
         : withTint(TableTint.follow);
-    // 表格、成块公式横向放不下时,两端淡出提示还能横滑。
+    // When tables or block math don't fit horizontally, edge fade-outs hint that more can be panned.
     markdown = ScrollConfiguration(behavior: const EdgeFadeScrollBehavior(), child: markdown);
     if (widget.reveal) markdown = _RevealStreaming(streaming: widget.streaming, blocks: _blocks, child: markdown);
     if (widget.selectable) markdown = SelectionArea(child: markdown);
@@ -669,7 +669,7 @@ class _MarkdownBodyState extends State<MarkdownBody> {
   }
 }
 
-/// 当前子树里有没有 ProviderScope;没有就按默认表格底色画。
+/// Whether the current subtree has a ProviderScope; without one, paint the default table background.
 bool _hasProviderScope(BuildContext context) {
   try {
     ProviderScope.containerOf(context, listen: false);

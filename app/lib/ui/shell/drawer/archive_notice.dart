@@ -8,10 +8,10 @@ import '../../../state/hosts_state.dart';
 import '../../common/brief_notice.dart';
 import '../../common/undo_notice_window.dart';
 
-/// Both drawer entry points: hides [ids] at once and shows [text] (「已归档…」)
-/// with 撤销 for the undo window; the Host archives them when it ends. Only
+/// Both drawer entry points: hides [ids] at once and shows [text] ("Archived…")
+/// with Undo for the undo window; the Host archives them when it ends. Only
 /// what makes [text] untrue is reported afterwards: rows that could not be
-/// archived, or a plan dropped without 撤销 before anything was sent.
+/// archived, or a plan dropped without Undo before anything was sent.
 Future<void> scheduleArchiveNotice(BuildContext context, WidgetRef ref, List<String> ids, String text) async {
   final messenger = ScaffoldMessenger.maybeOf(context);
   if (messenger == null) return;
@@ -81,7 +81,7 @@ Future<void> scheduleArchiveNotice(BuildContext context, WidgetRef ref, List<Str
     final result = await pending.done;
     final String failure;
     if (result == null) {
-      // 撤销 is the user's own doing; once sending started, the reloaded list
+      // Undo is the user's own doing; once sending started, the reloaded list
       // tells what the Host did.
       if (pending.undone || pending.sent) return;
       failure = l10n.shellArchiveFailed;

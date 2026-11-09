@@ -35,7 +35,7 @@ mixin _RefreshOnResume<T extends ConsumerStatefulWidget> on ConsumerState<T> {
   }
 }
 
-/// 设置 → 对话 → 通知: the current state at a glance; opens [NotificationSettingsPage].
+/// Settings → Chats → Notifications: the current state at a glance; opens [NotificationSettingsPage].
 class NotificationSettingsTile extends ConsumerStatefulWidget {
   const NotificationSettingsTile({super.key, this.tint = 3});
 
@@ -164,7 +164,7 @@ class _NotificationSettingsPageState extends ConsumerState<NotificationSettingsP
     final prefs = ref.watch(notifyPrefsProvider);
     final notifier = ref.read(notifyPrefsProvider.notifier);
     final system = ref.watch(notifySystemStatusProvider).value ?? const NotifySystemStatus();
-    // Unknown until the phone answers: no 「不支持」 flashing up meanwhile.
+    // Unknown until the phone answers: no "Not supported" flashing up meanwhile.
     final live = ref.watch(liveSystemStatusProvider).value;
     final liveSupported = live?.supported ?? true;
     final on = prefs.enabled;

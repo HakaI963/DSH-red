@@ -25,7 +25,7 @@ import 'restricted_settings_guide.dart' show RomFamily;
 const shizukuDownloadUrl = 'https://shizuku.rikka.app/download/';
 
 extension PhoneChannelLabel on PhonePrivilegedMode {
-  /// What 不打扰模式 calls this channel.
+  /// What Do Not Disturb mode calls this channel.
   String label(L10n l10n) => switch (this) {
     PhonePrivilegedMode.off => l10n.phoneDisabled,
     PhonePrivilegedMode.shizuku => 'Shizuku',
@@ -35,7 +35,7 @@ extension PhoneChannelLabel on PhonePrivilegedMode {
   };
 }
 
-/// One-line state of 不打扰模式 for the row on the main page.
+/// One-line state of Do Not Disturb mode for the row on the main page.
 String dndSummary(PhoneBackgroundStatus bg) {
   final l10n = appL10n;
   if (!bg.androidOk) return l10n.phoneDndRequiresAndroid;
@@ -53,7 +53,7 @@ const _groupMargin = EdgeInsets.fromLTRB(16, 12, 16, 12);
 /// The Shizuku app (or a binder it serves), not Sui speaking its interface.
 bool _shizukuInstalled(ShizukuStatus s) => s.provider == 'shizuku' || (s.appInstalled ?? s.installed);
 
-/// 不打扰模式: Agent works on a virtual display through a privileged channel —
+/// Do Not Disturb mode: the Agent works on a virtual display through a privileged channel —
 /// Shizuku, Sui, root or the app's own wireless-debugging connection — that
 /// the person picks here. Advanced, off by default; the page says plainly what
 /// each channel needs and why one isn't working.
@@ -133,7 +133,7 @@ class _PhoneDndPageState extends ConsumerState<PhoneDndPage> {
     if (!_ready || _resourceBlocked) return;
     if (mode == PhonePrivilegedMode.root && !await confirmRisk(context, RiskNotices.rootChannel)) return;
     if (!mounted) return;
-    // Folded back once it works: the row says 使用中.
+    // Folded back once it works: the row says In use.
     if (await _run(() => _phone.setPrivilegedMode(mode), done: context.l10n.phoneDndEnabled) && mounted) {
       setState(() => _open = null);
     }
@@ -402,7 +402,7 @@ class _PhoneDndPageState extends ConsumerState<PhoneDndPage> {
     );
   }
 
-  /// 保持 for the channel in use, off until the person turns it on: this
+  /// Keep-alive for the channel in use, off until the person turns it on: this
   /// switch is the only thing that writes it. The line under it says what
   /// keeping means, or while on and not connected, how reconnecting goes.
   Widget _keepRow(PhonePrivilegedMode mode, PhonePrivilegedKeepStatus keep) {
@@ -411,7 +411,7 @@ class _PhoneDndPageState extends ConsumerState<PhoneDndPage> {
     void toggle(bool on) => unawaited(_run(() => _phone.setBackgroundKeep(mode, on)));
     return MergeSemantics(
       child: ListPageRow(
-        // Lined up with 正在使用 above: one channel, one card.
+        // Lined up with In use above: one channel, one card.
         leading: const SizedBox(),
         title: l10n.phoneKeepTitle(mode.name),
         titleMaxLines: 2,
@@ -480,7 +480,7 @@ class _PhoneDndPageState extends ConsumerState<PhoneDndPage> {
   }
 
   /// A channel's state word: the accent for the one in use, green for one that
-  /// would work now, quiet otherwise. Root not tried yet is 尚未检查, never a
+  /// would work now, quiet otherwise. Root not tried yet reads Not checked, never a
   /// failure: su only runs once it is picked.
   (String, Color) _state(PhonePrivilegedMode mode, PhoneBackgroundStatus bg) {
     final l10n = context.l10n;
@@ -526,8 +526,8 @@ class _PhoneDndPageState extends ConsumerState<PhoneDndPage> {
     PhonePrivilegedMode.adb => _adb(bg),
   };
 
-  /// 用 X 开启, or 改用 X while another channel is in use (worded per channel:
-  /// 自连 ADB takes no space after 用).
+  /// Enable with X, or Switch to X while another channel is in use (worded per channel:
+  /// Self-connect ADB takes no space after "Enable with").
   Widget _useButton(PhonePrivilegedMode mode, PhoneBackgroundStatus bg) {
     final l10n = context.l10n;
     return FilledButton(
@@ -648,7 +648,7 @@ class _PhoneDndPageState extends ConsumerState<PhoneDndPage> {
       if (!a.connected) ...[
         Padding(
           padding: const EdgeInsets.fromLTRB(16, 6, 16, 12),
-          // Three equal steps, equal width; the filled button stays 「用 … 开启」.
+          // Three equal steps, equal width; the filled button stays "Enable with …".
           child: Row(
             spacing: 8,
             children: [

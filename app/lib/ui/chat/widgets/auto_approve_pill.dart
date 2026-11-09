@@ -7,11 +7,11 @@ import '../../theme/app_icons.dart';
 import '../../theme/theme.dart';
 import 'permission_pill.dart' show PermissionPillMetrics;
 
-/// 「自动允许中 ⓧ」:浮在输入条左上方的警示色小胶囊,和插件胶囊一样高
-/// ([PermissionPillMetrics.height])。
+/// "Auto-allowing ⓧ": a warning-colored mini pill floating over the input bar's top-left, as tall as the plugin pill
+/// ([PermissionPillMetrics.height]).
 ///
-/// 自动允许意味着命令不再逐条询问,所以它必须一直看得见,而且一点就关。
-/// 两端都是图标(左 ✓✓、右 ⓧ),左右内边距相等。
+/// Auto-allow means commands stop being asked one by one, so it must stay visible at all times and close with one tap.
+/// Icons at both ends (✓✓ left, ⓧ right), equal left/right insets.
 class AutoApprovePill extends StatelessWidget {
   const AutoApprovePill({super.key, required this.onDisable});
 

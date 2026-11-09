@@ -54,10 +54,10 @@ class RuntimeSetupPage extends ConsumerStatefulWidget {
   final bool choose;
 
   /// The way to a remote host instead of installing: the second choice
-  /// ([choose]) and, after a failed install, a quiet 「改用远程主机」.
+  /// ([choose]) and, after a failed install, a quiet "Use a remote host instead".
   final VoidCallback? onRemote;
 
-  /// Picked 「本机」 in the choice: the caller starts the unpack and moves on
+  /// Picked "Local device" in the choice: the caller starts the unpack and moves on
   /// while it runs. Null: this page installs and shows the progress.
   final VoidCallback? onLocal;
 
@@ -78,7 +78,7 @@ class _RuntimeSetupPageState extends ConsumerState<RuntimeSetupPage> {
   Timer? _finishTimer;
   bool _notifyPrimed = false;
 
-  /// The person picked 「本机」 (or nothing was asked): leaves the choice.
+  /// The person picked "Local device" (or nothing was asked): leaves the choice.
   bool _installRequested = false;
 
   /// Asks where DSH runs before installing.

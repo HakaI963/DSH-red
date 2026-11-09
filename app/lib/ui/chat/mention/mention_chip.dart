@@ -9,13 +9,13 @@ import '../../theme/app_icons.dart';
 import '../secret_mask.dart';
 import 'mention_syntax.dart';
 
-/// 行内引用签:图标 + 名字,很淡的中性底,和一行文字同高。
+/// The inline mention chip: icon + name on a faint neutral ground, as tall as a line of text.
 ///
 /// ```
-/// 看看 ( ▤ main.dart ) 为什么报错
+/// Take a look ( ▤ main.dart ) — why is it erroring
 /// ```
 ///
-/// 图标是主色的小线性图标,名字是正文色;太长的名字截断。
+/// The icon is a small tinted line icon; the name is body color; overly long names truncate.
 class MentionChip extends StatelessWidget {
   const MentionChip({super.key, required this.kind, required this.label, this.style});
 
@@ -95,9 +95,9 @@ class MentionChip extends StatelessWidget {
   }
 }
 
-/// 已发送消息的文字:引用画成 [MentionChip],其余照常。
+/// Text of sent messages: mentions render as [MentionChip]s, everything else as usual.
 ///
-/// 含凭据的消息整段交给 [SecretText](遮挡优先,不画签)。
+/// Messages containing credentials go wholly to [SecretText] (masking comes first, no chips).
 class ReferenceText extends StatelessWidget {
   const ReferenceText(this.text, {super.key, required this.style, this.interactive = false});
 

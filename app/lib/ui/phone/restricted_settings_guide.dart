@@ -14,7 +14,7 @@ import '../theme/app_icons.dart';
 import '../theme/theme.dart';
 import 'phone_widgets.dart';
 
-/// ROM families with their own way to "允许受限制的设置".
+/// ROM families with their own way to "Allow restricted settings".
 enum RomFamily {
   vivo,
   xiaomi,
@@ -49,7 +49,7 @@ enum RomFamily {
 }
 
 /// Which switch the restricted setting greys out: phone control's accessibility
-/// service, or the floating pet's 「显示在其他应用上层」.
+/// service, or the floating pet's "Display over other apps".
 enum RestrictedTarget {
   accessibility,
   overlay;
@@ -237,7 +237,7 @@ class _RestrictedSettingsGuidePageState extends ConsumerState<RestrictedSettings
 class GuideDiagram extends StatelessWidget {
   const GuideDiagram({super.key, this.advanced = false});
 
-  /// Xiaomi-style: the option sits under 「高级设置」 instead of the ⋮ menu.
+  /// Xiaomi-style: the option sits under "Advanced settings" instead of the ⋮ menu.
   final bool advanced;
 
   @override

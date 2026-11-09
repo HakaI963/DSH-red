@@ -1,4 +1,4 @@
-// Shared bits of the curated 「图像与视频」 pages (media-generation §5.8): how a
+// Shared bits of the curated "Images & video" pages (media-generation §5.8): how a
 // service row is written back, how a service reads in one line, what the
 // catalogue's state means to the page, and the inline save failure.
 

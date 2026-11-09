@@ -1,6 +1,6 @@
 // Writing on the forum — a reply, or a new topic with a category and a title.
 // Markdown, like Discourse's own composer; pictures upload to the forum and go
-// in as `upload://` links; 「分享码」 attaches a dsh-go share link that readers
+// in as `upload://` links; "Share code" attaches a dsh-go share link that readers
 // install with one tap.
 
 import 'dart:async';
@@ -370,7 +370,7 @@ class _ForumComposerSheetState extends ConsumerState<ForumComposerSheet> {
   }
 }
 
-/// The composer's bottom row: 图片 · 分享码 on the left, the send button on
+/// The composer's bottom row: Image · Share code on the left, the send button on
 /// the right; all 40 tall, [kSheetGutter] from both edges.
 class ForumComposerToolbar extends StatelessWidget {
   const ForumComposerToolbar({

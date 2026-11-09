@@ -51,7 +51,7 @@ List<String> listedPackages(PhoneState state) {
   }.toList();
 }
 
-/// 应用名单: banks and payment apps are off limits by default, WeChat asks at
+/// App list: banks and payment apps are off limits by default, WeChat asks at
 /// every step. Loosening a rule first shows the risk.
 class PhoneAppRulesPage extends ConsumerWidget {
   const PhoneAppRulesPage({super.key});

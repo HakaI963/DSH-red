@@ -91,7 +91,7 @@ final RegExp _trailingPunctuation = RegExp(r'[.,;:!?，。；：！？、）)]+$
 
 /// References in a sent message, for the bubble.
 ///
-/// - canonical conversation mentions (`@[标题](dsh-session:…)`);
+/// - canonical conversation mentions (`@[title](dsh-session:…)`);
 /// - `@label` for a conversation label in [labels] (longest wins);
 /// - quoted paths, and bare `@path` tokens that look like a path (a slash, a
 ///   dot inside the name, or `~`) — a lone `@word` stays text;
@@ -233,8 +233,8 @@ double? fuzzyScore(String text, String query) {
   return 300 - gaps - t.length / 100;
 }
 
-/// Age as the official reference menu words it: 刚刚 / 5分钟 / 3小时 / 2天 /
-/// 4个月 / 1年.
+/// Age as the official reference menu words it: just now / 5 min / 3 hours / 2 days /
+/// 4 months / 1 year.
 String mentionAge(DateTime time, DateTime now) {
   final d = now.difference(time);
   if (d.inMinutes < 1) return appL10n.chatJustNow;

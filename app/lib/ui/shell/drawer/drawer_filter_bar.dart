@@ -1,5 +1,5 @@
-// The drawer's status filters (全部 / 运行中 / 待确认 /
-// 未读) as quiet capsules, and the list's options key.
+// The drawer's status filters (All / Running / Needs review /
+// Unread) as quiet capsules, and the list's options key.
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -70,7 +70,7 @@ class DrawerFilterBar extends ConsumerWidget {
   }
 }
 
-/// 「对话列表」 options: a round key at the end of the workspace row, its
+/// "Conversation list" options: a round key at the end of the workspace row, its
 /// visible circle ending on the 10 line.
 class DrawerViewButton extends StatelessWidget {
   const DrawerViewButton({super.key, required this.onTap});

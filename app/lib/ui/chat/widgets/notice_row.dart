@@ -31,14 +31,14 @@ Subscription? lapsedSubscription(LlmFailure? failure, [String text = '']) {
   return null;
 }
 
-/// 说明行行尾的一个键(「重试」「继续」)。
+/// A key at a notice line's tail ("Retry", "Continue").
 typedef NoticeAction = ({String label, VoidCallback onPressed});
 
-/// 一轮结束时的说明行:出错 / 停止 / 重试 / 输出上限……
+/// The notice line at a turn's end: error / stopped / retry / output cap…
 ///
-/// 和过程行同一套几何([StreamRow]):图标在 24 的图形列里居中,文字从 32 起。
-/// 出错时图形是 danger 浅底的小方块、文字 danger 色;其余只是一行三级文字,
-/// 不打断阅读。带错误详情的点一下,下面展开原始的错误码和消息。
+/// Same geometry as process rows ([StreamRow]): icon centered in the 24 glyph column, text starts at 32.
+/// On error the glyph is a small square on a sheer danger ground and the text is danger-colored; otherwise just a tertiary text line,
+/// reading uninterrupted. One with error details expands the raw error code and message underneath on tap.
 class NoticeRow extends StatefulWidget {
   const NoticeRow({super.key, required this.item, this.action});
 
@@ -63,7 +63,7 @@ class _NoticeRowState extends State<NoticeRow> {
           return (AppIcons.noApiKey, appL10n.chatSubscriptionExpired(subscriptionLabel(lapsed)));
         }
         if (failure?.code == 'MISSING_CREDENTIAL') {
-          // pi-ai routes are the 模型渠道; the bare one is DeepSeek's key.
+          // pi-ai routes are the Model channels; the bare one is DeepSeek's key.
           if (failure!.message.startsWith('llm-pi-ai')) {
             return (AppIcons.noApiKey, appL10n.chatProviderKeyMissing);
           }
@@ -100,7 +100,7 @@ class _NoticeRowState extends State<NoticeRow> {
     final (icon, text) = _content(lapsed);
     final style = StreamRow.detail(context)?.copyWith(height: 1.45, color: isError ? dsh.danger : null);
 
-    // 一行最多一个键:登录失效、缺 Key 有自己的去处,其余用列表给的。
+    // At most one key per line: expired login and missing key have their own destinations; the rest use what the list gives.
     final NoticeAction? action;
     if (lapsed != null) {
       action = (label: l10n.chatSignInAgain, onPressed: () => showSubscriptionLogin(context, lapsed));
@@ -130,7 +130,7 @@ class _NoticeRowState extends State<NoticeRow> {
               SizedBox.square(
                 dimension: StreamRow.lead,
                 child: DecoratedBox(
-                  // 出错时图形块是 danger 浅底(和工具图标块同形),其余不铺底。
+                  // On error the glyph block gets a sheer danger ground (same shape as tool icon blocks); others get no ground.
                   decoration: ShapeDecoration(
                     color: isError ? dsh.dangerContainer : null,
                     shape: Squircle.border(StreamRow.lead * 0.32),
@@ -144,7 +144,7 @@ class _NoticeRowState extends State<NoticeRow> {
               ),
               const SizedBox(width: StreamRow.gap),
               Expanded(
-                // 文字首行与 24 的图形格竖直居中。
+                // The text's first line and the 24 glyph cell are vertically centered.
                 child: Padding(
                   padding: const EdgeInsets.only(top: 2.5),
                   child: Text(text, style: style),
@@ -175,7 +175,7 @@ class _NoticeRowState extends State<NoticeRow> {
   }
 }
 
-/// 行尾的键:和图形格同高(24)的胶囊。
+/// The row-tail key: a pill as tall as the glyph cell (24).
 class _NoticeKey extends StatelessWidget {
   const _NoticeKey({required this.label, required this.onPressed});
 
@@ -203,8 +203,8 @@ class _NoticeKey extends StatelessWidget {
   }
 }
 
-/// `ChatState.error` 的行内横幅:浮在输入条上方,可关闭。
-/// [info] 用于 `ChatState.notice`:提示而非失败,换成信息色和图标。
+/// The inline banner of `ChatState.error`: floats above the input bar, dismissible.
+/// [info] is for `ChatState.notice`: a hint, not a failure — info color and icon instead.
 class ErrorBanner extends StatelessWidget {
   const ErrorBanner({super.key, required this.message, this.onDismiss, this.info = false, this.action});
 

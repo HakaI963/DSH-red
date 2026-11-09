@@ -9,25 +9,25 @@ import '../turn_summary.dart';
 import 'chat_card.dart';
 import '../../common/brief_notice.dart';
 
-/// 一轮结束时的**改动卡**:改了哪些文件、各自 +/−,是改动详情页的入口。
+/// The **change card** at a turn's end: which files changed, each with +/−, and the entry to the change detail page.
 ///
 /// ```
 /// ┌──────────────────────────────────────┐
-/// │ ▤ 改动了 5 个文件              +31 −6 │  ChatCard 标题行
-/// │ ▢ login_controller.dart  app/l… +18 −4│  每行 40,行间不画线
-/// │ ▢ README.md  新建                  +6 │
+/// │ ▤ Changed 5 files              +31 −6 │  ChatCard title row
+/// │ ▢ login_controller.dart  app/l… +18 −4│  40 per row, no dividers
+/// │ ▢ README.md  New                     +6 │
 /// │ ▢ CHANGELOG.md                  +1 −1 │
-/// │ 查看改动            还有 2 个文件  ›  │  ChatCardFooter
+/// │ View changes        2 more files  ›  │  ChatCardFooter
 /// └──────────────────────────────────────┘
 /// ```
 ///
-/// 最多列 [shownCount] 个文件;点文件直接打开那个文件,点底栏从第一个看起。
+/// Lists at most [shownCount] files; tapping a file opens that one directly, tapping the footer starts from the first.
 class ChangeCard extends StatelessWidget {
   const ChangeCard({super.key, required this.files});
 
   final List<FileChange> files;
 
-  /// 卡片上最多列几个文件。
+  /// How many files the card shows at most.
   static const shownCount = 3;
 
   void _open(BuildContext context, int index) {
@@ -60,7 +60,7 @@ class ChangeCard extends StatelessWidget {
   }
 }
 
-/// 一行一个文件:文件名、目录(弱化、可省略)、+/−。
+/// One file per row: filename, directory (weakened, elidable), +/−.
 class _FileRow extends StatelessWidget {
   const _FileRow({required this.file, required this.onTap});
 
@@ -133,7 +133,7 @@ class _FileRow extends StatelessWidget {
   }
 }
 
-/// 等宽数字的 `+18 −4`;一侧为 0 时省掉那一侧(两侧都为 0 显示 `+0`)。
+/// `+18 −4` in tabular figures; a zero side is dropped (both zero shows `+0`).
 class DiffCounts extends StatelessWidget {
   const DiffCounts({super.key, required this.added, required this.removed});
 
@@ -163,7 +163,7 @@ class DiffCounts extends StatelessWidget {
   }
 }
 
-/// 复制完整路径并给一句轻提示。
+/// Copies the full path and shows a light toast.
 Future<void> copyPath(BuildContext context, String path) async {
   final l10n = context.l10n;
   final messenger = ScaffoldMessenger.maybeOf(context);

@@ -1,4 +1,4 @@
-/// 主题层统一出口:`import 'package:dsh_app/ui/theme/theme.dart';`
+/// Single entry point for the theme layer: `import 'package:dsh_app/ui/theme/theme.dart';`
 library;
 
 export 'accent.dart';

@@ -24,28 +24,28 @@ import '../../common/expand_reveal.dart';
 import 'change_card.dart' show copyPath;
 import 'chat_card.dart';
 
-/// 一轮结束时的**产物卡**:这一轮交付(`present`)或生成的文件。
+/// The **artifact card** at a turn's end: files this turn delivered (`present`) or generated.
 ///
 /// ```
 /// ┌──────────────────────────────────────┐
-/// │ ▣ 交付了 3 个文件                     │
-/// │ [▦] 季度销售报告.pdf               ⋯ │
-/// │     季度汇总                          │
+/// │ ▣ Delivered 3 files                   │
+/// │ [▦] Quarterly sales report.pdf       ⋯ │
+/// │     quarterly summary                   │
 /// │ [▤] trend.png                      ⋯ │
-/// │     图片 · PNG · 84.2 KB              │
-/// │ 全部 6 个文件 ⌄                       │
+/// │     Image · PNG · 84.2 KB               │
+/// │ All 6 files ⌄                           │
 /// └──────────────────────────────────────┘
 /// ```
 ///
-/// 点一行:图片 / Markdown / 文本在 App 里预览,其余交给手机上的应用打开;
-/// ⋯ 或长按:打开、用其他应用打开、分享、存到「下载」、复制路径。
+/// Tap a row: images / Markdown / text preview in-app, everything else hands off to a phone app;
+/// ⋯ or long-press: open, open with another app, share, save to "Downloads", copy path.
 class ArtifactCard extends StatefulWidget {
   const ArtifactCard({super.key, required this.sessionId, required this.group});
 
   final String sessionId;
   final TurnArtifacts group;
 
-  /// 收起时最多列几个(官方 Web 同为 4)。
+  /// When folded, how many are listed at most (official Web uses 4 too).
   static const shownCount = 4;
 
   @override
@@ -100,17 +100,17 @@ class _ArtifactCardState extends State<ArtifactCard> {
 /// What a file action is doing right now.
 enum _Busy { fetching, opening, saving }
 
-/// 一个文件一行:缩略图 / 类型图标、文件名、说明(或类型 · 大小),⋯ 操作。
+/// One row per file: thumbnail / type icon, filename, description (or type · size), ⋯ actions.
 ///
-/// 动作的进度和结果写在说明那一行:成功的提示停 5 秒后恢复(官方同款),
-/// 失败的留到下一次尝试。
+/// An action's progress and result write themselves into the description line: a success note restores after 5 s (same as official),
+/// a failure stays until the next attempt.
 class ArtifactTile extends ConsumerStatefulWidget {
   const ArtifactTile({super.key, required this.sessionId, required this.artifact, this.dense = false});
 
   final String sessionId;
   final Artifact artifact;
 
-  /// 会话详情的清单里用:左右留白小一些。
+  /// Used in the session details list: smaller side insets.
   final bool dense;
 
   @override
@@ -263,7 +263,7 @@ class _ArtifactTileState extends ConsumerState<ArtifactTile> {
         onTap: busy ? null : _tap,
         onLongPress: busy ? null : _menu,
         child: Padding(
-          // 右 6:⋯ 的 40 点按格里图标居中,字形右缘正好落在 16。
+          // Right 6: the icon centres itself in the ⋯'s 40 tap cell so the glyph's right edge lands exactly on 16.
           padding: EdgeInsets.fromLTRB(widget.dense ? 12 : 16, 8, 6, 8),
           child: Row(
             children: [
@@ -325,7 +325,7 @@ class _ArtifactTileState extends ConsumerState<ArtifactTile> {
   }
 }
 
-/// 40×40 的文件图标块;图片换成缩略图(取得到时)。
+/// A 40×40 file icon block; images swap in a thumbnail (when available).
 class ArtifactThumb extends ConsumerWidget {
   const ArtifactThumb({super.key, required this.sessionId, required this.artifact, this.size = 40});
 
@@ -362,7 +362,7 @@ class ArtifactThumb extends ConsumerWidget {
     return SizedBox.square(
       dimension: size,
       child: DecoratedBox(
-        // 官方:图标底块浅色 50% 白、深色 5% 白,外加一圈细描边。
+        // Official: icon ground block 50% white in light, 5% white in dark, plus a hairline ring.
         decoration: ShapeDecoration(
           color: Colors.white.withValues(alpha: dark ? 0.05 : 0.5),
           shape: Squircle.border(10, side: border),
@@ -392,7 +392,7 @@ IconData artifactIcon(ArtifactKind kind) => switch (kind) {
   ArtifactKind.other => AppIcons.file,
 };
 
-/// 类型色:跟常见办公软件的习惯走(PDF 红、表格绿、演示橙、文档蓝)。
+/// Type colors follow office-software habits (PDF red, spreadsheet green, deck orange, document blue).
 Color artifactColor(BuildContext context, ArtifactKind kind) {
   final dsh = DshColors.of(context);
   final colors = Theme.of(context).colorScheme;
@@ -406,7 +406,7 @@ Color artifactColor(BuildContext context, ArtifactKind kind) {
   };
 }
 
-/// 产物的操作。
+/// The artifact's actions.
 enum ArtifactAction {
   preview(AppIcons.preview),
   open(AppIcons.openExternal),
@@ -489,8 +489,8 @@ class _MenuHead extends StatelessWidget {
   }
 }
 
-/// 一个产物的操作菜单。[canFetch] = false(连接读不了文件)时只能复制路径;
-/// [officeToPdf]:Host 能把 Office 文件转成 PDF 预览。
+/// One artifact's action menu. [canFetch] = false (the connection can't read files) means copy-path only;
+/// [officeToPdf]: the Host can convert Office files to PDF for preview.
 Future<ArtifactAction?> showArtifactMenu(
   BuildContext context, {
   required Artifact artifact,
@@ -561,7 +561,7 @@ Future<ArtifactAction?> showArtifactMenu(
               SheetGroup(
                 children: [
                   for (final action in actions)
-                    // 二级弹层:线性图标、次级色,不铺彩色底(page-design §4)。
+                    // Secondary sheet: line icons, secondary color, no color ground (page-design §4).
                     SettingsTile(
                       icon: action.icon,
                       tinted: false,

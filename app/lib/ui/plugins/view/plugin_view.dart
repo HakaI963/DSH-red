@@ -45,20 +45,20 @@ class PluginView extends StatefulWidget {
   final Object? view;
   final Object? data;
 
-  /// null：只读（`actions`、`confirm` 不显示，`options` 只读，`list` 行不可点）。
+  /// null: read-only (`actions`, `confirm` hidden, `options` read-only, `list` rows untappable).
   final PluginActionHandler? onAction;
 
   /// Uses the host clock at the real tap, before any local request queue.
   final DateTime Function()? clock;
   final PluginViewBudget budget;
 
-  /// 缺省从上层的 [PluginImages] 取。
+  /// Defaults are taken from the enclosing [PluginImages].
   final PluginImageResolver? imageResolver;
 
-  /// 画视图自己的 `title`（面板已经有标题栏时可以关掉）。
+  /// Draws the view's own `title` (can be turned off when the panel already has a title bar).
   final bool showTitle;
 
-  /// 图表生长（只在内容刚到时开）。
+  /// Chart growth animation (only right after content arrives).
   final bool animate;
 
   @override
@@ -114,7 +114,7 @@ class _PluginViewState extends State<PluginView> {
   }
 }
 
-/// 已经解析好的视图（工具卡在 `ToolView` 里解析过一次，直接用这个）。
+/// The already-parsed view (the tool card parsed it once inside `ToolView`; use this directly).
 class PluginViewBody extends StatelessWidget {
   const PluginViewBody({
     super.key,
@@ -172,7 +172,7 @@ class PluginViewBody extends StatelessWidget {
   }
 }
 
-/// 根节点坏了：一行「插件界面有误」。
+/// Broken root node: a single line "Plugin UI error".
 class PluginViewError extends StatelessWidget {
   const PluginViewError({super.key});
 
@@ -201,12 +201,12 @@ class PluginViewError extends StatelessWidget {
   }
 }
 
-/// 署名外框：玻璃卡片（圆角 20、内边距 16），顶部一行插件图标 + 插件名
-/// （次要色），[trailing] 在这一行末尾。插件界面一律套它，防止冒充系统
-/// 界面（`native-plugins-views.md` §7、`native-plugins.md` §3.7）。
+/// The signed frame: a glass card (radius 20, padding 16) with a top row of plugin icon + plugin name
+/// (secondary color); [trailing] sits at that row's end. Every plugin UI is wrapped in it, so nothing can impersonate system
+/// UI (`native-plugins-views.md` §7, `native-plugins.md` §3.7).
 ///
-/// [icon] 是 ui.json 图标名；缺省画插件名的首字。[surface] 为 false 时
-/// 只画署名行和内容（已经在卡片或弹层里时用）。
+/// [icon] is a ui.json icon name; by default it draws the plugin name's first letter. With [surface] false,
+/// only the signature row and the content paint (use it when already inside a card or sheet).
 class PluginFrame extends StatelessWidget {
   const PluginFrame({
     super.key,
@@ -223,7 +223,7 @@ class PluginFrame extends StatelessWidget {
   final bool surface;
   final Widget child;
 
-  /// 署名行的高度（也是图标的格子）。
+  /// The signature row's height (= the icon's cell).
   static const headerHeight = 24.0;
   static const markSize = 20.0;
 
@@ -273,8 +273,8 @@ class PluginFrame extends StatelessWidget {
   }
 }
 
-/// 插件的小标记（20 × 20）：认识的图标名（[nativeIcon]：ui.json 的名字加
-/// coin、speaker 等）画图标，否则画名字的首字。
+/// The plugin's small mark (20 × 20): known icon names ([nativeIcon]: ui.json names plus
+/// coin, speaker, etc.) draw the icon, otherwise the name's first letter.
 class PluginMark extends StatelessWidget {
   const PluginMark({super.key, required this.name, this.icon});
 
@@ -314,11 +314,11 @@ class PluginMark extends StatelessWidget {
   }
 }
 
-/// 工具卡（`native-plugins-views.md` §8）：工具行展开区。能画就是一张与模型卡
-/// 同一套的卡片（只读），参数和结果（[fallback]）收在卡片下的「详情」里、默认收起；
-/// 画不了是一行「插件界面有误」，下面直接是 [fallback]。
+/// The tool card (`native-plugins-views.md` §8): the tool row's expansion area. Renderable, it is a card on the same
+/// system as the model cards (read-only); arguments and results ([fallback]) tuck under "Details" below the card, folded by default;
+/// unrenderable, it reads "Plugin UI error" with [fallback] directly below.
 ///
-/// [details] 为 false 时只画卡片（一轮折叠后外露的那张）。
+/// With [details] false, only the card paints (the one left exposed after a turn folds).
 class PluginToolCard extends StatelessWidget {
   const PluginToolCard({super.key, required this.parse, required this.fallback, this.details = true});
 
@@ -362,7 +362,7 @@ class _ToolCardSurface extends StatelessWidget {
   );
 }
 
-/// 卡片下的「详情」：一行，点开是参数和结果。
+/// "Details" under the card: one row; tapping opens arguments and result.
 class _ToolCardDetails extends StatefulWidget {
   const _ToolCardDetails({required this.child});
 
