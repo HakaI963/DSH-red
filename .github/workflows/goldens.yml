@@ -72,7 +72,11 @@ jobs:
             test/launch/launch_golden_test.dart \
             test/phone/phone_golden_test.dart \
             test/phone/dnd_mode_golden_test.dart \
-            test/settings/icon_shortcut_sheet_test.dart
+            test/settings/icon_shortcut_sheet_test.dart \
+            test/share/share_card_golden_test.dart \
+            test/settings/appearance_page_test.dart \
+            test/settings/launch_screen_section_test.dart \
+            test/settings/settings_pages_golden_test.dart
       - name: Package changed goldens
         run: |
           git -c core.quotepath=off diff --name-only HEAD -- 'app/test' > changed.txt

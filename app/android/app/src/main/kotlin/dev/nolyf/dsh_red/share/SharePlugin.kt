@@ -262,10 +262,10 @@ class SharePlugin : FlutterPlugin, ActivityAware, MethodChannel.MethodCallHandle
 
         /** `maxFileBytes` there: no size cap — shares are as unlimited as composer
          *  attachments; the device's heap is the real ceiling. */
-        const val MAX_FILE_BYTES = 1L shl 62
+        const val MAX_FILE_BYTES = 4611686018427387904L
 
         /** All files of one share; mirrors the unlimited Dart-side message budget. */
-        const val MAX_TOTAL_BYTES = 1L shl 62
+        const val MAX_TOTAL_BYTES = 4611686018427387904L
         const val MAX_TEXT_CHARS = 200_000
         private const val KEEP_SLOTS = 4
 
