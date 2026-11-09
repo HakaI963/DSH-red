@@ -73,6 +73,12 @@ jobs:
       # incomplete". Downloads are hash-pinned; single ABI per run.
       - name: Build bundled runtime
         timeout-minutes: 45
+        env:
+          # GitHub-hosted runners: the official Ubuntu archives keep every pool
+          # file; the China mirrors occasionally serve a Packages index a few
+          # minutes ahead of the pool sync and 404 fresh deb revisions.
+          UBUNTU_ARCHIVE_AMD64: https://archive.ubuntu.com/ubuntu
+          UBUNTU_ARCHIVE_ARM64: https://ports.ubuntu.com/ubuntu-ports
         run: |
           flavor="${{ github.event_name == 'workflow_dispatch' && inputs.flavor || 'arm64' }}"
           case "$flavor" in
