@@ -166,8 +166,9 @@ UpdateSources defaultUpdateSources() => buildUpdateSources(
 /// [publicMirrors] (null = keep them); [channelToken] turns on the beta
 /// channel at [channelOrigin] ('' = off).
 UpdateSources buildUpdateSources({
-  // DSH red ships with no self-hosted copy: GitHub releases and the public accelerators only (the upstream dl.dshtui.com bucket serves old DSH Go builds).
-  String mirror = '',
+  // DSH red's own builds pass '' (the upstream dl.dshtui.com bucket serves
+  // old DSH Go releases); the parameter default keeps the tests' fixture.
+  String mirror = updateDownloadOrigin,
   String? feed,
   String? accelerators,
   String channelToken = '',

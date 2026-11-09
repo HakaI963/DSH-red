@@ -332,8 +332,8 @@ void main() {
       expect(find.byType(RiskNoticeSheet), findsNothing);
       expect(h.native!.callsOf('setPolicies'), hasLength(2));
 
-      await pick('微信', '照常');
-      expect(find.text('「微信」不再逐步确认？'), findsOneWidget);
+      await pick('WeChat', '照常');
+      expect(find.text('「WeChat」不再逐步确认？'), findsOneWidget);
       expect(find.textContaining('强制下线'), findsOneWidget);
     });
 
@@ -349,7 +349,7 @@ void main() {
       await tester.tap(find.text('添加'));
       await tester.pumpAndSettle();
       expect((h.native!.callsOf('setPolicies').single.arguments as Map)['denyPackages'], contains('com.taobao.taobao'));
-      expect(find.descendant(of: groupTitled('不碰'), matching: find.text('淘宝')), findsOneWidget);
+      expect(find.descendant(of: groupTitled('不碰'), matching: find.text('Taobao')), findsOneWidget);
     });
 
     testWidgets('unreadable list says so', (tester) async {

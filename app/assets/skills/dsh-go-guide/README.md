@@ -1,6 +1,6 @@
 # dsh-go User guide
 
-> dsh-go 1.0.14
+> dsh-go 1.0.18
 
 - [Chat](en/01-chat.md): new chats, models, images and voice, steering and queueing, questions and approvals, message menu, chat list, hardware keyboard
 - [Models and providers](en/02-models.md): switching models, thinking effort, custom providers, model settings, DeepSeek account and API key

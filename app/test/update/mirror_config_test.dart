@@ -26,10 +26,10 @@ void main() {
   group('defaults', () {
     // The upstream layout, pinned for the tests that exercise a self-hosted
     // bucket; DSH red itself ships without one (see the fork defaults below).
-    final sources = buildUpdateSources(mirror: 'https://dl.dshtui.com');
+    final sources = buildUpdateSources();
 
     test('DSH red: GitHub and the accelerators, the API last; nothing on go.dshtui.com', () {
-      final bare = buildUpdateSources();
+      final bare = buildUpdateSources(mirror: '');
       expect(bare.channel, isNull);
       expect(bare.feed, isNull);
       expect(bare.mirrors.map((m) => m.id), ['github', 'ghfast', 'gh-proxy']);
@@ -49,7 +49,7 @@ void main() {
 
     test('the shipped configuration (no token in tests) is the same', () {
       final shipped = defaultUpdateSources();
-      final bare = buildUpdateSources();
+      final bare = buildUpdateSources(mirror: '');
       expect(shipped.channel, isNull);
       expect(shipped.feed, isNull);
       expect(shipped.metadataEndpoints().map((e) => e.id), bare.metadataEndpoints().map((e) => e.id));

@@ -148,7 +148,7 @@ void main() {
   group('a bridge before R7', () {
     testWidgets('设置 › 引擎参数 › 插件: each row by its own title, the covered one unmarked', (tester) async {
       await pumpConfigPage(tester, const EngineSettingsHubPage(), _kit(), host: _kitHost(), height: 1200);
-      expect(_hubPlugins(tester), ['Speech recognition', 'SenseVoice 本地识别', 'Speech transcription API', '翻译', '天气']);
+      expect(_hubPlugins(tester), ['语音识别', 'SenseVoice 本地识别', '语音转写接口', '翻译', '天气']);
       expect(find.text('由配置文件固定'), findsNothing);
       expect(find.text('只读'), findsNothing);
       await tester.tap(find.text('SenseVoice 本地识别'));
@@ -162,10 +162,10 @@ void main() {
       await _openSheet(tester, PluginBundle.fromJson(_kitBundles().first), configOverrides(_kit(), host: _kitHost()));
       expect(_sheetRows(tester), ['Speech recognition', 'SenseVoice 本地识别', 'Speech transcription API']);
       expect(find.text('由配置文件固定'), findsNothing);
-      await tester.tap(_row('语音转写接口'));
+      await tester.tap(_row('Speech transcription API'));
       await flush(tester);
       expect(find.byType(PluginConfigPage), findsOneWidget);
-      expect(find.text('语音转写接口'), findsWidgets);
+      expect(find.text('Speech transcription API'), findsWidgets);
     });
 
     testWidgets('a page opened on its own: the row\'s title', (tester) async {
