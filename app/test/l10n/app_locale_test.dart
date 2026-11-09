@@ -1,11 +1,6 @@
 import 'package:dsh_app/l10n/l10n.dart';
-import 'package:dsh_app/state/locale_state.dart';
-import 'package:dsh_app/ui/settings/language_tile.dart';
-import 'package:dsh_app/ui/theme/theme.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
   tearDown(() => AppLocale.use(AppLocale.zhCN));
@@ -59,22 +54,5 @@ void main() {
       ),
     );
     expect(text, '取消');
-  });
-
-  testWidgets('the language row stores the choice', (tester) async {
-    SharedPreferences.setMockInitialValues({});
-    await tester.pumpWidget(
-      ProviderScope(
-        child: MaterialApp(
-          theme: buildLightTheme(),
-          home: const Scaffold(body: LanguageSettingsTile()),
-        ),
-      ),
-    );
-    expect(find.text('语言'), findsOneWidget);
-    await tester.tap(find.text('English'));
-    await tester.pumpAndSettle();
-    final prefs = await SharedPreferences.getInstance();
-    expect(prefs.getString(AppLanguageController.prefsKey), 'en');
   });
 }

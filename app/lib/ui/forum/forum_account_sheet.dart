@@ -21,7 +21,7 @@ import 'forum_notifications_page.dart';
 import 'forum_post_body.dart' show openForumLink;
 import 'forum_widgets.dart';
 
-/// The forum's glyph colour (the Community hub's forum row uses the same slot).
+/// The forum's glyph colour.
 const forumTint = 2;
 
 Future<void> showForumAccountSheet(BuildContext context) =>

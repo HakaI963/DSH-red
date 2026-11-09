@@ -27,7 +27,7 @@ const pageLinkHost = 'open';
 /// [FeatureItem.id]: each is a native page that needs no open conversation.
 /// Settings pages and rows answer through the settings index
 /// ([SettingsIndex.linkIds]).
-const catalogPageLinks = <String>{'schedules', 'cordis', 'agent-team', 'forum', 'community', 'ds-bot', 'workspaces'};
+const catalogPageLinks = <String>{'schedules', 'cordis', 'agent-team', 'forum', 'ds-bot', 'workspaces'};
 
 /// Companion room: the home-screen widget opens it (android companion/CompanionWidget.kt).
 const companionPageLink = 'companion';

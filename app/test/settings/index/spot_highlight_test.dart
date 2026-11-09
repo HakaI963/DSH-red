@@ -130,7 +130,7 @@ void main() {
     // The hub's last group, by its spot.
     await tester.pumpWidget(
       goldenApp(
-        home: spotPage(Spots.community),
+        home: spotPage(Spots.askAi),
         brightness: Brightness.light,
         overrides: [
           localRuntimeProvider.overrideWith(
@@ -144,10 +144,10 @@ void main() {
       await tester.pump(const Duration(milliseconds: 50));
     }
     expect(find.byType(SettingsScreen), findsOneWidget);
-    final rect = tester.getRect(find.byKey(SpotKey(Spots.community.id)));
+    final rect = tester.getRect(find.byKey(SpotKey(Spots.askAi.id)));
     expect(rect.top, greaterThan(0));
     expect(rect.bottom, lessThan(844));
-    expect(find.text(appL10n.hubSettingsCommunity), findsOneWidget);
+    expect(find.text(appL10n.askAiHelpTitle), findsOneWidget);
     await tester.pump(const Duration(seconds: 2));
   });
 }

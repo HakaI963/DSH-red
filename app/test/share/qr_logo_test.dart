@@ -317,7 +317,7 @@ void main() {
       await pump(tester, QrCodeView(data: data, size: 64, quietZone: 3, logo: true));
       expect(find.byKey(QrCodeView.logoKey), findsNothing);
       expect(QrCodeView.codeFor(data, QrEcc.medium, logo: true, size: 64, quietZone: 3).$1.ecc, QrEcc.medium);
-      // The same link on the community sheet's 208 carries it.
+      // The same link on a 208-wide code carries it.
       await pump(tester, QrCodeView(data: data, size: 208, quietZone: 1, logo: true));
       expect(find.byKey(QrCodeView.logoKey), findsOneWidget);
     });

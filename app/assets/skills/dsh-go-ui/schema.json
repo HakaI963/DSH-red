@@ -154,7 +154,7 @@
         "session-detail", "artifacts", "files", "terminal", "export", "jobs", "plan-goal", "skills",
         "subagents", "reference", "schedules", "permission", "agent-presets", "models", "subagent-settings",
         "agent-loop", "shell-settings", "web-search", "plugins", "plugin-inventory", "cordis", "agent-team",
-        "cot-translation", "voice-input", "forum", "community", "ds-bot", "share-profile", "search",
+        "cot-translation", "voice-input", "forum", "ds-bot", "share-profile", "search",
         "notifications", "workspaces", "general", "account", "remote", "phone", "engine", "diagnostics", "web",
         "new-chat", "settings"
       ]

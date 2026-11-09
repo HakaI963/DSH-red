@@ -572,13 +572,6 @@ abstract final class Spots {
     title: (l) => l.hubSettingsCollapseSteps,
     keywords: (l) => l.searchKwFoldTurns,
   );
-  static final language = SettingSpot(
-    'language',
-    page: SettingsPageId.hub,
-    group: _general,
-    title: (l) => l.localeTitle,
-    keywords: (l) => l.searchKwLanguage,
-  );
   static final askAi = SettingSpot(
     'ask-ai',
     page: SettingsPageId.hub,
@@ -586,13 +579,6 @@ abstract final class Spots {
     title: (l) => l.askAiHelpTitle,
     keywords: (l) => l.searchKwHelp,
     condition: SpotCondition.nativeUi,
-  );
-  static final community = SettingSpot(
-    'community',
-    page: SettingsPageId.hub,
-    group: _help,
-    title: (l) => l.hubSettingsCommunity,
-    keywords: (l) => l.searchKwCommunity,
   );
 
   // Models.
@@ -1058,9 +1044,7 @@ abstract final class Spots {
 final _rows = <SettingSpot>[
   Spots.chatTextSize,
   Spots.foldTurns,
-  Spots.language,
   Spots.askAi,
-  Spots.community,
   Spots.addProvider,
   Spots.permissionCurrent,
   Spots.permissionDefault,

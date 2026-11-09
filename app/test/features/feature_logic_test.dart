@@ -152,7 +152,6 @@ void main() {
           'cot-translation',
           'voice-input',
           'account',
-          'community',
           'ds-bot',
           'share-profile',
         ]),

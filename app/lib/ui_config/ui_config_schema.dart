@@ -150,7 +150,6 @@ abstract final class UiSchema {
     'cot-translation',
     'voice-input',
     'forum',
-    'community',
     'ds-bot',
     'share-profile',
     'search',
