@@ -23,10 +23,10 @@ abstract final class AppLocale {
   /// Chinese on non-Chinese systems (typography.dart「汉字字形」).
   static const supported = [zhCN, en];
 
-  static Locale _locale = zhCN;
-  static L10n _l10n = lookupL10n(zhCN);
+  static Locale _locale = en;
+  static L10n _l10n = lookupL10n(en);
 
-  /// The locale in use (zh_CN until the app resolves one; tests keep it).
+  /// The locale in use (English until the app resolves one; tests keep it).
   static Locale get current => _locale;
 
   static bool get isEnglish => _locale.languageCode == 'en';
@@ -41,14 +41,11 @@ abstract final class AppLocale {
     _l10n = lookupL10n(next);
   }
 
-  /// Chinese for any Chinese system language, English for everything else.
+  /// English for every system language: the system list no longer picks
+  /// Chinese. Only an explicit choice (a stored pref; tests pin zh_CN) can.
   static Locale resolve(Locale? chosen, List<Locale>? system) {
     if (chosen != null) return chosen.languageCode == 'en' ? en : zhCN;
-    for (final l in system ?? const <Locale>[]) {
-      if (l.languageCode == 'zh') return zhCN;
-      if (l.languageCode == 'en') return en;
-    }
-    return (system == null || system.isEmpty) ? zhCN : en;
+    return en;
   }
 }
 

@@ -78,11 +78,6 @@ void main() {
     expect(Localizations.localeOf(tester.element(find.byType(_Page))), AppLocale.en);
     final prefs = await SharedPreferences.getInstance();
     expect(prefs.getString(AppLanguageController.prefsKey), 'en');
-
-    await tester.tap(find.text('简体中文'));
-    await tester.pumpAndSettle();
-    expect(find.text('plain 取消'), findsOneWidget);
-    expect(AppLocale.current, AppLocale.zhCN);
   });
 
   testWidgets('a stored choice is there from the first frame', (tester) async {

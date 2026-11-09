@@ -16,21 +16,21 @@ void main() {
       expect(AppLocale.resolve(AppLocale.zhCN, const [Locale('en', 'US')]), AppLocale.zhCN);
     });
 
-    test('any Chinese system language is Chinese', () {
+    test('system languages never pick Chinese', () {
       for (final l in const [
         Locale('zh'),
         Locale('zh', 'TW'),
         Locale.fromSubtags(languageCode: 'zh', scriptCode: 'Hant'),
       ]) {
-        expect(AppLocale.resolve(null, [l]), AppLocale.zhCN, reason: '$l');
+        expect(AppLocale.resolve(null, [l]), AppLocale.en, reason: '$l');
       }
     });
 
-    test('the first Chinese or English system language decides; others are English', () {
-      expect(AppLocale.resolve(null, const [Locale('ja'), Locale('zh')]), AppLocale.zhCN);
+    test('every system language list resolves to English', () {
+      expect(AppLocale.resolve(null, const [Locale('ja'), Locale('zh')]), AppLocale.en);
       expect(AppLocale.resolve(null, const [Locale('fr'), Locale('en')]), AppLocale.en);
       expect(AppLocale.resolve(null, const [Locale('ja')]), AppLocale.en);
-      expect(AppLocale.resolve(null, const []), AppLocale.zhCN);
+      expect(AppLocale.resolve(null, const []), AppLocale.en);
     });
   });
 

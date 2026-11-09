@@ -8,7 +8,7 @@ import '../../state/locale_state.dart';
 import '../theme/app_icons.dart';
 import 'settings_widgets.dart';
 
-/// 设置 → 外观: 语言 (跟随系统 / 简体中文 / English). Language names are
+/// Settings → Appearance: Language (System / English). Language names are
 /// written in their own language, the way system pickers show them.
 class LanguageSettingsTile extends ConsumerWidget {
   const LanguageSettingsTile({super.key, this.tint = 0});
@@ -26,7 +26,6 @@ class LanguageSettingsTile extends ConsumerWidget {
       spot: Spots.language,
       segments: [
         PillSegment(AppLanguage.system, l10n.localeSystem),
-        PillSegment(AppLanguage.zh, l10n.localeZh),
         PillSegment(AppLanguage.en, l10n.localeEn),
       ],
       selected: language,

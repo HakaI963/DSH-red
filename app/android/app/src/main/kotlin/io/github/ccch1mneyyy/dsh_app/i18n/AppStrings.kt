@@ -7,14 +7,14 @@ import androidx.annotation.StringRes
 import java.util.Locale
 
 /**
- * Native text in the language the app shows (设置 → 语言), not the system's.
+ * Native text in the language the app shows (Settings → Language), not the system's.
  *
  * The Flutter side stores the choice in SharedPreferences as `app_language`
  * (`system` / `zh` / `en`, lib/state/locale_state.dart); here it is
  * `flutter.app_language` in `FlutterSharedPreferences`. `values/` holds
- * English, `values-zh/` Chinese, so "follow the system" is plain resource
- * resolution: any Chinese system language gets Chinese, everything else
- * English, the same rule as AppLocale.resolve in Dart.
+ * English, `values-zh/` Chinese. English is the default everywhere: with no
+ * stored choice the resources are forced to English, the same rule as
+ * AppLocale.resolve in Dart (the system language no longer picks Chinese).
  */
 object AppStrings {
     /** The app's name as the phone shows it (`android:label` in AndroidManifest.xml), in every
@@ -37,10 +37,11 @@ object AppStrings {
     fun isEnglish(ctx: Context): Boolean =
         context(ctx).resources.configuration.locales[0].language != "zh"
 
-    /** A context whose resources are in the app language. */
+    /** A context whose resources are in the app language: English unless a
+     *  stored choice says otherwise (the system language is not consulted). */
     fun context(ctx: Context): Context {
         val app = ctx.applicationContext ?: ctx
-        val lang = language(app) ?: return app
+        val lang = language(app) ?: "en"
         cache?.let { (l, c) -> if (l == lang) return c }
         val locale = if (lang == "zh") Locale.SIMPLIFIED_CHINESE else Locale.ENGLISH
         val config = Configuration(app.resources.configuration).apply { setLocale(locale) }
