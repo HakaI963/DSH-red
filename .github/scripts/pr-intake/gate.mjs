@@ -9,8 +9,9 @@ const CI_ONLY_PR_AUTHOR_IDS = new Set([
 ])
 const COMMENT_MARKER = '<!-- dsh-go-pr-gate -->'
 
-// dsh-Go 目前不接受任何外部 PR：作者不是协作者、也不在 APPROVED_CONTRIBUTORS
-// 里时关闭 PR，并留一条指向 CONTRIBUTING.md 的评论。维护者 reopen 视为放行。
+// dsh-Go currently accepts no external PRs: when the author is neither a
+// collaborator nor listed in APPROVED_CONTRIBUTORS, close the PR and leave a
+// comment pointing at CONTRIBUTING.md. A maintainer reopen counts as approval.
 export async function runPrGate({ github, context, core, workspace = process.env.GITHUB_WORKSPACE }) {
   const pullNumber = context.payload.pull_request.number
   const defaultBranch = context.payload.repository.default_branch
@@ -31,8 +32,9 @@ export async function runPrGate({ github, context, core, workspace = process.env
       })
       return data.permission
     } catch (error) {
-      // 404: 不是协作者。401/403/限流/5xx 必须抛出——吞掉会把
-      // write 协作者当成路人，reopen 例外也会失效。
+      // 404: not a collaborator. 401/403/rate-limit/5xx must throw — swallowing
+      // them would treat a write collaborator as a stranger and also defeat the
+      // reopen exception.
       if (error.status === 404) return null
       throw error
     }

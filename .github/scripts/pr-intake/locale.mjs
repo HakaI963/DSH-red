@@ -1,5 +1,6 @@
-// 标题+正文里汉字占「汉字+字母」≥ 20%，或汉字 ≥ 12，回中文。
-// 先剥模板注释、代码块、URL，避免 API 名把拉丁字母撑高。
+// Reply in Chinese when Han characters make up >= 20% of (Han + letters) in
+// the title+body, or there are >= 12 of them. Template comments, code blocks
+// and URLs are stripped first so API names don't inflate the letter count.
 export function detectReplyLocale(title, body) {
   const text = `${title || ''}\n${body || ''}`
     .replace(/<!--[\s\S]*?-->/g, ' ')

@@ -1,11 +1,14 @@
-# PR 入口门禁——CONTRIBUTING.md「暂不接受外部 PR」的 CI 落地。
-# 逻辑在 .github/scripts/pr-intake/，本文件只编排。
+# PR intake gate — the CI enforcement of CONTRIBUTING.md's "no external PRs for now".
+# The logic lives in .github/scripts/pr-intake/; this file only orchestrates.
 #
-# pull_request_target 才能关别人仓库推过来的 PR。必须 checkout 默认分支，
-# 禁止 checkout PR 头，避免在可信上下文里跑 fork 代码。
+# pull_request_target is required to close PRs pushed from other repositories.
+# It must check out the default branch; never check out the PR head, so fork
+# code never runs in a trusted context.
 #
-# 不追溯：只监听 opened / reopened。门禁生效前已经开着的 PR 不会收到 opened，
-# 因而不会被关掉。维护者 reopen 视为一次性放行；其他人 reopen 再关一次。
+# Not retroactive: it only listens to opened / reopened. A PR already open
+# before the gate existed never receives `opened`, so it is not closed.
+# A maintainer reopen counts as a one-time approval; anyone else's reopen is
+# closed again.
 name: PR Gate
 
 on:
