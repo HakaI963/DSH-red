@@ -213,7 +213,7 @@ void main() {
 
     testWidgets('使用帮助 is not there in 网页模式', (tester) async {
       await pumpSettings(tester, overrides: [askAiAvailableProvider.overrideWithValue(false)]);
-      await tester.scrollUntilVisible(find.text('关于'), 300, scrollable: find.byType(Scrollable).first);
+      await tester.scrollUntilVisible(find.text('关于 DSH Go'), 300, scrollable: find.byType(Scrollable).first);
       await tester.pumpAndSettle();
       expect(find.widgetWithText(SettingsTile, '使用帮助'), findsNothing);
     });
