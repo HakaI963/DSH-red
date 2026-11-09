@@ -51,7 +51,15 @@ import '../../shell/golden_harness.dart';
 /// list's spot covers it) or a row that only shows for a moment.
 final Map<SettingsPageId, List<String Function(L10n)>> _unlisted = {
   // The author's profiles are links, not settings to look up.
-  SettingsPageId.about: [(_) => AppInfo.author, (l) => l.hubAboutBilibili, (l) => l.hubAboutX, (l) => l.hubAboutGithub],
+  SettingsPageId.about: [
+    (_) => AppInfo.author,
+    (l) => l.hubAboutBilibili,
+    (l) => l.hubAboutX,
+    (l) => l.hubAboutGithub,
+    // The fork credits are links too (hardcoded English on this build).
+    (_) => 'DSH red — this fork',
+    (_) => 'Original DSH Go project',
+  ],
   SettingsPageId.performance: [
     (l) => l.performanceAuto,
     (l) => l.performanceFull,

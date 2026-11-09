@@ -76,7 +76,8 @@ jobs:
             test/share/share_card_golden_test.dart \
             test/settings/appearance_page_test.dart \
             test/settings/launch_screen_section_test.dart \
-            test/settings/settings_pages_golden_test.dart
+            test/settings/settings_pages_golden_test.dart \
+            test/settings/wallpaper_section_test.dart
       - name: Package changed goldens
         run: |
           git -c core.quotepath=off diff --name-only HEAD -- 'app/test' > changed.txt
