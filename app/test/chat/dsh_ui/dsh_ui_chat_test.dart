@@ -102,7 +102,7 @@ void main() {
     );
     final field = find.descendant(of: find.byType(DshUiCard), matching: find.byType(TextField));
     expect(field, findsOneWidget);
-    // 只填字、不选预设也能发。
+    // Typing text without picking a preset still sends.
     await tester.enterText(field, '先算一次总利息');
     await pumpFrames(tester, 2);
     await tester.tap(find.descendant(of: find.byType(DshUiCard), matching: find.text('发送')));

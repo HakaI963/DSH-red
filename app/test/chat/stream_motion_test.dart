@@ -115,7 +115,7 @@ void main() {
     await tester.pump();
     await tester.tap(find.byType(ThinkingPill));
     await pumpFrames(tester, 10);
-    // 展开时只有全文,行内预览让位。
+    // Expanded shows the full text only; the inline preview yields.
     expect(find.descendant(of: find.byType(ThinkingPill), matching: find.text('完整思考')), findsOneWidget);
     bool pillExpanded() => tester
         .widget<Semantics>(
@@ -136,7 +136,7 @@ void main() {
       expect(tester.state(find.byType(AssistantMessage)), same(state));
       expect(_opacityOf(tester, find.text('回答')), 1);
     }
-    // 一轮结束:亲手展开的全文收回去,只剩一行预览。
+    // Turn over: the hand-expanded full text folds back, leaving a one-line preview.
     expect(pillExpanded(), isFalse);
   });
 

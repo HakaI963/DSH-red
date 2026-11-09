@@ -1,11 +1,11 @@
-// 展开的思考正文本身也是收起的落点:点它和再点一次头部等价 —— 回到三行
-// 实时窗口(思考中)或行内预览(一轮结束)。正文里的链接、译文切换按钮
-// 是更靠里的手势目标,不能被收起吞掉。
+// Tapping the expanded reasoning body collapses it too — the same as
+// tapping the header again: back to the three-line live window (思考中)
+// or the inline preview (turn over). Links and 「翻译」 stay tappable.
 //
-// 正文自带文本选择(SelectionArea),选择区自己也装了一个 tap 手势,而且比
-// 外层包装更先摸到指针;控件因此把选择区套在收起手势的**外面**(见
-// thinking_pill.dart 的 _CollapsibleReasoningBody)。这里用真实的点击路径
-// 验证,不直接调回调。
+// The body selects text on its own (SelectionArea), and that layer's tap
+// wins the pointer before the outer wrapper, so the widget nests the
+// selection **outside** the collapse gesture (see _CollapsibleReasoningBody
+// in thinking_pill.dart). These tests drive real taps, not the callbacks.
 
 import 'dart:ui' as ui;
 
@@ -53,7 +53,7 @@ Future<void> _expand(WidgetTester tester, {bool active = false}) async {
   await pumpFrames(tester, 6);
 }
 
-/// 正文里一段 [label] 文字的中心点(按排版框量,而不是猜坐标)。
+/// Centre of a run of [label] text in the body (measured on its layout box, not guessed).
 Offset _labelCenter(WidgetTester tester, String label) {
   final paragraph = tester.renderObject<RenderParagraph>(
     find.descendant(
@@ -109,13 +109,13 @@ void main() {
     await _expand(tester);
     expect(_body, findsOneWidget);
 
-    // 再点头部:收起。
+    // Tap the header again: collapsed.
     await tester.tap(find.text('思考'));
     await pumpFrames(tester, 8);
     expect(_body, findsNothing);
     expect(find.text(_preview), findsOneWidget);
 
-    // 还能再点开。
+    // It opens again.
     await _expand(tester);
     expect(_body, findsOneWidget);
   });
@@ -160,7 +160,7 @@ void main() {
     expect(opened, ['phone']);
     expect(find.text('page phone'), findsOneWidget);
 
-    // 链接吞掉了这次点击:回到上面,思考正文还是展开的。
+    // The link took this tap: back up, and the reasoning body is still expanded.
     Navigator.of(tester.element(find.text('page phone'))).pop();
     await tester.pumpAndSettle();
     expect(_body, findsOneWidget);
@@ -192,7 +192,7 @@ void main() {
     await tester.tap(find.text('翻译'));
     await pumpFrames(tester, 4);
     expect(find.text(_translated), findsOneWidget);
-    // 工具栏不在收起手势里:切译文不会把正文收起来。
+    // The toolbar sits outside the collapse gesture: switching the translation does not fold the body.
     expect(_body, findsOneWidget);
     expect(_ticker, findsNothing);
 
@@ -242,12 +242,12 @@ void main() {
     final scrollable = tester.state<ScrollableState>(find.byType(Scrollable).first);
     expect(scrollable.position.pixels, 0);
 
-    // 从正文里一个确定落在文字上的点开始拖(不校验 finder 的 render box:
-    // MarkdownBody 这个 finder 落在包装层上,不参与命中)。
+    // Drag from a point surely on the body's text (the finder's render box is
+    // not validated: the MarkdownBody finder lands on the wrapper, never hit-tested).
     await tester.dragFrom(tester.getTopLeft(_body) + const Offset(120, 12), const Offset(0, -40));
     await pumpFrames(tester, 8);
     expect(scrollable.position.pixels, greaterThan(0));
-    // 拖动不该被当成点按:正文还是展开的。
+    // A drag must not read as a tap: the body stays expanded.
     expect(_body, findsOneWidget);
     expect(_ticker, findsNothing);
   });

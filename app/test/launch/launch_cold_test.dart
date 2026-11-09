@@ -1,7 +1,7 @@
-// 冷启动与热启动：自定义画面每次 App 冷启动都按它本身的长度播完一轮，不设上限，引擎在跑、现起、
-// 没开，首页连远程主机，轻量模式都一样，只有系统要求减少动画时停在首帧、不等；默认动画只在引擎
-// 这次现起时播完（1.36 s，引擎先就绪就提前收），引擎早已在跑、首页连的是远程主机、或减少动画时，
-// 界面可用就收，一刻不拖。轻点随时跳过；热启动（进程还在）没有启动画面。时间点都按帧量出来。
+// Cold and warm start: every cold start plays a custom clip through once at its own length, no cap — the same whether the engine
+// runs, spawns now or is off, the home page is a remote host, or lite mode is on; only system reduce-motion parks it on the first
+// frame, waiting for nothing. The default animation plays through (1.36 s, cut short if the engine is ready first) only when the
+// engine spawns on this launch; when it already runs, home is remote, or animations are reduced, it clears the moment the UI is usable. A tap skips at any time; a warm start (process alive) shows no splash. Timings measured frame by frame.
 
 import 'dart:convert';
 import 'dart:io';

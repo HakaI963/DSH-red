@@ -68,7 +68,11 @@ jobs:
           flutter test --no-pub --update-goldens \
             test/settings/settings_ia_golden_test.dart \
             test/shell/shell_golden_test.dart \
-            test/plugins/seats/seats_pages_test.dart
+            test/plugins/seats/seats_pages_test.dart \
+            test/launch/launch_golden_test.dart \
+            test/phone/phone_golden_test.dart \
+            test/phone/dnd_mode_golden_test.dart \
+            test/settings/icon_shortcut_sheet_test.dart
       - name: Package changed goldens
         run: |
           git -c core.quotepath=off diff --name-only HEAD -- 'app/test' > changed.txt

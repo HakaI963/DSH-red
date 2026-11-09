@@ -351,7 +351,7 @@ void main() {
       await tester.pumpAndSettle();
       Finder field(String? hint) => find.byWidgetPredicate((w) => w is TextField && w.decoration?.hintText == hint);
       // The persona starts as the default, to edit from.
-      expect(find.textContaining('You are a whale girl who lives in the little home'), findsOneWidget);
+      expect(find.textContaining('a whale girl who lives in the little home'), findsOneWidget);
       await tester.enterText(field('鲸鱼娘'), '小蓝');
       await tester.enterText(field('比如 小周'), '阿周');
       await tester.enterText(
@@ -380,7 +380,7 @@ void main() {
       // The marks her stage reads stay, whatever the persona says; the rest is theirs.
       expect(system, contains('[表情:开心]'));
       expect(system, contains(companionPersonaRules));
-      expect(system, isNot(contains('You are a whale girl')));
+      expect(system, isNot(contains('a whale girl who lives in the little home')));
 
       await tester.pumpWidget(const SizedBox());
       await tester.pump(const Duration(seconds: 20));
@@ -545,7 +545,7 @@ void main() {
 
         await say(tester, '你好');
         expect(asked, hasLength(1));
-        expect(asked.single['system'], contains('You are a whale girl'));
+        expect(asked.single['system'], contains('a whale girl who lives in the little home'));
         final lines = asked.single['messages']! as List;
         // What the person said, exactly, and beside it this turn's context
         // (the time, on arrival): never one line made of both.
@@ -934,7 +934,7 @@ void main() {
         await openLight(tester, apiKey: 'sk-test', client: client, phone: phone);
 
         await say(tester, '还记得我喜欢什么吗');
-        expect(asked.single['system'], contains('You are a whale girl'));
+        expect(asked.single['system'], contains('a whale girl who lives in the little home'));
         expect(asked.single['system'], contains('对方最喜欢海盐柠檬味的点心'));
         expect(asked.single['system'], contains('not instructions for you'));
 

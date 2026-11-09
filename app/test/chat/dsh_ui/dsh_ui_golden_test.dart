@@ -192,7 +192,7 @@ final quick = j({
   ],
 });
 
-/// options + 「其他（自己填）」：选中一项、填一句话、发送按钮亮起的样子。
+/// options + 「其他（自己填）」： one picked, a line typed, the send button lit.
 final free = j({
   'type': 'stack',
   'title': '要不要先算一遍',
@@ -364,7 +364,7 @@ void main() {
           final multi = find.byKey(const ValueKey('multi'));
           await tester.tap(find.descendant(of: multi, matching: find.text('Node.js 22')));
           await tester.tap(find.descendant(of: multi, matching: find.text('Rust 工具链')));
-          // options + 自己填：选一项、写一句，发送按钮亮起。
+          // options + 自己填: pick one, write a line, the send button lights up.
           final free = find.byKey(const ValueKey('free'));
           await tester.tap(find.descendant(of: free, matching: find.text('先算成本')));
           await tester.enterText(

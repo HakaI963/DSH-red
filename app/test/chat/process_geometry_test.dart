@@ -60,25 +60,25 @@ void main() {
     await pumpFrames(tester, 4);
     final ticker = find.byType(ThinkingTicker);
     expect(ticker, findsOneWidget);
-    // 超过三行:窗口钉在三行高(13 号 × 1.3 行高 × 3),不跟着内容长。
+    // Past three lines: the window pins at three rows tall (13 px × 1.3 lh × 3), never growing with the content.
     expect(tester.getSize(ticker).height, closeTo(13 * 1.3 * 3, 0.5));
-    // 一整块连续的文字,最新的字还在;不再拆行、也没有省略号。
+    // One continuous block of text, the newest characters still in it; no row splitting, no ellipsis.
     expect(find.descendant(of: ticker, matching: find.textContaining('正在写的这一段更长一些')), findsOneWidget);
     expect(find.textContaining('…'), findsNothing, reason: 'no ellipsis on the ticker');
-    // 点开:实时窗口让位给全文,两块不会同时在树上。
+    // Expanded: the live window yields to the full text, the two are never in the tree at once.
     await tester.tap(find.text('思考中'));
     await pumpFrames(tester, 6);
     expect(find.byType(ThinkingTicker), findsNothing);
     expect(find.textContaining('正在写的这一段更长一些'), findsOneWidget);
-    // 再点:回到三行窗口。
+    // Tap again: back to the three-line window.
     await tester.tap(find.text('思考中'));
     await pumpFrames(tester, 6);
     expect(find.byType(ThinkingTicker), findsOneWidget);
-    // 恒高三行:内容只有一行时窗口也不缩,流式期间列表不跟着跳。
+    // Always three rows tall: no shrink for one-line content, so the list never jumps while streaming.
     await tester.pumpWidget(testApp(const Scaffold(body: ThinkingPill(reasoning: '短', active: true))));
     await pumpFrames(tester, 4);
     expect(tester.getSize(find.byType(ThinkingTicker)).height, closeTo(13 * 1.3 * 3, 0.5));
-    // 思考结束:窗口收回,行内预览出现。
+    // Thinking over: the window retracts and the inline preview appears.
     await tester.pumpWidget(pill(false));
     await pumpFrames(tester, 6);
     expect(find.byType(ThinkingTicker), findsNothing);
@@ -88,12 +88,12 @@ void main() {
     Widget pill(String reasoning) =>
         testApp(Scaffold(body: ThinkingPill(reasoning: reasoning, active: true, streaming: true)));
     await tester.pumpWidget(pill('第一行'));
-    // 流式期间块高按行瞬长:高度动画会和文字上滑、列表追底叠在一起,看起来在抖。
+    // While streaming, block height grows per line instantly: animating it would fight the text glide and the bottom-chasing list and read as jitter.
     expect(find.byType(AnimatedSize), findsNothing);
     await tester.pumpWidget(pill('第一行\n第二行'));
     expect(find.byType(AnimatedSize), findsNothing);
     expect(tester.getSize(find.byType(ThinkingTicker)).height, greaterThan(13 * 1.3));
-    // 点开全文时高度动画回来(单槽切换才需要过渡)。
+    // Opening the full text brings the height animation back (only the single-slot switch needs a tween).
     await tester.tap(find.text('思考中'));
     await tester.pump();
     expect(find.byType(AnimatedSize), findsOneWidget);

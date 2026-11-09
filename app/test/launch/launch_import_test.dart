@@ -1,6 +1,6 @@
-// 自定义启动画面的导入：认文件头、量边缘颜色、按上限拷贝（视频 30 MB，图片 8 MB）、坏文件拒收、
-// 视频不限时长、
-// 换新时删旧文件；配置的读写与回退。
+// Importing custom 启动画面 files: recognise by file header, measure the edge colours, copy within the caps (30 MB video, 8 MB image),
+// videos of any length accepted, bad files refused,
+// and the old file deleted on replacement; the config's read, write and fallback.
 
 import 'dart:convert';
 import 'dart:io';

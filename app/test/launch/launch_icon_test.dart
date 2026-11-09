@@ -1,6 +1,6 @@
-// 启动画面从头到尾只出现用户选的图标：系统阶段没画图标（Android 8–12、13+ 的第一次启动、或带
-// 自定义画面）时首帧也不画，动画开头再把所选图标淡入；系统画了图标（13+ 已换成所选图标的启动
-// 主题）时首帧原样接上。四款图标逐款出 golden，自定义画面接在它自己的纯色系统画面后面。
+// 启动画面 shows only the user-chosen icon from first frame to last: where the system stage drew no icon (Android 8–12, the first launch
+// on 13+, or a custom clip), the first frame draws none either and fades the chosen icon in at the animation's start; where the system did
+// (13+, splash theme already the chosen icon), the first frame carries it over as-is. Goldens per icon; custom clips follow their own solid system frame.
 //
 //   flutter test --update-goldens test/launch/launch_icon_test.dart
 

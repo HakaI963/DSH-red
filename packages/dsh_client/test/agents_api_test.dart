@@ -325,7 +325,7 @@ void main() {
       client.routeSubagent(const SubagentAddress(parentSessionId: _parent, childSessionId: _child));
       await expectLater(
         client.prompt(_child, 'hi'),
-        throwsA(isA<SubagentReadOnlyException>().having((e) => e.message, 'message', contains('上级对话'))),
+        throwsA(isA<SubagentReadOnlyException>().having((e) => e.message, 'message', contains('parent conversation'))),
       );
       expect(client.subagentRoute(_child)!.mode, SubagentMode.continuable);
       // A one-shot child has nothing to stop.

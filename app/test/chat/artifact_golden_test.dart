@@ -143,7 +143,7 @@ void main() {
                         ),
                       ),
                       const SizedBox(height: 24),
-                      // 对话详情「文件」页签顶上的那一块(自带左右 16)。
+                      // The block atop 对话详情's 「文件」 tab (brings its own 16 on each side).
                       const SessionArtifactsSection(sessionId: 's1'),
                     ],
                   ),

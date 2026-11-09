@@ -228,6 +228,9 @@ class CompanionNameSetting extends Notifier<String?> {
   Future<void> set(String? name) async {
     final trimmed = name?.trim();
     final next = trimmed == null || trimmed.isEmpty ? null : String.fromCharCodes(trimmed.runes.take(companionNameMax));
+    // The persona page flushes through a microtask after dispose; if the
+    // container is already gone the write is meaningless.
+    if (!ref.mounted) return;
     state = next;
     final prefs = await SharedPreferences.getInstance();
     if (next == null) {
@@ -325,6 +328,7 @@ class CompanionPersonaController extends Notifier<CompanionPersonaSettings> {
   }
 
   Future<void> set(CompanionPersonaSettings next) async {
+    if (!ref.mounted) return;
     state = next;
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString(_personaKey, jsonEncode(next.toJson()));
@@ -366,7 +370,9 @@ class CompanionRenamed extends Notifier<String?> {
   @override
   String? build() => null;
 
-  void set(String? name) => state = name;
+  void set(String? name) {
+    if (ref.mounted) state = name;
+  }
 }
 
 final companionRenamedProvider = NotifierProvider<CompanionRenamed, String?>(CompanionRenamed.new);

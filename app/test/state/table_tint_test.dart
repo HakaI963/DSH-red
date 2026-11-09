@@ -4,7 +4,7 @@ import 'package:dsh_app/state/table_tint_state.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
-  // 三档只差在两个填充上：表头永远给一个色（透明也算），隔行给不给。
+  // The three levels differ only in the two fills: the header always gets a colour (transparent counts), stripes get one or not.
   const header = Color(0xFF112233);
   const stripe = Color(0x0A000000);
 
@@ -22,7 +22,7 @@ void main() {
     });
 
     test('none is transparent, not null', () {
-      // TableStyle 把 null 当成"用主题默认值"，所以"不铺"必须是显式透明。
+      // TableStyle reads null as "use the theme default", so "no fill" must be an explicit transparency.
       final fills = tableTintFills(TableTint.none, headerColor: header, stripeColor: stripe);
       expect(fills.header, transparentFill);
       expect(fills.header.a, 0);

@@ -191,7 +191,7 @@ void main() {
     ) async {
       final f = _Fixture()..observe();
       await f.publisher.publish();
-      expect(written.single, contains('- Runtime state: connecting'));
+      expect(written.single, contains('- state: connecting'));
       if (succeeds) {
         f.ready.complete(f.connected);
       } else {
@@ -199,7 +199,7 @@ void main() {
       }
       await _flush(tester);
       expect(written, hasLength(2));
-      expect(written.last, contains('- Runtime state: ${succeeds ? 'connected' : 'failed'}'));
+      expect(written.last, contains('- state: ${succeeds ? 'connected' : 'failed'}'));
     });
   }
 
@@ -217,7 +217,7 @@ void main() {
     await first;
     await _flush(tester);
     expect(written, hasLength(2));
-    expect(written.last, contains('- Runtime state: connected'));
+    expect(written.last, contains('- state: connected'));
   });
 
   for (final restart in [false, true]) {
@@ -238,7 +238,7 @@ void main() {
       expect(await explicit, isA<PublishedDiagnostics>());
       await _flush(tester);
       expect(written, hasLength(2), reason: 'only the initial and later explicit report may write');
-      expect(written.last, contains('- Runtime state: connected'));
+      expect(written.last, contains('- state: connected'));
     });
   }
 
@@ -257,7 +257,7 @@ void main() {
     expect(await explicit, isA<PublishedDiagnostics>());
     await _flush(tester);
     expect(written, hasLength(2));
-    expect(written.last, contains('- Runtime state: connected'));
+    expect(written.last, contains('- state: connected'));
   });
 
   testWidgets('repeating the same observed state does not rewrite the snapshot', (tester) async {
@@ -269,7 +269,7 @@ void main() {
     local.emit(AsyncData(f.connected));
     await _flush(tester);
     expect(written, hasLength(1));
-    expect(written.single, contains('- Runtime state: connected'));
+    expect(written.single, contains('- state: connected'));
   });
 
   testWidgets('publishing never initializes a connection or a Host link', (tester) async {
@@ -291,7 +291,7 @@ void main() {
     await _flush(tester);
     expect(connectionReads, 0);
     expect(linkReads, 0);
-    expect(written.single, contains('- Runtime state: not_observed'));
+    expect(written.single, contains('- state: not_observed'));
   });
 
   testWidgets('reading the publisher does not enable writes before a publish request', (tester) async {
@@ -312,7 +312,7 @@ void main() {
     expect(written, hasLength(1));
     await f.publisher.publish();
     expect(written, hasLength(2));
-    expect(written.last, contains('- Runtime state: connected'));
+    expect(written.last, contains('- state: connected'));
   });
 
   testWidgets('overlapping requests coalesce into one later collection and cannot write in reverse order', (
@@ -336,8 +336,8 @@ void main() {
     expect(beforeRelease, 1);
     expect(collections, 2);
     expect(written, hasLength(2));
-    expect(written.first, contains('- Runtime state: connecting'));
-    expect(written.last, contains('- Runtime state: connected'));
+    expect(written.first, contains('- state: connecting'));
+    expect(written.last, contains('- state: connected'));
   });
 
   testWidgets('a failed current collection does not discard the next requested report', (tester) async {
@@ -354,7 +354,7 @@ void main() {
     firstSnapshot.completeError(StateError('synthetic collection failure'));
     expect(await first, isA<StateError>());
     expect(await second, isA<PublishedDiagnostics>());
-    expect(written.single, contains('- Runtime state: connected'));
+    expect(written.single, contains('- state: connected'));
   });
 
   testWidgets('automatic snapshots omit retained IME evidence; manual publication and ZIP opt in', (tester) async {
@@ -403,7 +403,7 @@ void main() {
     await _flush(tester);
     expect(written, hasLength(2));
     expect(written.first, contains('System IME evidence'));
-    expect(written.last, contains('- Runtime state: connected'));
+    expect(written.last, contains('- state: connected'));
     expect(written.last, isNot(contains('System IME evidence')));
     expect(manualFlags, [true, false]);
     expect(reports['diagnostics.md'], written.last, reason: 'automatic refresh must still update connection facts');

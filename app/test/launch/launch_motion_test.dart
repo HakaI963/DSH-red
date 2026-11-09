@@ -1,4 +1,4 @@
-// 启动画面的时间线：关键帧上的位置和透明度，按 launch_motion.dart 顶部的设计量出来。
+// The 启动画面 timeline: position and opacity at each keyframe, measured from the design at the top of launch_motion.dart.
 
 import 'package:dsh_app/launch/launch_motion.dart';
 import 'package:flutter/painting.dart';

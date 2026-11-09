@@ -168,11 +168,11 @@ void main() {
       final typed = dshUiAnswerFor(free, DshUiReply.choice(const [], freetext: '再算一次'));
       expect(typed!.selected, isEmpty);
       expect(typed.freetext, '再算一次');
-      // 选项和「其他」可以一起答。
+      // Options and 「其他」 can be answered together.
       final both = dshUiAnswerFor(free, DshUiReply.choice(['方案 A'], freetext: '先别动'));
       expect(both!.selected, ['方案 A']);
       expect(both.freetext, '先别动');
-      // 没开 freetext 的卡不认这句。
+      // A card without freetext does not accept this reply.
       expect(dshUiAnswerFor(titled, DshUiReply.choice(const [], freetext: '再算一次')), isNull);
     });
   });

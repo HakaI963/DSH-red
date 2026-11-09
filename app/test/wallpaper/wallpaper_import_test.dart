@@ -1,5 +1,5 @@
-// 自定义壁纸的导入（启动画面那条链路，换成壁纸的预算）和持久化：只要照片、15 MB 以内、
-// PNG / JPEG / WebP（动图取首帧）、坏文件和视频拒收、换图删旧文件、取景和观感的读写与回退。
+// Importing custom wallpapers (the 启动画面 pipeline, with the wallpaper's budget) and persistence: photos only, within 15 MB,
+// PNG / JPEG / WebP (animated images take the first frame), broken files and videos rejected, replacing a picture deletes the old file, framing and appearance read/write and fallback.
 
 import 'dart:convert';
 import 'dart:io';
