@@ -68,7 +68,9 @@ jobs:
           node sdk/plugin-kit/scripts/sync-skill.mjs --check
           # Not --check: this also writes site/build/share, which the share worker builds from.
           python3 app/tool/make_replay_viewer.py
-          git diff --exit-code -- app/lib/share_code/replay_viewer.g.dart
+          if ! git diff --quiet -- app/lib/share_code/replay_viewer.g.dart; then
+            echo "== replay viewer drift =="; git diff -- app/lib/share_code/replay_viewer.g.dart | head -60; exit 1
+          fi
       - name: Python tooling
         run: |
           python3 -m venv "$RUNNER_TEMP/venv"

@@ -78,7 +78,9 @@ jobs:
             test/settings/launch_screen_section_test.dart \
             test/settings/settings_pages_golden_test.dart \
             test/settings/wallpaper_section_test.dart \
-            test/features/features_pages_test.dart
+            test/features/features_pages_test.dart \
+            test/plugin_config/plugin_config_golden_test.dart \
+            test/integration/wiring_test.dart
       - name: Package changed goldens
         run: |
           git -c core.quotepath=off diff --name-only HEAD -- 'app/test' > changed.txt
