@@ -24,18 +24,20 @@ const _mirrorApk = '$_mirror/download/0.9.0/$_apk';
 
 void main() {
   group('defaults', () {
-    final sources = buildUpdateSources();
+    // The upstream layout, pinned for the tests that exercise a self-hosted
+    // bucket; DSH red itself ships without one (see the fork defaults below).
+    final sources = buildUpdateSources(mirror: 'https://dl.dshtui.com');
 
-    test('GitHub and the accelerators, the API last; nothing on go.dshtui.com', () {
-      expect(sources.channel, isNull);
-      // DSH red: no self-hosted bucket; GitHub first, then the accelerators.
-      expect(sources.feed, isNull);
-      expect(sources.mirrors.map((m) => m.id), ['github', 'ghfast', 'gh-proxy']);
-      final endpoints = sources.metadataEndpoints();
+    test('DSH red: GitHub and the accelerators, the API last; nothing on go.dshtui.com', () {
+      final bare = buildUpdateSources();
+      expect(bare.channel, isNull);
+      expect(bare.feed, isNull);
+      expect(bare.mirrors.map((m) => m.id), ['github', 'ghfast', 'gh-proxy']);
+      final endpoints = bare.metadataEndpoints();
       expect(endpoints.map((e) => e.id), ['manifest:github', 'manifest:ghfast', 'manifest:gh-proxy', 'api']);
       expect(endpoints.map((e) => e.url.toString()).take(2), [_manifest, 'https://ghfast.top/$_manifest']);
       expect(endpoints.every((e) => e.headers.isEmpty), isTrue);
-      final urls = sources.downloadUrls([Uri.parse(_githubApk)]);
+      final urls = bare.downloadUrls([Uri.parse(_githubApk)]);
       expect(urls.map((u) => u.url.toString()), [
         _githubApk,
         'https://ghfast.top/$_githubApk',
@@ -47,10 +49,11 @@ void main() {
 
     test('the shipped configuration (no token in tests) is the same', () {
       final shipped = defaultUpdateSources();
+      final bare = buildUpdateSources();
       expect(shipped.channel, isNull);
       expect(shipped.feed, isNull);
-      expect(shipped.metadataEndpoints().map((e) => e.id), sources.metadataEndpoints().map((e) => e.id));
-      expect(shipped.mirrors.map((m) => m.id), sources.mirrors.map((m) => m.id));
+      expect(shipped.metadataEndpoints().map((e) => e.id), bare.metadataEndpoints().map((e) => e.id));
+      expect(shipped.mirrors.map((m) => m.id), bare.mirrors.map((m) => m.id));
     });
 
     test('the API is not moved ahead by having answered last time; the others are', () {

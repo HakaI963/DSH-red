@@ -108,7 +108,7 @@ void main() {
       final sections = inventory.occupancy!['settings.section']!;
       expect(sections.map((o) => (o.package, o.label, o.official)), [
         ('@deepseek-ai/dsh-client-ui-settings-general', null, true),
-        ('dsh-pet', '桌宠', false),
+        ('dsh-pet', 'Desktop pet', false),
       ]);
       expect(inventory.routeGuard, isTrue);
       expect(inventory.occupancyStale, isFalse);

@@ -152,7 +152,7 @@ void main() {
       expect(names(MarketSection.adapted, '天气'), ['@someone/dsh-weather']);
       expect(names(MarketSection.official, '天气'), isEmpty);
       expect(official.byName['@dsh-go/media']!.title('en'), 'Images & video');
-      expect(official.byName['@dsh-go/media']!.summary(), startsWith('在对话里用即梦'));
+      expect(official.byName['@dsh-go/media']!.summary(), startsWith('Generate images and video in chat'));
     });
 
     test('a sidecar entry for another version is ignored', () {

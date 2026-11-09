@@ -288,10 +288,10 @@ void main() {
     testWidgets('banks and payment are off limits; WeChat confirms each step', (tester) async {
       await pumpPhone(tester, const PhoneAppRulesPage());
       final deny = groupTitled('不碰');
-      for (final app in ['支付宝', '云闪付', '招商银行', '中国工商银行']) {
+      for (final app in ['Alipay', 'UnionPay', 'China Merchants Bank', 'ICBC']) {
         expect(find.descendant(of: deny, matching: find.text(app)), findsOneWidget);
       }
-      expect(find.descendant(of: groupTitled('每一步都确认'), matching: find.text('微信')), findsOneWidget);
+      expect(find.descendant(of: groupTitled('每一步都确认'), matching: find.text('WeChat')), findsOneWidget);
       expect(find.text('密码、验证码、付款和系统设置都由你来'), findsOneWidget);
     });
 
@@ -306,8 +306,8 @@ void main() {
         await tester.pumpAndSettle();
       }
 
-      await pick('支付宝', '照常');
-      expect(find.text('让 DSH 操作「支付宝」？'), findsOneWidget);
+      await pick('Alipay', '照常');
+      expect(find.text('让 DSH 操作「Alipay」？'), findsOneWidget);
       expect(find.textContaining('冻结账号'), findsOneWidget);
       // Every time, in the danger colour: the cost lands outside the app.
       final notice = tester.widget<RiskNoticeSheet>(find.byType(RiskNoticeSheet)).notice;
@@ -317,7 +317,7 @@ void main() {
       await tester.pumpAndSettle();
       expect(h.native!.callsOf('setPolicies'), isEmpty);
 
-      await pick('支付宝', '照常');
+      await pick('Alipay', '照常');
       await tester.tap(find.text('我知道风险，仍然修改'));
       await tester.pumpAndSettle();
       expect(h.native!.callsOf('setPolicies'), hasLength(1));
@@ -326,9 +326,9 @@ void main() {
         isNot(contains('com.eg.android.AlipayGphone')),
       );
       // Still listed, so it can be put back.
-      expect(find.descendant(of: groupTitled('照常 · 你改过的'), matching: find.text('支付宝')), findsOneWidget);
+      expect(find.descendant(of: groupTitled('照常 · 你改过的'), matching: find.text('Alipay')), findsOneWidget);
 
-      await pick('支付宝', '不碰');
+      await pick('Alipay', '不碰');
       expect(find.byType(RiskNoticeSheet), findsNothing);
       expect(h.native!.callsOf('setPolicies'), hasLength(2));
 

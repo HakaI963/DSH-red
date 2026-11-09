@@ -198,7 +198,7 @@ void main() {
     expect(p.ruleFor('com.tencent.mm'), AppRule.confirmEachStep);
     expect(p.ruleFor('com.taobao.taobao'), AppRule.normal);
     expect(p.labelFor('com.unionpay'), '云闪付 App'); // native label wins
-    expect(p.labelFor('com.tencent.mm'), '微信'); // built-in fallback
+    expect(p.labelFor('com.tencent.mm'), 'WeChat'); // built-in fallback
     expect(p.labelFor('org.example.x'), 'org.example.x');
     expect(p.defaultRuleFor('com.tencent.mm'), AppRule.confirmEachStep);
 

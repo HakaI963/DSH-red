@@ -22,7 +22,7 @@ void main() {
     expect(entry.categoryTitleIn('en'), 'Agent Boosters');
     expect(entry.categoryTitleIn('zh'), 'Agent 增强');
     // Preserve the legacy plain-label property and constructor contract.
-    expect(entry.categoryTitle, 'Agent 增强');
+    expect(entry.categoryTitle, 'Agent Boosters');
   });
 
   test('plain-label callers and absent categories keep their fallback', () {
