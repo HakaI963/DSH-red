@@ -60,7 +60,7 @@ void _expectTokenOnlyOnChannel(FakeHttp http) {
 }
 
 void main() {
-  final sources = buildUpdateSources(channelToken: _token);
+  final sources = buildUpdateSources(mirror: 'https://dl.dshtui.com', channelToken: _token);
 
   group('channel', () {
     test('needs a token and an HTTPS origin', () {

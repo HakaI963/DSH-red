@@ -1,9 +1,9 @@
 /// Where in-app updates come from. Everything network-facing about updates is
 /// configured here; the conventions and trade-offs are in `docs/release.md`.
 ///
-/// Every build asks our own copy of the release files first
-/// ([updateDownloadOrigin]: `/update.json`, `/download/<version>/<file>`), then
-/// GitHub and the public accelerators, and the rate-limited GitHub API last.
+/// DSH red asks GitHub and the public accelerators first (no self-hosted copy:
+/// the upstream `dl.dshtui.com` bucket would offer old DSH Go builds), and the
+/// rate-limited GitHub API last.
 /// Beta builds carry a channel token (`--dart-define=DSH_BETA_CHANNEL_TOKEN`,
 /// put in by `tooling/build-apk.sh`): they ask the beta channel before all of
 /// that ([UpdateChannel], `go.dshtui.com/beta/update.json`,
@@ -145,7 +145,7 @@ const publicMirrors = [
 ];
 
 const _unset = '\u0000';
-const _mirrorDefine = String.fromEnvironment('DSH_UPDATE_MIRROR', defaultValue: updateDownloadOrigin);
+const _mirrorDefine = String.fromEnvironment('DSH_UPDATE_MIRROR', defaultValue: ''); // DSH red has no self-hosted update bucket: GitHub releases only.
 const _feedDefine = String.fromEnvironment('DSH_UPDATE_FEED', defaultValue: _unset);
 const _mirrorsDefine = String.fromEnvironment('DSH_UPDATE_MIRRORS', defaultValue: _unset);
 const _betaTokenDefine = String.fromEnvironment('DSH_BETA_CHANNEL_TOKEN');
@@ -166,7 +166,8 @@ UpdateSources defaultUpdateSources() => buildUpdateSources(
 /// [publicMirrors] (null = keep them); [channelToken] turns on the beta
 /// channel at [channelOrigin] ('' = off).
 UpdateSources buildUpdateSources({
-  String mirror = updateDownloadOrigin,
+  // DSH red ships with no self-hosted copy: GitHub releases and the public accelerators only (the upstream dl.dshtui.com bucket serves old DSH Go builds).
+  String mirror = '',
   String? feed,
   String? accelerators,
   String channelToken = '',

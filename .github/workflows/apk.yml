@@ -94,7 +94,11 @@ jobs:
           esac
           runtime/build-runtime.sh "${runtime_abis[@]}"
       - name: Build release APK
-        run: tooling/build-apk.sh -f "${{ github.event_name == 'workflow_dispatch' && inputs.flavor || 'arm64' }}"
+        run: |
+          name_arg=()
+          # Tag builds carry the tag's version; the pubspec stays the fallback.
+          if [[ "${GITHUB_REF_NAME}" == v* ]]; then name_arg=(--build-name "${GITHUB_REF_NAME#v}"); fi
+          tooling/build-apk.sh -f "${{ github.event_name == 'workflow_dispatch' && inputs.flavor || 'arm64' }}" "${name_arg[@]}"
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: dsh-red-apk-${{ github.event_name == 'workflow_dispatch' && inputs.flavor || 'arm64' }}-${{ github.run_number }}
@@ -106,6 +110,15 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
+          # The in-app update checker recognises assets as dsh-go-<version>-<abi>.apk.
+          version="${GITHUB_REF_NAME#v}"
+          cd app/build/app/outputs/flutter-apk
+          for a in app-arm64-release.apk app-x64-release.apk; do
+            [ -f "$a" ] || continue
+            abi="${a#app-}"; abi="${abi%-release.apk}"
+            mv "$a" "dsh-go-${version}-${abi}.apk"
+          done
+          cd -
           gh release create "${GITHUB_REF_NAME}" \
             --title "DSH-red ${GITHUB_REF_NAME}" \
             --notes "English build of DSH Go (DeepSeek Harness for Android). Release APK built by GitHub Actions; debug-signed (add signing secrets to the repo for store-ready builds). Install over any earlier build of the same version." \

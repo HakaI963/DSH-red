@@ -96,7 +96,7 @@ void main() {
       overrides: [
         updateHttpProvider.overrideWithValue(http),
         updateInstallerProvider.overrideWithValue(installer),
-        updateSourcesProvider.overrideWithValue(buildUpdateSources()),
+        updateSourcesProvider.overrideWithValue(buildUpdateSources(mirror: 'https://dl.dshtui.com')),
         updateClockProvider.overrideWithValue(() => DateTime(2026, 11, 2, 9)),
         updateFlavorNameProvider.overrideWithValue('arm64'),
         updateDirectoryProvider.overrideWithValue(() async => downloads()),
