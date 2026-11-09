@@ -40,12 +40,12 @@ void main() {
     expect('- '.allMatches(capped.substring(companionPersonaCore.length)).length, 5);
 
     final long = companionLightSystem(
-      [memory('a', 'x' * 30, updatedDaysAgo: 0), memory('b', 'y' * 30, updatedDaysAgo: 1)],
+      [memory('a', '甲' * 30, updatedDaysAgo: 0), memory('b', '乙' * 30, updatedDaysAgo: 1)],
       now: now,
       budget: 40,
     );
-    expect(long, contains('x' * 30));
-    expect(long, isNot(contains('y')));
+    expect(long, contains('甲' * 30));
+    expect(long, isNot(contains('乙')));
 
     expect(companionLightSystem([memory('a', '喜欢\n\n  下雨天')], now: now), contains('- 喜欢 下雨天'));
   });

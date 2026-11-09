@@ -240,7 +240,7 @@ void main() {
       final result = await device.pickFiles();
       expect(result.attachments, isEmpty);
       expect(result.problem, appL10n.stateAttachmentImageLimit(file.name));
-      expect(file.consumed, _png.length + maxImageBytes + _mib);
+      expect(file.consumed, _png.length + maxImageBytes);
       expect(file.closed, isTrue);
       expect(file.wholeReads, 0);
     });
