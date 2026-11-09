@@ -1,6 +1,6 @@
-// 自定义启动画面：用户选的图片、动图或短视频，怎么摆，铺什么底色。文件在
-// App 私有目录（`<support>/launch/`），设置存在 shared_preferences 的
-// `launch_custom`（一条 JSON：启动时和语言一起读出来，首帧就知道要不要用）。
+// Custom launch screen: the user's chosen picture, animation or short video, how it sits and what
+// backdrop color it gets. Files live in the app's private directory (`<support>/launch/`); settings are stored
+// in shared_preferences under `launch_custom` (one JSON, read at launch with the language so the first frame already knows whether to use it).
 
 import 'dart:convert';
 import 'dart:io';

@@ -65,13 +65,13 @@ import kotlin.math.roundToInt
  * The out-of-app pet (docs/design/pets.md): a window the size of the pack's wide hit
  * box (grown around the lifted pose while held, and around an animation that reaches past it while
  * that shows, [PetFrames]), a separate bubble window (with a
- * request's answers on it), a long-press menu, 问一句's input bar, and a 「×」 target while
+ * request's answers on it), a long-press menu, Quick ask's input bar, and a "×" target while
  * dragging. Dart pushes the reduced state ([push]) and does what the bar and the bubble ask
  * ([Listener.call]); when it shows is [OverlayMachine]'s call, the permission branches
  * [OverlayAccess]'s, the dock [EdgeSnap]'s, what plays [PetPlayer]'s.
  *
  * Window type: TYPE_ACCESSIBILITY_OVERLAY through the phone-control accessibility service when it
- * is on (no other permission), else TYPE_APPLICATION_OVERLAY with 「显示在其他应用上层」. Whether
+ * is on (no other permission), else TYPE_APPLICATION_OVERLAY with "Display over other apps". Whether
  * that works is decided by adding the window, not by `canDrawOverlays` (vendor switches).
  *
  * Process-wide, main thread only. [init] comes from [PetOverlayPlugin] with the engine.
@@ -81,7 +81,7 @@ internal object PetOverlay {
         fun onStatus(status: Map<String, Any?>)
         fun onOpenSettings()
 
-        /** Asks Dart [method] (问一句, an answer, 停止, …); [reply] gets null when Dart can't answer. */
+        /** Asks Dart [method] (Quick ask, an answer, Stop, …); [reply] gets null when Dart can't answer. */
         fun call(method: String, args: Any?, reply: (Any?) -> Unit)
     }
 
@@ -102,7 +102,7 @@ internal object PetOverlay {
     private const val NOTICE_ID = 3091
     /** An answer key takes touches this long after its bubble shows (as phone control's prompt). */
     private const val ARM_MS = 600L
-    /** 问一句's bar: as wide as there is room beside the pet, within these. */
+    /** Quick ask's bar: as wide as there is room beside the pet, within these. */
     private const val ASK_MIN_DP = 240f
     private const val ASK_MAX_DP = 360f
     /** Less than this much recording is nothing heard (the composer's rule, 0.3 s at 16 kHz). */
@@ -122,7 +122,7 @@ internal object PetOverlay {
     private val producer = OverlayProducerOwner()
 
     /**
-     * The pet is on screen, lit, not hidden by the system, with bubbles on: 「做完了」「出错了」
+     * The pet is on screen, lit, not hidden by the system, with bubbles on: "Done"/"Something went wrong"
      * notifications go silent meanwhile (notify/ChatNotifier.kt), the bubble says it.
      */
     @Volatile var speaksForResults = false
@@ -257,7 +257,7 @@ internal object PetOverlay {
 
     /**
      * A brought pet's files changed (imported again, removed): what was read of [id] is stale even
-     * though its id and size are not. Read it again if it is the one out. If it isn't (不显示,
+     * though its id and size are not. Read it again if it is the one out. If it isn't (None,
      * another pet), what is kept or still loading of it goes, so choosing it again reads it fresh.
      */
     fun reloadPack(id: String) {
@@ -328,7 +328,7 @@ internal object PetOverlay {
         )
     }
 
-    /** 「今天不再显示」: hidden until local midnight. */
+    /** "Hidden for today": hidden until local midnight. */
     fun snoozeToday() {
         capture.invalidate()
         val c = Calendar.getInstance().apply {
@@ -1378,7 +1378,7 @@ internal object PetOverlay {
         }
     }
 
-    /** 切换主机: the menu's rows become the hosts, the one in use muted. */
+    /** Switch host: the menu's rows become the hosts, the one in use muted. */
     /** The rows this phone can offer: the accessibility screenshot exists from Android 11. */
     private fun menuItems(push: PetPush?) = PetMenuItem.of(push, screenshots = Build.VERSION.SDK_INT >= 30)
 
@@ -1475,7 +1475,7 @@ internal object PetOverlay {
         l.call(method, args, reply)
     }
 
-    // ---- 问一句 ---------------------------------------------------------------------------------
+    // ---- Quick ask ---------------------------------------------------------------------------------
 
     private var askView: AskBarView? = null
     private var askParams: WindowManager.LayoutParams? = null
@@ -1498,7 +1498,7 @@ internal object PetOverlay {
     private var askRequest = 0L
 
     /**
-     * Opens the bar beside the docked pet ([fresh]: on 「新对话」), focused, the keyboard up; asks
+     * Opens the bar beside the docked pet ([fresh]: on "New chat"), focused, the keyboard up; asks
      * Dart where a send would go meanwhile.
      */
     private fun showAsk(fresh: Boolean) {
@@ -1675,7 +1675,7 @@ internal object PetOverlay {
         askTarget = null
     }
 
-    // ---- 语音问 ---------------------------------------------------------------------------------
+    // ---- Voice ask ---------------------------------------------------------------------------------
 
     private var recorder: WavRecorder? = null
     private var recorderMic = 0
@@ -1804,8 +1804,8 @@ internal object PetOverlay {
 
     /**
      * Opens [sessionId] (or just the app) through EntryActivity. A tap on an overlay may start an
-     * activity on stock Android, but some vendors block 「后台弹出界面」 on their own: when the app
-     * isn't up shortly after, a notification takes the tap instead (as SystemActions.kt does).
+     * activity on stock Android, but some vendors block "Display pop-up windows in background" on
+     * their own: when the app isn't up shortly after, a notification takes the tap instead (as SystemActions.kt does).
      */
     private fun open(sessionId: String?, host: String?, title: String?) = openIntent(
         if (sessionId != null) EntryActivity.openChat(app, sessionId, host) else EntryActivity.openApp(app),
@@ -1929,7 +1929,7 @@ internal object PetOverlay {
         override fun onActivityDestroyed(activity: Activity) = Unit
     }
 
-    /** For the debug probe: 问一句's bar, as the menu opens it. */
+    /** For the debug probe: Quick ask's bar, as the menu opens it. */
     fun probeAsk(fresh: Boolean) {
         if (alive(petTicket)) showAsk(fresh)
     }

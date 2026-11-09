@@ -1,7 +1,7 @@
 // Where the dsh-go forum lives and how the app signs in to it (a self-hosted
 // Discourse, server kit in infra/forum/, deploy steps in docs/forum/deploy.md).
 
-/// The forum's address (docs/forum/deploy.md). An address set in 论坛设置
+/// The forum's address (docs/forum/deploy.md). An address set in Forum settings
 /// wins over it.
 const forumDefaultBaseUrl = 'https://forum.dshtui.com';
 

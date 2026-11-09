@@ -28,10 +28,10 @@ class NotifySystemStatus {
   /// The app-level switch (`areNotificationsEnabled`, Android 13+ permission).
   final bool enabled;
 
-  /// 「一轮结束」 channel not blocked.
+  /// "Turn ended" channel not blocked.
   final bool done;
 
-  /// 「等你确认」 channel not blocked.
+  /// "Needs approval" channel not blocked.
   final bool attention;
 
   bool get allOpen => enabled && done && attention;
@@ -315,7 +315,7 @@ class NotifyChannel {
     }
   }
 
-  /// Opens DSH Go's 「实时活动」 switch where the system has one, else its notification settings.
+  /// Opens DSH Go's "Live activity" switch where the system has one, else its notification settings.
   Future<bool> openLiveSettings() async {
     try {
       return await _methods.invokeMethod<bool>('openLiveSettings') ?? false;

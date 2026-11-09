@@ -1,4 +1,4 @@
-// What a share code carries (分享码, docs/design/share-codes.md): one plugin, or a
+// What a share code carries (docs/design/share-codes.md): one plugin, or a
 // profile bundle exported from an engine. Readers are strict about what may be
 // installed from a link — public npm packages at an exact version, GitHub /
 // https git at a ref, or an official bundle to switch on — and lenient about

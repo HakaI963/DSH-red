@@ -17,7 +17,7 @@ enum class PhoneScreen(val prefix: Char) {
     /** What the person sees, read and driven through the accessibility service. */
     MAIN('s'),
 
-    /** 不打扰模式: a virtual display the person doesn't see. */
+    /** Non-disruptive mode: a virtual display the person doesn't see. */
     BACKGROUND('b');
 
     companion object {
@@ -57,14 +57,14 @@ data class ScreenSnapshot(
 data class TargetInfo(
     val screenId: String,
     val elementId: Int,
-    /** Chinese role word as rendered (按钮, 输入框, …). */
+    /** The role word as rendered, in Chinese (button, input, …). */
     val role: String,
     /** Visible text / content description / hint, already length-capped. */
     val label: String,
     val packageName: String?,
     val appLabel: String?,
     val isPassword: Boolean,
-    /** Hint mentions 密码 / 验证码 / 支付密码 / CVV / 安全码. */
+    /** Hint mentions passwords / verification codes / payment passwords / CVV / security codes. */
     val isSecretField: Boolean,
     val isEditable: Boolean,
     /**
@@ -223,7 +223,7 @@ interface PhoneDriver {
 }
 
 data class ConfirmRequest(
-    /** The full plain sentence shown to the person, e.g. 在「微信」给 张三 发送："晚上见". */
+    /** The full plain sentence shown to the person, e.g. In "WeChat" send to Zhang San: "See you tonight". */
     val sentence: String,
     val appLabel: String?,
     val packageName: String?,
@@ -231,7 +231,7 @@ data class ConfirmRequest(
     val firstInApp: Boolean,
     val timeoutMs: Long = 30_000,
     /**
-     * 本任务免确认: offer [Decision.ALLOW_ALL_FOR_TASK] as the main choice (see ConfirmMode); a
+     * "Skip confirmations for this task": offer [Decision.ALLOW_ALL_FOR_TASK] as the main choice (see ConfirmMode); a
      * gate that ignores it still answers correctly, just asks more.
      */
     val offerTaskWaiver: Boolean = false,
@@ -247,7 +247,7 @@ enum class HandoffResult { CONTINUE, STOP, TIMEOUT }
 
 /**
  * Why a `handoff` came: the hard rule that refused the task's last write, when there was one.
- * The card names it in its title (「密码需要你来输入」) so the person knows it is a rule, not a
+ * The card names it in its title ("You need to enter the password yourself") so the person knows it is a rule, not a
  * fault; the model's own sentence stays the body. Null: the model handed off on its own.
  */
 enum class HandoffCause(val rule: String) {
@@ -257,7 +257,7 @@ enum class HandoffCause(val rule: String) {
     /** System settings, permissions, installers, security centres, SystemUI. */
     SYSTEM("system-page"),
 
-    /** An app on the person's 不碰 list. */
+    /** An app on the person's hands-off list. */
     DENY_LIST("deny-list");
 
     companion object {
@@ -278,7 +278,7 @@ enum class HandoffCause(val rule: String) {
 interface UserGate {
     fun confirm(request: ConfirmRequest): Decision
 
-    /** Blocks until the person taps 继续 / 停止, up to [timeoutMs] (≤ 10 min). */
+    /** Blocks until the person taps Continue / Stop, up to [timeoutMs] (≤ 10 min). */
     fun handoff(reason: String, timeoutMs: Long): HandoffResult
 
     /** [handoff] with the rule behind it, for the card's title; gates that can't show it ignore it. */
@@ -287,7 +287,7 @@ interface UserGate {
     fun handoff(reason: String, timeoutMs: Long, cause: HandoffCause?, owner: PhoneTasks.Owner): HandoffResult =
         handoff(reason, timeoutMs, cause)
 
-    /** The one-line "DSH 正在操作 · 点「路线」" status; null clears it. */
+    /** The one-line "DSH is acting · tap "Route"" status; null clears it. */
     fun status(text: String?)
 
     /** Owner gate: only short memory writes belong inside [ifCurrent], never platform IO.
@@ -303,7 +303,7 @@ interface UserGate {
 }
 
 /**
- * The status bar's 暂停 / 停止 / 插话 for the one task whose status they are shown with. Each acts
+ * The status bar's Pause / Stop / Steer for the one task whose status they are shown with. Each acts
  * on that task's owner only: once it stopped, ended or was replaced, an action does nothing, and
  * it never reaches a task selected later. Main thread; must return quickly.
  */
@@ -313,13 +313,13 @@ interface TaskControls {
 
     fun isPaused(): Boolean
 
-    /** 暂停 (true) / 继续 (false). While paused, MAIN actions are refused by the driver as well. */
+    /** Pause (true) / resume (false). While paused, MAIN actions are refused by the driver as well. */
     fun setPaused(paused: Boolean): Boolean
 
     /** [reason] is Chinese (for the agent). */
     fun stop(reason: String): Boolean
 
-    /** Text the person typed into 插话 and sent; meant for the agent as a user message. */
+    /** Text the person typed into Steer and sent; meant for the agent as a user message. */
     fun interject(text: String): Boolean
 }
 
@@ -357,8 +357,8 @@ object PhoneRegistry {
     @Volatile var controlListener: ControlListener? = null
 
     /**
-     * The hard rules the person lifted (解除限制), for the drivers' own second line of refusals and
-     * the overlay's 「已解除限制」 tag. Nothing lifted until the core says otherwise.
+     * The hard rules the person lifted (lift limits), for the drivers' own second line of refusals and
+     * the overlay's "limits lifted" tag. Nothing lifted until the core says otherwise.
      */
     @Volatile var unlocks: () -> PhoneUnlocks = { PhoneUnlocks() }
 

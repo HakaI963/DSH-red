@@ -1,5 +1,5 @@
 // What a ui.json setting is called and what it says, in words for people (the
-// 「界面配置」 sheet and 「来自 ui.json」).
+// "Interface settings" sheet and "From ui.json").
 
 import '../l10n/l10n.dart';
 import 'ui_config_model.dart';
@@ -40,7 +40,7 @@ Map<String, String> get _seatNames => {
   'hidden': appL10n.commonHide,
 };
 
-/// `(name, value)` of an applied setting: 「外观模式 · 深色」.
+/// `(name, value)` of an applied setting: "Appearance mode · Dark".
 (String, String) uiSettingLabel(UiConfigEntry entry) {
   final id = entry.key.id;
   final value = entry.value;

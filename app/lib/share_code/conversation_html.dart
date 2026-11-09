@@ -1,4 +1,4 @@
-// 「导出为网页」: one `.html` file that opens anywhere, offline, and replays the
+// "Export as Web page": one `.html` file that opens anywhere, offline, and replays the
 // conversation. The page is the shared viewer (site/share/viewer.js) inlined at
 // build time (replay_viewer.g.dart); the conversation file goes inside it as
 // JSON.

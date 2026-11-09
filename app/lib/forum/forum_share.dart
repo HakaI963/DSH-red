@@ -1,7 +1,7 @@
 // Share codes (lib/share_code) inside forum posts. A post carries the
 // landing-page link (`<shareLandingUrl>#p=…`), which works in a browser too
 // (the forum's theme component draws it as an install card); in the app it
-// becomes a card whose 「安装」 hands the link to the share-code feature through
+// becomes a card whose "Install" hands the link to the share-code feature through
 // the app-link router (`dshgo://share/…`), the same path a link tapped in
 // WeChat takes.
 
@@ -22,10 +22,10 @@ class ForumShareSummary {
   final ShareKind kind;
   final String title;
 
-  /// `3 个插件 · 2 个技能`, the author, … (null when nothing to add).
+  /// `3 plugins · 2 skills`, the author, … (null when nothing to add).
   final String? detail;
 
-  /// 「插件」 / 「配置」.
+  /// "Plugin" / "Configuration".
   String get kindLabel => kind == ShareKind.plugin ? appL10n.statePluginLabel : appL10n.stateConfigLabel;
 }
 
@@ -73,17 +73,17 @@ String shareLinkMarkdown(ShareLink link) {
   return '[$title](${link.webLink})';
 }
 
-/// 「安装」 on a card: hands the link to whoever imports share codes.
+/// "Install" on a card: hands the link to whoever imports share codes.
 final forumShareInstallerProvider = Provider<Future<bool> Function(ShareLink link)>((ref) {
   return (link) => ref.read(linkRouterProvider).open(link.appLink);
 });
 
-/// What 「附上分享码」 attaches: the share link, or null (with a reason to
+/// "Attach share code" attaches: the share link, or null (with a reason to
 /// show) when there is none.
 typedef ForumShareCodePick = ({ShareLink? link, String? reason});
 
-/// 「附上分享码」 in the composer. Default: the share link on the clipboard
-/// (copied from the share sheet's 「复制链接」). Override to pick the link
+/// "Attach share code" in the composer. Default: the share link on the clipboard
+/// (copied from the share sheet's "Copy link"). Override to pick the link
 /// another way.
 final forumShareCodePickerProvider = Provider<Future<ForumShareCodePick> Function(BuildContext context)>((ref) {
   return (context) async {

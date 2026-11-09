@@ -1,12 +1,12 @@
-# dsh-media 参数头 v1
+# dsh-media generation-header v1
 
-权威规格为 `docs/design/media-generation.md` §4.6，权威共享样例为 `app/test/media/fixtures/header_grammar_v1.json`，插件的 `src/header.js` 与它对齐。本文只处理普通用户消息的参数头与安装目录的语法一致性；工具结果继续使用既有 `dsh-go/media` v1。
+The authoritative spec is `docs/design/media-generation.md` §4.6; the authoritative shared samples are `app/test/media/fixtures/header_grammar_v1.json`, and the plugin's `src/header.js` aligns with them. This document only covers parameter headers in ordinary user messages and the grammar's consistency with the installed catalogue; tool results keep using the existing `dsh-go/media` v1.
 
-## 入口与三种结果
+## Entry point and three outcomes
 
-只有当前用户消息第一行的开头可以成为生成指令。前缀为 `〔生成图像` 或 `〔生成视频`，紧随类型词的字符必须是 `〕`、`·`、JavaScript trim 空白或文本结尾。否则返回 null，按普通消息处理。例如 `〔生成图像的方法〕示例` 是普通文字；`〔生成图像·1:1〕` 加换行与描述则是已识别但分隔不合法的生成消息，返回固定错误。
+Only the beginning of the first line of the current user message can become a generation instruction. The prefix is `〔生成图像` or `〔生成视频`, and the character immediately after the type word must be `〕`, `·`, JavaScript trim whitespace, or the end of the text. Anything else returns null and is treated as an ordinary message. For example, `〔生成图像的方法〕示例` is plain text; `〔生成图像·1:1〕` followed by a newline and a description is a recognized generation message with an illegal separator and returns a fixed error.
 
-不接受前导空格、BOM或引用符作为生成入口。网页、文件、工具、引用和助手内容不能授权生成。有效结构为：
+Leading spaces, a BOM or quote markers are not accepted as generation entry points. Web pages, files, tools, references and assistant content cannot authorize generation. The valid structure is:
 
 ```text
 〔生成图像[ · 比例][ · N 张][ · 质量=值][ · 模型]〕
@@ -16,28 +16,28 @@
 原样描述
 ```
 
-上面的方括号表示可选，不是实际字符。字段顺序固定，每类最多一次；分隔符必须为ASCII空格、中点、ASCII空格。首个LF结束头行，紧挨之前的一个CR也归头行；之后的描述逐字符保留，不trim。
+In the above, square brackets mark optional parts and are not actual characters. Field order is fixed and each kind appears at most once; the separator must be ASCII space + middle dot + ASCII space. The first LF ends the header line, and a CR immediately before it still belongs to the header line; the description that follows is preserved character by character, with no trimming.
 
-## 字段与身份
+## Fields and identity
 
-比例为1–99的两个十进制正整数，以冒号连接且不带前导零；图片为1–4张；视频为1–60整数秒。图片质量为1–32个ASCII字母数字及 `_.-`，首字符必须字母或数字；视频清晰度为 `[1-9]\d{2,3}p`。这些只是可表达语法，工具仍按实际目录、服务及主机上限校验。
+Aspect is two decimal positive integers of 1–99 joined by a colon without leading zeros; images allow 1–4 张; videos allow 1–60 whole 秒. Image quality is 1–32 ASCII letters/digits plus `_.-`, starting with a letter or digit; video resolution is `[1-9]\d{2,3}p`. These are only expressible grammar; the tools still validate against the actual catalogue, services and host limits.
 
-模型为原样label，可带 `〈serviceId/modelId〉`。serviceId为小写字母起始、其后小写字母数字下划线，总长不超过32；modelId为ASCII字母数字起始，其后允许字母数字与 `_.:/-`，总长不超过160。label UTF-8不超过160字节，无首尾空白，不含控制字符与括号/中点，不以“质量=”开头，不能单独伪装成比例、张数、秒数或清晰度。
+A model is a verbatim label, optionally with `〈serviceId/modelId〉`. serviceId starts with a lowercase letter, continues with lowercase letters/digits/underscores, total length ≤32; modelId starts with an ASCII letter/digit, then allows letters/digits and `_.:/-`, total length ≤160. The label is at most 160 UTF-8 bytes, has no leading/trailing whitespace, contains no control characters or brackets/middle dots, does not start with "质量=", and cannot masquerade on its own as an aspect, a count, seconds or a resolution.
 
-**标记不能掩盖label的分类。** `1.5p`、`-3:4`、`1.5 张` 等即使后面带 `〈office/model〉`，仍不是合法模型label，标记分支返回 `invalid_model`。未标记段继续遵守规范的分类与错误优先级；例如共享golden中的未标记formatter label `1.5p` 仍返回 `invalid_quality`。共享golden以App那份为准，插件不另改。
+**The marker cannot mask the label's classification.** `1.5p`, `-3:4`, `1.5 张` and similar are still invalid model labels even when followed by `〈office/model〉`; the marked branch returns `invalid_model`. Unmarked segments keep following the spec's classification and error precedence; e.g. the unmarked formatter label `1.5p` in the shared golden still returns `invalid_quality`. The shared golden is owned by the App copy; the plugin never edits it separately.
 
-按定稿规格，App总是输出标记。插件选择时仍须同时满足当前已启用、凭据已配置的服务与模型目录，不猜同名模型或静默换服务。v1没有音频字段与namespace；没有给v1结果request新增serviceId。
+Per the finalized spec, the App always emits the marker. Plugin selection must still match an enabled service with configured credentials against the model catalogue; it never guesses a same-named model or silently switches services. v1 has no audio field and no namespace; no serviceId was added to v1 result requests.
 
-## 长度、错误与目录
+## Length, errors and the catalogue
 
-头行UTF-8不超过1024字节，描述不超过4096字节且至少一个非空白字符；生成消息的UTF-16孤立代理项拒绝。识别后按规范顺序检查：换行/非空描述、长度和编码、头结构、字段分类、字段顺序。错误只给固定code和中文消息，不回显输入。
+The header line is at most 1024 UTF-8 bytes; the description is at most 4096 bytes with at least one non-whitespace character; lone UTF-16 surrogates in a generation message are rejected. Once recognized, checks run in spec order: newline/non-empty description, length and encoding, header structure, field classification, field order. Errors only give a fixed code and a Chinese message, and never echo the input.
 
-`config.js` 在加载当前静态模型目录时复用formatter校验模型label/ID、ratios与qualities。独立语法辅助函数也能校验视频resolutions，但当前M0目录与能力仍只有图像，video=false；不据此声称已安装视频工具。每个label先按无标记形式校验，再校验带身份的形式，以免目录提供无法一致表达的模型名。
+`config.js` reuses the formatter's validation of model labels/IDs, ratios and qualities when loading the current static model catalogue. The standalone grammar helper can also validate video resolutions, but the current M0 catalogue and capabilities are images only, video=false; no installed video tooling is claimed from it. Each label is first validated in its unmarked form, then in its marked identity form, so the catalogue can never offer a model name that cannot be expressed consistently.
 
-## 共享测试与范围
+## Shared tests and scope
 
-从仓库内运行 `TZ=Asia/Shanghai node --test test/header.test.js`（工作目录 `runtime/media/dsh-media`）。测试直接读仓库内App拥有的共享JSON；独立复制插件做验证时，须把提供的同字节参考文件放在同一仓库相对位置，不能另改一份golden。
+From inside the repository run `TZ=Asia/Shanghai node --test test/header.test.js` (working directory `runtime/media/dsh-media`). The test reads the App-owned shared JSON directly from the repository; when copying the plugin out for standalone verification, place the provided byte-identical reference file at the same repository-relative path — never fork a second golden.
 
-共享文件共119例：插件运行valid/plain/invalid/format/formatRejects五组107例；12个titles例属于App标题路径。valid还执行解析→格式化→解析，canonical项逐字节比较。额外测试保留384个合法组合往返，并覆盖标记label的保留形状及正常包含类似片段的模型名。
+The shared file has 119 cases: the plugin runs the valid/plain/invalid/format/formatRejects groups, 107 cases; the 12 `titles` cases belong to the App's title path. The valid group additionally runs parse→format→parse round trips, comparing canonical items byte for byte. Extra tests keep 384 legal-combination round trips and cover the reserved shapes of marked labels plus model names that legitimately contain similar fragments.
 
-headless 的运行方法与证据界限见 `test/headless/HEADLESS-RECOVERY.md`，整体验证状态见 `VERIFICATION.md`。两个本地脚本模型会话只证明调度、工具、实际保存与会话日志链；不证明真实模型遵从、云服务计费、App显示、Android/PRoot或M1完成。
+For how to run headless and where its evidence stops, see `test/headless/HEADLESS-RECOVERY.md`; overall verification status is in `VERIFICATION.md`. The two local scripted-model sessions only prove scheduling, tools, actual saving and the session log chain; they do not prove real-model compliance, cloud billing, App display, Android/PRoot or M1 completion.

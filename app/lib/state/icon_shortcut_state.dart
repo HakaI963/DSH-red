@@ -1,10 +1,10 @@
-// 图片快捷方式: a home-screen shortcut with the user's own picture that opens the app
+// Picture shortcut: a home-screen shortcut with the user's own picture that opens the app
 // (ShortcutManager.requestPinShortcut). Android doesn't let an app make its launcher icon any
 // picture; this is the honest way to have one. Native side: icons/PictureShortcutPlugin.kt
 // (`dsh/picture_shortcut`: `pin`, and `pinned` back once the launcher has added one).
 // Where to allow it when no dialog shows: the maker's own permission page for this app
-// (runtime/VendorSettings.kt, `popup`: vivo's 权限管理 and Xiaomi's 其他权限 hold
-// 桌面快捷方式 there), else the system's app details.
+// (runtime/VendorSettings.kt, `popup`: vivo's "Permission manager" and Xiaomi's "Other permissions" hold
+// home-screen shortcuts there), else the system's app details.
 
 import 'dart:async';
 

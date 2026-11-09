@@ -312,7 +312,7 @@ void main() {
       );
       await expectLater(
         client.prompt('once', 'hi'),
-        throwsA(isA<SubagentReadOnlyException>().having((e) => e.toString(), 'message', '一次性子代理只能查看记录')),
+        throwsA(isA<SubagentReadOnlyException>().having((e) => e.toString(), 'message', 'One-shot subagents can only view the transcript')),
       );
       // Unknown mode resolves through session/projections first.
       host.handlers['session/projections'] = (_) => ok({

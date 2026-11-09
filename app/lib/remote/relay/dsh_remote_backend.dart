@@ -10,14 +10,14 @@ import '../secret_store.dart';
 import 'relay_backend.dart';
 import 'network_route.dart';
 
-/// [RelayBackend] over `packages/dsh_remote` (ds-harness-remote by 李国宝:
+/// [RelayBackend] over `packages/dsh_remote` (ds-harness-remote by Li Guobao:
 /// account login, Host directory with key pinning, Noise IK over the Relay).
 ///
 /// Host trust works like SSH: a Host seen for the first time is only pinned
 /// after the person confirmed its fingerprint in the UI ([approveHost]); a
 /// changed key fails closed until [forgetHost].
 ///
-/// [direct] (直连优先) lets connections try LAN / P2P / TURN over
+/// [direct] (Direct-first) lets connections try LAN / P2P / TURN over
 /// [peerConnector] (flutter_webrtc) before the Server's relay.
 class DshRemoteRelayBackend implements RelayBackend, RelayNetworkBackend, RelayPairingBackend {
   DshRemoteRelayBackend({
@@ -68,7 +68,7 @@ class DshRemoteRelayBackend implements RelayBackend, RelayNetworkBackend, RelayP
   set compactHistory(bool enabled) => account.compactHistory = enabled;
 
   /// Reconnects back off to a minute: a sleeping computer isn't polled every
-  /// few seconds (network changes and 重试 still connect at once).
+  /// few seconds (network changes and Retry still connect at once).
   static const _muxOptions = MuxOptions(
     retryCaps: [
       Duration(milliseconds: 500),
@@ -489,7 +489,7 @@ class DshRemoteRelayBackend implements RelayBackend, RelayNetworkBackend, RelayP
       'CONNECTION_REJECTED' => e(HostLinkErrorKind.other, appL10n.remoteErrHostRejected),
       'MEMBERSHIP_REQUIRED' => e(HostLinkErrorKind.other, appL10n.remoteErrHostNotOwned),
       // Version and protocol mismatches fail the same way on every attempt:
-      // no reconnect loop (network changes don't fix them), 重试 still works.
+      // no reconnect loop (network changes don't fix them), Retry still works.
       'HARNESS_VERSION_INCOMPATIBLE' => e(
         HostLinkErrorKind.other,
         appL10n.remoteErrVersionIncompatible,

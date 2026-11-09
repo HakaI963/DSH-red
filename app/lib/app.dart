@@ -47,23 +47,23 @@ class _DshAppState extends ConsumerState<DshApp> with WidgetsBindingObserver {
   Locale? _shown;
 
   /// The stored palette arrives a moment after launch; that first switch
-  /// lands without a cross-fade, later ones fade (切换配色).
+  /// lands without a cross-fade, later ones fade (theme switching).
   bool _settled = false;
 
   @override
   void initState() {
     super.initState();
-    // Start loading the stored tile style now, so 全部功能 opens in it rather
+    // Start loading the stored tile style now, so All features opens in it rather
     // than flashing the default first.
     ref.read(tileStyleProvider);
-    // Anonymous usage statistics live as long as the app, in either 界面
+    // Anonymous usage statistics live as long as the app, in either interface
     // (release builds: today is noted, and earlier days go out).
     ref.read(usageStatsProvider);
-    // 公测版: the star prompt counts time in front from launch, in either 界面.
+    // Public beta: the star prompt counts time in front from launch, in either interface.
     if (ref.read(starPromptGateProvider)) ref.read(starPromptProvider);
-    // 伙伴小屋: her invitation ledger is read now, so it is known before the room opens.
+    // Companion room: her invitation ledger is read now, so it is known before the room opens.
     ref.read(companionInitiativeProvider);
-    // 刷新率: some systems cap third-party apps at 60 Hz and then show their per-app
+    // Refresh rate: some systems cap third-party apps at 60 Hz and then show their per-app
     // switch as an in-app setting; the app answers frames to run at the fastest rate
     // while it is actually drawing (see RefreshRateService).
     RefreshRateService.instance.start();
@@ -76,7 +76,7 @@ class _DshAppState extends ConsumerState<DshApp> with WidgetsBindingObserver {
     super.dispose();
   }
 
-  /// 跟随系统: the system language changed while the app was open.
+  /// Follow system: the system language changed while the app was open.
   @override
   void didChangeLocales(List<Locale>? locales) {
     if (ref.read(appLanguageProvider) == AppLanguage.system) setState(() {});
@@ -145,7 +145,7 @@ class _DshAppState extends ConsumerState<DshApp> with WidgetsBindingObserver {
 
   @override
   Widget build(BuildContext context) {
-    // 刷新率设置改动时告诉原生;setMode 对同一个值不做任何事。
+    // Tell native when the refresh-rate setting changes; setMode does nothing for the same value.
     unawaited(
       RefreshRateService.instance.setMode(ref.watch(performancePrefsProvider.select((p) => p.refreshRate))),
     );
@@ -182,7 +182,7 @@ class _DshAppState extends ConsumerState<DshApp> with WidgetsBindingObserver {
       supportedLocales: AppLocale.supported,
       localizationsDelegates: const [L10n.delegate, ...GlobalMaterialLocalizations.delegates],
       // A phone on its side: the cutout's inset on both sides (side_insets). Over everything,
-      // the launch screen of a cold start (启动画面).
+      // the launch screen of a cold start (launch_state.dart).
       builder: (context, child) {
         final media = MediaQuery.of(context);
         return MediaQuery(

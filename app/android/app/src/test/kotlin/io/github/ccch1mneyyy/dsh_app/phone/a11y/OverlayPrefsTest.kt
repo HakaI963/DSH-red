@@ -4,7 +4,7 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Test
 
-/** The 悬浮条 settings: defaults and the 30–100 % range (the overlay applies whatever this gives). */
+/** The floating-bar settings: defaults and the 30–100 % range (the overlay applies whatever this gives). */
 class OverlayPrefsTest {
     @Test fun defaultsKeepThePillOpenAt70Percent() {
         val p = OverlayPrefs()

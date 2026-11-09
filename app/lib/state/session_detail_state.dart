@@ -43,7 +43,7 @@ class SessionGoal {
   final int? maxRounds;
 }
 
-/// Session-level state for the 对话详情 page, from DSH projections:
+/// Session-level state for the Chat details page, from DSH projections:
 /// `goal`, `plan` (plan mode) and `todos`.
 class SessionPanels {
   const SessionPanels({this.goal, this.planActive = false, this.planPending = false, this.todos});

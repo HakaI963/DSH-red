@@ -8,7 +8,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../update/update_config.dart' show updateRepo;
 import '../update/update_http.dart';
 
-/// The 社区 hub's content: picked plugins, prompt ideas, group links and
+/// The Community hub's content: picked plugins, prompt ideas, group links and
 /// news, curated by the maintainers in `community.json` at the root of the
 /// project repository (docs/design/community.md). Nothing here is
 /// written by users and nothing is uploaded.
@@ -100,7 +100,7 @@ class CommunityGroup {
   /// What the QR code encodes (defaults to [url]).
   final String? qr;
 
-  /// Copied by 「复制」: a group number, an account id.
+  /// Copied by "Copy": a group number, an account id.
   final String? copy;
 
   String? get qrData => qr ?? url;
@@ -208,7 +208,7 @@ class CommunityFeed {
 
   static String? _text(Object? value, int max, {bool multiline = false}) {
     if (value is! String || value.trim().isEmpty) return null;
-    // A prompt keeps its trailing blank lines: 「报错如下：\n\n」 leaves the
+    // A prompt keeps its trailing blank lines: "The error is as follows:\n\n" leaves the
     // cursor where the paste goes.
     final text = multiline
         ? value.trimLeft().replaceAll(RegExp(r'[ \t]+$', multiLine: true), '')

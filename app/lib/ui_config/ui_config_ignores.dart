@@ -1,4 +1,4 @@
-// 「恢复默认」 for one ui.json setting. The app never rewrites ui.json — it is the
+// "Reset to default" for one ui.json setting. The app never rewrites ui.json — it is the
 // person's and their agent's — so restoring the default only sets that setting
 // aside: one record of host + setting + a fingerprint of the value it had. When
 // the file says something else there, the record no longer matches and the new
@@ -85,7 +85,7 @@ class UiIgnoresController extends Notifier<List<UiIgnore>> {
 
   bool isIgnored(HostRef host, UiConfigEntry entry) => state.any((i) => i.matches(host, entry));
 
-  /// 「恢复默认」: [entry] stops applying on [host] while the file keeps that
+  /// "Reset to default": [entry] stops applying on [host] while the file keeps that
   /// value.
   Future<void> ignore(HostRef host, UiConfigEntry entry) async {
     await _loaded;

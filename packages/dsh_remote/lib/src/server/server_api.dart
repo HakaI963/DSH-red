@@ -9,7 +9,7 @@ import 'dart:io';
 import '../transport/peer_connection.dart' show RemoteIceServer;
 import '../util/bytes.dart';
 
-/// Default hosted Server (李国宝's deployment).
+/// Default hosted Server (Li Guobao's deployment).
 final Uri defaultRemoteServer = Uri.parse('https://dsh.r2049.cn');
 
 /// Normalizes a user-entered Server address to an origin without a trailing

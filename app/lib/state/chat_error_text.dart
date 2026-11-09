@@ -4,7 +4,7 @@ import 'package:flutter/foundation.dart';
 import '../l10n/l10n.dart';
 import 'engine_error_text.dart';
 
-/// 「[action]：原因」, or just [action] when the reason means nothing to a
+/// "[action]: reason", or just [action] when the reason means nothing to a
 /// person. The raw error only goes to the log.
 String chatErrorText(Object error, {required String action}) {
   debugPrint('$action: $error');

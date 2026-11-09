@@ -76,7 +76,7 @@ abstract final class DshGoSurfaces {
 // Capabilities and scope
 // -----------------------------------------------------------------------------
 
-/// What the app can draw (§3.1 能力参数): sent as query parameters with every
+/// What the app can draw (§3.1 capability parameters): sent as query parameters with every
 /// read so a plugin can leave out what this app would only draw as a
 /// placeholder.
 class DshGoCaps {
@@ -1187,7 +1187,7 @@ class DshGoStream {
   final _welcome = <Completer<String?>>[];
   final _pendings = <String, Completer<DshGoOutcome>>{};
 
-  /// Results that came before their invoke's answer (kept 5 s, §4.7 乱序).
+  /// Results that came before their invoke's answer (kept 5 s, §4.7 out-of-order).
   final _early = <String, (DshGoOutcome, DateTime)>{};
 
   DshGoLink get link => _link;

@@ -150,7 +150,7 @@ class PetEventBus {
 
   /// One alert. [bubble]: it may raise a bubble (it went to the pet or to the
   /// system, not to the conversation on screen, not switched off). [asked]:
-  /// the turn answered 问一句, its bubble shows the reply.
+  /// the turn answered Quick ask, its bubble shows the reply.
   void alert(ChatAlert alert, DateTime now, {bool bubble = false, bool asked = false}) {
     final kind = switch (alert.kind) {
       AlertKind.done => PetEventKind.done,
@@ -213,7 +213,7 @@ void petHearAlert(Ref ref, ChatAlert alert, {bool bubble = false}) {
   ref.read(petEventBusProvider).alert(alert, ref.read(petClockProvider)(), bubble: bubble, asked: asked);
 }
 
-/// Conversations 问一句 sent to whose turn hasn't ended yet: that turn's end
+/// Conversations Quick ask sent to whose turn hasn't ended yet: that turn's end
 /// bubble shows the reply's first lines (pet_overlay_actions.dart).
 class PetAskedController extends Notifier<Set<PetTarget>> {
   @override
@@ -504,7 +504,7 @@ final petCompactingProvider = NotifierProvider.autoDispose.family<PetCompactingC
 
 /// The conversation the native chat page shows, and what it is doing. The
 /// chat page's pet stage reports it ([PetFocusController.report]); null when
-/// no chat page is up (网页模式, before the first frame). Read from the page,
+/// no chat page is up (web mode, before the first frame). Read from the page,
 /// not from `chatProvider`, so nothing here opens a conversation's stream.
 class PetFocusController extends Notifier<PetFocus?> {
   @override
@@ -669,6 +669,6 @@ final petScopedStateProvider = Provider.family<PetState, PetScope>((ref, scope) 
 final petStateProvider = Provider<PetState>((ref) => ref.watch(petScopedStateProvider(PetScope.global)));
 
 /// The pet is drawn on the chat page: the empty state's still whale tail
-/// steps aside — one mascot a screen. Hidden, 不显示 or 网页模式: the whale
+/// steps aside — one mascot a screen. Hidden, None or web mode: the whale
 /// is back.
 final petTakesWhaleProvider = Provider<bool>((ref) => ref.watch(petLayerShownProvider));

@@ -1,6 +1,6 @@
 // Engine settings (`settings/describe`, `settings/mutate`, `credentials/*`)
 // and the plugin inventory (`pluginInventory/list`) of the active host: the
-// state behind the native 引擎设置 pages (lib/ui/engine_settings/).
+// state behind the native Engine settings pages (lib/ui/engine_settings/).
 //
 // The engine owns the values. Every namespace is one Loader entry with a
 // schemastery schema and three layers (`base` beneath the profile, the
@@ -1057,7 +1057,7 @@ class InventoryItem {
   final String? icon;
   final InventoryStatus status;
 
-  /// The bundle that brings it, in words (「DSH 内置」, 「智能体团队」).
+  /// The bundle that brings it, in words ("Built into DSH", "Agent team").
   final String? source;
 
   /// Package name of that bundle.
@@ -1072,7 +1072,7 @@ class InventoryItem {
   final List<String> enabledIn;
 
   /// The package carries no Chinese name: an internal component, listed
-  /// under 「系统组件」 by its package id.
+  /// under "System components" by its package id.
   final bool system;
 
   /// The bundle row id, which is also its settings namespace.

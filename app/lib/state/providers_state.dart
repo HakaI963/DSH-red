@@ -36,14 +36,14 @@ export 'provider_backend.dart';
 bool isSubscriptionRoute(ProviderProfile profile) =>
     Subscription.fromWire(profile.route) != null && (profile.apiKeyEnv == null || profile.apiKeyEnv!.isEmpty);
 
-/// 协议在界面上的名字。
+/// The protocol's name in the UI.
 String protocolLabel(ProviderApi api) => switch (api) {
   ProviderApi.openaiCompletions => appL10n.stateProviderOpenAi,
   ProviderApi.anthropicMessages => appL10n.stateProviderAnthropic,
   ProviderApi.openaiResponses => 'Responses',
 };
 
-/// A custom provider (自定义渠道) as the app shows it: one `llm-pi-ai` route
+/// A custom provider as the app shows it: one `llm-pi-ai` route
 /// of the **active** engine. The engine's settings are the source of truth;
 /// this is a read-back, rebuilt on every change.
 class CustomProvider {
@@ -354,7 +354,7 @@ class ProviderFailure implements Exception {
   final String message;
 
   /// The profile was written but the key was not: the form switches to
-  /// editing this provider so "保存" retries just the key.
+  /// editing this provider so "Save" retries just the key.
   final String? savedId;
 
   @override

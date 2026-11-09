@@ -19,7 +19,7 @@ class RestrictedSettingsTest {
         assertEquals(CLEAR, RestrictedSettings.state(33, AppOpsManager.MODE_ALLOWED, 3))
         // Sideloaded: the switch is greyed out and App info's ⋮ has nothing yet.
         assertEquals(GUARDED, RestrictedSettings.state(34, AppOpsManager.MODE_ERRORED, 4))
-        // The 「受限制的设置」 dialog was seen: ⋮ offers 「允许受限制的设置」 now.
+        // The "Restricted setting" dialog was seen: ⋮ offers "Allow restricted settings" now.
         assertEquals(ACKNOWLEDGED, RestrictedSettings.state(34, AppOpsManager.MODE_IGNORED, 4))
     }
 

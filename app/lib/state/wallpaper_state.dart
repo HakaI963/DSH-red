@@ -1,4 +1,4 @@
-// 设置 › 主题 › 壁纸: the user's own wallpaper (lib/wallpaper/custom_wallpaper.dart), whether it's
+// Settings › Theme › Wallpaper: the user's own wallpaper (lib/wallpaper/custom_wallpaper.dart), whether it's
 // the one in use, and the picture baked for the screen it's on.
 
 import 'dart:ui' as ui;
@@ -77,7 +77,7 @@ class CustomWallpaperController extends AsyncNotifier<CustomWallpaper?> {
     await _store(current.copyWith(blur: blur.clamp(0.0, 1.0)));
   }
 
-  /// 提亮 (light mode) or 压暗 (dark mode).
+  /// Lighten (light mode) or Dim (dark mode).
   Future<void> setTone(Brightness brightness, double tone) async {
     final current = await _current;
     if (current == null || current.toneFor(brightness) == tone) return;

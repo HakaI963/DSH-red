@@ -3,7 +3,7 @@
 // or off (the bridge's revisions key a cache, so an unchanged answer changes
 // nothing on screen), and one multiplexed stream that sleeps 60 s after the app
 // leaves the foreground. Also what the person decided: surfaces switched off
-// per plugin, and the one-time 「要读取剪贴板」 notice. Nothing here runs until a
+// per plugin, and the one-time "wants to read your clipboard" notice. Nothing here runs until a
 // surface asks.
 
 import 'dart:async';
@@ -177,7 +177,7 @@ final _lastCaps = Expando<DshGoCaps>('dshGoCaps');
 /// switched a plugin with no stream open to say so.
 void rereadNativeContributions(WidgetRef ref) => ref.invalidate(nativeRawContributionsProvider);
 
-/// Keeps 设置 › 插件's list in step with the engine: when the contributions
+/// Keeps Settings › Plugins's list in step with the engine: when the contributions
 /// come back changed (a plugin added, removed or switched, by the agent or
 /// in the terminal), the installed list reads again. Kept alive by the chat
 /// page's bar and the plugins page.
@@ -266,7 +266,7 @@ final nativeStreamProvider = Provider<DshGoStream?>((ref) {
 
 String _pluginKey(HostRef host, String package) => '${uiHostKey(host)}|$package';
 
-/// Surfaces switched off, per host and plugin (设置 › 插件 › 某插件). Default:
+/// Surfaces switched off, per host and plugin (Settings › Plugins › a plugin). Default:
 /// everything on. Persisted.
 class NativeSurfacePrefs extends Notifier<Map<String, Set<NativeSurface>>> {
   static const prefsKey = 'native_plugins.off';
@@ -428,7 +428,7 @@ final nativePanelsProvider = Provider<List<NativePanel>>((ref) {
 // ── Diagnostics ──────────────────────────────────────────────────────────────
 
 /// What went wrong while running one plugin's native part, and how it is
-/// doing (the 原生界面 row).
+/// doing (the native interface row).
 class NativeDiagnostics {
   const NativeDiagnostics({this.issues = const [], this.lastViewBytes, this.lastInvoke});
 

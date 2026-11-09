@@ -1,4 +1,4 @@
-/// 伙伴小屋's state on the Host, through the dsh-go bridge
+/// The Companion room's state on the Host, through the dsh-go bridge
 /// (runtime/bridge/dsh-go-bridge/lib/companion/, contract in
 /// docs/design/companion.md):
 ///

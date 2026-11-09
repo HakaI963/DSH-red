@@ -30,7 +30,7 @@ import java.util.concurrent.TimeUnit
 import kotlin.concurrent.thread
 
 /**
- * 启动画面: the system's launch window hands over to the app's own launch screen
+ * Launch screen: the system's launch window hands over to the app's own launch screen
  * (app/lib/launch/launch_state.dart) with nothing to see in between. MethodChannel `dsh/launch`:
  *
  * - `begin` → what the launch window shows, for Dart's first frame: `{active, sdk, systemSplash,
@@ -39,7 +39,7 @@ import kotlin.concurrent.thread
  *   process's first activity was created, and LaunchStart is starting it now. `systemIcon`: the
  *   system's launch window shows the chosen icon (Android 13+ with its own splash theme in place,
  *   [LaunchThemes]); otherwise it shows the page colour alone and the app brings the icon in.
- *   `icon` is always the chosen 桌面图标's.
+ *   `icon` is always the chosen app icon's.
  * - native → Dart `systemSplash {icon: [left, top, width, height] | null, removed}` (logical
  *   pixels, from the Flutter view's corner): Android 12+'s splash, now lying over Dart's first
  *   frame, measured. `removed`: its icon was exactly where the first frame drew it, so it is
@@ -135,7 +135,7 @@ object LaunchScreen {
         )
     }
 
-    /** The launcher icon's own resource for a 桌面图标 [variant] (LauncherIcons.mipmapOf). */
+    /** The launcher icon's own resource for an app-icon [variant] (LauncherIcons.mipmapOf). */
     private fun mipmapOf(variant: String): Int = when (LauncherIcons.mipmapOf(variant)) {
         "ic_launcher_night" -> R.mipmap.ic_launcher_night
         "ic_launcher_frost" -> R.mipmap.ic_launcher_frost
@@ -306,7 +306,7 @@ object LaunchScreen {
         }
     }
 
-    /** What the launch window shows now (the current 桌面图标's icon, the system's mode): for a preview. */
+    /** What the launch window shows now (the current app icon's icon, the system's mode): for a preview. */
     internal fun snapshot(context: Context, result: MethodChannel.Result) {
         thread(name = "dsh-launch-preview", isDaemon = true) {
             val map = try {

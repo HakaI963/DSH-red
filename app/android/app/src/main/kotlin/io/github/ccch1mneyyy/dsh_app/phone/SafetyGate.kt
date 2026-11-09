@@ -42,7 +42,7 @@ data class PhonePolicies(
 }
 
 /**
- * 解除限制: hard rules the person lifted one by one, at their own risk, behind a confirmation
+ * Lift limits: hard rules the person lifted one by one, at their own risk, behind a confirmation
  * page in the app. Each is off by default, and anything missing or unreadable reads as off: a
  * value that isn't a boolean keeps [base]'s, and stored policies are read on top of the
  * defaults. Changed only by a `setPolicies` that names it (the app sends nothing else with it).
@@ -85,10 +85,10 @@ data class PhoneUnlocks(
  * those are where one wrong tap costs money or an account, and what prompt injection aims at.
  */
 enum class ConfirmMode(val wire: String) {
-    /** 每次都询问 (default): first step in each app, sensitive words, every-write apps, tap_xy. */
+    /** "Ask every time" (default): first step in each app, sensitive words, every-write apps, tap_xy. */
     ASK("ask"),
 
-    /** 本任务免确认: the first question of a task offers to waive the rest of that task. */
+    /** Skip confirmations for this task: the first question of a task offers to waive the rest of that task. */
     TASK("task"),
 
     /** Ordinary confirmation waiver; hard rules and independent visual gates still apply. */
@@ -309,7 +309,7 @@ class SafetyGate(
             firstInApp = false, visualScope = visual.scope), t.packageName, "first-visual")
     }
 
-    /** Nothing more to ask: 始终免确认, or 本任务免确认 already granted for this task. */
+    /** Nothing more to ask: always skip confirmation, or this task is already waived. */
     fun waived(p: PhonePolicies = policies()): Boolean =
         p.confirmMode == ConfirmMode.ALWAYS || (p.confirmMode == ConfirmMode.TASK && tasks.isWaived)
 

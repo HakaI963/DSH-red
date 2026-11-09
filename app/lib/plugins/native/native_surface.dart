@@ -282,7 +282,7 @@ class NativeSurfaceController extends Notifier<NativeSurfaceState> {
     _set(state.copyWith(data: _data, loading: false));
   }
 
-  /// A `refresh` effect, or 重试: read the view again (a panel), or follow
+  /// A `refresh` effect, or Retry: read the view again (a panel), or follow
   /// the stream again (a strip).
   void refresh() {
     if (!ref.mounted) return;

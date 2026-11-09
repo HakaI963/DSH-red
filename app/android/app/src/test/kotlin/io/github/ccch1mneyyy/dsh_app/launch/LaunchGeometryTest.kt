@@ -95,7 +95,7 @@ class LaunchGeometryTest {
     @Test fun launchWindowIsThePageAloneNoIcon() {
         for (dir in listOf("drawable", "drawable-v21")) {
             val items = xml("$dir/launch_background.xml").children("item")
-            // A window background can't follow the chosen 桌面图标: no icon at all.
+            // A window background can't follow the chosen app icon: no icon at all.
             assertTrue(dir, items.none { it.hasAttribute("android:drawable") })
             assertEquals(dir, 1, items.size)
             // The page gradient, from the colours the app reads back in `begin`.

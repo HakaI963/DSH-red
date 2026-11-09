@@ -64,7 +64,7 @@ internal class MainScreenDriver(private val service: PhoneA11yService, private v
 
     private val ownPackage: String = service.packageName
 
-    /** 解除限制, read at each check: the person may lift or restore a rule between calls. */
+    /** Lift limits, read at each check: the person may lift or restore a rule between calls. */
     private val lifted: PhoneUnlocks get() = PhoneRegistry.unlocks()
     private val clock get() = service.clock
     private val actuator = Actuator(service, overlay)
@@ -1477,7 +1477,7 @@ internal class MainScreenDriver(private val service: PhoneA11yService, private v
         )
         var formatted = format(notes)
         var noteKeys = notes.map { it.first }.toSet()
-        // Such inputs still read 「不可代填」 (their fingerprints must not change with the setting):
+        // Such inputs still read "not for the agent" (their fingerprints must not change with the setting):
         // say once, on the screens that have one, that the person allowed filling them.
         if (lifted.secretFields && "secretFields" !in seen && formatted.elements.any { it.password || it.secret }) {
             // l10n:keep agent screen result

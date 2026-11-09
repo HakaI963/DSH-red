@@ -1,6 +1,6 @@
-// 宠物设置 (docs/design/pets.md §2.1, §7), kept in SharedPreferences like the
+// Pet settings (docs/design/pets.md §2.1, §7), kept in SharedPreferences like the
 // other appearance settings: which pet (or none), its size, quiet mode, where
-// it stands, and 「藏起来 1 小时」. The overlay keeps its own switches natively.
+// it stands, and "Hide for 1 hour". The overlay keeps its own switches natively.
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -32,18 +32,18 @@ class PetPrefs {
   /// jump-to-bottom key on the right.
   static const defaultPosition = 0.25;
 
-  /// The chosen pet, or [noPetId] (「不显示」).
+  /// The chosen pet, or [noPetId] ("None").
   final String packId;
   final bool packExplicit;
   final PetSize size;
 
-  /// 「安静模式」: moves only, no bubbles.
+  /// "Quiet mode": moves only, no bubbles.
   final bool quiet;
 
   /// Where its foot stands along its perch, as a share of the perch's width.
   final double position;
 
-  /// 「藏起来 1 小时」 until then.
+  /// "Hide for 1 hour" until then.
   final DateTime? hiddenUntil;
   final bool loaded;
 
@@ -155,13 +155,13 @@ class PetPrefsController extends Notifier<PetPrefs> {
       });
 
   /// The pet changed for the person, not by them (theirs is being removed):
-  /// unlike [setPack], 「藏起来 1 小时」 stays as it was.
+  /// unlike [setPack], "Hide for 1 hour" stays as it was.
   Future<void> replacePack(String id) =>
       _save((s) => s.copyWith(packId: id, packExplicit: true), (p) => p.setString(keys.pack, id));
 
-  /// First run's 「桌宠与悬浮窗」 was picked: the default pet, unless a pet
-  /// (or 「不显示」) was chosen already. Without it a light phone, whose
-  /// default is no pet, would turn on 「App 外显示」 with nothing to show.
+  /// First run's "Pet over other apps" was picked: the default pet, unless a pet
+  /// (or "None") was chosen already. Without it a light phone, whose
+  /// default is no pet, would turn on "Show outside the app" with nothing to show.
   Future<void> adoptDefault() async {
     await _loaded;
     if (!ref.mounted || state.packExplicit) return;
@@ -175,7 +175,7 @@ class PetPrefsController extends Notifier<PetPrefs> {
     return _save((s) => s.copyWith(position: x), (p) => p.setDouble(keys.position, x));
   }
 
-  /// 「藏起来 1 小时」.
+  /// "Hide for 1 hour".
   Future<void> hideUntil(DateTime until) =>
       _save((s) => s.copyWith(hiddenUntil: until), (p) => p.setInt(keys.hidden, until.millisecondsSinceEpoch));
 

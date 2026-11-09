@@ -541,7 +541,7 @@ class StepStatus {
 
   final ImportStepState state;
 
-  /// Why it failed, or a short note (`重启后生效`).
+  /// Why it failed, or a short note (`Takes effect after restart`).
   final String? message;
 }
 

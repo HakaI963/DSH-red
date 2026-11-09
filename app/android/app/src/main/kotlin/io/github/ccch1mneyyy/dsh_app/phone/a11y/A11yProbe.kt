@@ -33,7 +33,7 @@ import java.util.concurrent.Executors
  *        key back|home|recents|notifications | tapxy sid x y | open pkg | collect sid id [pages] [until] |
  *        fg | windows | status [text] | confirm sentence [app] [first] | handoff reason [ms] | injecttest [relax] | guard |
  *        begin (a task starts, as on a tool call) | finish [session] [host] [reopen] (what Dart's finishTask does) |
- *        overlay [opacity 0.3–1] [auto true|false] (the 悬浮条 settings, as the settings page writes them) |
+ *        overlay [opacity 0.3–1] [auto true|false] (the floating-bar settings, as the settings page writes them) |
  *        palette dark|light|auto (the overlay's palette against the system's, for contrast checks) |
  *        form ball|capsule|card (as the person's taps would) | press key=pause|stop|steer|done |
  *        unlocks none|system|secrets|all|real (lifted limits to show) | freeze true|false (no timer changes the form) |
@@ -174,7 +174,7 @@ internal class A11yProbe(private val service: PhoneA11yService, private val driv
         "ok=${r.ok} msg=${r.message}\n----\n${r.screen?.let { "id=${it.id}\n${it.text}" }}"
 
     /**
-     * Shows a confirm card, then injects a tap on 允许一次 through this service's own
+     * Shows a confirm card, then injects a tap on "Allow once" through this service's own
      * dispatchGesture — the attack the card must refuse — and reports whether it resolved.
      * relax=true lifts the InjectGuard / pass-through layers: with nothing else checking event
      * fields (see PromptInputPolicy), the tap then gets through, which shows those layers are the guard.

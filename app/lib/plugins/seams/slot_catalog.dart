@@ -175,7 +175,7 @@ abstract final class Slots {
   /// A plugin's View of a conversation, beside Chat and Trajectory.
   static const conversationView = 'conversation.view';
 
-  /// rc.4's three 「更多」 menus (more conversation views, more panels, more
+  /// rc.4's three "More" menus (more conversation views, more panels, more
   /// tools): rows of a web menu, nothing the app can seat.
   static const headerViewsActions = 'conversation.session.header.views.actions';
   static const panelListActions = 'sidebar.panellist.actions';
@@ -187,7 +187,7 @@ abstract final class Slots {
   static const dshGoPanel = 'dsh-go.panel';
 
   /// Where the app has a seat today (docs/design/plugin-ui-v3.md §1.2, A):
-  /// a plugin's web part anywhere else is listed under 「网页版界面」 in its
+  /// a plugin's web part anywhere else is listed under "In DSH Web" in its
   /// details instead.
   static const seated = {
     settingsSection,
@@ -204,7 +204,7 @@ abstract final class Slots {
     ...chatPanel,
   };
 
-  /// The chat page's 「插件」 sheet: one panel island of the app's own
+  /// The chat page's "Plugins" sheet: one panel island of the app's own
   /// showing all of [chatPanel] (docs/design/plugin-ui-v3.md §3.4). Not a
   /// DSH slot: only `recipes.json` knows it.
   static const chatSheet = 'dsh-go.chat';

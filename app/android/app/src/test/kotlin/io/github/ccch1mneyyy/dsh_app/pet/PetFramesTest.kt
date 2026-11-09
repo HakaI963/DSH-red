@@ -199,7 +199,7 @@ class PetFramesTest {
     }
 
     /**
-     * The bug (群友, 11-01): out of the app, thinking's cloud and juggling's notes and props were cut
+     * The bug (a group member's report, 11-01): out of the app, thinking's cloud and juggling's notes and props were cut
      * off. Only happy, waking and typing had their own frame; everything else drew into the rest
      * frame, and this much of the art (medium on a 2.75 phone) fell outside it.
      */

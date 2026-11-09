@@ -1,23 +1,23 @@
-// 启动画面：系统的启动窗口（Android 12+ 的启动画面，或 8–11 的启动窗口背景）交给
-// App 自己的启动画面，中间看不出切换；再在界面可用时收起，不为动画多等一刻。
+// Launch screen: the system's start window (the Android 12+ splash screen, or the 8–11 start
+// window background) hands over to the app's own launch screen with no visible switch; it then leaves when the UI is ready, never waiting a moment for the animation.
 //
-// 原生侧：android/.../launch/LaunchScreen.kt（MethodChannel `dsh/launch`）。
+// Native side: android/.../launch/LaunchScreen.kt (MethodChannel `dsh/launch`).
 //
-//   main()             begin：系统画了什么（图标像素、方块大小、底色）→ 首帧原样画出
-//   首帧               Android 12+：系统启动画面盖在首帧上，原生量出它的图标位置送来
-//                      （systemSplash）→ 按量到的位置再画一帧 → reveal：系统画面淡出
-//   交接完成           动画开始（launch_motion.dart）；8–11 首帧即开始
-//   RootGate 出界面    ready：自定义画面每次 App 冷启动都按它本身的长度播完一轮，不设上限，
-//                      引擎在跑、现起还是没开都一样（轻量模式也播，只有系统要求减少动画时停在
-//                      首帧、不等）；默认动画只在引擎这次现起时播完一遍（1.36 s，引擎先就绪
-//                      就提前收），引擎早已在跑、没自动启动、或轻量 / 减少动画时界面可用就收，
-//                      播到哪算哪。轻点屏幕随时跳过
+//   main()             begin: what the system drew (icon pixels, block size, backdrop color) → the first frame paints it as-is
+//   first frame        Android 12+: the system splash covers the first frame; native measures its icon position and sends it over
+//                      (systemSplash) → paint one more frame at the measured position → reveal: the system layer fades out
+//   handover done      the animation starts (launch_motion.dart); on 8–11 it starts at the first frame
+//   RootGate shows UI  ready: a custom screen plays through its own length on every cold start, with no cap,
+//                      whether the engine runs, starts now or stays off (light mode plays too; only the system's
+//                      reduce-motion stops it at the first frame, without waiting); the default animation plays once only when the engine starts now
+//                     (1.36 s; it wraps early if the engine is ready first); when the engine was already running, autostart is off,
+//                      or on light / reduce-motion, it leaves when the UI is ready, wherever the animation is. A tap skips it anytime
 //
-// 系统阶段画不画图标（systemIcon）：清单里的启动主题画不了用户选的桌面图标（activity-alias
-// 不能各有主题），所以只铺页面底色；Android 13+ 由原生把下一次启动的启动主题换成所选图标
-// 自己的（launch/LaunchThemes.kt），那时系统画的就是它。没有图标时，App 在动画开头把图标淡入。
+// Whether the system phase draws an icon (systemIcon): the launch themes in the manifest can't draw the user's chosen launcher icon (activity-aliases
+// can't each have their own theme), so it only fills the page background; on Android 13+ native swaps the next launch's splash theme to the chosen icon's
+// own (launch/LaunchThemes.kt), and then the system draws that very icon. Without an icon, the app fades it in at the start of the animation.
 //
-// 没有原生侧（测试、其他平台）或这次不是冷启动：没有启动画面，RootGate 照旧。
+// With no native side (tests, other platforms) or no cold start this time: no launch screen, and RootGate behaves as before.
 
 import 'dart:async';
 import 'dart:ui' as ui;
@@ -405,7 +405,7 @@ class LaunchController extends ChangeNotifier {
     _leaveIfDone();
   }
 
-  /// 减少动画, as the overlay finds it for what shows (the user's own picture: the system's
+  /// Reduce motion, as the overlay finds it for what shows (the user's own picture: the system's
   /// setting alone, not a light phone's): nothing plays, so nothing is waited for.
   bool get reduced => _reduced;
   set reduced(bool value) {

@@ -45,7 +45,7 @@ object PhoneStorage {
         return listOf("${hostRoot()}:$GUEST_PATH", "/storage")
     }
 
-    /** `/root/手机存储` → `/sdcard` inside the rootfs, present only while the mode is on. */
+    /** The phone-storage link under /root (the folder itself is named in Chinese) → `/sdcard` inside the rootfs, present only while the mode is on. */
     fun syncShortcut(rootfs: java.io.File, enabled: Boolean) {
         // l10n:keep guest filesystem path
         val link = java.io.File(rootfs, "root/手机存储")

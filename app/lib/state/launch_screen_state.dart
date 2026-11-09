@@ -1,4 +1,4 @@
-// 设置 › 主题 › 启动画面: the user's own launch screen (lib/launch/custom_launch.dart), and
+// Settings › Theme › Launch screen: the user's own launch screen (lib/launch/custom_launch.dart), and
 // whether it is the one in use.
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';

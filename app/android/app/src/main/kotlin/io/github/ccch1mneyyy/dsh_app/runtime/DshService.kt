@@ -75,7 +75,7 @@ class DshService : Service() {
                 return START_NOT_STICKY
             }
             ACTION_PHONE_STOP -> {
-                // 「停止操作」 on the notification: stop the task it was shown for, keep the engine.
+                // The "Stop" action on the notification: stop the task it was shown for, keep the engine.
                 val taskId = intent.data?.takeIf { it.scheme == PHONE_TASK_SCHEME }?.schemeSpecificPart?.toLongOrNull()
                 // l10n:keep agent stop reason
                 if (taskId != null) PhoneControl.get(this).stopShownTask("用户在通知里停止", taskId)
@@ -189,7 +189,7 @@ class DshService : Service() {
         private const val PHONE_TASK_SCHEME = "dsh-phone-task"
         private const val EXTRA_STOP_GENERATION = "stopGeneration"
 
-        /** 停止操作 for exactly [taskId]. The id is the intent's data, so every task gets its own
+        /** Stop action for exactly [taskId]. The id is the intent's data, so every task gets its own
          * PendingIntent: a newer task's button never rewrites the one still on screen. */
         fun phoneStopIntent(context: Context, taskId: Long): Intent = Intent(context, DshService::class.java)
             .setAction(ACTION_PHONE_STOP).setData(Uri.fromParts(PHONE_TASK_SCHEME, taskId.toString(), null))
@@ -251,7 +251,7 @@ class DshService : Service() {
             nm.notify(ALERT_ID, notification)
         }
 
-        /** Unpacking the runtime: progress, no 停止 (an interrupted unpack only starts over). */
+        /** Unpacking the runtime: progress, no Stop (an interrupted unpack only starts over). */
         private fun buildInstallNotification(context: Context, upgrade: Boolean, percent: Int): Notification =
             Notification.Builder(context, CHANNEL_ID)
                 .setSmallIcon(R.drawable.ic_stat_dsh)
@@ -331,7 +331,7 @@ class DshService : Service() {
             } else {
                 @Suppress("DEPRECATION") Notification.Builder(context)
             }
-            // While DSH operates the phone: say what it does and offer 停止操作 for that task.
+            // While DSH operates the phone: say what it does and offer the Stop action for that task.
             val phone = PhoneControl.peek()
             val phoneTask = phone?.liveTask()
             val phoneLine = phoneTask?.let { phone?.foregroundLine(it) }

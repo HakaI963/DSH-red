@@ -7,7 +7,7 @@ import io.github.ccch1mneyyy.dsh_app.phone.TaskControls
 internal class StatusOwnership {
     private var current: ((() -> Unit) -> Boolean)? = null
 
-    /** 暂停 / 停止 / 插话 of the task whose status is displayed; never re-resolved at tap time. */
+    /** Pause / Stop / Steer of the task whose status is displayed; never re-resolved at tap time. */
     var controls: TaskControls? = null
         private set
 

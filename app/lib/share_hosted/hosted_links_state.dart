@@ -1,4 +1,4 @@
-// 「我的分享链接」, the hosted links made on this phone. Each holds its
+// "My shared links", the hosted links made on this phone. Each holds its
 // decryption key and delete token, so the list lives in the Keystore-backed
 // secure storage, like the API keys (settings_state.dart).
 
@@ -64,7 +64,7 @@ class HostedLinksState {
   final bool loaded;
   final HostedDeleteFailure? failure;
 
-  /// What 「我的分享链接」 shows.
+  /// What "My shared links" shows.
   List<HostedLink> get visible => [
     for (final l in links)
       if (!l.deleting) l,
@@ -78,7 +78,7 @@ class HostedLinksController extends Notifier<HostedLinksState> {
   /// How long a deleted link can be brought back.
   static const undoWindow = Duration(seconds: 4);
 
-  /// Expired links stay listed (as 已过期) this long, then drop off.
+  /// Expired links stay listed (as expired) this long, then drop off.
   static const keepExpired = Duration(days: 30);
 
   final _timers = <String, Timer>{};

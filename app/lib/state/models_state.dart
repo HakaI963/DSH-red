@@ -136,7 +136,7 @@ bool isValidModelSelection(ModelCatalog? catalog, ModelSelection? selection) {
 }
 
 /// The effort [model] starts at when it is picked: the engine's own default
-/// when the model names one (DeepSeek: 高), else 中, else its lowest level
+/// when the model names one (DeepSeek: High), else Medium, else its lowest level
 /// that thinks, else the first. A custom provider's models name no default
 /// (the adapter only knows a route-wide one), and the engine runs a selection
 /// without an effort as not thinking: so picking one must say which.

@@ -1,5 +1,5 @@
 // Which conversations want the person's attention, for the drawer's markers
-// and its 待确认 / 未读 filters:
+// and its Pending / Unread filters:
 //
 // * pending — an approval, plan review or question waits on them. Source:
 //   the mux's pending host requests (`approval/request` and
@@ -8,7 +8,7 @@
 //   Subagent requests count for their top-level conversation, like the
 //   official sidebar's `pendingInteraction` marker.
 // * unread — a conversation moved on since the person last looked at it
-//   (the official "未读完成提醒"). This phone remembers, per host, the
+//   (the official "done reminders for unread chats"). This phone remembers, per host, the
 //   activity time it last saw of each conversation; everything already there
 //   the first time counts as seen.
 
@@ -53,7 +53,7 @@ final pendingSourceProvider = Provider<PendingSource?>((ref) {
 });
 
 /// How long a request has to stay open before it is marked, so one answered
-/// at once (「本对话都允许」, another device) never flashes.
+/// at once ("Allow for chat", another device) never flashes.
 final pendingSettleProvider = Provider<Duration>((ref) => const Duration(milliseconds: 800));
 
 /// Top-level conversation id → what it waits for.

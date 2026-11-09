@@ -52,7 +52,7 @@ class SafetyGateTest {
             assertSame(screen, own.filterScreen(screen))
             assertEquals("system-page", refused(own.checkWrite(WriteKind.TAP, target(), "com.android.settings", null)))
 
-            // The 不碰 list is the person's own list, not one of these: it still refuses.
+            // The hands-off list is the person's own list, not one of these: it still refuses.
             assertEquals("deny-list", refused(verdict(all, "com.icbc")))
             assertEquals("deny-list", gate(all).checkRead("com.icbc", null)?.rule)
             if (mode == ConfirmMode.ALWAYS) {

@@ -31,7 +31,7 @@ import 'hosts_state.dart';
 /// it works on hosts without the experimental `pluginMarket` bundle and over
 /// the relay.
 
-/// Default market: dshfind's format-1 index (attribution "数据来自 dshfind").
+/// Default market: dshfind's format-1 index (attribution "Data from dshfind").
 const dshfindIndexUrl = 'https://api.dshfind.com/market/dsh-index.json';
 
 /// Profile `dsh web` runs with; the app starts every host it drives that way.
@@ -173,7 +173,7 @@ class MarketEntry {
   bool matches(List<String> terms) => terms.every(haystack.contains);
 }
 
-/// The two sections the official index fills (§2); 全部 is everything.
+/// The two sections the official index fills (§2); All is everything.
 enum MarketSection { official, adapted }
 
 /// The fetched index plus derived entries.
@@ -287,7 +287,7 @@ Future<MarketCatalog> _officialCatalog(String index, MarketSidecar sidecar) asyn
 
 /// Both files from [base]. A sidecar that is missing or not schema 1 leaves
 /// the plugins without a tier; one that can't be fetched fails the read, so a
-/// network problem doesn't pass for 暂无. The pair is kept when every plugin
+/// network problem doesn't pass for empty. The pair is kept when every plugin
 /// has its listing for the pinned version (the edge may briefly serve one
 /// file newer than the other).
 Future<MarketCatalog> _readOfficial(String base, MarketFileFetcher get, _OfficialCopy? copy) async {
@@ -347,7 +347,7 @@ Future<MarketCatalog> fetchOfficialMarket({MarketFileFetcher get = fetchMarketFi
 }
 
 /// The first read in a session may use the copy on the phone; any later one
-/// is a pull to refresh or 重试 (both invalidate [officialMarketProvider]) and
+/// is a pull to refresh or Retry (both invalidate [officialMarketProvider]) and
 /// asks the server.
 final officialMarketFetcherProvider = Provider<OfficialMarketFetcher>((ref) {
   final get = ref.watch(marketFileFetcherProvider);
@@ -358,14 +358,14 @@ final officialMarketFetcherProvider = Provider<OfficialMarketFetcher>((ref) {
 final marketFileFetcherProvider = Provider<MarketFileFetcher>((ref) => fetchMarketFile);
 
 /// Read once per app session like dshfind's (the copy on the phone may
-/// answer: [fetchOfficialMarket]); the chat's 生成 entry reads it too (the
+/// answer: [fetchOfficialMarket]); the chat's Create entry reads it too (the
 /// media plugin it offers).
 final officialMarketProvider = FutureProvider<MarketCatalog>(
   (ref) => ref.watch(officialMarketFetcherProvider)(),
   retry: (_, _) => null,
 );
 
-/// 全部: dshfind with the official entries merged in; dshfind alone while
+/// All: dshfind with the official entries merged in; dshfind alone while
 /// the official index loads or when it failed.
 final marketAllProvider = Provider<AsyncValue<MarketCatalog>>((ref) {
   final official = ref.watch(officialMarketProvider).value;
@@ -375,7 +375,7 @@ final marketAllProvider = Provider<AsyncValue<MarketCatalog>>((ref) {
 });
 
 /// [section]'s entries passing the search box, in index order. Categories
-/// and the web-only switch belong to 全部.
+/// and the web-only switch belong to All.
 List<MarketEntry> marketSection(MarketCatalog official, MarketSection section, MarketFilter filter) {
   final terms = filter.terms;
   return [
@@ -449,7 +449,7 @@ final _webOnlyName = RegExp(r'(?:client-ui|web-ui|webui|(?:^|[-/])(?:themes?|ski
 /// * for uncategorized entries, package names like `dsh-client-ui-*`,
 ///   `*-web-ui`, `*-theme`, `skin-*`.
 /// Such plugins load into DSH's web profile but do nothing for this app's
-/// native chat; they are hidden by default behind 「显示网页版插件」.
+/// native chat; they are hidden by default behind "Show Web plugins".
 bool isWebOnlyPlugin(MarketPlugin plugin, MarketIndex index) {
   final category = plugin.category;
   if (category != null) {
@@ -559,7 +559,7 @@ final pluginHostProvider = Provider<PluginHost?>((ref) {
 
 // ── Installed bundles ────────────────────────────────────────────────────────
 
-/// How a bundle shows up on 「已安装」.
+/// How a bundle shows up on "Installed".
 enum BundleGroup {
   /// Third-party bundles the profile depends on (and selected names with a
   /// problem).
@@ -610,7 +610,7 @@ class PendingPluginRemoval {
   /// The Host's answer; null when the plan was dropped before sending.
   Future<PluginOperationResult?> get done => _done.future;
 
-  /// 撤销: [cancel], remembered as the user's choice.
+  /// Undo: [cancel], remembered as the user's choice.
   bool undo() {
     if (!canUndo || _committing) return false;
     _undone = true;
@@ -623,7 +623,7 @@ class PendingPluginRemoval {
   /// screen, or a newer undo notice takes this one's place.
   bool commitNow() => _commitNow();
 
-  /// Dropped with 撤销.
+  /// Dropped with Undo.
   bool get undone => _undone;
 
   /// The removal has been sent to the Host; it can no longer be taken back.
@@ -774,7 +774,7 @@ class InstalledPluginsController extends AsyncNotifier<List<PluginBundle>?> {
     };
     _removals[bundle.name] = pending;
     // Leaving the screen (Home, recents, another app on top; the process may be
-    // killed from there) uninstalls at once: the notice said 已卸载, and the
+    // killed from there) uninstalls at once: the notice said Uninstalled, and the
     // undo it offered is gone with the screen.
     final lifecycle = AppLifecycleListener(
       onStateChange: (state) {
@@ -852,7 +852,7 @@ class InstalledPluginsController extends AsyncNotifier<List<PluginBundle>?> {
     return _visible(bundles);
   }
 
-  /// How many plugins 「已安装」 lists, for the usage statistics.
+  /// How many plugins "Installed" lists, for the usage statistics.
   void _counted(List<PluginBundle> bundles) => ref
       .read(usageStatsProvider.notifier)
       .plugins(bundles.where((b) => bundleGroup(b) == BundleGroup.installed && b.installed).length);

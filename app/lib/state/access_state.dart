@@ -1,5 +1,5 @@
-// System permissions by what they are for: first run's 「想让 DSH Go 帮你做哪些
-// 事」 (lib/ui/onboarding/access_step.dart) and 设置 › 系统权限
+// System permissions by what they are for: first run's "What should DSH Go help
+// with?" (lib/ui/onboarding/access_step.dart) and Settings › System permissions
 // (lib/ui/settings/system_access_page.dart) read and open the same items here.
 //
 // Nothing here detects or opens anything on its own: the readings come from
@@ -9,11 +9,11 @@
 //
 // feature → items (this phone's maker decides the last few):
 //
-//   读写手机里的文件  storage
-//   桌宠与悬浮窗     overlay
-//   手机操控        accessibility · notifications · popup (vivo, Xiaomi)
-//   后台持续运行     notifications · battery · vendorBackground · autostart (vivo, Xiaomi)
-//   语音输入        mic
+//   Read and write phone files    storage
+//   Pet over other apps           overlay
+//   Phone control                 accessibility · notifications · popup (vivo, Xiaomi)
+//   Keep running in background    notifications · battery · vendorBackground · autostart (vivo, Xiaomi)
+//   Voice input                   mic
 
 import 'dart:async';
 import 'dart:convert';
@@ -41,7 +41,7 @@ import 'voice_state.dart';
 final voiceModelApproxMb = (voiceModelDefaultBytes / 1000000).round();
 
 /// First run's answer about voice input, which [VoiceModelController] picks
-/// up: true when 语音输入 was picked (it starts the download once), false when
+/// up: true when Voice input was picked (it starts the download once), false when
 /// the page was confirmed without it, absent when the page was skipped.
 const onboardingWantsVoiceKey = VoiceModelController.onboardingKey;
 
@@ -99,7 +99,7 @@ enum AccessState {
 /// The makers' own switches, by the native vendor key (`VendorSettings.kt`
 /// holds their pages). Huawei and Honor keep start-up and background running
 /// on one page; OPPO keeps everything on the app's details page; Samsung's
-/// 「不受限制」 is the system's battery exemption.
+/// "Unrestricted" is the system's battery exemption.
 const vendorSwitches = <String, List<AccessItem>>{
   'vivo': [AccessItem.vendorBackground, AccessItem.autostart, AccessItem.popup],
   'xiaomi': [AccessItem.vendorBackground, AccessItem.autostart, AccessItem.popup],
@@ -191,7 +191,7 @@ class AccessReadings {
     AccessItem.vendorBackground || AccessItem.autostart || AccessItem.popup => null,
   };
 
-  /// Android's 「受限制的设置」 may stand in front of the accessibility switch.
+  /// Android's "Restricted setting" may stand in front of the accessibility switch.
   bool get mayNeedRestricted => PhoneDevice(sdkInt: sdk, sideloaded: sideloaded, restricted: restricted)
       .mayNeedRestrictedSettings;
 }
@@ -208,7 +208,7 @@ AccessState? accessStateOf(AccessItem item, AccessReadings readings, Set<AccessI
   };
 }
 
-/// The step of 「先允许受限制的设置」 the accessibility page is on, 1-based
+/// The step of "Allow restricted settings first" the accessibility page is on, 1-based
 /// (1 tap the greyed switch once, 2 allow it on App info, 3 turn it on);
 /// null when nothing stands in front of the switch.
 ///
@@ -239,7 +239,7 @@ abstract class AccessDriver {
   /// when nothing opened.
   Future<bool> open(AccessItem item, {bool again = false});
 
-  /// This app's system info page (「允许受限制的设置」).
+  /// This app's system info page ("Allow restricted settings").
   Future<bool> openAppInfo();
 }
 
@@ -321,7 +321,7 @@ class SystemAccessDriver implements AccessDriver {
         case AccessItem.storage:
           final access = await bridge.requestStorage();
           if (access.granted) return true;
-          // The device ignores legacy storage: 「所有文件访问」 is the way.
+          // The device ignores legacy storage: "All files access" is the way.
           if (access.permission && !access.legacy) return bridge.openAllFilesAccess();
           // Denied again: the dialog won't come back, the app's page will.
           if (again) return ref.read(phoneProvider.notifier).openAppDetails();
@@ -414,7 +414,7 @@ class AccessSetup {
   /// Picked, and being walked; null before the pick (or after a skip).
   final Set<AccessFeature>? features;
 
-  /// Items passed over with 「跳过」.
+  /// Items passed over with "Skip".
   final Set<AccessItem> skipped;
 }
 
@@ -473,8 +473,8 @@ class AccessSetupController extends Notifier<AccessSetup> {
     } catch (_) {}
   }
 
-  /// 「开启所选」: the walk starts, and the voice answer is written for the
-  /// voice feature to pick up. [phoneMode], picked with 手机操控, goes to the
+  /// "Turn on selected": the walk starts, and the voice answer is written for the
+  /// voice feature to pick up. [phoneMode], picked with Phone control, goes to the
   /// phone's policies now, or as soon as they can be written
   /// ([PhoneController.chooseConfirmMode]).
   Future<void> choose(Set<AccessFeature> features, {PhoneConfirmMode? phoneMode}) async {
@@ -504,7 +504,7 @@ class AccessSetupController extends Notifier<AccessSetup> {
     await _save();
   }
 
-  /// 「继续」 on the summary: what was picked is turned on from readings taken
+  /// "Continue" on the summary: what was picked is turned on from readings taken
   /// now (an item turned on from the summary counts), and the step is over
   /// only once the settings that changes are written — killed before then,
   /// the next launch comes back to the step. Asked again meanwhile, it is the
@@ -517,8 +517,8 @@ class AccessSetupController extends Notifier<AccessSetup> {
     await clear();
   }
 
-  /// Turns on what was picked, as far as the phone allows: 访问手机文件 once
-  /// files may be reached, 手机操控 (its disclosure was accepted on the pick),
+  /// Turns on what was picked, as far as the phone allows: Access phone files once
+  /// files may be reached, Phone control (its disclosure was accepted on the pick),
   /// the default pet unless one was chosen, its floating window once it can
   /// be drawn. An engine running or starting restarts once
   /// so its mounts and tools follow: one starting already took the old
@@ -544,7 +544,7 @@ class AccessSetupController extends Notifier<AccessSetup> {
       restarting = (await attempt(() => ref.read(phoneProvider.notifier).setEnabled(true)))?.restarting ?? false;
     }
     if (features.contains(AccessFeature.phone)) {
-      // The pick's 确认方式, if it didn't go in then; still pending after this,
+      // The pick's Confirmation, if it didn't go in then; still pending after this,
       // it goes in on the next read of the policies.
       await attempt(ref.read(phoneProvider.notifier).applyPendingConfirmMode);
     }

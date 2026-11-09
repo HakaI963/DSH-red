@@ -179,7 +179,7 @@ class BalanceState {
     return threshold > 0 && b.total < threshold;
   }
 
-  /// Threshold 0 (「不提醒」) turns the banner off entirely, also when the balance
+  /// Threshold 0 ("Off") turns the banner off entirely, also when the balance
   /// can no longer pay: someone on other providers' models doesn't need it.
   bool get showBanner => threshold > 0 && isLow && !dismissed;
 
@@ -203,7 +203,7 @@ class BalanceState {
 
 const defaultLowBalanceThreshold = 5.0;
 
-/// Choices offered for the low-balance line (0 = 不提醒).
+/// Choices offered for the low-balance line (0 = Off).
 const lowBalanceThresholds = [0.0, 1.0, 5.0, 10.0, 20.0, 50.0];
 
 /// Balance of the key saved in the app.

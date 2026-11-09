@@ -35,7 +35,7 @@ class SlashCommand {
   /// Registered name without the slash (`compact`); what gets executed.
   final String name;
 
-  /// Short Chinese title (`压缩`); also accepted as a typed alias (`/压缩`).
+  /// Short localized title (`压缩` in Chinese); also accepted as a typed alias (`/压缩`).
   final String label;
   final String description;
 

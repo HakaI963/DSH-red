@@ -32,7 +32,7 @@ Map<String, String> get _labels => {
   'speech-to-text': appL10n.pluginsNamespaceVoiceInput,
 };
 
-/// 「子代理」 for `subagent`; the id itself when unknown.
+/// "Subagent" for `subagent`; the id itself when unknown.
 String namespaceLabel(String ns) => _labels[ns] ?? ns;
 
 /// Whether [ns] has a product name (unknown ones are drawn in mono).

@@ -33,7 +33,7 @@ abstract final class VoiceModelPaths {
   /// Suffix of the app's resumable partial files (the provider's own are `.<uuid>.part`).
   static const partSuffix = '.dsh-go.part';
 
-  /// Where 重新下载 puts the new files (laid out as under [models]) until
+  /// Where re-download puts the new files (laid out as under [models]) until
   /// every one is in and checked. The same file system as [models], so each
   /// takes its place with a rename; outside it, so the provider never sees
   /// a half-downloaded copy.
@@ -153,14 +153,14 @@ class VoiceModelFiles {
   });
 
   /// Removes the models (also the provider's and the app's partial files,
-  /// and a 重新下载 copy in [VoiceModelPaths.staging]).
+  /// and a re-download copy in [VoiceModelPaths.staging]).
   Future<void> delete() async {
     await clearStaging();
     final dir = Directory(host(VoiceModelPaths.models).path);
     if (await dir.exists()) await dir.delete(recursive: true);
   }
 
-  /// Where [asset] comes in during 重新下载.
+  /// Where [asset] comes in during re-download.
   File staged(VoiceModelAsset asset) {
     final under = asset.guestPath.startsWith('${VoiceModelPaths.models}/')
         ? asset.guestPath.substring(VoiceModelPaths.models.length)
@@ -168,7 +168,7 @@ class VoiceModelFiles {
     return host('${VoiceModelPaths.staging}$under');
   }
 
-  /// Removes a 重新下载 copy, finished or not.
+  /// Removes a re-download copy, finished or not.
   Future<void> clearStaging() async {
     final dir = Directory(host(VoiceModelPaths.staging).path);
     if (await dir.exists()) await dir.delete(recursive: true);

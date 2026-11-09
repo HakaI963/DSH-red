@@ -1,5 +1,5 @@
-// Another page hands a word to the chat composer — 技能 › 「在对话里用」 /
-// 「新对话里用」 put `/name` there.
+// Another page hands a word to the chat composer — Skills › "Use in chat" /
+// "New chat" put `/name` there.
 //
 // The official client applies a skill as plain text, with no method of its
 // own: picking it in the "/" menu writes `/name ` into the editor

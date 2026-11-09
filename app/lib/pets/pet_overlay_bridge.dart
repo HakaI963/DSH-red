@@ -37,7 +37,7 @@ final petOverlayBridgeProvider = Provider<void>((ref) {
 });
 
 /// Keeps [petOverlayBridgeProvider] alive where it is mounted (the home
-/// shell, so the overlay is fed in both 原生 and 网页 modes). Draws nothing.
+/// shell, so the overlay is fed in both native and web modes). Draws nothing.
 class PetOverlayBridge extends ConsumerStatefulWidget {
   const PetOverlayBridge({super.key});
   @override

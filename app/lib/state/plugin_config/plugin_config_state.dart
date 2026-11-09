@@ -1,6 +1,6 @@
 // The native plugin configuration of the active Host (docs/design/
 // plugin-config.md): every plugin entry's form, edits to live fields sent at
-// once, edits to the rest held until 保存 and applied together with a reload,
+// once, edits to the rest held until Save and applied together with a reload,
 // the apply's progress, and a failed apply that can be retried, put back or
 // dropped.
 //
@@ -429,7 +429,7 @@ class PluginConfigController extends AsyncNotifier<PluginConfigState?> {
   Timer? _refreshTimer;
   final Map<String, Timer> _doneTimers = {};
 
-  /// How long 「已生效」 stays.
+  /// How long "Applied" stays.
   static const doneFor = Duration(milliseconds: 1600);
 
   bool _accepts(Object origin) => ref.mounted && identical(origin, _origin);
@@ -594,7 +594,7 @@ class PluginConfigController extends AsyncNotifier<PluginConfigState?> {
     if (ref.mounted) state = AsyncData(next);
   }
 
-  /// Sets one field: at once when it is live, held for 保存 otherwise. A
+  /// Sets one field: at once when it is live, held for Save otherwise. A
   /// value equal to what the field inherits clears the user's own instead.
   Future<bool> set(FieldRef field, Object? value, {Object? fallback}) {
     final current = _current;

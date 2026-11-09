@@ -70,9 +70,9 @@ import java.util.concurrent.TimeUnit
  * the main thread.
  *
  * While a task runs the person sees one control at the top, in three forms
- * (docs/design/phone-overlay.md): the capsule with the line and 暂停 / 停止 ([OverlayCapsule]),
+ * (docs/design/phone-overlay.md): the capsule with the line and Pause / Stop ([OverlayCapsule]),
  * the card it grows into, and the ball it folds into ([OverlayBall]). [FoldClock] decides the
- * form; this class plays the morphs between them and keeps 停止 one step away in every form.
+ * form; this class plays the morphs between them and keeps Stop one step away in every form.
  */
 internal class ControlOverlay(private val service: AccessibilityService) : UserGate, PhonePromptPresenter {
     private val main = Handler(Looper.getMainLooper())
@@ -80,11 +80,11 @@ internal class ControlOverlay(private val service: AccessibilityService) : UserG
     private val a11y = service.getSystemService(AccessibilityManager::class.java)
     private val ime = service.getSystemService(InputMethodManager::class.java)
 
-    /** 暂停 is on: the driver refuses actions until 继续. */
+    /** Pause is on: the driver refuses actions until resume. */
     @Volatile var paused = false
         private set
 
-    /** The person is typing into 插话: actions wait so the keyboard isn't fought over. */
+    /** The person is typing into Steer: actions wait so the keyboard isn't fought over. */
     @Volatile var editing = false
         private set
 
@@ -114,7 +114,7 @@ internal class ControlOverlay(private val service: AccessibilityService) : UserG
     private val steps = StepHistory()
     private var stoppedNote = false
 
-    /** 「已发给 DSH：…」 for a moment after 插话, in the line's place. */
+    /** "Sent to DSH: …" for a moment after steering, in the line's place. */
     private var steerNote: String? = null
     private var pill: OverlayCapsule? = null
     private val previewOwner = Any()
@@ -147,7 +147,7 @@ internal class ControlOverlay(private val service: AccessibilityService) : UserG
     /** A narrower line may shrink the capsule now. */
     private val shrinkTick = Runnable { renderPill() }
 
-    // 闲置时不透明度 (the ball's) and 「闲置时自动收起」 (设置 → 手机操控 → 悬浮条), live while showing.
+    // Idle opacity (the ball's) and "Collapse when idle" (Settings → Phone control → Floating bar), live while showing.
     private val overlayPrefs = OverlayPrefs.prefs(service)
     private var idleOpacity = OverlayPrefs.from(overlayPrefs).idleOpacity
     private val prefsListener = SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
@@ -183,7 +183,7 @@ internal class ControlOverlay(private val service: AccessibilityService) : UserG
         main.post {
             // This runnable and close apply on the same queue. Never hold the task lock
             // over WindowManager work or enqueue a second, unguarded status runnable.
-            // The pill's 暂停 / 停止 / 插话 are bound to this status's own task, captured inside its guard.
+            // The pill's Pause / Stop / Steer are bound to this status's own task, captured inside its guard.
             if (!statusOwnership.publish(ifCurrent) { PhoneRegistry.controlListener?.shownControls() }) return@post
             if (editing && statusOwnership.editingControls == null) endEditing()
             statusText = text
@@ -382,7 +382,7 @@ internal class ControlOverlay(private val service: AccessibilityService) : UserG
         return hide && (pill != null || confirmCard != null || handoffCard != null)
     }
 
-    /** Screen off, lock, 停止 elsewhere, service going away: answer everything pending with STOP. */
+    /** Screen off, lock, Stop elsewhere, service going away: answer everything pending with STOP. */
     fun stopAll() {
         val shared = sharedPrompt
         val confirm = pendingConfirm
@@ -401,12 +401,12 @@ internal class ControlOverlay(private val service: AccessibilityService) : UserG
         }
     }
 
-    /** "已停止" stays briefly; if the core doesn't clear or replace the status, the control (and its KEEP_SCREEN_ON) goes. */
+    /** "Stopped" stays briefly; if the core doesn't clear or replace the status, the control (and its KEEP_SCREEN_ON) goes. */
     private fun clearStoppedLater() {
         main.postDelayed({ if (stoppedNote) { statusText = null; line = null; steps.clear(); setStopped(false); paused = false; removePill(animated = true) } }, 4_000)
     }
 
-    /** The 已停止 note: holds the capsule (or the ball) as it is, the card folding back first. */
+    /** The Stopped note: holds the capsule (or the ball) as it is, the card folding back first. */
     private fun setStopped(on: Boolean) {
         stoppedNote = on
         if (on) holdFold(FoldClock.Hold.STOPPED) else releaseFold(FoldClock.Hold.STOPPED)
@@ -438,7 +438,7 @@ internal class ControlOverlay(private val service: AccessibilityService) : UserG
         }
     }
 
-    /** Debug probe: 暂停 / 继续 / 停止 / the steer field, as the keys do. */
+    /** Debug probe: Pause / resume / Stop / the steer field, as the keys do. */
     fun debugKey(key: String) {
         main.post {
             when (key) {
@@ -603,7 +603,7 @@ internal class ControlOverlay(private val service: AccessibilityService) : UserG
         syncPreview()
     }
 
-    /** 「已解除限制」 in bold over what is lifted (「系统设置、密码和验证码」), a size smaller. */
+    /** "Limits lifted" in bold over what is lifted ("system settings, passwords and codes"), a size smaller. */
     private fun unlockedLine(u: PhoneUnlocks): CharSequence {
         val names = listOfNotNull(
             if (u.systemPages) s(R.string.overlay_unlock_system) else null,
@@ -694,7 +694,7 @@ internal class ControlOverlay(private val service: AccessibilityService) : UserG
         update(p.root, p.params)
     }
 
-    /** The 「已解除限制」 row: 设置 › 手机操控 › 解除限制, through the app's own page link. */
+    /** The "Limits lifted" row: Settings › Phone control › Lift limits, through the app's own page link. */
     private fun openUnlocks() {
         val intent = Intent(Intent.ACTION_VIEW, Uri.parse(UNLOCKS_LINK))
             .setClass(service, LinkTrampolineActivity::class.java)
@@ -873,7 +873,7 @@ internal class ControlOverlay(private val service: AccessibilityService) : UserG
         val armedAt = SystemClock.uptimeMillis() + ARM_MS
         val guarded = mutableListOf<GuardedButton>()
         fun decide(d: Decision) { if (pending.resolve(d)) main.post { if (pendingConfirm === pending) dismissConfirm() } }
-        // 本任务免确认: the main choice waives the rest of the task. Otherwise, on the first action
+        // Skip confirmations for this task: the main choice waives the rest of the task. Otherwise, on the first action
         // in an app, the main choice allows that app for the rest of the task so later steps there
         // don't ask again. "Only this step" stays available as the quieter option either way.
         val wide = request.visualScope != null || request.offerTaskWaiver || request.firstInApp
@@ -1133,7 +1133,7 @@ internal class ControlOverlay(private val service: AccessibilityService) : UserG
         scheduleFold()
     }
 
-    /** The mark (or the card's 收成小球): folded until the ball is tapped, for the rest of this task. */
+    /** The mark (or the card's collapse-to-ball): folded until the ball is tapped, for the rest of this task. */
     private fun collapseByHand() {
         endEditing()
         if (fold.foldByHand(now())) foldPill(animationsOn())
@@ -1169,7 +1169,7 @@ internal class ControlOverlay(private val service: AccessibilityService) : UserG
         val p = OverlayPrefs.from(overlayPrefs)
         idleOpacity = p.idleOpacity
         fold.setAutoFold(p.autoFold, now())
-        // A new 不透明度 shows at once on a faded ball or capsule.
+        // A new opacity shows at once on a faded ball or capsule.
         applyIdle(animated = false)
         scheduleFold()
     }
@@ -1461,7 +1461,7 @@ internal class ControlOverlay(private val service: AccessibilityService) : UserG
         private const val TAG = "DshA11y"
         private const val ARM_MS = 600L
 
-        /** The app's page link for 解除限制 (lib/ui/settings/index/spots.dart). */
+        /** The app's page link for lift limits (lib/ui/settings/index/spots.dart). */
         private const val UNLOCKS_LINK = "dshgo://open/phone-unlocks"
 
         /** The ball's way back to the capsule on a tap: quicker than the way out. */

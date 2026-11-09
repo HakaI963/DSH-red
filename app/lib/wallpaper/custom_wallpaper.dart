@@ -1,8 +1,8 @@
-// 自定义壁纸：用户选的一张图片，铺在首页、对话和抽屉后面。文件在 App 私有目录
-// （`<support>/wallpaper/`），设置存在 shared_preferences 的 `wallpaper_custom`（一条 JSON）。
+// Custom wallpaper: one picture the user picked, laid behind home, chats and the drawer. The file lives
+// in the app's private directory (`<support>/wallpaper/`); settings sit in shared_preferences under `wallpaper_custom` (one JSON).
 //
-// 取景（缩放 + 位置）按屏幕比例存成相对值，换屏幕尺寸、横竖屏都还对得上；模糊一份，
-// 提亮（浅色）和压暗（深色）各一份。
+// Framing (zoom + position) is stored in screen-relative units, so it still fits other screen sizes and orientations; one blurred copy,
+// one lightened (light mode) and one dimmed (dark mode).
 
 import 'dart:convert';
 import 'dart:io';

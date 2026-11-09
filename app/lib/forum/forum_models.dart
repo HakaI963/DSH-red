@@ -287,7 +287,7 @@ class ForumSite {
   final Map<int, String> notificationTypes;
   final bool canTagTopics;
 
-  /// 「未分类」: kept by Discourse even when posting there is off; not shown
+  /// "Uncategorized": kept by Discourse even when posting there is off; not shown
   /// as a capsule or offered in the composer.
   final int? uncategorizedId;
 
@@ -300,7 +300,7 @@ class ForumSite {
   }
 
   /// Top-level categories, in the forum's order (the capsule row), without
-  /// 「未分类」.
+  /// "Uncategorized".
   List<ForumCategory> get topLevel => [
     for (final c in categories)
       if (c.parentId == null && c.id != uncategorizedId && c.slug.isNotEmpty) c,
@@ -426,7 +426,7 @@ class ForumTopic {
   final String? imageUrl;
   final String? lastPosterUsername;
 
-  /// What a list shows as 「N 回复」.
+  /// What a list shows as "N replies".
   int get replies => postsCount > 0 ? postsCount - 1 : 0;
 
   /// The time a list shows: the last post, else the bump, else creation.
@@ -575,7 +575,7 @@ class ForumPost {
   final bool hidden;
   final bool deleted;
 
-  /// 1 regular, 2 moderator action, 3 small action (「置顶了话题」), 4 whisper.
+  /// 1 regular, 2 moderator action, 3 small action ("Pinned the topic"), 4 whisper.
   final int postType;
   final String? userTitle;
   final bool staff;

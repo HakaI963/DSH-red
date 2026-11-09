@@ -12,7 +12,7 @@ final runtimeBridgeProvider = Provider<RuntimeBridge>((ref) => RuntimeBridge());
 /// [RuntimeBridge.batteryExempt]; invalidate to read it again.
 final batteryExemptProvider = FutureProvider<bool?>((ref) => ref.watch(runtimeBridgeProvider).batteryExempt());
 
-/// A one-off message from the runtime (e.g. "已用安全模式启动"); [seq] tells repeats apart.
+/// A one-off message from the runtime (e.g. "Started in Safe mode"); [seq] tells repeats apart.
 class RuntimeNotice {
   const RuntimeNotice(this.seq, this.text);
   final int seq;

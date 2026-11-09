@@ -211,7 +211,7 @@ sealed interface IntentSpec {
     }
 }
 
-/** Deep-link builders for `intent kind=navigate` (高德 URI API / 百度 / geo:). */
+/** Deep-link builders for `intent kind=navigate` (AMap URI API / Baidu / geo:). */
 object NavUris {
     const val AMAP = "com.autonavi.minimap"
     const val BAIDU = "com.baidu.BaiduMap"

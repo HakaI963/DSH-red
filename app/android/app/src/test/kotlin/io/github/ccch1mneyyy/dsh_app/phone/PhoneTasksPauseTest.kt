@@ -73,7 +73,7 @@ class PhoneTasksPauseTest {
             assertFalse(waiter.returnedWithin(300))
             assertTrue(t.isPaused)
             assertTrue(t.isWaived)
-            // 继续 on the pill is what lets it go on.
+            // Resume on the pill is what lets it go on.
             t.setPaused(false)
             assertTrue(waiter.returnedWithin(5_000))
             assertEquals(true, waiter.result.get())

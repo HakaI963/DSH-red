@@ -217,7 +217,7 @@ class Artifact {
   /// Already in the phone's public Downloads (nothing to save).
   bool get inPhoneDownloads => path.startsWith('$phoneStorageGuestPath/Download/');
 
-  /// `PDF`, `表格 · XLSX`: the kind, plus the extension when it adds something.
+  /// `PDF`, `Spreadsheet · XLSX`: the kind, plus the extension when it adds something.
   String get typeLabel {
     final ext = _extension(path).toUpperCase();
     final label = kind.label;
@@ -516,7 +516,7 @@ class FilesChannel {
 final filesChannelProvider = Provider<FilesChannel>((ref) => const FilesChannel());
 
 /// The local engine's output folder ([phoneOutputDir]); empty unless the
-/// engine is on this phone with "访问手机文件" on. Scanned when first needed
+/// engine is on this phone with "Access phone files" on. Scanned when first needed
 /// and again whenever a turn ends ([refresh]).
 class PhoneOutputsController extends Notifier<List<PhoneOutput>> {
   bool _enabled = false;

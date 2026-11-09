@@ -479,7 +479,7 @@ class AppUpdateController extends Notifier<AppUpdateState> {
   /// file. Nothing downloaded or verified under the old one goes to the
   /// installer: a running download or install finds out at its next step,
   /// fails and throws its file away; an APK nobody is installing is thrown
-  /// away here. 「重试」 then downloads against the digest on screen.
+  /// away here. "Retry" then downloads against the digest on screen.
   Future<void> _conflicted() async {
     if (state.busy) {
       // The running attempt owns the file: it fails it itself. A download
@@ -492,7 +492,7 @@ class AppUpdateController extends Notifier<AppUpdateState> {
     // An install attempt the grace period gave up on can't come back to it.
     final run = ++_run;
     _apk = null;
-    // Busy while the file goes, so 「重试」 can't download to the same path
+    // Busy while the file goes, so "Retry" can't download to the same path
     // meanwhile and meet the delete.
     state = state.copyWith(task: UpdateTaskPhase.verifying, problem: () => null);
     await _deleteQuietly(apk.file);
@@ -530,7 +530,7 @@ class AppUpdateController extends Notifier<AppUpdateState> {
     await _prefs?.setBool(_autoKey, value);
   }
 
-  /// 「跳过这个版本」: no automatic prompt until a newer one appears.
+  /// "Skip this version": no automatic prompt until a newer one appears.
   Future<void> skipLatest() async {
     final version = state.latest?.version.toString();
     if (version == null) return;
@@ -690,7 +690,7 @@ class AppUpdateController extends Notifier<AppUpdateState> {
 
   void cancelDownload() => _cancel?.cancel();
 
-  /// 「重试」: install again when the APK is already here, else resume the download.
+  /// "Retry": install again when the APK is already here, else resume the download.
   Future<void> retry() async {
     final apk = _apk;
     if (apk != null && await apk.file.exists()) {
@@ -702,7 +702,7 @@ class AppUpdateController extends Notifier<AppUpdateState> {
 
   // ── Install ────────────────────────────────────────────────────────────────
 
-  /// 「用系统安装器安装」: the downloaded package, already checked by [install],
+  /// "Install with the system installer": the downloaded package, already checked by [install],
   /// in the system's own installer. Some OEM builds stop the in-app install
   /// before asking and it reads as cancelled. False when it couldn't open.
   Future<bool> installWithSystem() async {
@@ -729,7 +729,7 @@ class AppUpdateController extends Notifier<AppUpdateState> {
     state = state.copyWith(task: UpdateTaskPhase.installing, problem: () => null);
     bool owns() => ref.mounted && run == _run;
     // A file that failed its checks is deleted before the failure shows (the
-    // task stays busy meanwhile): 「重试」 then downloads afresh and can't meet
+    // task stays busy meanwhile): "Retry" then downloads afresh and can't meet
     // a delete of the same path still on its way.
     Future<void> fail(UpdateProblem problem, {bool discard = false}) async {
       if (!owns()) return;

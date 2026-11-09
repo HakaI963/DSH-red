@@ -62,11 +62,11 @@ export const confirm = (a, b) => (typeof a === 'string' ? node('confirm', { ...b
 
 /** Rows: `list([{ title, subtitle?, trailing?, icon?, tone?, action? }])`. */
 export const list = listOr('list', 'items')
-/** Name … value pairs: `keyValue([['Name', 'Value'], …])` or `keyValue({ items: { Name: 'Value' } })`. */
+/** Name … value pairs: `keyValue([['名称', '值'], …])` or `keyValue({ items: { 名称: '值' } })`. */
 export const keyValue = listOr('keyValue', 'items')
 /** `progress(0.42 * 100, { label, caption?, max?, tone? })` or `progress({ value, … })`. */
 export const progress = valueOr('progress', 'value')
-/** `table({ columns: ['Name', { label: 'Amount', align: 'end' }], rows: [['a', 1]] })`. */
+/** `table({ columns: ['名称', { label: '金额', align: 'end' }], rows: [['a', 1]] })`. */
 export const table = (props) => node('table', props)
 /** Buttons: `actions([{ label, action, icon?, style?: 'primary' | 'plain' }])`. */
 export const actions = listOr('actions', 'items')

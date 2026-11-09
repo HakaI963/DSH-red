@@ -10,7 +10,7 @@ import java.io.File
 import javax.xml.parsers.DocumentBuilderFactory
 
 /**
- * The system's launch window never shows an icon other than the chosen 桌面图标: each icon's
+ * The system's launch window never shows an icon other than the chosen app icon: each icon's
  * splash theme names the very icon its launcher entry uses, the blank one none, and the theme
  * chosen for the next launches follows the icon and the custom launch screen.
  */
@@ -101,7 +101,7 @@ class LaunchThemesTest {
         assertEquals(LaunchThemes.BLANK, next("auto"))
         assertEquals(LaunchThemes.WHITE, next("white"))
         assertEquals(LaunchThemes.BLACK, next("black"))
-        // 取自图片: whichever of page, white and black is nearest the picture's edge.
+        // "From the picture": whichever of page, white and black is nearest the picture's edge.
         assertEquals(LaunchThemes.BLACK, next("edge", 0xFF050608.toInt()))
         assertEquals(LaunchThemes.WHITE, next("edge", 0xFFFCFCFC.toInt()))
         assertEquals(LaunchThemes.BLANK, next("edge", 0xFFE8EEFB.toInt()))

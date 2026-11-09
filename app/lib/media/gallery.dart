@@ -1,4 +1,4 @@
-// 「保存到相册」: pictures from a conversation into the
+// "Save to Photos": pictures from a conversation into the
 // phone's gallery through `media/MediaPlugin.kt` (MediaStore on Android 10+,
 // the public Pictures folder before).
 
@@ -68,7 +68,7 @@ String galleryFileName(String? name, String mime, {DateTime? now}) {
   final dot = base.lastIndexOf('.');
   if (dot > 0) base = base.substring(0, dot);
   base = base.replaceAll(RegExp(r'[\x00-\x1f\\:*?"<>|]'), '_').replaceAll(RegExp(r'\s+'), ' ').trim();
-  // A bare 「图片」 placeholder or nothing at all: a dated name instead.
+  // A bare 「图片」 ("Image") placeholder or nothing at all: a dated name instead.
   if (base.isEmpty ||
       base == '图片' || // l10n:keep the Chinese placeholder, whatever the app language
       base == appL10n.fileImageName ||

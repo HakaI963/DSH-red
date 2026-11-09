@@ -4,7 +4,7 @@ import '../l10n/l10n.dart';
 import '../runtime/runtime_bridge.dart';
 import '../runtime/runtime_state.dart';
 
-/// What "恢复上次正常配置" would change right now. Refreshes whenever the engine's
+/// What "Restore the last working configuration" would change right now. Refreshes whenever the engine's
 /// phase, mode or failure changes.
 final lastKnownGoodProvider = FutureProvider.autoDispose<LastKnownGood>((ref) async {
   ref.watch(localRuntimeProvider.select((s) => (s.status.phase, s.status.mode, s.status.failure?.at)));
@@ -26,7 +26,7 @@ final safePreflightProvider = FutureProvider.autoDispose<List<SafeHazard>>((ref)
   }
 });
 
-/// A repair prompt waiting for the chat composer (「帮我修复」).
+/// A repair prompt waiting for the chat composer ("Help me fix it").
 ///
 /// Safe-mode UI calls [request]; the chat screen listens, opens a new session, puts
 /// the text in the composer **without sending it** (it costs tokens; the user decides)
@@ -47,7 +47,7 @@ class RepairDraftController extends Notifier<String?> {
 
 final repairDraftProvider = NotifierProvider<RepairDraftController, String?>(RepairDraftController.new);
 
-/// One short Chinese clause for a failure, e.g. "启动失败，可疑插件：foo".
+/// One short localized clause for a failure, e.g. "Failed to start, suspicious plugin: foo".
 String failureOneLiner(RuntimeFailure f) {
   final what = switch (f.kind) {
     FailureKind.launchFailed => appL10n.phoneFailureLaunch,
@@ -71,7 +71,7 @@ String failureOneLiner(RuntimeFailure f) {
   return what;
 }
 
-/// The text 「帮我修复」 pre-fills. The agent's briefing (written natively on every safe
+/// The text "Help me fix it" pre-fills. The agent's briefing (written natively on every safe
 /// start) has the details; this only points it there.
 String repairPrompt(RuntimeStatus status) {
   final f = status.mainFailure ?? status.failure;

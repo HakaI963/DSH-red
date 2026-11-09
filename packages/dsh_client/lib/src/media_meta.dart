@@ -282,7 +282,7 @@ class MediaMeta {
   final MediaProvenance? provenance;
   final MediaFailure? error;
 
-  /// What 「复制提示词」 copies: the rewrite when there is one.
+  /// What "Copy prompt" (复制提示词) copies: the rewrite when there is one.
   String? get promptToCopy => revisedPrompt ?? prompt;
 
   /// The paths of the items (and their posters), for de-duplicating images

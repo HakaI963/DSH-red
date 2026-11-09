@@ -1,5 +1,5 @@
-// The quiet 「来自 ui.json」 tag next to a setting that the host's ui.json decides.
-// Tapping it shows where in the file the value comes from and offers 「恢复默认」,
+// The quiet "From ui.json" tag next to a setting that the host's ui.json decides.
+// Tapping it shows where in the file the value comes from and offers "Reset to default",
 // which only sets that setting aside in the app — the file is left as it is.
 //
 // The control itself should be greyed out while the tag shows:
@@ -22,7 +22,7 @@ import '../ui_config_state.dart';
 /// The tag's words.
 String get fromUiJsonLabel => appL10n.shellFromUiJson;
 
-/// 「来自 ui.json」 when the active host's ui.json sets [setting]; nothing
+/// "From ui.json" when the active host's ui.json sets [setting]; nothing
 /// otherwise. Put it after the row's title (like `FieldBadge`).
 class FromUiJsonBadge extends ConsumerWidget {
   const FromUiJsonBadge(this.setting, {super.key});
@@ -51,7 +51,7 @@ class FromUiJsonBadge extends ConsumerWidget {
   }
 }
 
-/// Where [setting]'s value comes from, with 「恢复默认」.
+/// Where [setting]'s value comes from, with "Reset to default".
 Future<void> showUiOverrideSheet(BuildContext context, UiSettingKey setting) =>
     showAppSheet<void>(context, builder: (_) => UiOverrideSheet(setting: setting));
 

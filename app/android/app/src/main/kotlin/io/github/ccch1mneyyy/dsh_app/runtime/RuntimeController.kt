@@ -270,7 +270,7 @@ class RuntimeController private constructor(private val app: Context) : DshProce
     /**
      * Writes the app's diagnostics snapshot where the engine's agent can read it
      * (`$DSH_HOME/dsh-app/diagnostics.md`). A few KB on the platform thread, after the
-     * engine came up or when the person asks from 设置 → 诊断. Null when the runtime is
+     * engine came up or when the person asks from Settings → Diagnostics. Null when the runtime is
      * not installed or the write failed.
      */
     fun publishDiagnostics(markdown: String, manual: Boolean = false): Map<String, Any?>? = try {

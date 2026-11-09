@@ -13,10 +13,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'notify_state.dart' show appForegroundProvider;
 
-/// 流式文本的 token 估算:中文(含日韩)字 × 0.6,其余非空白字符 × 0.3。
+/// Token estimate for streaming text: CJK (incl. Japanese/Korean) chars × 0.6, other non-space chars × 0.3.
 ///
-/// 系数是 DeepSeek 文档给的经验值;空白不计(分词器把缩进、空格大多并进
-/// 相邻 token)。只用来测速,不用来算钱。
+/// The factors are empirical values from DeepSeek's docs; whitespace isn't counted (tokenizers fold most
+/// indentation and spaces into neighboring tokens). Used for speed only, never for billing.
 double estimateTokens(String text) {
   var cjk = 0;
   var other = 0;
@@ -35,12 +35,12 @@ double estimateTokens(String text) {
   return cjk * 0.6 + other * 0.3;
 }
 
-/// 滑动窗口里的输出速度(token/秒)。
+/// Output speed over a sliding window (tokens/sec).
 ///
-/// 每个增量带着它产生的时刻进来;速度 = 窗口内的 token ÷ 窗口长度。窗口
-/// 刚开始(一段输出的头 [window] 内)按实际经过的时间算,但至少按
-/// [minSpan] 算,免得第一块字被除以几毫秒。最后一块之后安静超过
-/// [stallAfter] 就算停了(等工具、等你确认),速度为 0。
+/// Each delta arrives stamped with when it was produced; speed = tokens in the window ÷ window length. While
+/// the window is still filling (the first [window] of an output) actual elapsed time is used, but never less than
+/// [minSpan], so the first chunk isn't divided by a few milliseconds. After the last chunk, silence past
+/// [stallAfter] counts as stopped (waiting on a tool or your approval); speed is then 0.
 class TokenRateMeter {
   TokenRateMeter({
     this.window = const Duration(milliseconds: 2500),
@@ -54,10 +54,10 @@ class TokenRateMeter {
 
   final _samples = <({DateTime at, double tokens})>[];
 
-  /// 这一段连续输出从什么时候开始(中间停过 [stallAfter] 就重新算)。
+  /// When this stretch of continuous output began (restarts after a [stallAfter] gap).
   DateTime? _burstStart;
 
-  /// 最后一块到达的时刻;没有为 null。
+  /// When the last chunk arrived; null if none.
   DateTime? get lastAt => _samples.isEmpty ? null : _samples.last.at;
 
   void add(DateTime at, double tokens) {
@@ -75,7 +75,7 @@ class TokenRateMeter {
     _burstStart = null;
   }
 
-  /// [now] 时的速度;停了或没有数据为 0。
+  /// Speed at [now]; 0 when stopped or with no data.
   double rateAt(DateTime now) {
     final last = lastAt;
     if (last == null || now.difference(last) > stallAfter) return 0;
@@ -90,19 +90,19 @@ class TokenRateMeter {
   }
 }
 
-/// 速度 → 鲸尾的四档,带迟滞。
+/// Speed → the whale tail's four levels, with hysteresis.
 ///
-/// | 档 | 意思 | 进入 | 退出 |
+/// | Level | Meaning | Enter | Exit |
 /// |---|---|---|---|
-/// | 1 | 没有 token 在流(等模型首字、跑工具、等你) | — | — |
-/// | 2 | 慢慢吐字 | > 0 | 停了 |
-/// | 3 | 正常速度 | ≥ 30 tok/s | < 24 |
-/// | 4 | 飞快 | ≥ 75 tok/s | < 60 |
+/// | 1 | no tokens streaming (awaiting first token, tools, you) | — | — |
+/// | 2 | trickling | > 0 | stopped |
+/// | 3 | normal speed | ≥ 30 tok/s | < 24 |
+/// | 4 | flying | ≥ 75 tok/s | < 60 |
 ///
-/// 阈值的依据:DeepSeek 官方 API 的输出大多在每秒几十到一百出头 token
-/// (V4 Flash 偏快,Pro 和长思考偏慢),30 以下肉眼就是"一个字一个字往外
-/// 蹦",75 以上整段整段地出。退出线是进入线的 0.8 倍,速度在线附近抖动时
-/// 不来回跳;另外每档至少停 [minDwell],档位不会一秒内换好几次。
+/// Basis for the thresholds: DeepSeek's official API mostly outputs tens to just over a hundred tokens/s
+/// (V4 Flash quicker, Pro and long thinking slower); below 30 the eye sees it crawl "one word at a
+/// time", above 75 whole paragraphs land at once. The exit line is 0.8× the enter line, so jitter near
+/// a line doesn't flip levels back and forth; each level also dwells at least [minDwell], so it can't change several times a second.
 class SpeedGauge {
   SpeedGauge({this.minDwell = const Duration(milliseconds: 900)});
 
@@ -116,7 +116,7 @@ class SpeedGauge {
 
   int get level => _level;
 
-  /// 按 [tps] 推进档位并返回;[now] 只用来判断停留时间。
+  /// Advances the level by [tps] and returns it; [now] only judges dwell time.
   int update(double tps, DateTime now) {
     final target = targetFor(tps, _level);
     if (target == _level) return _level;
@@ -132,7 +132,7 @@ class SpeedGauge {
     _changedAt = null;
   }
 
-  /// 不考虑停留时间的目标档位(纯函数,测试用)。
+  /// The target level ignoring dwell time (pure function, for tests).
   static int targetFor(double tps, int current) {
     if (tps <= 0) return 1;
     var level = math.max(current, 2);
@@ -146,11 +146,11 @@ class SpeedGauge {
   }
 }
 
-/// 一个会话的实时脉搏:鲸尾档位、估算速度、是否正在压缩上下文。
+/// One conversation's live pulse: whale-tail level, estimated speed, whether context is compacting.
 ///
-/// [ChatController] 把每个事件交给 [observe];界面监听它(档位或压缩状态
-/// 变了才通知)。有 token 在流时每 [tick] 重算一次,停下来回到 1 档后计时器
-/// 自己停掉。
+/// [ChatController] feeds every event to [observe]; the UI listens (it notifies only when the level
+/// or compaction state changes). While tokens stream it recomputes every [tick]; once things stop and
+/// level 1 returns, the timer stops itself.
 class RunPulse extends ChangeNotifier {
   RunPulse({
     DateTime Function()? clock,
@@ -170,29 +170,29 @@ class RunPulse extends ChangeNotifier {
   bool _disposed = false;
   bool _samplingEnabled = true;
 
-  /// 每个 attempt 下一块的序号(重连重放的块不重复计)。
+  /// Per-attempt chunk sequence numbers (chunks replayed after a reconnect aren't counted twice).
   final _nextIndex = <String, int>{};
 
-  /// 每个 attempt 估出来的 token,等 usage 块来校准。
+  /// Per-attempt estimated tokens, awaiting calibration from usage chunks.
   final _attemptEstimate = <String, double>{};
 
-  /// usage ÷ 估算 的滑动校准系数(按会话;没有 usage 时为 1)。
+  /// Sliding calibration factor of usage ÷ estimate (per conversation; 1 without usage).
   double _scale = 1;
 
   double _tps = 0;
   DateTime? _compactingSince;
 
-  /// 鲸尾档位 1–4。
+  /// Whale-tail level 1–4.
   int get level => gauge.level;
 
-  /// 最近一次算出的速度(token/秒,已校准);停着为 0。
+  /// Speed from the last computation (tok/s, calibrated); 0 while stopped.
   double get tokensPerSecond => _tps;
 
-  /// 正在压缩上下文时为开始时刻(Host 时间)。
+  /// When compacting context, its start time (Host clock).
   DateTime? get compactingSince => _compactingSince;
 
-  /// [skew] 是设备时钟减 Host 时钟;已知时块按它产生的时刻计(网络攒了一批
-  /// 再到也不会被当成一阵猛冲),未知时按到达时刻计。
+  /// [skew] is device clock minus Host clock; when known, chunks are timed where they were produced (a
+  /// batch arriving after network buffering isn't read as a sprint); when unknown, at arrival.
   void observe(DshEvent event, {Duration? skew}) {
     switch (event) {
       case AssistantChunkEvent(:final attemptId, :final index, :final chunk):
@@ -238,7 +238,7 @@ class RunPulse extends ChangeNotifier {
     _ensureTimer();
   }
 
-  /// 估算和真实 usage 差得太远时慢慢拉过去(只信足够长的一段)。
+  /// Drifts toward real usage when the estimate is far off (trusts only long enough stretches).
   void _calibrate(double? estimated, int actual) {
     if (estimated == null || estimated < 40 || actual <= 0) return;
     final ratio = (actual / estimated).clamp(0.4, 2.5);
@@ -253,7 +253,7 @@ class RunPulse extends ChangeNotifier {
     if (gauge.level == 1 && meter.lastAt == null) _stopTimer();
   }
 
-  /// 计时器的一拍(测试直接调用)。
+  /// One timer tick (tests call it directly).
   @visibleForTesting
   void tickNow() {
     _update();
@@ -306,9 +306,9 @@ class RunPulse extends ChangeNotifier {
   }
 }
 
-/// 读过 [events] 之后是否还在压缩上下文:最后一个 `compaction/start` 之后
-/// 既没有 `compaction/end`,也没有 `turn/end`(崩溃留下的半截括号会被下一个
-/// 结束的轮次收掉)。[merge] 为 false 时从头算(新快照),否则接着 [current]。
+/// Whether context is still compacting after reading [events]: after the last `compaction/start` there is
+/// neither `compaction/end` nor `turn/end` (a bracket left open by a crash is closed by the next
+/// finished turn). [merge] false recounts from scratch (new snapshot), else it continues from [current].
 @visibleForTesting
 DateTime? compactingAfter(Iterable<SessionLogEvent> events, DateTime? current, bool merge) {
   var since = merge ? current : null;
@@ -323,7 +323,7 @@ DateTime? compactingAfter(Iterable<SessionLogEvent> events, DateTime? current, b
   return since;
 }
 
-/// 每个会话一个 [RunPulse];[ChatController] 喂数据,活动条读。
+/// One [RunPulse] per conversation; [ChatController] feeds it, the activity bar reads it.
 final runPulseProvider = Provider.autoDispose.family<RunPulse, String>((ref, sessionId) {
   final pulse = RunPulse();
   ref.listen(appForegroundProvider, (_, foreground) {

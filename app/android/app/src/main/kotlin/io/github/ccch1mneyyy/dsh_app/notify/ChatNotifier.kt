@@ -33,7 +33,7 @@ import java.security.SecureRandom
  * and a redelivered request updates in place. With two or more in a group a silent summary
  * (id [SUMMARY_ID]) bundles them.
  *
- * Lock screen: every notification is VISIBILITY_PRIVATE with a public version ("DSH Go · 有一轮完成了"),
+ * Lock screen: every notification is VISIBILITY_PRIVATE with a public version ("DSH Go · a turn finished"),
  * which Android shows when the person's lock-screen setting hides sensitive content. Posted while
  * the device is locked, the notification itself carries only that public text whatever the
  * setting, and gets its real title and text once the person unlocks (USER_PRESENT), silently.
@@ -50,7 +50,7 @@ class ChatNotifier(private val app: Context) {
         val attention: Boolean,
         val title: String,
         val text: String,
-        /** Lock-screen text ("有一轮完成了"): no session title, no content. */
+        /** Lock-screen text ("a turn finished"): no session title, no content. */
         val publicText: String,
         val sessionId: String,
         /** `HostRef.encode()` of the host the conversation lives on. */
@@ -118,7 +118,7 @@ class ChatNotifier(private val app: Context) {
             .setGroup(tag)
             .setContentIntent(openIntent(post, tag, id))
         if (post.attention) builder.setCategory(Notification.CATEGORY_REMINDER)
-        // The floating pet is out and its bubble says 做完了 / 出错了: posted, but no banner, no sound.
+        // The floating pet is out and its bubble says Done / Something went wrong: posted, but no banner, no sound.
         io.github.ccch1mneyyy.dsh_app.pet.ResultSilence.apply(builder, tag, post.attention)
         // Approval buttons, in the approval card's order; not on the lock screen.
         if (!processing) {
@@ -236,7 +236,7 @@ class ChatNotifier(private val app: Context) {
     fun ensureChannels() {
         if (nm.getNotificationChannel(CHANNEL_DONE) != null && nm.getNotificationChannel(CHANNEL_ATTENTION) != null) return
         // An app can't raise a channel's importance once created: the old IMPORTANCE_DEFAULT
-        // "一轮结束" channel goes, and the heads-up one lives under a new id.
+        // The "turn finished" channel goes, and the heads-up one lives under a new id.
         nm.deleteNotificationChannel(LEGACY_CHANNEL_DONE)
         nm.createNotificationChannelGroup(NotificationChannelGroup(GROUP_ID, AppStrings.get(app, R.string.notify_group_chats)))
         nm.createNotificationChannel(

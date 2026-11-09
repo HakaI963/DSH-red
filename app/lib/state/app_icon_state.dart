@@ -1,4 +1,4 @@
-// 桌面图标: which of the four launcher icons the phone shows. Native side:
+// App icon: which of the four launcher icons the phone shows. Native side:
 // android/.../icons/ (LauncherIconPlugin, LauncherIcons; MethodChannel
 // `dsh/launcher_icon`), one <activity-alias> per icon.
 

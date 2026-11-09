@@ -9,7 +9,7 @@ import io.github.ccch1mneyyy.dsh_app.performance.PerformancePolicy
 import kotlin.concurrent.thread
 
 /**
- * 「打开 App 时自动启动」 as soon as the activity is created. The app root (RootGate,
+ * "Start when DSH Go opens", as soon as the activity is created. The app root (RootGate,
  * app/lib/ui/shell/root_gate.dart) asks for the same start once Flutter is up, settings and the
  * runtime status have loaded and the first frame is out: about half a second later on an
  * emulator, more on a phone. Starting here boots DSH alongside Flutter; RootGate's own start()

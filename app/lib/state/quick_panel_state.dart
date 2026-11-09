@@ -1,4 +1,4 @@
-// 快捷入口, the panel a left swipe over the chat pulls in from the right:
+// Shortcuts, the panel a left swipe over the chat pulls in from the right:
 // whether the swipe opens it and which destinations it lists, in order, kept
 // across launches. Only the destinations' names are stored.
 

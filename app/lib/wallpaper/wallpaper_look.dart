@@ -1,14 +1,14 @@
-// 壁纸上的字怎么保证读得清：一条亮度界限，两头各管一半。
+// Keeping text readable over the wallpaper: one luminance line, each end covers half.
 //
-//   壁纸那头（wallpaper_render.dart）：每一小格背景都烘到界限之内 —— 浅色不暗于、深色不亮于
-//   「二级文字恰好 4.6:1」的亮度（深色按卡片、胶囊那层薄白算，卡片里的字也够）。不够的格子叠一层页面色（浅色是晨雾、深色是石板），只叠到
-//   刚好够，再扩散、抹匀成渐变；顶上（状态栏 + 顶栏）和底下（输入区 + 导航条）的界限更靠近
-//   页面本色，所以那两条在需要时会自己长出一层渐变遮罩。
+//   The wallpaper end (wallpaper_render.dart): every small background cell is baked inside the line — in light mode no darker, in dark mode no lighter
+//   than the luminance where "secondary text hits exactly 4.6:1" (dark is measured through the card and capsule's thin white layer, so text inside cards is fine too). Cells that fall short get a layer of page color (morning mist in light, slate in dark), layered only
+//   until just enough, then spread and smoothed into a gradient; the top (status bar + app bar) and bottom (input area + nav bar) lines sit closer
+//   to the plain page color, so those two bands grow their own gradient veil when needed.
 //
-//   文字那头（guardTheme）：比二级文字还淡的颜色（三级文字、主色、状态色）在壁纸上挪一点
-//   明度，挪到对这条界限也有 4.6:1。主文字和二级文字本来就够。
+//   The text end (guardTheme): colors fainter than secondary text (tertiary text, accent, status colors) shift a little
+//   lightness on wallpaper, until they also reach 4.6:1 against this line. Primary and secondary text are already enough.
 //
-// 4.6 而不是 4.5：留一点给 8 位取整和合成。
+// 4.6 rather than 4.5: leaves room for 8-bit rounding and compositing.
 
 import 'dart:math' as math;
 

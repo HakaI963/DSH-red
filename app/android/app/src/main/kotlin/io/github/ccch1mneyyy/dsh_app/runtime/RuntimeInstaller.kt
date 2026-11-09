@@ -244,7 +244,7 @@ internal fun syncDirectory(directory: File) {
     FileChannel.open(directory.toPath(), StandardOpenOption.READ).use { it.force(true) }
 }
 
-/** What 「重置运行环境」 can keep of the user's /root (paths under the rootfs). */
+/** What "Reset runtime" can keep of the user's /root (paths under the rootfs). */
 enum class ResetKeep(val wire: String, val paths: List<String>) {
     /** `$DSH_HOME/dsh-go` (ui.json) and both user skill roots: small, written by the user, harmless. */
     UI_AND_SKILLS("uiAndSkills", listOf("root/.dsh/dsh-go", "root/.dsh/skills", "root/.agents/skills")),

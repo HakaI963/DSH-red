@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
-# 在论坛服务器上执行：打包 theme-dshgo 并安装 / 更新到正在运行的 Discourse。
+# Run on the forum server: packages theme-dshgo and installs / updates it on the running Discourse.
 #
 #   sudo infra/forum/scripts/install_theme.sh
 #
-# 之后在 后台 → 外观 → 主题 → dsh-go 分享码卡片 → 设置 里填「download_url」。
+# Afterwards fill in "download_url" under Admin → Appearance → Themes → dsh-go 分享码卡片 → Settings.
 set -euo pipefail
 
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -13,11 +13,11 @@ CONTAINER="${DISCOURSE_CONTAINER:-app}"
 STAGE="$SHARED/dshgo"
 
 if [[ $EUID -ne 0 ]]; then
-  echo "请用 root 执行（sudo）" >&2
+  echo "run as root (sudo)" >&2
   exit 1
 fi
 if ! docker ps --format '{{.Names}}' | grep -qx "$CONTAINER"; then
-  echo "容器 $CONTAINER 没在运行：先 cd /var/discourse && ./launcher rebuild app" >&2
+  echo "container $CONTAINER is not running: first cd /var/discourse && ./launcher rebuild app" >&2
   exit 1
 fi
 

@@ -1,5 +1,5 @@
 // Which first-time risk notices (ui/common/risk_notice.dart) the person
-// confirmed with 「不再提示」 ticked: their ids, kept in SharedPreferences.
+// confirmed with "Don't show again" ticked: their ids, kept in SharedPreferences.
 // Every-time notices are never stored. A read that fails counts as "not
 // silenced", so the notice shows rather than being skipped.
 
@@ -7,7 +7,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 abstract interface class RiskNoticeStore {
-  /// Whether the notice [id] was confirmed with 「不再提示」.
+  /// Whether the notice [id] was confirmed with "Don't show again".
   Future<bool> silenced(String id);
 
   /// Remembers [id]: the notice no longer shows.

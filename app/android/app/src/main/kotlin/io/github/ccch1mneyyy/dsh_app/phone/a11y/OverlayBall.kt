@@ -39,7 +39,7 @@ import kotlin.math.roundToInt
  * task ([HoldToStop]: a ring fills round it first, letting go cancels); screen readers get the
  * same stop as an action. Dragged, it follows the finger and settles on the nearer side, where it
  * stays (side and height kept across tasks, like the pet's dock: pet/EdgeSnap.kt). Left alone it
- * fades, all of it alike, to the 闲置时不透明度.
+ * fades, all of it alike, to the idle opacity.
  *
  * The window is added once per control and shown or hidden (GONE windows take no touches); the
  * overlay folds and unfolds the capsule around it ([ControlOverlay]).
@@ -148,7 +148,7 @@ internal class OverlayBall(
         ball.stopLabel = stopLabel
     }
 
-    /** The whole ball's opacity: the 闲置时不透明度 when idle, full otherwise. */
+    /** The whole ball's opacity: the idle opacity when idle, full otherwise. */
     fun setIdle(alpha: Float, animated: Boolean, durationMs: Long) = OverlayMotion.fadeIdle(root, alpha, animated, durationMs)
 
     /** Where the ball rests now ([dock] on the current screen). */
@@ -283,7 +283,7 @@ internal class OverlayBall(
 
     /**
      * The ring round the ball while it is held; the stop when it closes. Frame callbacks on the
-     * wall clock ([HoldToStop]), not an animator: with 移除动画 an animator would end at once and the
+     * wall clock ([HoldToStop]), not an animator: with "Remove animations" an animator would end at once and the
      * hold would never stop anything.
      */
     private val holdTick = object : Runnable {

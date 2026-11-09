@@ -1,4 +1,4 @@
-// dsh-go 分享码卡片。只用 Discourse 的配色变量，浅色 / 深色配色方案自动适配。
+// dsh-go share-code cards. Uses only Discourse color-scheme variables, so light / dark schemes adapt automatically.
 
 .cooked .dshgo-share-card,
 .d-editor-preview .dshgo-share-card {
@@ -13,7 +13,7 @@
   background: var(--secondary);
   box-sizing: border-box;
 
-  // .btn 自带 display，会盖过 hidden 属性
+  // .btn sets its own display, which would override the hidden attribute
   [hidden] {
     display: none !important;
   }

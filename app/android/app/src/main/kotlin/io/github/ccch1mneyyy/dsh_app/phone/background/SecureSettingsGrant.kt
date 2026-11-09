@@ -3,7 +3,7 @@ package io.github.ccch1mneyyy.dsh_app.phone.background
 import io.github.ccch1mneyyy.dsh_app.R
 
 /**
- * WRITE_SECURE_SETTINGS for 自动恢复无障碍 ([io.github.ccch1mneyyy.dsh_app.phone.a11y.A11yKeeper]):
+ * WRITE_SECURE_SETTINGS for restore-accessibility-automatically ([io.github.ccch1mneyyy.dsh_app.phone.a11y.A11yKeeper]):
  * which one-tap way to it the shell-uid engine offers right now, and the command for granting it
  * by hand (its `pm grant` part also runs as is in a root shell).
  */
@@ -27,7 +27,7 @@ object SecureSettingsGrant {
     const val SUI_PERMISSION = "suiPermission"
     const val ROOT = "root"
 
-    /** Neither is set up (不打扰模式's page sets up both). */
+    /** Neither is set up (Non-disruptive mode's page sets up both). */
     const val SETUP = "setup"
 
     fun path(granted: Boolean, shizuku: ShizukuStatus, adb: AdbStatus): String = when {

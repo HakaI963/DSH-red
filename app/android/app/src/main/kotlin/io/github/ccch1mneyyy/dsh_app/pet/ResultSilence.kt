@@ -3,8 +3,8 @@ package io.github.ccch1mneyyy.dsh_app.pet
 import android.app.Notification
 
 /**
- * 「做完了」「出错了」 notifications while the floating pet says it:
- * still posted, but no heads-up, no sound, no vibration. 「等你确认 / 回答」 always alert.
+ * "Done"/"Something went wrong" notifications while the floating pet says it:
+ * still posted, but no heads-up, no sound, no vibration. "Needs approval / answer" always alert.
  */
 object ResultSilence {
     /** The pet is out, lit, not hidden by the system, and bubbles are on. */

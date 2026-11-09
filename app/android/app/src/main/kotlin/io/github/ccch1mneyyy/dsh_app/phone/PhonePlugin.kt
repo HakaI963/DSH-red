@@ -318,7 +318,7 @@ class PhonePlugin : FlutterPlugin, ActivityAware, MethodChannel.MethodCallHandle
                 val id = call.argument<String>("requestId")
                 result.success(id != null && id.length in 1..200 && control.prompts.cancel(id))
             }
-            // 设置 → 手机操控 → 悬浮条: {idleOpacity 0.3–1, autoCollapse}; a showing overlay follows at once.
+            // Settings → Phone control → Floating bar: {idleOpacity 0.3–1, autoCollapse}; a showing overlay follows at once.
             "overlayPrefs" -> result.success(OverlayPrefs.read(appContext).toMap())
             "setOverlayPrefs" -> result.success(OverlayPrefs.write(appContext, call.arguments as? Map<*, *>).toMap())
             else -> result.notImplemented()

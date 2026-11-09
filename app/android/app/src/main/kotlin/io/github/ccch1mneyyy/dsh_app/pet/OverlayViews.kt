@@ -38,7 +38,7 @@ import android.view.accessibility.AccessibilityNodeInfo
 import android.widget.LinearLayout
 import android.widget.TextView
 
-/** The app's 雾蓝 surfaces and ink (app/lib/ui/theme/palette.dart), as phone/a11y/ControlOverlay.kt uses them. */
+/** The app's Mist surfaces and ink (app/lib/ui/theme/palette.dart), as phone/a11y/ControlOverlay.kt uses them. */
 internal class OverlayPalette(
     val fill: Int, val stroke: Int, val ink: Int, val muted: Int, val pressed: Int,
     val accent: Int, val onAccent: Int, val tonal: Int, val onTonal: Int, val danger: Int,
@@ -135,7 +135,7 @@ internal class BubbleBackground(
 }
 
 /**
- * The bubble: one line, 「标题 · 做完了」; under it 问一句's reply (its first two lines), or a request
+ * The bubble: one line, "Title · Done"; under it Quick ask's reply (its first two lines), or a request
  * with its answers (docs/design/pets.md §2.7). Nothing else from a conversation ever shows here.
  */
 @SuppressLint("ViewConstructor")
@@ -207,7 +207,7 @@ internal class BubbleView(context: Context, onTap: () -> Unit) : LinearLayout(co
     private val buttons = ArrayList<TextView>()
 
     /**
-     * Puts [list] under the text, each calling [onAction]. Answers (not 「去回答」) are guarded as
+     * Puts [list] under the text, each calling [onAction]. Answers (not "go answer it") are guarded as
      * phone control's prompt is: no touch before [armedAt], none through another window, none injected.
      */
     fun setActions(list: List<BubbleAction>, kind: String?, armedAt: Long, onAction: (BubbleAction) -> Unit) {
@@ -305,7 +305,7 @@ internal class BubbleView(context: Context, onTap: () -> Unit) : LinearLayout(co
     }
 
     private companion object {
-        /** 问一句's reply: its first two lines. */
+        /** Quick ask's reply: its first two lines. */
         const val DETAIL_LINES = 2
 
         /** A request: up to four lines, and answered only when it fits them whole. */

@@ -1,6 +1,6 @@
-# 分类、标签和界面文字覆盖。由 scripts/apply_settings.rb 写入，可重复执行：
-# 已存在的分类（按 slug 匹配）只同步权限、颜色和「已解决」开关，不改名称和说明，
-# 方便你之后在后台手动调整文案。
+# Categories, tags and UI text overrides. Written by scripts/apply_settings.rb, re-runnable:
+# existing categories (matched by slug) only get permissions, color and the "solved" toggle
+# synced; names and descriptions are left alone so you can fine-tune the copy in the admin UI later.
 
 categories:
   - name: 公告
@@ -8,7 +8,7 @@ categories:
     color: "4D6BFE"
     text_color: "FFFFFF"
     description: 版本发布与社区通知
-    # 所有人可看，只有管理员和版主能发帖
+    # visible to everyone, only admins and moderators can post
     permissions: { everyone: readonly, staff: full }
     position: 0
 
@@ -38,7 +38,7 @@ categories:
     color: "E45735"
     text_color: "FFFFFF"
     description: 安装、连接、使用中遇到的问题
-    # 开启后，提问者和版主可以把某个回复标记为解决方案
+    # once enabled, the asker and moderators can mark one reply as the solution
     solved: true
     position: 4
 
@@ -47,11 +47,11 @@ categories:
     color: "8C6238"
     text_color: "FFFFFF"
     description: Bug 报告与功能建议
-    # 新站自带一个「网站反馈」分类；这里直接把它改造成「反馈」，避免两个反馈分类并存
+    # every new site ships a "meta" category; repurpose it into this one instead of having two feedback categories
     reuse_site_setting: meta_category_id
     position: 5
 
-# 话题标签。只有 3 级用户和版主能新建，其余人从这里选
+# Topic tags. Only level-3 users and moderators may create new ones; everyone else picks from this list
 tags:
   - 本机
   - 远程
@@ -64,7 +64,7 @@ tags:
   - bug
   - 建议
 
-# 界面文字覆盖：登录按钮显示 LINUX DO，而不是插件默认的 OpenID Connect
+# UI text overrides: the login button says LINUX DO instead of the plugin's default OpenID Connect
 translation_overrides:
   zh_CN:
     js.login.oidc.name: "LINUX DO"

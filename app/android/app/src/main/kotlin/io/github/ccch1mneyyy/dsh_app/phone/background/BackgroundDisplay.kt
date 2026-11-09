@@ -501,7 +501,7 @@ class BackgroundDisplay internal constructor(
                 fingerprint(action.elementId, request)
                 request.putString(Proto.TEXT, action.text)
                 request.putBoolean(Proto.SUBMIT, action.submit)
-                // 解除限制 › 密码和验证码: the privileged side refuses such inputs unless told so.
+                // Lift limits › passwords and verification codes: the privileged side refuses such inputs unless told so.
                 request.putBoolean(Proto.ALLOW_SECRET, PhoneRegistry.unlocks().secretFields)
             }
             is PhoneAction.Scroll -> {

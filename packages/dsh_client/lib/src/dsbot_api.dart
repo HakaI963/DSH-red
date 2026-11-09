@@ -398,7 +398,7 @@ class DsBot {
   final String id;
   final String name;
 
-  /// Short label under the name (「写手」).
+  /// Short label under the name (e.g. 「写手」, "writer").
   final String role;
   final String instructions;
 

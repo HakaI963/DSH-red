@@ -83,14 +83,10 @@ void main() {
     });
   }
 
-  testWidgets('a system language change while paused: the new stream closes after the grace', (tester) async {
+  testWidgets('a language change while paused: the new stream closes after the grace', (tester) async {
     tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.resumed);
-    tester.binding.platformDispatcher.localesTestValue = const [Locale('zh', 'CN')];
-    addTearDown(tester.binding.platformDispatcher.clearLocalesTestValue);
     final bridge = _LocaleBridge();
-    final container = ProviderContainer(
-      overrides: [...nativeOverrides(bridge), appLanguageProvider.overrideWith(() => _Fixed(AppLanguage.system))],
-    );
+    final container = ProviderContainer(overrides: nativeOverrides(bridge));
     final stream = container.listen(nativeStreamProvider, (_, _) {});
     final first = stream.read()!;
     final held = first.hold();
@@ -99,8 +95,9 @@ void main() {
     for (final step in away.take(3)) {
       tester.binding.handleAppLifecycleStateChanged(step);
     }
-    tester.binding.platformDispatcher.localesTestValue = const [Locale('en', 'US')];
-    tester.binding.handleLocaleChanged();
+    // English-first: system languages no longer recreate streams; an explicit
+    // choice change still does.
+    await container.read(appLanguageProvider.notifier).set(AppLanguage.en);
     await tester.pump();
     final current = stream.read()!;
     expect(current, isNot(same(first)));
@@ -141,7 +138,7 @@ void main() {
     stream.close();
   });
 
-  test('following the system: a system language change is heard', () async {
+  test('following the system: English, whatever the system languages say', () async {
     final binding = TestWidgetsFlutterBinding.instance;
     binding.platformDispatcher.localesTestValue = const [Locale('zh', 'CN')];
     addTearDown(binding.platformDispatcher.clearLocalesTestValue);
@@ -150,7 +147,7 @@ void main() {
     );
     addTearDown(container.dispose);
     final locale = container.listen(nativeLocaleProvider, (_, _) {});
-    expect(locale.read(), 'zh-CN');
+    expect(locale.read(), 'en');
     binding.platformDispatcher.localesTestValue = const [Locale('en', 'US')];
     binding.handleLocaleChanged();
     await _settle();

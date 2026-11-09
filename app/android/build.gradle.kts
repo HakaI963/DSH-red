@@ -6,7 +6,7 @@ allprojects {
         }
         google()
         mavenCentral()
-        // libadb-android (不打扰模式 self-ADB path) is published on JitPack only.
+        // libadb-android (Non-disruptive mode self-ADB path) is published on JitPack only.
         maven { url = uri("https://jitpack.io") }
     }
 }

@@ -126,8 +126,8 @@ class VoiceModelEvent {
   final VoiceModelFailure? failure;
   final int? neededBytes;
 
-  /// [VoiceModelEventKind.failed] of a 重新下载: the model in place was kept,
-  /// and 重试 asks for the whole model again.
+  /// [VoiceModelEventKind.failed] of a re-download: the model in place was kept,
+  /// and Retry asks for the whole model again.
   final bool again;
 }
 
@@ -305,7 +305,7 @@ class VoiceModelController extends Notifier<VoiceModelState> {
   bool _cancelled = false;
   bool _foreground = true;
 
-  /// 重新下载 is bringing its copy into [VoiceModelPaths.staging]; the model in
+  /// Re-download is bringing its copy into [VoiceModelPaths.staging]; the model in
   /// place, and what was shown about it ([_kept]), stay until the swap.
   bool _replacing = false;
   VoiceModelState _kept = const VoiceModelState();
@@ -349,7 +349,7 @@ class VoiceModelController extends Notifier<VoiceModelState> {
     } catch (_) {
       // Unreadable preferences: nothing resumes by itself this run.
     }
-    // A 重新下载 cut short by a kill: the model in place was never touched,
+    // A re-download cut short by a kill: the model in place was never touched,
     // and its copy is not needed. (Every run waits for this load first.)
     await _dropStaging();
   }
@@ -462,7 +462,7 @@ class VoiceModelController extends Notifier<VoiceModelState> {
     ];
     await _setWanted(false);
     final client = _client;
-    // 重新下载 never touched the engine: the model it has loaded stays.
+    // The re-download never touched the engine: the model it has loaded stays.
     if (client != null && !replacing) {
       try {
         await client.cancelSpeechPreparation(voiceModelProviderId, timeout: const Duration(seconds: 20));
@@ -473,8 +473,8 @@ class VoiceModelController extends Notifier<VoiceModelState> {
     if (writing.isNotEmpty) {
       await Future.wait(writing).timeout(downloadStopWait, onTimeout: () => const <void>[]);
     }
-    // The 重新下载 copy goes only once nothing may still write into it: a
-    // stop not reported yet leaves it where it is (a later 重新下载 or delete
+    // The re-download copy goes only once nothing may still write into it: a
+    // stop not reported yet leaves it where it is (a later re-download or delete
     // removes it after the same check, the next start in any case).
     if (replacing && !downloadStopping) await _dropStaging();
     if (!_alive(run)) return;
@@ -635,7 +635,7 @@ class VoiceModelController extends Notifier<VoiceModelState> {
     }
   }
 
-  /// 重新下载: every file from its mirror into staging, checked, then the
+  /// Re-download: every file from its mirror into staging, checked, then the
   /// swap and the engine's part as after any download.
   Future<void> _replaceRun(int run, VoiceModelFiles files, List<VoiceModelAsset> assets) async {
     final total = _total(assets);
@@ -697,8 +697,8 @@ class VoiceModelController extends Notifier<VoiceModelState> {
     }
   }
 
-  /// 重新下载 did not get its copy in: the model in place is still the one
-  /// in use, shown as it was. Says why; 重试 asks for the whole model again.
+  /// Re-download did not get its copy in: the model in place is still the one
+  /// in use, shown as it was. Says why; Retry asks for the whole model again.
   void _keep(VoiceModelFailure failure, {int? neededBytes}) {
     if (!ref.mounted) return;
     state = _kept.copyWith(wanted: false);
@@ -929,7 +929,7 @@ class VoiceModelController extends Notifier<VoiceModelState> {
   void _fail(VoiceModelFailure failure, {int? neededBytes}) {
     _poll?.cancel();
     if (!ref.mounted) return;
-    // A failed download is not retried by itself; the settings page offers 重试.
+    // A failed download is not retried by itself; the settings page offers Retry.
     unawaited(_setWanted(false));
     state = state.copyWith(status: VoiceModelStatus.failed, failure: failure, neededBytes: neededBytes);
     _events.add(VoiceModelEvent(VoiceModelEventKind.failed, failure: failure, neededBytes: neededBytes));

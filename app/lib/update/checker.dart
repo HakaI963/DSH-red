@@ -7,7 +7,7 @@ import 'update_http.dart';
 import 'version.dart';
 
 /// Why no endpoint could say what the latest release is. All of them read
-/// "暂时检查不了更新" to the person; the kind is for logs and tests.
+/// "Can't check for updates right now" to the person; the kind is for logs and tests.
 enum CheckFailure {
   /// No connection, DNS, timeout, TLS.
   network,

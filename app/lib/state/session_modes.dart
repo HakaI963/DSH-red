@@ -22,7 +22,7 @@ class SessionModes {
   /// step takes it).
   final bool plan;
 
-  /// Looser than 工作区内修改: the pill above the composer says so.
+  /// Looser than Workspace write: the pill above the composer says so.
   bool get risky => preset == 'danger-full-access' || preset == 'auto';
 
   @override

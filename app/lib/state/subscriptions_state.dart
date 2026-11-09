@@ -13,7 +13,7 @@ import 'read_list_epoch.dart';
 
 export 'package:dsh_client/dsh_client.dart' show LoginPhase, LoginStep, Subscription, SubscriptionStatus;
 
-/// 订阅在界面上的名字。
+/// The subscription's name in the UI.
 String subscriptionLabel(Subscription s) => switch (s) {
   Subscription.chatgpt => 'ChatGPT',
   Subscription.claude => 'Claude',
@@ -127,9 +127,9 @@ void refreshAfterSubscriptionChange(WidgetRef ref) {
   ref.invalidate(modelCatalogProvider);
 }
 
-/// 订阅在 pi-ai 里的 route profile（`providers.openai-codex` 之类），
-/// 模型覆盖（上下文长度）从这里读写。未连接 / 引擎没挂 pi-ai / 桥还没声明
-/// route 时为 null。
+/// A subscription's route profile in pi-ai (like `providers.openai-codex`);
+/// model overrides (context length) are read and written through it. Null when
+/// not connected / the engine has no pi-ai mounted / the bridge hasn't declared a route.
 final subscriptionProfileProvider = FutureProvider.autoDispose.family<ProviderProfile?, Subscription>((
   ref,
   subscription,

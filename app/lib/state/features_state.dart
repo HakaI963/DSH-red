@@ -18,7 +18,7 @@ void _refreshOn(Ref ref, DshClient client, Set<String> events) {
   ref.onDispose(() => unawaited(sub.cancel()));
 }
 
-// ── 自动化任务 ────────────────────────────────────────────────────────────────
+// ── Automations ────────────────────────────────────────────────────────────────
 
 /// Every automation task on the active host (`schedule/catalog`), refreshed
 /// on `schedule/changed`. Null while not connected.
@@ -44,7 +44,7 @@ final scheduleHistoryProvider = FutureProvider.autoDispose.family<ScheduleHistor
   return client.scheduleHistory(task);
 });
 
-// ── 后台任务 ──────────────────────────────────────────────────────────────────
+// ── Background jobs ──────────────────────────────────────────────────────────────
 
 /// A session's background jobs (`job/list`): the whole set on every change,
 /// running ones first.
@@ -63,7 +63,7 @@ final jobsProvider = StreamProvider.autoDispose.family<List<JobInfo>, String>((r
   });
 });
 
-// ── 技能 ──────────────────────────────────────────────────────────────────────
+// ── Skills ──────────────────────────────────────────────────────────────────────
 
 /// Skills the user can call with `/name` in [sessionId]; refreshed when a
 /// plugin changes the command catalog.
@@ -75,7 +75,7 @@ final skillsProvider = FutureProvider.autoDispose.family<List<SkillInfo>?, Strin
   return skills..sort((a, b) => a.name.compareTo(b.name));
 });
 
-// ── Agent 预设 ────────────────────────────────────────────────────────────────
+// ── Agent presets ────────────────────────────────────────────────────────────────
 
 /// Agent presets in the Host's order; refreshed when the default changes.
 final agentPresetsProvider = FutureProvider.autoDispose<List<AgentPresetInfo>?>((ref) async {
@@ -92,7 +92,7 @@ final agentPresetDocumentProvider = FutureProvider.autoDispose.family<AgentPrese
   return client.readAgentPreset(id);
 });
 
-// ── 权限预设 ──────────────────────────────────────────────────────────────────
+// ── Permission presets ──────────────────────────────────────────────────────────
 
 /// One selectable permission preset.
 class PermissionOption {
@@ -102,7 +102,7 @@ class PermissionOption {
   final String? description;
 }
 
-/// What the 权限 page shows: the presets, the session's current one and
+/// What the Permissions page shows: the presets, the session's current one and
 /// the default for new sessions.
 class PermissionState {
   const PermissionState({

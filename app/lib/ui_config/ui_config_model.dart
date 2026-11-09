@@ -196,7 +196,7 @@ enum UiPetPosition {
   final String wire;
 }
 
-/// `plugins.seats` values; [web] is the seat's 「在网页版打开」 row.
+/// `plugins.seats` values; [web] is the seat's "Open in DSH Web" row.
 enum UiSeatMode { native, island, web, hidden }
 
 /// `theme.accentPreset` ([presetId]) or `theme.accent` ([rgb], 0xRRGGBB).
@@ -240,8 +240,8 @@ class UiPetSpec {
 
 // ── Settings and their provenance ───────────────────────────────────────────
 
-/// One thing ui.json can set: the unit that is marked 「来自 ui.json」 and
-/// that 「恢复默认」 sets aside. Equality is by [id].
+/// One thing ui.json can set: the unit that is marked "From ui.json" and
+/// that "Reset to default" sets aside. Equality is by [id].
 @immutable
 class UiSettingKey {
   const UiSettingKey._(this.id);
@@ -294,7 +294,7 @@ class UiConfigEntry {
   /// The canonical JSON of the value as applied (after trimming).
   final Object? value;
 
-  /// Short fingerprint of [value]: a 「恢复默认」 lasts while it matches.
+  /// Short fingerprint of [value]: a "Reset to default" lasts while it matches.
   String get hash => sha256.convert(utf8.encode(_canonical(value))).toString().substring(0, 16);
 
   /// The value for people: a string as is, anything else as compact JSON,
@@ -374,14 +374,14 @@ class UiConfig {
 
   bool get isEmpty => entries.isEmpty;
 
-  /// 「已应用 N 项」: one per setting (a list setting counts once, each
+  /// "Applied N items": one per setting (a list setting counts once, each
   /// hidden item and each seat override once).
   int get appliedCount => entries.length;
 
   bool hides(UiHideItem item) => hide.contains(item);
 
   /// The same configuration without [keys] (settings set aside with
-  /// 「恢复默认」).
+  /// "Reset to default").
   UiConfig without(Set<UiSettingKey> keys) {
     if (keys.isEmpty || !keys.any(entries.containsKey)) return this;
     bool keep(UiSettingKey key) => !keys.contains(key);
@@ -461,7 +461,7 @@ class UiConfigIssue {
 
   bool get fatal => kind == UiIssueKind.fatal;
 
-  /// `/composer/quickActions/2/action/url：只支持 https 链接`.
+  /// `/composer/quickActions/2/action/url：Only HTTPS links are supported`.
   String get line => pointer.isEmpty ? message : '$pointer：$message';
 
   Map<String, Object?> toJson() => {'pointer': pointer, 'kind': kind.name, 'message': message};
@@ -502,7 +502,7 @@ class UiConfigLoad {
 
   bool get fatal => issues.any((i) => i.fatal);
 
-  /// 「N 处没生效」.
+  /// "N issues not applied".
   int get notAppliedCount => issues.where((i) => i.kind.dropsSomething).length;
 
   int get appliedCount => fatal ? 0 : config.appliedCount;

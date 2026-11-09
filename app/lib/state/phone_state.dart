@@ -45,7 +45,7 @@ class PhoneState {
   /// The master switch is being flipped.
   final bool toggling;
 
-  /// The 显著披露 was accepted once (persisted).
+  /// The prominent disclosure was accepted once (persisted).
   final bool disclosureAccepted;
 
   PhoneState copyWith({
@@ -80,7 +80,7 @@ class PhoneToggleResult {
 class PhoneController extends Notifier<PhoneState> {
   static const disclosureKey = 'phone_disclosure_v1';
 
-  /// First run's 关键步骤先问我 / 全程自动 until the native side has it.
+  /// First run's "Ask me at key steps" / "Fully automatic" until the native side has it.
   static const confirmPendingKey = 'phone_confirm_pending';
 
   StreamSubscription<PhoneStatus>? _sub;
@@ -188,7 +188,7 @@ class PhoneController extends Notifier<PhoneState> {
     } catch (_) {}
   }
 
-  /// Flips 「手机操控」, then restarts a running local engine so the phone plugin
+  /// Flips "Phone control", then restarts a running local engine so the phone plugin
   /// mounts or unmounts (tools are fixed per DSH launch). In safe mode nothing
   /// loads plugins anyway: turning on is refused, turning off needs no restart.
   Future<PhoneToggleResult> setEnabled(bool enabled) async {
@@ -328,7 +328,7 @@ class PhoneController extends Notifier<PhoneState> {
     return true;
   }
 
-  /// 每次都询问 / 本任务免确认 / 始终免确认; false when the native side refused
+  /// "Always ask" / "This task" / "Always skip"; false when the native side refused
   /// (nothing changes). Written, it also settles a first-run choice still
   /// pending: the latest word wins.
   Future<bool> setConfirmMode(PhoneConfirmMode mode) async {
@@ -372,11 +372,11 @@ class PhoneController extends Notifier<PhoneState> {
     return ok;
   }
 
-  /// First run's 关键步骤先问我 / 全程自动, through the same `setPolicies` as
-  /// 设置 › 手机操控 › 确认方式. Kept (`phone_confirm_pending`) until written:
+  /// First run's "Ask me at key steps" / "Fully automatic", through the same `setPolicies` as
+  /// Settings › Phone control › Confirmation. Kept (`phone_confirm_pending`) until written:
   /// with the native side not answering yet, or a write that failed, it goes
-  /// in on the next read of the policies (the summary's 继续, the app's next
-  /// start, opening 设置 › 手机操控). True once written.
+  /// in on the next read of the policies (the summary's Continue, the app's next
+  /// start, opening Settings › Phone control). True once written.
   Future<bool> chooseConfirmMode(PhoneConfirmMode mode) async {
     try {
       final prefs = await SharedPreferences.getInstance();
@@ -428,7 +428,7 @@ class PhoneController extends Notifier<PhoneState> {
     } catch (_) {}
   }
 
-  /// 解除限制: lifts or restores one hard rule. Lifting is refused while any
+  /// "Lift limits": lifts or restores one hard rule. Lifting is refused while any
   /// task may act (read afresh; native refuses it too): the agent driving the
   /// phone must not widen its own reach. False when refused or the native side
   /// said no (nothing changes).
@@ -458,7 +458,7 @@ final phoneProvider = NotifierProvider<PhoneController, PhoneState>(PhoneControl
 
 /// Why phone control can't work right now; null when nothing stands in the way.
 enum PhoneBlocker {
-  /// The native module didn't answer: 未就绪.
+  /// The native module didn't answer: Not ready.
   notReady,
 
   /// The local engine runs (or will start) the rescue profile, which loads no plugins.
@@ -478,7 +478,7 @@ final phoneBlockerProvider = Provider<PhoneBlocker?>((ref) {
   return null;
 });
 
-/// A first-run 确认方式 still pending ([PhoneController.chooseConfirmMode]) is
+/// A first-run Confirmation still pending ([PhoneController.chooseConfirmMode]) is
 /// written once the home shell is up; the policies' next read tries again.
 final phoneConfirmPendingProvider = Provider<void>((ref) {
   unawaited(() async {

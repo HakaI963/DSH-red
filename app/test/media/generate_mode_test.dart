@@ -215,7 +215,7 @@ void main() {
       expect(find.descendant(of: find.byType(GenerateSheet), matching: find.text('请选择')), findsOneWidget);
       await tester.tap(find.text('模型'));
       await pumpFrames(tester);
-      expect(find.text('阿里云百炼'), findsOneWidget);
+      expect(find.text('Alibaba Cloud Model Studio'), findsOneWidget);
       expect(find.text('家里'), findsOneWidget);
       await tester.tap(find.text('通义千问图像 3.0').last);
       await pumpFrames(tester);
@@ -373,8 +373,8 @@ void main() {
       await pumpFrames(tester);
       await tester.tap(find.text('模型'));
       await pumpFrames(tester);
-      expect(find.text('火山方舟'), findsOneWidget);
-      expect(find.text('阿里云百炼'), findsOneWidget);
+      expect(find.text('Volcano Ark'), findsOneWidget);
+      expect(find.text('Alibaba Cloud Model Studio'), findsOneWidget);
       expect(find.text('¥0.30 / 张'), findsOneWidget);
       expect(find.text('管理'), findsOneWidget);
       await tester.tap(find.text('通义千问图像 3.0'));

@@ -29,7 +29,7 @@ final notifyChannelProvider = Provider<NotifyChannel>((ref) => NotifyChannel());
 
 // ── Settings ─────────────────────────────────────────────────────────────────
 
-/// 设置 → 通知: a master switch plus one per kind of event.
+/// Settings → Notifications: a master switch plus one per kind of event.
 class NotifyPrefs {
   const NotifyPrefs({
     this.enabled = true,
@@ -43,19 +43,19 @@ class NotifyPrefs {
 
   final bool enabled;
 
-  /// 一轮正常完成.
+  /// Turn complete.
   final bool done;
 
-  /// 一轮出错或被停下.
+  /// Error or stopped.
   final bool failed;
 
-  /// 等你确认（审批）.
+  /// Needs approval.
   final bool approval;
 
-  /// 向你提问.
+  /// Questions for you.
   final bool question;
 
-  /// 实时活动: the status bar chip / island while DSH works (lib/notify/live_activity.dart).
+  /// Live activity: the status bar chip / island while DSH works (lib/notify/live_activity.dart).
   final bool live;
   final bool loaded;
 
@@ -437,7 +437,7 @@ class ChatAlertsController extends Notifier<ChatAlert?> {
     }
   }
 
-  /// The host a remote connection belongs to; null for 本机.
+  /// The host a remote connection belongs to; null for this phone.
   HostRef? _remoteRef(HostConnection connection) {
     final id = connection.hostId;
     if (connection.isLocal || id == null) return null;

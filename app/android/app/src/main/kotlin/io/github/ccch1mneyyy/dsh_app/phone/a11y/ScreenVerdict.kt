@@ -3,10 +3,10 @@ package io.github.ccch1mneyyy.dsh_app.phone.a11y
 /**
  * What an action may honestly say about the screen after it.
  *
- * The one rule: **缺少观测依据不等于界面没变**。Empty fingerprints on both sides, or a screen
+ * The one rule: **missing observation is not proof that nothing changed**. Empty fingerprints on both sides, or a screen
  * whose content is filtered (see [TreeCapture] `unreadableWindowTitle`), mean "cannot verify" —
- * saying 「没有明显变化」 there makes the model retry an action that already worked, and saying
- * 「可能已经到头了」 after a scroll makes it give up on a list it never reached the end of.
+ * saying "no visible change" there makes the model retry an action that already worked, and saying
+ * "probably reached the end" after a scroll makes it give up on a list it never reached the end of.
  */
 internal object ScreenVerdict {
     const val UNCHANGED = "界面没有明显变化。"
@@ -17,7 +17,7 @@ internal object ScreenVerdict {
     const val KEYBOARD_SHOWN = "键盘已弹出。"
 
     /**
-     * The sentence to append after 「已点击…」/「已返回…」. Empty when the tree changed (or the
+     * The sentence to append after "tapped…"/"went back…". Empty when the tree changed (or the
      * window insets did) and both screens are readable: the new screen speaks for itself.
      *
      * @param comparable both before and after had readable elements to compare

@@ -33,7 +33,7 @@ import io.flutter.plugin.common.PluginRegistry
  * Speech while a clip plays: the capture thread's edge reaches the main thread, the clip is
  * released here, and only then does `voice.speechStart` go to Dart, with `localStopped: true`.
  *
- * This side ends an owner by itself — the indicator's 停止, dictation taking the microphone, the
+ * This side ends an owner by itself — the indicator's Stop, dictation taking the microphone, the
  * activity leaving the screen, Dart going away — and reports `owner.revoked`; Dart then tells the
  * plugin. Methods: capabilities, activate, play, pause, resume, stop, requestVoiceGrant,
  * startVoice, stopVoice, showOverlay, updateOverlay, hideOverlay, disposeOwner.

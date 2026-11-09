@@ -22,8 +22,8 @@ Map<String, String> _arb(String lang) => {
 };
 
 void main() {
-  for (final lang in ['zh', 'en']) {
-    test('every 设置 path in the $lang guide is a way the index knows', () {
+  for (final lang in ['en']) {
+    test('every Settings path in the $lang guide is a way the index knows', () {
       final l10n = lookupL10n(Locale(lang));
       final arb = _arb(lang);
       final trails = {

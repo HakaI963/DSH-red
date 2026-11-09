@@ -8,20 +8,20 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../l10n/l10n.dart';
 import '../ui/theme/accent.dart';
 
-/// 配色从哪来。
+/// Where the color scheme comes from.
 enum AccentSource {
-  /// 六套预设之一([AppearanceSettings.presetId])。
+  /// One of the six presets ([AppearanceSettings.presetId]).
   preset,
 
-  /// 用户挑的颜色([AppearanceSettings.customColor]),过对比度守卫。
+  /// The color the user picked ([AppearanceSettings.customColor]), through the contrast guard.
   custom,
 
-  /// 系统壁纸取色(Android 12 起)。
+  /// The system's wallpaper accent (Android 12+).
   wallpaper,
 }
 
-/// 外观设置里的配色部分。外观模式(浅 / 深 / 跟随系统)仍在
-/// `settings_state.dart` 的 `themeMode`,只是界面挪到了外观页。
+/// The color-scheme part of Appearance settings. The appearance mode (light / dark / follow system) is still
+/// `themeMode` in `settings_state.dart`; only its UI moved to the Appearance page.
 class AppearanceSettings {
   const AppearanceSettings({
     this.source = AccentSource.preset,
@@ -32,15 +32,15 @@ class AppearanceSettings {
 
   final AccentSource source;
 
-  /// 最近一次选的预设;切到自定义 / 壁纸再切回来时用。
+  /// The preset chosen last; used when switching back from custom / wallpaper.
   final String presetId;
 
-  /// 自定义色(ARGB),守卫之前的原色。
+  /// The custom color (ARGB), raw, before the guard.
   final int customColor;
   final bool loaded;
 
-  /// 自定义色的初值:一抹灰调的苔绿(色相 140°),第一次打开时和六套预设
-  /// 都不撞。
+  /// The custom color's initial value: a grey-toned moss green (hue 140°) that clashes with none
+  /// of the six presets on first open.
   static const defaultCustom = 0xFF5F7A55;
 
   AppearanceSettings copyWith({AccentSource? source, String? presetId, int? customColor, bool? loaded}) =>
@@ -57,8 +57,8 @@ class AppearanceController extends Notifier<AppearanceSettings> {
   static const _presetKey = 'appearance.preset';
   static const _customKey = 'appearance.custom_color';
 
-  /// 当前配色的浅色主色(ARGB),给原生通知的强调色读
-  /// (`DynamicColorPlugin.kt` 的 `ThemeAccent`)。
+  /// The current scheme's light-mode primary (ARGB), read by native notifications as the accent
+  /// (`ThemeAccent` in `DynamicColorPlugin.kt`).
   static const notifyColorKey = 'appearance.notify_color';
 
   late Future<void> _loaded;
@@ -85,7 +85,7 @@ class AppearanceController extends Notifier<AppearanceSettings> {
     }
   }
 
-  /// 存在读完之后:启动后马上改的值不会被晚到的读取盖掉。
+  /// Writes wait for the read: a value changed right after launch is not overwritten by a late load.
   Future<void> _save(AppearanceSettings next, Future<void> Function(SharedPreferences prefs) write) async {
     await _loaded;
     state = next.copyWith(loaded: true);
@@ -101,7 +101,7 @@ class AppearanceController extends Notifier<AppearanceSettings> {
     await p.setString(_presetKey, id);
   });
 
-  /// 选中自定义;[color] 给了就同时换颜色(色相条、推荐色)。
+  /// Selects custom; with [color] given, also changes it (hue bar, suggested colors).
   Future<void> selectCustom([int? color]) =>
       _save(state.copyWith(source: AccentSource.custom, customColor: color), (p) async {
         await p.setString(_sourceKey, AccentSource.custom.name);
@@ -113,20 +113,20 @@ class AppearanceController extends Notifier<AppearanceSettings> {
     (p) => p.setString(_sourceKey, AccentSource.wallpaper.name),
   );
 
-  /// 关掉跟随壁纸:回到上一次的预设。
+  /// Turns off wallpaper following: back to the last preset.
   Future<void> leaveWallpaper() => selectPreset(state.presetId);
 }
 
 final appearanceProvider = NotifierProvider<AppearanceController, AppearanceSettings>(AppearanceController.new);
 
-/// 系统的壁纸取色(Android 12+ 的 `system_accent1_*`)。低版本、取不到时为
-/// null,外观页据此整行不显示「跟随壁纸」。
+/// The system's wallpaper accents (Android 12+ `system_accent1_*`). Null on older versions or
+/// when unreadable; the Appearance page then hides the "Use wallpaper colors" row entirely.
 class DynamicColorChannel {
   const DynamicColorChannel([this._methods = const MethodChannel('dsh/dynamic_color')]);
 
   final MethodChannel _methods;
 
-  /// 壁纸主色(accent1 的中间调);不支持时 null。
+  /// The wallpaper accent (accent1's middle tone); null when unsupported.
   Future<Color?> wallpaperAccent() async {
     try {
       final palette = await _methods.invokeMapMethod<String, Object?>('palette');
@@ -142,14 +142,14 @@ class DynamicColorChannel {
 
 final dynamicColorChannelProvider = Provider<DynamicColorChannel>((ref) => const DynamicColorChannel());
 
-/// 壁纸主色;App 回到前台时重读(用户可能刚换了壁纸)。
+/// The wallpaper accent; re-read when the app returns to the foreground (the user may have just changed the wallpaper).
 final wallpaperAccentProvider = FutureProvider<Color?>((ref) {
   final listener = AppLifecycleListener(onResume: ref.invalidateSelf);
   ref.onDispose(listener.dispose);
   return ref.watch(dynamicColorChannelProvider).wallpaperAccent();
 });
 
-/// 当前生效的配色。壁纸色还没读到(或读不到)时先用上一次的预设。
+/// The scheme in effect. Until the wallpaper accent is read (or if it can't be), the last preset stands in.
 final accentProvider = Provider<AppAccent>((ref) {
   final s = ref.watch(appearanceProvider);
   final preset = AppAccent.preset(s.presetId);
@@ -167,7 +167,7 @@ final accentProvider = Provider<AppAccent>((ref) {
 
 int? _published;
 
-/// 原生通知读这个值给小图标着色;只在变了时写。
+/// Native notifications read this to tint the small icon; written only when it changes.
 Future<void> _publishNotifyColor(AppAccent accent) async {
   final argb = accent.seed.toARGB32();
   if (_published == argb) return;

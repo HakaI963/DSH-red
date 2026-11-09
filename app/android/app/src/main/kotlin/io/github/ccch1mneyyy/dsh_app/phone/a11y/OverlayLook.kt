@@ -24,7 +24,7 @@ import kotlin.math.cos
 import kotlin.math.roundToInt
 
 /**
- * The control's colours: the app's 雾蓝 (mist) neutrals, accent and brick-rose danger
+ * The control's colours: the app's Mist neutrals, accent and brick-rose danger
  * (app/lib/ui/theme/palette.dart, surfaces.dart). Every surface is solid — the chrome glass's
  * no-blur fill, made opaque — with the glass's hairline, top rim and cool-ink shadow, so it reads
  * the same over any page and its text keeps its contrast (ink ≥ 13 : 1, faint ≥ 4.6 : 1).
@@ -81,10 +81,10 @@ internal object OverlayMotion {
     /** The running mark's breath (AppMotion.breath). */
     const val BREATH_MS = 2_400L
 
-    /** 系统设置 → 移除动画 sets the animator scale to 0. */
+    /** System settings → "Remove animations" sets the animator scale to 0. */
     fun on(): Boolean = if (Build.VERSION.SDK_INT >= 26) ValueAnimator.areAnimatorsEnabled() else true
 
-    /** The 闲置时不透明度 fade of a whole form: [view] to [alpha], over [durationMs] when [animated]. */
+    /** The idle-opacity fade of a whole form: [view] to [alpha], over [durationMs] when [animated]. */
     fun fadeIdle(view: View, alpha: Float, animated: Boolean, durationMs: Long) {
         view.animate().cancel()
         if (!animated || !on()) {
@@ -277,7 +277,7 @@ internal fun View.softShadow(c: OverlayPalette, elevationDp: Float) {
 }
 
 /**
- * 暂停 / 继续 / 停止: a 48 dp touch target with a [discDp] disc and a glyph, a ripple over the
+ * Pause / resume / Stop: a 48 dp touch target with a [discDp] disc and a glyph, a ripple over the
  * disc and a small press. Changing the glyph cross-fades it.
  */
 internal class RoundKey(context: Context, private val discDp: Int, private val glyphDp: Int) : View(context) {

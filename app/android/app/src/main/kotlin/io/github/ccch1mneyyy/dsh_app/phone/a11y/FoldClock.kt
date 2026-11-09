@@ -6,18 +6,18 @@ import java.util.EnumSet
  * Which of the control's three forms is due, and when the next one is. Plain Kotlin: the overlay
  * supplies the clock, runs one timer at [nextAt] and animates from what is on screen to [form].
  *
- * - [Form.CAPSULE], the default: one line (what DSH does now) and 暂停 / 停止. Left alone it
- *   fades to the 闲置时不透明度 after [dimMs], unless 「闲置时自动收起」 folds it first.
+ * - [Form.CAPSULE], the default: one line (what DSH does now) and Pause / Stop. Left alone it
+ *   fades to the idle opacity after [dimMs], unless "Collapse when idle" folds it first.
  * - [Form.CARD]: the capsule grown downwards with the second layer (app, recent steps, lifted
- *   limits, 插话). Opened from the capsule's line; back to the capsule [cardMs] after the last
+ *   limits, Steer). Opened from the capsule's line; back to the capsule [cardMs] after the last
  *   touch, unless the person is typing.
  * - [Form.BALL]: only the state, docked on a side. The capsule's mark folds it ([foldByHand]),
- *   until the person taps the ball, for the rest of the task. With 「闲置时自动收起」
+ *   until the person taps the ball, for the rest of the task. With "Collapse when idle"
  *   ([autoFold]) an idle capsule folds after [foldMs]. A ball that is left alone fades like the
  *   capsule; a touch brings either back. The card never fades.
  *
  * What needs the person's eyes or hands holds the form and stops every count: a confirm card, a
- * handoff card, 插话 being typed, the 已停止 note. All but typing fold the card back to the
+ * handoff card, Steer being typed, the Stopped note. All but typing fold the card back to the
  * capsule (the card would compete with the confirm card for attention); an automatic fold opens
  * for the first three ([OPENING]), a fold by hand stays. When the last hold goes, the counts
  * start over. Status lines from the agent are not touches.
@@ -29,7 +29,7 @@ class FoldClock(val dimMs: Long = DIM_MS, val foldMs: Long = FOLD_MS, val cardMs
 
     enum class Tick { NONE, DIM, FOLD, COLLAPSE }
 
-    /** 「闲置时自动收起」. */
+    /** "Collapse when idle". */
     var autoFold = false
         private set
 
@@ -154,7 +154,7 @@ class FoldClock(val dimMs: Long = DIM_MS, val foldMs: Long = FOLD_MS, val cardMs
         return true
     }
 
-    /** 「闲置时自动收起」 switched (applies at once to the control on screen). */
+    /** "Collapse when idle" switched (applies at once to the control on screen). */
     fun setAutoFold(on: Boolean, now: Long) {
         if (autoFold == on) return
         autoFold = on
@@ -201,7 +201,7 @@ class FoldClock(val dimMs: Long = DIM_MS, val foldMs: Long = FOLD_MS, val cardMs
         collapseAt = null
     }
 
-    /** One count per form: the card goes back, an idle capsule folds (自动收起) or else dims, a ball dims. */
+    /** One count per form: the card goes back, an idle capsule folds (auto-collapse) or else dims, a ball dims. */
     private fun arm(now: Long) {
         dimAt = null
         foldAt = null
@@ -218,7 +218,7 @@ class FoldClock(val dimMs: Long = DIM_MS, val foldMs: Long = FOLD_MS, val cardMs
         /** 3 s: a ball or a capsule left alone fades after this long. */
         const val DIM_MS = 3_000L
 
-        /** 3.5 s for 「闲置时自动收起」. */
+        /** 3.5 s for "Collapse when idle". */
         const val FOLD_MS = 3_500L
 
         /** 8 s: long enough to read the card, then it gets out of the way. */

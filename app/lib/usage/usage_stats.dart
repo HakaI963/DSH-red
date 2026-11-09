@@ -1,7 +1,7 @@
-// 发送匿名使用统计: anonymous, per-day counts kept on the phone and sent once
+// "Send anonymous usage stats": anonymous, per-day counts kept on the phone and sent once
 // each, the day after (contract v1, usage_ledger.dart). On by default, but
 // nothing is counted until the person has seen the switch (first run's
-// 「想让 DSH Go 帮你做哪些事」, or 设置 › 隐私与分享). Off means nothing is
+// "What should DSH Go help with?", or Settings › Privacy and sharing). Off means nothing is
 // counted, nothing is kept and no request is made.
 
 import 'dart:async';
@@ -183,7 +183,7 @@ class UsageStatsController extends Notifier<UsageStatsState> {
     unawaited(foreground());
   }
 
-  /// 发送匿名使用统计. Off drops the install id and every count at once.
+  /// "Send anonymous usage stats". Off drops the install id and every count at once.
   Future<void> setEnabled(bool enabled) async {
     await _loaded;
     if (!ref.mounted) return;

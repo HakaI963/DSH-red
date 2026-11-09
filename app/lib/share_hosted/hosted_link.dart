@@ -15,7 +15,7 @@ enum HostedTtl {
 
   final String wire;
 
-  /// For a picker: 「7 天」「30 天」「永久」.
+  /// For a picker: "7 days", "30 days", "Forever".
   String get label => switch (this) {
     HostedTtl.week => appL10n.remoteHostedTtlWeek,
     HostedTtl.month => appL10n.remoteHostedTtlMonth,
@@ -30,7 +30,7 @@ enum HostedTtl {
 /// Ids the share host hands out: 10 base62 characters.
 final hostedIdPattern = RegExp(r'^[0-9A-Za-z]{10}$');
 
-/// One link: enough to open it again, show it in 「我的分享链接」 and delete it.
+/// One link: enough to open it again, show it in "My shared links" and delete it.
 /// [key] and [deleteToken] are secrets; the list lives in secure storage.
 class HostedLink {
   const HostedLink({
@@ -54,7 +54,7 @@ class HostedLink {
   final DateTime createdAt;
   final HostedTtl ttl;
 
-  /// Null for 永久.
+  /// Null for Forever.
   final DateTime? expiresAt;
 
   /// The host it was made on, so a later change of [shareHostOrigin] keeps old
@@ -125,7 +125,7 @@ const hostedOrigins = [shareHostOrigin];
 
 /// The id and key in a hosted link: `https://<host>/c/<id>#k=<key>`, or the
 /// same as an app link, `dshgo://<host>/c/<id>#k=<key>` (what the web viewer's
-/// 「用 dsh-go 打开」 hands over). Null for anything else; [origin] limits it to
+/// "Open with dsh-go" hands over). Null for anything else; [origin] limits it to
 /// one host.
 ({String origin, String id, String key})? parseHostedUrl(String text, {String? origin}) {
   final uri = Uri.tryParse(text.trim());

@@ -28,7 +28,7 @@ enum PetStateName {
   static PetStateName fromName(String? name) => values.asNameMap()[name] ?? idle;
 }
 
-/// The three sizes in 宠物设置, by body height (docs/design/pets.md §2.10).
+/// The three sizes in Pet settings, by body height (docs/design/pets.md §2.10).
 /// The name is the persisted value.
 enum PetSize {
   small,
@@ -124,13 +124,13 @@ class PetAsk {
   final String eventId;
   final int? token;
 
-  /// An approval's whole action (「运行：git push」), or the question.
+  /// An approval's whole action ("Run: git push"), or the question.
   final String text;
 
-  /// 允许本次 / 拒绝 on the bubble: the exact call is known and shows whole.
+  /// Allow once / Decline on the bubble: the exact call is known and shows whole.
   final bool approvable;
 
-  /// A question's one-tap answers; empty: 「去回答」.
+  /// A question's one-tap answers; empty: "Go answer".
   final List<String> choices;
 
   Map<String, Object?> toMap(PetBubbleKind kind) => {
@@ -155,9 +155,9 @@ class PetAsk {
   int get hashCode => Object.hash(eventId, token, text, approvable, Object.hashAll(choices));
 }
 
-/// A short line over the pet's head: 「做完了」「标题 · 等你确认」
-/// 「3 个对话做完了」. Never the conversation's text, with two exceptions on
-/// the floating pet: a request it can answer ([ask]), and 问一句's own reply
+/// A short line over the pet's head: "Done", "title · Needs approval",
+/// "3 chats finished". Never the conversation's text, with two exceptions on
+/// the floating pet: a request it can answer ([ask]), and Quick ask's own reply
 /// ([preview]).
 @immutable
 class PetBubble {
@@ -191,7 +191,7 @@ class PetBubble {
   /// The request, to answer on the bubble; only for a single conversation.
   final PetAsk? ask;
 
-  /// 问一句's reply, masked, on one line (the overlay shows two lines of it).
+  /// Quick ask's reply, masked, on one line (the overlay shows two lines of it).
   final String? preview;
 
   /// The title as the bubble shows it (cut at [petTitleMax]); null when
@@ -203,7 +203,7 @@ class PetBubble {
     return chars.length <= petTitleMax ? t : '${String.fromCharCodes(chars.take(petTitleMax))}…';
   }
 
-  /// What the bubble says after the title: 「做完了」, or 「3 个对话做完了」.
+  /// What the bubble says after the title: "Done", or "3 chats finished".
   String get verb => count > 1
       ? switch (kind) {
           PetBubbleKind.done => appL10n.statePetChatsDone(count),
@@ -267,8 +267,8 @@ class PetBubble {
   String toString() => 'PetBubble(${kind.name} "$text" → $target)';
 }
 
-/// A host the floating pet's 切换主机 offers: one that switches without a
-/// question (本机, a pinned SSH or DSH Remote host).
+/// A host the floating pet's Switch host offers: one that switches without a
+/// question (this phone, a pinned SSH or DSH Remote host).
 @immutable
 class PetHostChoice {
   const PetHostChoice(this.host, this.label, {this.current = false});
@@ -287,7 +287,7 @@ class PetHostChoice {
   int get hashCode => Object.hash(host, label, current);
 }
 
-/// Id of the 「不显示」 choice.
+/// Id of the "None" choice.
 const noPetId = 'none';
 
 /// What the pet shows right now. Equal values need no redraw and no push.
@@ -333,14 +333,14 @@ class PetState {
   final String packId;
   final PetSize size;
 
-  /// 安静模式: moves only, no bubbles.
+  /// Quiet mode: moves only, no bubbles.
   final bool quiet;
   final bool reduceMotion;
 
-  /// [target] runs on the host in use: the floating pet's 「停止当前任务」.
+  /// [target] runs on the host in use: the floating pet's "Stop the current task".
   final bool canStop;
 
-  /// The floating pet's 切换主机, when there are two or more; else empty.
+  /// The floating pet's Switch host, when there are two or more; else empty.
   final List<PetHostChoice> hosts;
 
   Map<String, Object?> toMap() => {

@@ -60,7 +60,7 @@ class PhoneCore(
     // serial with that body, not a mutable Core-wide field or a fresh lookup when say runs.
     private val executionStatus = ThreadLocal<((() -> Unit) -> Boolean)>()
 
-    /** The overlay's status line; 免确认 stays visible the whole time nothing is asked. */
+    /** The overlay's status line; the skip-confirmation tag stays visible the whole time nothing is asked. */
     private fun say(owner: PhoneTasks.Owner, text: String) {
         if (!current(owner)) return
         val guard = executionStatus.get() ?: return
@@ -71,7 +71,7 @@ class PhoneCore(
     @Volatile private var lastScreen: PhoneScreen = PhoneScreen.MAIN
 
     /**
-     * The task's last hard refusal (密码框, 系统设置, 不碰名单), for the `handoff` that usually
+     * The task's last hard refusal (password field, system settings, hands-off list), for the `handoff` that usually
      * follows it: the card says which rule it was. Cleared by a write that went through, a new
      * task, or the handoff it named.
      */
@@ -1154,7 +1154,7 @@ class PhoneCore(
         )
     }
 
-    /** A `type` in the log without its length or text: 「输入 s3#5（••••）」. */
+    /** A `type` in the log without its length or text: "typed into s3#5 (••••)". */
     private fun secretSummary(sid: String, id: Int, submit: Boolean): String =
         ui.get("phone_log_type_secret", "输入 %1\$s#%2\$d（%3\$s%4\$s）", sid, id, SafetyRules.MASK, if (submit) ui.get("phone_log_submit", "，提交") else "") // l10n:keep test default
 

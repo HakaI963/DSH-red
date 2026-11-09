@@ -7,7 +7,7 @@ import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
 
 /**
- * Wallpaper colours for 设置 › 外观 › 跟随壁纸: MethodChannel `dsh/dynamic_color`
+ * Wallpaper colours for Settings › Appearance › Follow wallpaper: MethodChannel `dsh/dynamic_color`
  * (see lib/state/appearance_state.dart).
  *
  * `palette` answers the system's Monet tones (`system_accent1_*`, `system_neutral1_500`) on
@@ -60,7 +60,7 @@ object ThemeAccent {
     private const val PREFS = "FlutterSharedPreferences"
     private const val KEY = "flutter.appearance.notify_color"
 
-    /** 雾蓝, until the app has written one. */
+    /** Mist, until the app has written one. */
     private const val DEFAULT = 0xFF4B67B4.toInt()
 
     fun notificationColor(context: Context): Int = runCatching {

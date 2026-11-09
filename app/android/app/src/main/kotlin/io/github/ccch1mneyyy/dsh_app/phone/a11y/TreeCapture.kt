@@ -25,7 +25,7 @@ internal class Capture(
     val screen: Box,
     /** Package of the top-most readable window (what the person is looking at). */
     val packageName: String?,
-    /** DSH itself is in front. Read anyway (the 「读一下当前屏幕」 check shows it); the core's
+    /** DSH itself is in front. Read anyway (the "Read current screen" check shows it); the core's
      *  SafetyGate.filterScreen hides it from the model and the driver never acts on it. */
     val ownAppInFront: Boolean,
     /** A system window (notification shade, quick settings) covers the screen. */
@@ -43,7 +43,7 @@ internal class Capture(
      * Title of the front window that is there but gives us only empty layout shells.
      * Android 14+ hides views marked accessibilityDataSensitive from non-tool
      * services this way (GitHub, banking and password pages), so the root survives while the
-     * content subtree does not. Only a hint: report 「可能受敏感视图策略限制」, never assert
+     * content subtree does not. Only a hint: report "possibly blocked by the sensitive-view policy", never assert
      * that the app is a sensitive page (a fresh, still-drawing app looks the same for a moment).
      */
     val unreadableWindowTitle: String? = null,

@@ -1,7 +1,7 @@
 // Portions derived from Phase (https://github.com/CikeSeven/phase), used with the author's permission. See THIRD_PARTY_NOTICES.md.
 // Local changes: blocking, one owner per task (the bridge serialises calls on one worker
 // thread); a UiAutomation control-tree read rendered to the screen text format, so text-only
-// models can use 不打扰模式 too; IME policy HIDE; JPEG capture with bounded first-frame readiness; display
+// models can use Non-disruptive mode too; IME policy HIDE; JPEG capture with bounded first-frame readiness; display
 // sized to the phone's aspect (short side 720). No commands, paths or display ids are accepted
 // from callers.
 package io.github.ccch1mneyyy.dsh_app.phone.background

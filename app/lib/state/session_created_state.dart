@@ -1,4 +1,4 @@
-// When each conversation was created, for the drawer's 「创建时间」 order.
+// When each conversation was created, for the drawer's "Date created" order.
 //
 // `session/list` rows carry only the latest activity (`updatedAt`); the
 // creation time lives in the log header, which only `session/follow` sends.

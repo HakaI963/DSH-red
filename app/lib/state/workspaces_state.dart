@@ -252,7 +252,7 @@ class WorkspacePrefs {
 
   final bool loaded;
 
-  /// The workspace the drawer shows; null is 全部对话.
+  /// The workspace the drawer shows; null is All chats.
   final String? selected;
 
   /// Pinned workspace ids, most recently pinned first.
@@ -378,7 +378,7 @@ final workspacePrefsProvider = NotifierProvider<WorkspacePrefsController, Worksp
 // ── Derived views ────────────────────────────────────────────────────────────
 
 /// The workspace the drawer shows and new conversations start in; null for
-/// 全部对话 (or while the selection isn't on the host's list).
+/// All chats (or while the selection isn't on the host's list).
 final selectedWorkspaceProvider = Provider<Workspace?>((ref) {
   final selected = ref.watch(workspacePrefsProvider.select((p) => p.selected));
   if (selected == null) return null;
@@ -399,7 +399,7 @@ final workspaceFilterPendingProvider = Provider<bool>((ref) {
 
 enum WorkspaceSectionKind { pinned, group, rest }
 
-/// One block of the workspace list: 置顶, a group, or the rest.
+/// One block of the workspace list: Pinned, a group, or the rest.
 class WorkspaceSection {
   const WorkspaceSection(this.kind, this.title, this.items);
 

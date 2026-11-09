@@ -44,7 +44,7 @@ final mentionSourceProvider = Provider<MentionSource?>((ref) {
   return ClientMentionSource(client);
 });
 
-/// One picked reference, for the 「最近」 rows.
+/// One picked reference, for the "Recent" rows.
 class MentionRecent {
   const MentionRecent({required this.key, required this.mention, this.cwd, this.sessionId});
 

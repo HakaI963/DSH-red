@@ -31,7 +31,7 @@ import io.github.ccch1mneyyy.dsh_app.i18n.AppStrings
  * and the one-line caption, stacked at the top centre just under the chat header. Both are the
  * app's own views in the activity, so they are only there while the app is on screen and need no
  * window permission. The indicator is drawn by the app, not the plugin: its text names the plugin,
- * its 停止 ends the plugin's listening and playback, and it cannot be hidden while listening runs.
+ * its Stop ends the plugin's listening and playback, and it cannot be hidden while listening runs.
  * The caption's text comes from the plugin; its × is the app's.
  */
 internal class MediaOverlays(private val onStop: () -> Unit, private val onCaptionClosed: () -> Unit) {
@@ -189,7 +189,7 @@ internal class MediaOverlays(private val onStop: () -> Unit, private val onCapti
             orientation = LinearLayout.HORIZONTAL
             gravity = Gravity.CENTER_VERTICAL
             pill(this, c)
-            // The 停止 key sits KEY_INSET from the pill on its top, right and bottom.
+            // The Stop key sits KEY_INSET from the pill on its top, right and bottom.
             setPadding(context.px(16f), context.px(KEY_INSET_DP), context.px(KEY_INSET_DP), context.px(KEY_INSET_DP))
             addView(
                 View(context).apply { background = GradientDrawable().apply { shape = GradientDrawable.OVAL; setColor(c.danger) } },
@@ -297,7 +297,7 @@ internal class MediaOverlays(private val onStop: () -> Unit, private val onCapti
         }
     }
 
-    /** The app's 雾蓝 surfaces (as phone/a11y/ControlOverlay.kt draws them). */
+    /** The app's Mist surfaces (as phone/a11y/ControlOverlay.kt draws them). */
     internal class Palette(
         val top: Int, val bottom: Int, val stroke: Int, val ink: Int, val muted: Int,
         val field: Int, val ripple: Int, val danger: Int,

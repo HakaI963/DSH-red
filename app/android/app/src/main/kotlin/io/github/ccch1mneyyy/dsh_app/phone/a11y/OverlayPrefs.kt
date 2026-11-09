@@ -5,7 +5,7 @@ import android.content.SharedPreferences
 import kotlin.math.roundToInt
 
 /**
- * 设置 → 手机操控 → 悬浮条: 闲置时不透明度 (the ball's, when left alone) and 「闲置时自动收起」
+ * Settings → Phone control → Floating bar: idle opacity (the ball's, when left alone) and "Collapse when idle"
  * (an idle capsule folds into the ball), in the overlay's own preferences file (with the ball's
  * dock). The settings page writes them through `dsh/phone` (`setOverlayPrefs`); a showing
  * overlay picks changes up at once through [SharedPreferences.OnSharedPreferenceChangeListener].

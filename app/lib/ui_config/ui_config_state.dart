@@ -1,9 +1,9 @@
 // ui.json as app state. Each host has its own file: [uiConfigProvider] follows
 // one host's, keeps its last good text per host for the next cold start, and
 // [uiOverridesProvider] gives the active host's configuration minus the
-// settings set aside with 「恢复默认」. The ui*Provider values at the bottom merge
+// settings set aside with "Reset to default". The ui*Provider values at the bottom merge
 // ui.json over the app's own settings for the screens to read, each with the
-// entry that set it (for 「来自 ui.json」).
+// entry that set it (for "From ui.json").
 
 import 'dart:async';
 import 'dart:io';
@@ -280,7 +280,7 @@ final uiConfigProvider = NotifierProvider.family<UiConfigController, UiConfigSta
 
 // ── The active host's configuration ─────────────────────────────────────────
 
-/// The active host's ui.json after 「恢复默认」: what the screens apply.
+/// The active host's ui.json after "Reset to default": what the screens apply.
 class UiOverrides {
   const UiOverrides({required this.host, this.config = UiConfig.empty, this.load});
 
@@ -319,7 +319,7 @@ final uiSettingEntryProvider = Provider.family<UiConfigEntry?, UiSettingKey>(
   (ref, key) => ref.watch(uiOverridesProvider.select((o) => o.entryFor(key))),
 );
 
-/// 「恢复默认」 for [key] on the active host: the app's own setting applies
+/// "Reset to default" for [key] on the active host: the app's own setting applies
 /// again while the file keeps this value.
 Future<void> restoreUiDefault(UiOverrides overrides, UiIgnoresController ignores, UiSettingKey key) async {
   final entry = overrides.entryFor(key);
@@ -344,7 +344,7 @@ class UiValue<T> {
   int get hashCode => Object.hash(value, entry);
 }
 
-/// Light / dark: ui.json's `theme.mode` over 设置 › 外观.
+/// Light / dark: ui.json's `theme.mode` over Settings › Appearance.
 final uiThemeModeProvider = Provider<UiValue<ThemeMode>>((ref) {
   final mode = ref.watch(uiOverridesProvider.select((o) => o.config.themeMode));
   if (mode == null) return UiValue(ref.watch(settingsProvider.select((s) => s.themeMode)));
@@ -355,7 +355,7 @@ final uiThemeModeProvider = Provider<UiValue<ThemeMode>>((ref) {
   }, ref.watch(uiSettingEntryProvider(UiSettingKey.themeMode)));
 });
 
-/// The palette: ui.json's `theme.accentPreset` / `theme.accent` over 外观's.
+/// The palette: ui.json's `theme.accentPreset` / `theme.accent` over Appearance's.
 /// A custom colour goes through the same derivation and contrast guard as
 /// the appearance page's.
 final uiAccentProvider = Provider<UiValue<AppAccent>>((ref) {

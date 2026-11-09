@@ -37,7 +37,7 @@ import kotlin.math.roundToInt
 
 /** What the capsule and its card show; ControlOverlay builds it from the task and the line. */
 internal data class CapsuleState(
-    /** The header's line: what DSH does now, or 已暂停 / 等你确认 / 已停止. */
+    /** The header's line: what DSH does now, or Paused / Needs approval / Stopped. */
     val line: String,
     val look: MarkLook,
     val paused: Boolean,
@@ -46,9 +46,9 @@ internal data class CapsuleState(
     val expandable: Boolean,
     /** Any limit lifted: a lock before the line, a row in the card. */
     val unlocked: Boolean,
-    /** The card's 已解除限制 row (which limits). */
+    /** The card's "Limits lifted" row (which limits). */
     val unlockedLine: CharSequence?,
-    /** The card's first line under the header: 「微信 · 免确认」. */
+    /** The card's first line under the header: "WeChat · confirmations skipped". */
     val meta: String?,
     /** The steps before this one, newest first. */
     val steps: List<String>,
@@ -56,10 +56,10 @@ internal data class CapsuleState(
 
 /**
  * The control's open window (TYPE_ACCESSIBILITY_OVERLAY): one solid surface that is a capsule —
- * the default, the line and 暂停 / 停止 — or the card that grows out of it, and shrinks to a circle
+ * the default, the line and Pause / Stop — or the card that grows out of it, and shrinks to a circle
  * when it folds into the ball. The surface is one view drawing one rounded rect that the morphs
  * animate ([OverlaySurface]); the rows inside never re-flow during a fold, they are cut by the
- * outline and fade. The header row is the same in both forms, so 停止 stays at the right end.
+ * outline and fade. The header row is the same in both forms, so Stop stays at the right end.
  *
  * Main thread only. The owner ([ControlOverlay]) adds and removes the window, decides the form and
  * runs the ball; this class draws, lays out and morphs.
@@ -240,7 +240,7 @@ internal class OverlayCapsule(
         setOnClickListener { actions.unlocks() }
     }
 
-    /** 插话: a field that only takes the keyboard once tapped (the window is not focusable till then). */
+    /** Steer: a field that only takes the keyboard once tapped (the window is not focusable till then). */
     val input: EditText = object : EditText(ctx) {
         override fun onKeyPreIme(keyCode: Int, event: KeyEvent?): Boolean {
             if (keyCode == KeyEvent.KEYCODE_BACK && event?.action == KeyEvent.ACTION_UP) { actions.inputDone(); return true }
@@ -392,7 +392,7 @@ internal class OverlayCapsule(
     val surface = OverlaySurface(ctx, c, header, body)
 
     /**
-     * The whole capsule's opacity: the 闲置时不透明度 when idle, full otherwise. On [surface], so the
+     * The whole capsule's opacity: the idle opacity when idle, full otherwise. On [surface], so the
      * window's own alpha stays free for the unfold's swap.
      */
     fun setIdle(alpha: Float, animated: Boolean, durationMs: Long) = OverlayMotion.fadeIdle(surface, alpha, animated, durationMs)

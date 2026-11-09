@@ -41,7 +41,7 @@ object GuestSetup {
         |""").trimMargin()
 
     /**
-     * Appended while 「可视化回复」 is on (default): how to answer with a ```dsh-ui view. The
+     * Appended while "Visual replies" is on (default): how to answer with a ```dsh-ui view. The
      * component list and the rules are adapted from DS Bot's `show_view` description and prompt
      * rule (`ds-bot/src/host/tools.js`, `prompt.js`), rewritten for a fenced block in a phone chat.
      */

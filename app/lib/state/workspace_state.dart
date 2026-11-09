@@ -1,4 +1,4 @@
-// One conversation's workspace as the 文件 page browses it, after the
+// One conversation's workspace as the Files page browses it, after the
 // official file panel (`dsh-client-ui-sidebar-files`): one directory at a
 // time, directories first in natural name order, each open directory kept
 // current by its own `workspaceFiles/changes` watch, plus name search over
@@ -14,7 +14,7 @@ import 'chat_state.dart';
 import 'connection_state.dart';
 import 'sessions_state.dart';
 
-/// The Host calls behind the 文件 page and the file previews. [path] is
+/// The Host calls behind the Files page and the file previews. [path] is
 /// absolute or relative to the workspace root ('' is the root).
 abstract interface class WorkspaceSource {
   Future<DshWorkspaceListing> list(String path);

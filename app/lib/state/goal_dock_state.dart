@@ -350,7 +350,7 @@ final goalDockProvider = NotifierProvider.autoDispose.family<GoalDockController,
   GoalDockController.new,
 );
 
-/// 「[action]：原因」 for a refused goal change; transport and other failures
+/// "[action]: reason" for a refused goal change; transport and other failures
 /// read like the rest of the chat ([chatErrorText]).
 String goalErrorText(Object error, {required String action}) {
   if (error is DshRemoteException) {

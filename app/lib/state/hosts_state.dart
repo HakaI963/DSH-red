@@ -73,7 +73,7 @@ class HostRef {
   String toString() => 'HostRef(${kind.name}:$id)';
 }
 
-/// Chat-header label for a connection: "本机", "电脑 · SSH", "家里的 Mac · 远程".
+/// Chat-header label for a connection: "This phone", "Computer · SSH", "Mac at home · Remote".
 String hostLabel(HostKind kind, String? name) => switch (kind) {
   HostKind.local => appL10n.commonThisPhone,
   HostKind.ssh => '${_short(name ?? appL10n.stateSshHost)} · SSH',
@@ -204,7 +204,7 @@ class HostsController extends Notifier<HostsState> {
     );
   }
 
-  /// Removes the host and its secrets; switches back to 本机 if it was active.
+  /// Removes the host and its secrets; switches back to this phone if it was active.
   Future<void> removeSsh(String id) async {
     await _loaded;
     await _persist([...state.ssh.where((h) => h.id != id)]);
@@ -328,12 +328,12 @@ class ActiveHostController extends Notifier<HostRef> {
       final autoConnect = prefs.getBool(RemoteAutoConnectController.prefsKey) ?? true;
       if (!_touched && owner.mounted && autoConnect) state = restored;
     } catch (_) {
-      // No preferences backend (tests): stay on 本机.
+      // No preferences backend (tests): stay on this phone.
     }
   }
 
   /// Switches hosts. The open conversation belongs to the old host, so the
-  /// chat goes back to "新对话".
+  /// chat goes back to "New chat".
   void select(HostRef host) {
     _touched = true;
     if (host == state && host.name == state.name) return;
@@ -348,8 +348,8 @@ class ActiveHostController extends Notifier<HostRef> {
   }
 
   /// Hosts matching [gone] no longer exist (a deleted SSH host, a signed-out
-  /// relay account): leave one in use for 本机, and drop one only saved for
-  /// the next launch (with 连接上次使用的主机 off, this launch never used it).
+  /// relay account): leave one in use for this phone, and drop one only saved for
+  /// the next launch (with "Connect to the last host" off, this launch never used it).
   Future<void> forget(bool Function(HostRef host) gone) async {
     if (gone(state)) {
       select(HostRef.local);

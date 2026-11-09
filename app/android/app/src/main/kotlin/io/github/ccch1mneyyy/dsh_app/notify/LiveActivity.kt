@@ -28,7 +28,7 @@ import io.github.ccch1mneyyy.dsh_app.theme.ThemeAccent
  * on the person or drives the phone, asking Android 16 to promote it to a Live Update: the status
  * bar chip, the top of the shade, the lock screen. HyperOS 3.1+, ColorOS 16 and MagicOS 10 draw
  * promoted notifications in their islands; HyperOS's focus template rides along where SystemUI
- * takes it ([XiaomiFocus]). vivo's 原子岛 and Samsung's Now Bar take allowlisted apps only (on
+ * takes it ([XiaomiFocus]). vivo's Atomic Island and Samsung's Now Bar take allowlisted apps only (on
  * OriginOS 6 the extras are stripped from anyone else's notification), so nothing here aims at them.
  *
  * Posted only where it is more than one more ongoing notification: promotion allowed for this app
@@ -39,7 +39,7 @@ import io.github.ccch1mneyyy.dsh_app.theme.ThemeAccent
  * target SDK, so targetSdk 28 is no obstacle; [EXTRA_REQUEST_PROMOTED_ONGOING] is spelled out
  * because it is public only from SDK 36.1. Updates run on one background thread, at most one post
  * per [MIN_GAP_MS] (NotificationManager drops bursts); the post is refreshed while it lasts and
- * times out otherwise, so a process that died doesn't leave 「工作中」 behind.
+ * times out otherwise, so a process that died doesn't leave "Working" behind.
  *
  * Content: [LiveContent]. The agent's part comes from Dart ([update]); phone control's is read
  * here ([PhoneControl.liveTask]) whenever it changes ([refresh]).
@@ -138,7 +138,7 @@ object LiveActivity {
         )
     }
 
-    /** The system page with this app's 「实时活动」 switch (Android 16 QPR1+); check it resolves. */
+    /** The system page with this app's "Live activity" switch (Android 16 QPR1+); check it resolves. */
     @SuppressLint("InlinedApi")
     fun settingsIntent(context: Context): Intent =
         Intent(Settings.ACTION_APP_NOTIFICATION_PROMOTION_SETTINGS).putExtra(Settings.EXTRA_APP_PACKAGE, context.packageName)

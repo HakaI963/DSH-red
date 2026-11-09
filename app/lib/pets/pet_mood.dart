@@ -7,7 +7,7 @@
 // `autoReturn`). Turn ends are debounced: a goal's next round starting at once
 // is not a finish.
 //
-// | 宠物状态 | 信号 | 类型 |
+// | Pet state | Signal | Type |
 // |---|---|---|
 // | idle | nothing in scope runs | level |
 // | thinking | waiting for the model, reasoning, retrying | level |
@@ -201,7 +201,7 @@ class PetSignals {
   /// Reserved: a file is being uploaded or imported.
   final bool carrying;
 
-  /// 安静模式: no bubbles.
+  /// Quiet mode: no bubbles.
   final bool quiet;
 
   int get subRuns => runs.where((r) => r.subagent).length;
@@ -250,13 +250,13 @@ class PetEvent {
   final DateTime at;
 
   /// May raise a bubble: the alert went to the pet or to the system (not the
-  /// conversation on screen, not switched off in 通知).
+  /// conversation on screen, not switched off in Notifications).
   final bool bubble;
 
   /// A request the bubble shows and may answer (approval, question).
   final PetAsk? ask;
 
-  /// 问一句's reply, for its done bubble.
+  /// Quick ask's reply, for its done bubble.
   final String? preview;
 
   PetTarget get target => PetTarget(host, sessionId);
@@ -315,7 +315,7 @@ class PetTimings {
   /// A queued bubble older than this is dropped instead of shown.
   static const queueFor = Duration(seconds: 10);
 
-  /// A bubble with a request to answer, or 问一句's reply to read, stays this
+  /// A bubble with a request to answer, or Quick ask's reply to read, stays this
   /// long (an answered request goes at once: it is stale).
   static const readFor = Duration(seconds: 30);
 
@@ -519,7 +519,7 @@ PetMood reducePetMood(
       bubbleAt = now;
       merged = {e.target};
     } else if (current.kind == kind && now.difference(bubbleAt ?? now) < PetTimings.mergeWindow) {
-      // Several in a row: one bubble, 「3 个对话做完了」.
+      // Several in a row: one bubble, "3 chats finished".
       if (!merged.contains(e.target)) {
         merged = {...merged, e.target};
         bubble = current.copyWith(count: merged.length, until: now.add(kind.shownFor));

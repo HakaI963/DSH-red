@@ -1,6 +1,6 @@
 // The star prompt (docs/design/star-prompt.md): after half an hour with the
 // app in front, the whale girl asks for a star on GitHub, in a dialog, when
-// the person is idle in the chat; 「下次再说」 asks once more five hours of use
+// the person is idle in the chat; "Maybe later" asks once more five hours of use
 // later, and that is all.
 //
 // Off unless the build says `--dart-define=DSH_STAR_PROMPT=true`: off, nothing
@@ -31,7 +31,7 @@ const starPromptEnabled = bool.fromEnvironment('DSH_STAR_PROMPT');
 /// The switch as the app reads it (tests turn it on).
 final starPromptGateProvider = Provider<bool>((ref) => starPromptEnabled);
 
-/// Where 「去 GitHub 点 Star」 goes: the public repository's page (its releases
+/// Where "Star it on GitHub" goes: the public repository's page (its releases
 /// are the app's updates).
 final starProjectPage = Uri.https('github.com', '/$updateRepo');
 
@@ -40,7 +40,7 @@ abstract final class StarPromptRules {
   /// Time in front before the first ask.
   static const firstAsk = Duration(minutes: 30);
 
-  /// After 「下次再说」 (or back): this much more time in front before the second.
+  /// After "Maybe later" (or back): this much more time in front before the second.
   static const again = Duration(hours: 5);
 
   /// Asked this often at most, ever.
@@ -70,7 +70,7 @@ class StarPromptRecord {
   /// [used] when it last came up.
   final Duration? askedAt;
 
-  /// 「去 GitHub 点 Star」, 「已经点过啦」 or the settings row: never again.
+  /// "Star it on GitHub", "Already starred" or the settings row: never again.
   final bool finished;
 
   /// The time in front at which it asks next; null: never again.
@@ -178,7 +178,7 @@ final starPromptClockProvider = Provider<Duration Function()>((ref) {
 /// The record, loaded once; every change is written back. With the switch on
 /// it counts time in front: from resumed to anything else, written down every
 /// [StarPromptRules.tick] and on leaving. A read that fails starts a fresh
-/// record kept for this run only, so nothing stored earlier (「已经点过啦」
+/// record kept for this run only, so nothing stored earlier ("Already starred"
 /// above all) is overwritten; a write that fails keeps the change for this run.
 class StarPromptController extends Notifier<StarPromptRecord> {
   late Future<void> _loaded;
@@ -269,13 +269,13 @@ class StarPromptController extends Notifier<StarPromptRecord> {
   bool get due => _ready && state.due;
 
   /// The dialog came up (written at once: a kill while it is up counts as
-  /// 「下次再说」).
+  /// "Maybe later").
   Future<void> shown() {
     _note();
     return _apply((r) => r.copyWith(shows: r.shows + 1, askedAt: r.used));
   }
 
-  /// 「去 GitHub 点 Star」, 「已经点过啦」 or the settings row: never again.
+  /// "Star it on GitHub", "Already starred" or the settings row: never again.
   Future<void> finish() => _apply((r) => r.copyWith(finished: true));
 }
 

@@ -35,10 +35,10 @@ class HostConnection {
   /// A fixed label (tests); null builds it from [kind] and [name].
   final String? _label;
 
-  /// The host's own name (SSH / relay); null for 本机 or when not known.
+  /// The host's own name (SSH / relay); null for this phone or when not known.
   final String? name;
 
-  /// Shown in the chat header: "本机", "电脑 · SSH", "家里的 Mac · 远程".
+  /// Shown in the chat header: "This phone", "Computer · SSH", "Mac at home · Remote".
   /// Built on read, so it follows a language switch on a live connection.
   String get label => _label ?? hostLabel(kind, name);
   final bool isLocal;
@@ -178,7 +178,7 @@ final sshLinkFactoryProvider = Provider<SshLinkFactory>(
   },
 );
 
-/// The live link to a remote host; null for 本机 or an unknown host. Kept while
+/// The live link to a remote host; null for this phone or an unknown host. Kept while
 /// something watches it (the active connection, a status row); closed after.
 final hostLinkProvider = Provider.autoDispose.family<HostLink?, HostRef>((ref, host) {
   switch (host.kind) {
@@ -226,7 +226,7 @@ final hostLinkProvider = Provider.autoDispose.family<HostLink?, HostRef>((ref, h
   }
 });
 
-/// Status of a host's link for the UI (idle for 本机).
+/// Status of a host's link for the UI (idle for this phone).
 final hostLinkStatusProvider = StreamProvider.autoDispose.family<HostLinkStatus, HostRef>((ref, host) async* {
   final link = ref.watch(hostLinkProvider(host));
   if (link == null) {
@@ -292,7 +292,7 @@ class RemoteConnectionController extends AsyncNotifier<HostConnection?> {
     }
     final clients = link.clients.listen((client) => state = AsyncData(wrap(client)));
     // After a failed first open, the link may still come back on its own
-    // (network kick, "重试"): pick the client up then.
+    // (network kick, "Retry"): pick the client up then.
     final statuses = link.statuses.listen((s) {
       if (s.isConnected && state.hasError && !state.isLoading) ref.invalidateSelf();
     });

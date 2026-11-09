@@ -25,7 +25,7 @@ class SshHostConfig {
   /// Stable id (`ssh-<hex>`); also the secret-store namespace.
   final String id;
 
-  /// What the person calls it ("电脑", "家里的 Mac").
+  /// What the person calls it ("Computer", "the Mac at home").
   final String name;
   final String host;
   final int port;

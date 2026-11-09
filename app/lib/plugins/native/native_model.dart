@@ -361,7 +361,7 @@ class NativePlugin {
   /// The bridge's and the app's findings.
   final List<NativeIssue> issues;
 
-  /// Surfaces it shows something on (the switches in 设置).
+  /// Surfaces it shows something on (the switches in Settings).
   final Set<NativeSurface> declared;
 
   /// v1.2 capabilities it declares (`audio`, `voice`, `micro`, `overlay`),
@@ -452,7 +452,7 @@ class NativeContributions {
 /// - A plugin whose state isn't `ok` shows nothing (its issues stay).
 /// - Entries that aren't `ready` are left out.
 /// - Second line of limits: 2 buttons a plugin, labels 10 / 12, 4 panels,
-///   panel titles 16, only the 对话详情 and 全部功能 placements.
+///   panel titles 16, only the Chat details and All features placements.
 /// - v1.2: a button that `requires` a capability shows only when [features]
 ///   (what this app supports now) has it.
 NativeContributions nativeContributionsFrom(DshGoContributions raw, {Set<String> features = const {}}) {

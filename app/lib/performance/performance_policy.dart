@@ -40,17 +40,17 @@ class PerformanceSnapshot {
   Map<String, Object?> toMap() => {'available': available, 'loaded': loaded, 'device': device, 'thermal': thermal};
 }
 
-/// 屏幕刷新率(设置 → 性能)。有些系统把第三方 App 默认压在 60Hz;App 一旦声明
-/// 自己管刷新率,系统就会把开关显示成「应用内设置」——所以这里必须真的给用户一个
-/// 选择,包括「跟随系统」把决定权还回去。
+/// Screen refresh rate (Settings → Performance). Some systems pin third-party apps to 60 Hz by
+/// default; once an app declares it manages its own refresh rate, the system shows the switch as an
+/// "In-app setting" — so the user must really get a choice, including "System" to hand the decision back.
 enum RefreshRateMode {
-  /// 动画、滚动、流式输出时用屏幕最高刷新率;停下来交回系统。
+  /// Use the screen's fastest refresh rate for animation, scrolling and streaming output; hand back when still.
   auto,
 
-  /// 一直用最高刷新率。
+  /// Always use the highest refresh rate.
   max,
 
-  /// 不声明偏好,完全由系统的刷新率设置决定。
+  /// Declare no preference; the system's own refresh-rate setting decides entirely.
   system,
 }
 
@@ -69,7 +69,7 @@ class PerformancePrefs {
   final bool? blur;
   final bool? animations;
 
-  /// 灵动动效(见 `AppMotion.fluid`)。
+  /// Fluid motion (see `AppMotion.fluid`).
   final bool? fluid;
   final RefreshRateMode refreshRate;
   final bool loaded;
@@ -127,7 +127,7 @@ class PerformanceDefaults {
   final bool blur;
   final bool reduceMotion;
 
-  /// 灵动档:动效没关,且用户选了或当前档位默认开(低端机、发热时默认关)。
+  /// Fluid tier: motion isn't off, and the user chose it or the current tier defaults it on (off by default on low-end phones or when hot).
   final bool fluidMotion;
   final bool petEnabled;
   final bool autoStartLocal;

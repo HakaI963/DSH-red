@@ -1,4 +1,4 @@
-// 扫码配对电脑 (Remote device pairing v1), the phone's side: scan the code the
+// Pairing a computer by scanning (Remote device pairing v1), the phone's side: scan the code the
 // computer's Remote plugin shows, confirm it is that computer, show the 8-digit
 // code the person types into the computer, wait, then connect.
 //

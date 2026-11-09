@@ -10,9 +10,9 @@ import android.service.quicksettings.TileService
 import io.github.ccch1mneyyy.dsh_app.shortcuts.EntryActivity
 
 /**
- * Quick Settings tile 「新对话」: opens the app on a new conversation (through
+ * Quick Settings tile "New chat": opens the app on a new conversation (through
  * shortcuts/EntryActivity, like the launcher shortcut). An action, not a switch: always
- * inactive, with the app's name as its second line (otherwise the system writes 「关闭」 there).
+ * inactive, with the app's name as its second line (otherwise the system writes "Off" there).
  * On the lock screen it asks to unlock first.
  */
 class NewChatTileService : TileService() {

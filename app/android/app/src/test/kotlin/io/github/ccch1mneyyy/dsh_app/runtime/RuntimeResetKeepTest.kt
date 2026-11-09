@@ -7,7 +7,7 @@ import org.junit.Assert.*
 import org.junit.Assume.assumeFalse
 import org.junit.Test
 
-/** 「重置运行环境」 keeping chosen parts of /root: [retireRuntime], [settleReset], [restoreKept]. */
+/** "Reset runtime" keeping chosen parts of /root: [retireRuntime], [settleReset], [restoreKept]. */
 class RuntimeResetKeepTest {
     private val files: File = Files.createTempDirectory("reset-keep").toFile()
     private val base = File(files, "runtime")
@@ -228,7 +228,7 @@ class RuntimeResetKeepTest {
         assertKeepFailed { activateRootfs(base, "r1", keep, sync = {}) }
         write(files, "runtime-keep.dropped/root/old") // left by an earlier drop cut short
 
-        // 「不保留，继续安装」: what can move goes back, the rest is given up, the install finishes.
+        // "Continue without restoring": what can move goes back, the rest is given up, the install finishes.
         install(dropKept = true)
         assertSettled()
         assertFalse(File(files, "runtime-keep.dropped").exists())

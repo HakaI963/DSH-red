@@ -1,5 +1,5 @@
 // What the on-device runtime costs, shown where the
-// person decides whether to install it (first run, 安装本机运行环境).
+// person decides whether to install it (first run, "Install on this phone").
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -44,7 +44,7 @@ class LocalFootprint {
   /// unpacked size + 15%).
   int? get requiredStorageMb => unpackedMb == null ? null : (unpackedMb! * 115 + 99) ~/ 100;
 
-  /// [requiredStorageMb] rounded up to 50, for the 「存储空间不足」 line.
+  /// [requiredStorageMb] rounded up to 50, for the "Not enough storage" line.
   int? get requiredRoundedMb => requiredStorageMb == null ? null : (requiredStorageMb! + 49) ~/ 50 * 50;
 
   bool get lowMemory => totalMemoryMb != null && totalMemoryMb! < lowMemoryMb;

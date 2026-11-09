@@ -25,7 +25,7 @@ class ShizukuStarter(
         const val PACKAGE = "moe.shizuku.privileged.api"
         private const val PERMISSION_REQUEST_CODE = 4601
 
-        /** 自动恢复无障碍's request, told apart from 不打扰模式's. */
+        /** Restore-accessibility-automatically's request, told apart from Non-disruptive mode's. */
         private const val GRANT_REQUEST_CODE = 4602
     }
 

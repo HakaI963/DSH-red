@@ -20,7 +20,7 @@ import java.util.concurrent.atomic.AtomicReference
 
 /**
  * [UserGate] without the accessibility overlay: a heads-up notification with
- * 允许一次 / 拒绝 / 停止 (30 s → deny), and for `handoff` 继续 / 停止.
+ * Allow once / Decline / Stop (30 s → deny), and for `handoff` Continue / Stop.
  *
  * The buttons fire broadcasts to a receiver registered for this one question, under an action
  * name that carries a fresh random nonce. Shared presentations also bind that nonce to the
@@ -30,7 +30,7 @@ import java.util.concurrent.atomic.AtomicReference
  */
 class NotificationGate(
     private val app: Context,
-    /** The one-line status ("DSH 正在操作 · …"); the app shows it on the engine's notification. */
+    /** The one-line status ("DSH is acting · …"); the app shows it on the engine's notification. */
     private val onStatus: (String?, (() -> Unit) -> Boolean) -> Unit,
 ) : UserGate, PhonePromptPresenter {
     private val nm = app.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
@@ -55,7 +55,7 @@ class NotificationGate(
         if (!available()) return Decision.UNAVAILABLE
         // Without the unified presenter, a visual request can only authorize this step;
         // its three slots must not silently remove the one-shot alternative.
-        // Three buttons fit a heads-up: 本任务免确认 makes "allow" waive the rest of the task.
+        // Three buttons fit a heads-up: "skip confirmations for this task" makes "allow" waive the rest of the task.
         val allow = when {
             request.visualScope != null -> AppStrings.get(app, R.string.overlay_allow_once)
             request.offerTaskWaiver -> AppStrings.get(app, R.string.overlay_allow_task_no_ask)

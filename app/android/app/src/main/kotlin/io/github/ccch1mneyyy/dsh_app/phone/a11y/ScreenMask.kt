@@ -1,7 +1,7 @@
 package io.github.ccch1mneyyy.dsh_app.phone.a11y
 
 // Bank-card and resident-ID numbers in screen text are masked before
-// anything leaves the phone, e.g. `«银行卡 ****1234»`. Tasks that need the full
+// anything leaves the phone, e.g. `«bank card ****1234»`. Tasks that need the full
 // number are exactly the ones we refuse. Plain Kotlin: JVM-tested.
 
 object ScreenMask {

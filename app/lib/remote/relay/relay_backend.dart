@@ -109,7 +109,7 @@ enum RelayConnectionState { connecting, handshaking, connected, reconnecting, fa
 
 typedef RelayStateCallback = void Function(RelayConnectionState state, HostLinkError? error);
 
-/// What dsh-app needs from `packages/dsh_remote` (李国宝's ds-harness-remote
+/// What dsh-app needs from `packages/dsh_remote` (Li Guobao's ds-harness-remote
 /// protocol), implemented by `DshRemoteRelayBackend`. [UnavailableRelayBackend]
 /// turns the relay off; tests use a fake.
 abstract class RelayBackend {
@@ -431,7 +431,7 @@ class RelayHostLink implements HostLink, NetworkInspectableHostLink {
     }
   }
 
-  /// "重新连接". A client that stopped on a terminal failure (replaced by
+  /// "Reconnect". A client that stopped on a terminal failure (replaced by
   /// another device, trust fixed, …) is restarted in place; without one, a
   /// fresh connect publishes a new client through [clients].
   @override

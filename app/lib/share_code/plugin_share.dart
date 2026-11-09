@@ -1,4 +1,4 @@
-// 「分享插件」: a [SharedPlugin] from what the plugin pages already hold (a market
+// "Share plugin": a [SharedPlugin] from what the plugin pages already hold (a market
 // entry or an installed bundle), plus the npm facts that make it checkable on
 // the other side.
 

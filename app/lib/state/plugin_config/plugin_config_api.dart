@@ -167,7 +167,7 @@ class PluginConfigEntry {
   bool get readOnly => configurable && writable == false;
 
   /// [readOnly] because a host or command-line overlay sets its whole
-  /// config (「由配置文件固定」).
+  /// config ("Set by configuration file").
   bool get fixedByFile => readOnly && (reason == null || reason == 'overridden');
 }
 

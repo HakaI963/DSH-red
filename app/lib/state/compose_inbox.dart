@@ -3,7 +3,7 @@
 // the Quick Settings tile (routed by lib/ui/shell/system_entry_host.dart).
 //
 // The chat screen takes the head of the queue once its saved drafts are in
-// ([readyComposeProvider]), switches to 新对话 and fills the composer with
+// ([readyComposeProvider]), switches to New chat and fills the composer with
 // [mergeIntoDraft]. Nothing is sent: the person reads it and adds a question.
 
 import 'dart:convert';
@@ -36,7 +36,7 @@ class ComposeRequest {
     this.note,
   });
 
-  /// 新对话 from the launcher or the tile: an empty composer, focused — or
+  /// New chat from the launcher or the tile: an empty composer, focused — or
   /// listening, with [voice].
   const ComposeRequest.newChat({this.voice = false})
     : text = '',
@@ -51,7 +51,7 @@ class ComposeRequest {
   final List<String> problems;
 
   /// One line shown above the composer once it is filled, when nothing went
-  /// wrong (「问 AI」 on a host without the guide).
+  /// wrong ("Ask AI" on a host without the guide).
   final String? note;
 
   /// Start dictation instead of showing the keyboard.

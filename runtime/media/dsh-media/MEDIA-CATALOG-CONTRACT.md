@@ -1,16 +1,16 @@
-# MEDIA-CATALOG-CONTRACT · v1 / 插件 0.3.0
+# MEDIA-CATALOG-CONTRACT · v1 / plugin 0.3.0
 
-本文件是 App 读取插件目录与配置的契约，不修改冻结的 tool/result.meta["dsh-go/media"] v1。状态：插件 0.3.0 的 Node 测试已通过；0.2.0 的真实 rc.4 headless 结果见 VERIFICATION.md，0.3.0 未重跑 headless。真实 settings RPC、App 与真机仍 UNRUN。§2、§5 的源码位置取自 DSH 0.2.1-rc.2（git 687f282e8625c6b8d11ff58211a90524be2e4317）和 2026-10-28 的 App 源码，行号以后可能偏移。
+This file is the contract for how the App reads the plugin catalogue and configuration. It does not modify the frozen tool/result.meta["dsh-go/media"] v1. Status: the Node tests for plugin 0.3.0 pass; the real rc.4 headless results for 0.2.0 are in VERIFICATION.md, and 0.3.0 has not re-run headless. Real settings RPC, App and on-device checks remain UNRUN. Source locations in §2 and §5 were taken from DSH 0.2.1-rc.2 (git 687f282e8625c6b8d11ff58211a90524be2e4317) and the 2026-10-28 App sources; line numbers may drift.
 
-## 1. 唯一目录位置
+## 1. The single catalogue location
 
-目录位于插件 namespace schema 中 services 字段本身的：
+The catalogue lives in the `services` field itself within the plugin namespace schema:
 
     schema.fields["services"].meta.extra["dsh-go/media/catalog"]
 
-这是 App 解析后的 SchemaNode 访问位置。原始 Schemastery JSON 采用 {uid,refs} 图结构，不能硬写 JSON 根 dict 路径或固定数字 uid。先解析 graph，再找 services。由于本候选 services 为 transform(array)，目录在外层 services.meta.extra，不能只读取 services.effective.meta.extra；effective array 不一定携带外层 metadata。
+This is the access path on the App's parsed SchemaNode. The raw Schemastery JSON is a {uid,refs} graph; do not hard-code a JSON-root dict path or a fixed numeric uid. Parse the graph first, then find services. Because the candidate's services is a transform(array), the catalogue is on the outer services.meta.extra, so reading only services.effective.meta.extra is not enough; the effective array does not necessarily carry the outer metadata.
 
-目录形状：
+Catalogue shape:
 
     {
       v: 1,
@@ -25,131 +25,131 @@
       presets: [...]
     }
 
-0.2.0 增加可选 video 字段 `durations`、`resolutions`、`videoSizes`、`defaultSize`、`requiresRef`，以及编辑专用 `editOnly`。`profiles` 给出已核原生端点、queryPath 和取消能力；它们是 Host 适配数据，不允许 App 或模型传任意 API 字段。未列的时长/分辨率须省略，不能猜默认值。目录缺少价格即未知。
+0.2.0 added the optional video fields `durations`, `resolutions`, `videoSizes`, `defaultSize`, `requiresRef`, plus edit-only `editOnly`. `profiles` gives verified native endpoints, queryPath and cancellation ability; they are Host adapter data, and neither the App nor the model may pass arbitrary API fields. Unlisted durations/resolutions must be omitted; no guessed defaults. A catalogue without prices means prices are unknown.
 
-models 含 id、label、kind、profile、ratios、sizes、aspectSizes、qualities、maxN、maxRefs、edit、extend、upscale、sources。不存在 price 时表示未提供可靠价目。布尔能力与 maxN 是插件开放子集；不得推断供应商无其他能力。
+models contain id, label, kind, profile, ratios, sizes, aspectSizes, qualities, maxN, maxRefs, edit, extend, upscale, sources. When price is absent, no reliable price list was provided. The boolean capabilities and maxN are the subset the plugin opens; do not infer that the provider has no other capabilities.
 
-可选 responseFormats 字段：存在时是该模型服务配置必须显式选择的返回格式白名单；缺失时仍遵从 profile 的既有规则，GPT Image 必须省略 responseFormat。它不是工具参数，也不授权模型改变服务返回格式。ratios/sizes/qualities 的空数组与空 aspectSizes 表示插件没有开放已核值；App 应允许省略该参数，不制造默认值，不显示空选择器。所选模型 maxN=1 时不能根据目录顶层 maxN=4 显示 2–4 张为可用。
+The optional responseFormats field: when present it is the whitelist of return formats the model's service config must pick explicitly; when absent, follow the profile's existing rules, and GPT Image must omit responseFormat. It is not a tool parameter and does not authorize the model to change the service's return format. An empty ratios/sizes/qualities array and an empty aspectSizes mean the plugin opened no verified values; the App should allow omitting the parameter, invent no default and show no empty selector. When the selected model has maxN=1, do not show 2–4 张 as available based on the catalogue's top-level maxN=4.
 
-### presets（0.3.0 新增，App 可选）
+### presets (new in 0.3.0, optional for the App)
 
-根节点 `presets` 是可选的 ≤16 项数组，提供“新建服务”模板。每项字段：
+The root `presets` node is an optional array of ≤16 entries providing "new service" templates. Each entry's fields:
 
     {id, label, labelEn?, provider, profile, baseUrl, responseFormat, models, kind, keyGroup}
 
-- `id` 与 `keyGroup`：`^[a-z][a-z0-9-]{0,31}$`，`id` 唯一。同一 `keyGroup` 的图片和视频预设期望共用同一个凭据。
-- `label` 中文非空 ≤80 字节；`labelEn` 可选英文非空 ≤80 字节；`provider` 仅用于展示。
-- `profile` 必须属于目录 `profiles`（或内建 `openai-compatible` / `openai-gpt-image`）；`baseUrl` 与服务一样只接受 HTTPS，不允许认证信息、query 或 fragment，原生 profile 还必须落在目录声明的主机或工作空间后缀。
-- `responseFormat` 为 `"" | "url" | "b64_json"`；非 `openai-compatible` 必须为空。
-- `models` 为 1..16 个目录模型 ID，必须与预设的 `profile` 和 `kind` 一致。App 仍应与已安装目录及当前服务 value 求交，不能只信预设。
-- `kind` 为 `image` 或 `video`。
+- `id` and `keyGroup`: `^[a-z][a-z0-9-]{0,31}$`, `id` unique. Image and video presets with the same `keyGroup` are expected to share one credential.
+- `label` is non-empty Chinese, ≤80 bytes; `labelEn` is an optional non-empty English name ≤80 bytes; `provider` is for display only.
+- `profile` must belong to the catalogue `profiles` (or the built-in `openai-compatible` / `openai-gpt-image`); `baseUrl` accepts HTTPS only, like a service, with no credentials, query or fragment, and native profiles must also land on a host or workspace suffix declared by the catalogue.
+- `responseFormat` is `"" | "url" | "b64_json"`; anything other than `openai-compatible` must be empty.
+- `models` is 1..16 catalogue model IDs, consistent with the preset's `profile` and `kind`. The App should still intersect with the installed catalogue and the current service value rather than trusting the preset alone.
+- `kind` is `image` or `video`.
 
-App 可以用预设填入服务 ID、协议、API 根地址、返回格式和模型列表；保存前仍按本契约校验。0.2.x 目录没有该字段：读到缺失或非法的 `presets` 时应忽略预设并退回手动流程，而不是让设置页不可用。未知字段忽略。
+The App may use a preset to fill in the service ID, protocol, API root, return format and model list; validation against this contract still runs before saving. 0.2.x catalogues lack this field: on a missing or invalid `presets`, ignore the presets and fall back to the manual flow rather than disabling the settings page. Unknown fields are ignored.
 
-### defaults（0.3.0 扩展）
+### defaults (extended in 0.3.0)
 
-`value.defaults` 在旧版 `serviceId` / `modelId` 之外新增：
+Besides the legacy `serviceId` / `modelId`, `value.defaults` adds:
 
     {imageServiceId, imageModelId, videoServiceId, videoModelId}
 
-四个字段都是可选字符串，空串表示未设置。`generate_image` / `edit_image` 先使用图片默认服务与模型，`generate_video` 先使用视频默认服务与模型；类型默认解析不到时回落到旧版 `serviceId` / `modelId`，再回落首个可用候选。旧版只写 `serviceId` / `modelId` 的配置行为不变。App 应把默认值绑定到发起时的 Host / namespace / service / model 身份；字段缺失视为空，不推断旧服务。
+All four are optional strings; an empty string means unset. `generate_image` / `edit_image` first use the image default service and model, `generate_video` first uses the video default service and model; when the per-kind default resolves to nothing, fall back to the legacy `serviceId` / `modelId`, then to the first available candidate. Configs written by older versions with only `serviceId` / `modelId` behave exactly as before. The App should bind default values to the Host / namespace / service / model identities captured at request time; treat missing fields as empty and do not infer an old service.
 
-默认 bundle 的 entry ID 是 dsh-media，但 Host 可以另命名实例。客户端应在选定 Host 的 settings namespaces 中按 metadata 契约发现，保留 namespace 身份；多个实例不得按同名 label 合并。
+The default bundle's entry ID is dsh-media, but the Host may name instances differently. Clients should discover them through the metadata contract in the selected Host's settings namespaces and keep the namespace identity; multiple instances must not be merged by identical label.
 
-## 2. 源码链已经确认的内容
+## 2. What the source chain has confirmed
 
-| 环节 | 精确位置（DSH rc.2；标 App 的为 App 源码） | 所支持结论 |
+| Link | Exact location (DSH rc.2; App-marked rows are App sources) | Conclusion supported |
 |---|---|---|
-| metadata 写入 | vendor/schemastery/src/index.ts:385–388 | extra(key,value) 合并 schema.meta；本候选使用 extra('extra', {...}) |
-| JSON 序列化 | 同文件:311–321 | toJSON 用 schema 属性和 refs 序列化，plain JSON extra 被保留 |
-| volatile projection | packages/settings/settings/src/schema.ts:plainSchema / volatileForm | services 自身 volatile，因此 clone 整个 services schema，只移除 volatile 标记及 secret 默认值；extra 不被删除 |
-| 根字段筛选 | 同文件:volatileForm | 非 volatile 根 object 被重建，根 metadata 可能丢失；因此目录没有放到根上 |
-| 实际 describe | packages/settings/settings/src/index.ts:302–331 | descriptor.schema=form.toJSON；value/base/user 分别 projectForm，metadata 不混入这些值 |
-| RPC projection | packages/api/settings-controller/src/index.ts:namespaceView / describe | descriptor.schema 直接作为 JSON 输出，未另过滤 extra |
-| App graph parser | packages/dsh_client/lib/src/engine_settings_api.dart:132–187 | 解析 uid/refs 并构造 SchemaNode |
-| App metadata parser | 同文件:58–80 | 未知 meta 键被丢弃，但明确保留 map['extra'] |
-| App namespace | 同文件:387–402 | schema 被解析为 SchemaNode；不能假定还保留原始 JSON |
-| 生命周期 | vendor/loader/src/index.ts:29–34 | volatile-update 在引用提交后向所属实例通知 |
+| metadata write | vendor/schemastery/src/index.ts:385–388 | extra(key,value) merges into schema.meta; this candidate uses extra('extra', {...}) |
+| JSON serialization | same file:311–321 | toJSON serializes with schema properties and refs; plain JSON extra is preserved |
+| volatile projection | packages/settings/settings/src/schema.ts:plainSchema / volatileForm | services itself is volatile, so the whole services schema is cloned, removing only the volatile flag and secret defaults; extra is not deleted |
+| root field filtering | same file:volatileForm | non-volatile root objects are rebuilt and root metadata may be lost; that is why the catalogue is not on the root |
+| actual describe | packages/settings/settings/src/index.ts:302–331 | descriptor.schema=form.toJSON; value/base/user are each projectForm'd, metadata is not mixed into these values |
+| RPC projection | packages/api/settings-controller/src/index.ts:namespaceView / describe | descriptor.schema is emitted directly as JSON with no extra filtering |
+| App graph parser | packages/dsh_client/lib/src/engine_settings_api.dart:132–187 | parses uid/refs and builds SchemaNode |
+| App metadata parser | same file:58–80 | unknown meta keys are dropped, but map['extra'] is explicitly preserved |
+| App namespace | same file:387–402 | schema is parsed into SchemaNode; do not assume the raw JSON survives |
+| lifecycle | vendor/loader/src/index.ts:29–34 | volatile-update notifies the owning instance after the reference commits |
 
-因此“可挂任意 JS 属性”不是采用该路径的依据；已逐层读到序列化、表单筛选、RPC 与 App parser。尚未运行真实 SettingsForms/describe 或 Flutter 解析测试，结论限于这条固定版本源码链。
+So "arbitrary JS properties can be attached" is not the reason this path was chosen; serialization, form filtering, RPC and the App parser were each read to the end. No real SettingsForms/describe run or Flutter parsing test has been executed; conclusions are limited to this fixed-version source chain.
 
-## 3. App 端的读取要求
+## 3. Reading requirements on the App side
 
-App 侧实现在 `app/lib/state/media_catalog.dart`。现有 SchemaMeta.extra 已保留目录，不需要为了本路径修改未知 meta 的处理。App（M5）的读取须满足：
+The App-side implementation lives in `app/lib/state/media_catalog.dart`. The existing SchemaMeta.extra already preserves the catalogue; unknown-meta handling needs no change for this path. The App's (M5) reading must:
 
-1. 从 services.meta.extra 取本契约，校验 v 与基本类型，保留 namespace、Host 和连接代际。
-2. 读取真实服务配置 value.services，按 enabled、profile 与该服务允许的 models 列表求交；必要时走公开 credentials.describe 判断 keyRef 是否配置。不要把静态目录存在视为服务可用。
-3. 使用 header.js 相同语法渲染参数头。显式参数不支持时拒绝；不能把 3:4 改成 2:3，也不能把同名模型默认为第一个服务。
-4. label 相同的模型使用〈serviceId/modelId〉消歧；label 与标记同时匹配。目录提供实际 model ID，不可用显示名猜 ID。
-5. 请求、后续展示与默认值都绑定发起时的 Host / namespace / service / model 身份，不能在等待后向新 Host 重新取默认目标。
-6. 0.3.0 按目录与当前已配置服务开放图片、编辑和视频。video=true 不能代替服务凭据和模型可用性校验；没有可用视频服务时不显示可执行视频选择。
-7. 可选读取 `presets`、`defaults.image*` / `defaults.video*`：字段缺失、类型不符或目录 `v` 未知时忽略并退回手动配置，不阻断旧版读取。App 保存服务前仍按本契约校验 `presets` 提供的值。
+1. Take this contract from services.meta.extra, validate v and the basic types, and keep the namespace, Host and connection generation.
+2. Read the real service config value.services and intersect by enabled, profile and the service's allowed models list; call the public credentials.describe when needed to decide whether a keyRef is configured. Never treat the existence of the static catalogue as service availability.
+3. Render parameter headers with the same grammar as header.js. Reject unsupported explicit parameters; do not rewrite 3:4 into 2:3, and do not default a same-named model to the first service.
+4. Use 〈serviceId/modelId〉 to disambiguate models with identical labels; match label and marker together. The catalogue provides the actual model ID; do not guess IDs from display names.
+5. Bind requests, later display and defaults to the Host / namespace / service / model identities captured at submission; never re-derive the default target from a new Host after a wait.
+6. 0.3.0 opens image, edit and video according to the catalogue and the currently configured services. video=true cannot replace service-credential and model-availability validation; hide executable video choices when no usable video service exists.
+7. Optionally read `presets` and `defaults.image*` / `defaults.video*`: on missing fields, type mismatch or unknown catalogue `v`, ignore them and fall back to manual configuration; never block legacy reads. Values supplied by `presets` are still validated against this contract before the App saves a service.
 
-catalog.v 未知或字段损坏时，停止生成模式选择，保留普通对话工具路径。目录缺失时可显示当前 Host 未提供目录，不从 App 内置旧模型表猜测。未来若需新的位置或结构，使用新版本及明确迁移；本稿不把旧候选 value.catalog 当成权威 fallback。
+When catalog.v is unknown or fields are corrupt, stop generation-mode selection but keep the ordinary conversation tool path. When the catalogue is missing, the App may say the current Host provides no catalogue; do not guess from an App-bundled legacy model table. If a new location or structure is ever needed, use a new version with an explicit migration; this draft does not treat the old candidate value.catalog as an authoritative fallback.
 
-旧 App 无需读此目录才能发普通对话；工具结果用现有 Markdown 图片回退显示。专用生成模式与精确工具选择仍需与真实 Host 端到端验证。
+Old App builds do not need this catalogue to send ordinary conversations; tool results fall back to existing Markdown image display. Dedicated generation modes and exact tool selection still need end-to-end validation against a real Host.
 
-## 4. 为什么目录不做 const 配置值
+## 4. Why the catalogue is not a const config value
 
-const+volatile+disabled 的 value.catalog 存在真实升级反例：客户端显式把 C1 写进 raw config，升级包 schema 改 const(C2) 且 C1!=C2；旧显式值不走 default 分支，常量校验会失败。disabled 仅控制 UI，也不提供 Host 写保护。
+A value.catalog under const+volatile+disabled has a real upgrade counter-example: a client explicitly wrote C1 into raw config, the upgrade package changes the schema to const(C2) with C1!=C2; the old explicit value does not go through the default branch and the const validation fails. disabled only controls the UI and provides no Host write protection.
 
-本候选没有 catalog 配置字段。目录仅在 schema metadata，services/defaults/limits/budget/credentials 的普通值均不包含目录。settings describe 的 value/base/user、替换表单与用户覆盖不应带目录；升级只换安装 JSON 与 schema metadata，不迁移持久目录值。应在真实设置集成测试中加入“旧版本写过普通服务配置→升级目录→仍能启动”的回归，不能只断言按钮 disabled。
+This candidate has no catalog config field. The catalogue exists only in schema metadata; the ordinary values of services/defaults/limits/budget/credentials never include it. settings describe's value/base/user, the replacement form and user overrides should not carry the catalogue; an upgrade replaces only the installed JSON and schema metadata and never migrates persisted catalogue values. Real settings integration tests should add the regression "an old version wrote ordinary service config → upgrade the catalogue → it still starts" instead of asserting only that a button is disabled.
 
-## 5. 固定凭据槽与已否决的设计
+## 5. Fixed credential slots and rejected designs
 
-### 数组里的 secret 不可用
+### Secrets inside the array do not work
 
-App 的 schema_fields.dart:kindOf 把 array<object> 识别为 objectList。但 field_sheets.dart:_ObjectItemPage._draftField:1539–1596 只编辑 toggle/choice/text/number，其他类型包括 secret 都是 disabled 行。故 services 数组只放普通配置；不能因为顶层存在 SecretFieldTile 就声称数组里的密钥按钮可用。
+The App's schema_fields.dart:kindOf reads array<object> as objectList. But field_sheets.dart:_ObjectItemPage._draftField:1539–1596 only edits toggle/choice/text/number; every other type, secret included, renders as a disabled row. So the services array carries ordinary config only; do not claim the in-array key button works because a top-level SecretFieldTile exists.
 
-### 可变凭据编辑器被否决
+### The mutable credential editor was rejected
 
-曾候选普通 keyRef 输入加 transform 生成 hidden credentialRef，再让 secret 读取 sibling。正常路径中 _AcknowledgedSheet._save 会等待服务确认后关闭；SettingsEditSession._checkSecretTarget 也会比较旧/当前引用，拒绝目标已变的旧 secret 弹层。
+An earlier candidate paired a plain keyRef input with a transform that generated a hidden credentialRef, letting the secret read its sibling. On the normal path _AcknowledgedSheet._save waits for service confirmation before closing; SettingsEditSession._checkSecretTarget also compares old/current refs and rejects a stale secret sheet whose target moved.
 
-但如果 keyRef 写入挂起时用户 dismiss，乐观 keyRef 与服务端派生 credentialRef 可能暂时不同；仅靠说明“等保存完成”不能消掉向旧目标写入的窗口。本候选没有该动态编辑器。
+But if the keyRef write is pending while the user dismisses, the optimistic keyRef and the server-derived credentialRef can temporarily differ; a note saying "wait for the save to finish" does not close the window where a write lands on the old target. This candidate has no such dynamic editor.
 
-### 当前四槽
+### The current four slots
 
-credentials 是普通对象组；slot1–slot4 各有固定 const credentialRef，分别为 DSH_MEDIA_SLOT_1_API_KEY 等。secret 是叶节点，目标永远不随服务数组改变。服务 keyRef 是显式普通配置，引用槽或用户已知的现有引用。
+credentials is a plain object group; slot1–slot4 each have a fixed const credentialRef, DSH_MEDIA_SLOT_1_API_KEY and friends. The secret is a leaf node whose target never moves with the services array. A service keyRef is explicit ordinary config pointing at a slot or an existing reference the user knows.
 
-SecretFieldTile（schema_form.dart:404–457）构造 SettingsEditSession；controller（engine_settings_state.dart:418–442、776–815）先核来源与目标，再通过 client.setProviderKey / clearProviderKey 写 Host credentials。它不把真实 Key 保存到 config。
+SecretFieldTile (schema_form.dart:404–457) constructs the SettingsEditSession; the controller (engine_settings_state.dart:418–442, 776–815) first verifies source and target, then writes Host credentials through client.setProviderKey / clearProviderKey. It never stores the real key in config.
 
-只把 secret 直接写成 const('') 还有错误回显问题：Schemastery const resolver 抛出的错误含 got 值（657–659）。改成 transform(any) 的严格空串验证，非空只抛固定中文错误。再包 intersect 也不可用：App 的 schemaSections:555 会优先把 intersect 当 group。当前 transform 的 effective any 是叶；kindOf 先看到外层 secret role，因此保留密钥按钮路径，同时拒绝所有非空普通配置写入。
+Simply writing the secret as const('') also has an error-echo problem: errors thrown by the Schemastery const resolver include the got value (657–659). It is instead a transform(any) with strict empty-string validation; non-empty values throw only the fixed Chinese error. Wrapping in intersect does not work either: the App's schemaSections:555 prefers reading intersect as a group. In the current transform, effective any is the leaf; kindOf sees the outer secret role first, so the key-button path is preserved while every non-empty ordinary config write is rejected.
 
-这些是固定源支持的设计理由；实际按钮点击、凭据持久化、App 重连及设置重载仍待运行。Node 测试已通过，覆盖非空拒绝且错误不含假 Key、固定引用不可改以及 secret redaction。
+These are the design rationales the fixed sources support; actual button clicks, credential persistence, App reconnection and settings reload are still to be run. The Node tests pass and cover non-empty rejection with no fake key in the error, the fixed refs being immutable, and secret redaction.
 
-0.3.0 起 `keyRef` 可以是任意已配置的 env 风格凭据名（例如 `DSH_MEDIA_ARK_API_KEY`）；新版 App 可以在写入服务前按服务商创建该凭据。固定四槽继续保留，旧配置无需迁移。Host 仍只按显式 `keyRef` 解析，不枚举其他插件的凭据渠道。
+Since 0.3.0 `keyRef` may be any configured env-style credential name (e.g. `DSH_MEDIA_ARK_API_KEY`); new App builds can create that credential per provider before writing the service. The four fixed slots remain and old configs need no migration. The Host still resolves only the explicit `keyRef` and never enumerates other plugins' credential channels.
 
-## 6. Key 复用边界
+## 6. Key-reuse boundaries
 
-已知 CredentialRef 可由 credentials.resolve 按 Host 的实际 provider 解析，可能来自持久化凭据、环境或 dotenv 回退。M0 不把 unset 一概解释为“绝无 Key”。
+A known CredentialRef can be resolved by credentials.resolve against the Host's actual provider, possibly coming from persisted credentials, the environment or a dotenv fallback. M0 does not blanket-interpret an unset as "absolutely no key".
 
-这不等于自动枚举 llm-pi-ai 当前选择渠道的全部身份。后者还涉及实例、provider、endpoint、认证方式和 scoped credential record。M0 只允许用户明确填写已知 ref，不窥探其他插件的 scoped grant，也不静默切换到另一个“看起来已配置”的 Key。
+This does not mean auto-enumerating every identity of llm-pi-ai's currently selected channel. The latter also involves instance, provider, endpoint, auth method and scoped credential records. M0 only allows the user to explicitly enter a known ref; it never snoops another plugin's scoped grant and never silently switches to another "apparently configured" key.
 
-## 7. 目录来源与日期
+## 7. Catalogue sources and dates
 
-2026-10-28 打开并检索下列官方页面（不沿用设计文档中的 V 标签）：
+The following official pages were opened and searched on 2026-10-28 (design-doc V labels are not reused):
 
 - https://developers.openai.com/api/reference/resources/images/methods/generate
 - https://developers.openai.com/api/docs/guides/image-generation
 - https://developers.openai.com/api/docs/models/gpt-image-2.5-sunburst
 - https://developers.openai.com/api/docs/models/gpt-image-2.5-flare
-- https://ai.google.dev/gemini-api/docs/openai （读全文；页面标注 Last updated 2026-10-26 UTC，没有固定版本，不当作永久协议保证）
+- https://ai.google.dev/gemini-api/docs/openai (read in full; the page says Last updated 2026-10-26 UTC with no fixed version, so it is not treated as a permanent protocol guarantee)
 
-精确三个 OpenAI 模型 ID 在本次 Image API 页面中列明；三个标准尺寸与 low/medium/high 属于已核子集。GPT Image 返回 base64，不接受旧 response_format。页面包含更多尺寸、质量和能力，本 M0 数据没有全部开放。价格与账号权限未验证，目录不提供。
+Exactly three OpenAI model IDs are listed on that Image API page; the three standard sizes and low/medium/high belong to the verified subset. GPT Image returns base64 and does not accept the old response_format. The page lists more sizes, qualities and capabilities than this M0 data opens. Prices and account entitlements were not verified and the catalogue does not provide them.
 
-目录另含 gemini-2.5-flash-image 的最小兼容条目，profile=openai-compatible、responseFormats=[b64_json]、maxN=1，其他可选参数集合为空。依据是上面 Gemini 页面“Generate an image”的请求形状（model、prompt、n=1、response_format=b64_json，读 data[].b64_json），只推断与现有核心在文档形状上兼容，未发真实请求，也未证明账号可用；不新增视频、上传或 extra_body。
+The catalogue additionally contains a minimal compatibility entry for gemini-2.5-flash-image: profile=openai-compatible, responseFormats=[b64_json], maxN=1, with all other optional parameter sets empty. The basis is the "Generate an image" request shape on the Gemini page above (model, prompt, n=1, response_format=b64_json, reading data[].b64_json); only shape-compatibility with the existing core is inferred, no real request was sent and account usability is not proven. No video, upload or extra_body was added.
 
-## 8. 未运行验收
+## 8. Acceptance not yet run
 
-| 验收项 | 当前状态 |
+| Acceptance item | Current status |
 |---|---|
-| 实际 Config / Schemastery / redactSecrets Node 测试 | 0.3.0 `npm test` 314/314 已通过；0.2.0 rc.4 依赖细节见 VERIFICATION.md |
-| 真 Loader→SettingsForms→settings/describe graph→extra | 源码链已核，运行 UNRUN |
-| App SchemaNode 真实解码后 extra 定位 | 源码已核，Flutter UNRUN |
-| 四槽密钥写入、清除与普通 settings 非空拒绝 | Node 测试已通过；真实 UI 与 Host 持久化 UNRUN |
-| 更改服务 keyRef 时固定槽旧弹层仍写原固定目标 | 需真实 UI 运行，UNRUN |
-| 目录更新不把旧值固化到用户覆盖 | 源码设计支持，集成 UNRUN |
-| 同名模型标记、Host 变化与旧目录回包抑制 | App（M5）范围，端到端 UNRUN |
-| 实际生成参数头触发 / 普通说法触发两条 headless | 本地 mock 下已通过（模型是固定脚本，不证明真实模型）；事件记录未入库，未伪造夹具 |
+| Real Config / Schemastery / redactSecrets Node tests | 0.3.0 `npm test` 314/314 passed; 0.2.0 rc.4 dependency details in VERIFICATION.md |
+| Real Loader→SettingsForms→settings/describe graph→extra | source chain verified, running UNRUN |
+| Locating extra after real App SchemaNode decoding | source verified, Flutter UNRUN |
+| Four-slot key write/clear and non-empty rejection of ordinary settings | Node tests pass; real UI and Host persistence UNRUN |
+| Fixed-slot stale sheet still writing the original fixed target when a service keyRef changes | needs real UI run, UNRUN |
+| Catalogue updates never freezing old values into user overrides | source design supports it, integration UNRUN |
+| Marked same-name models, Host changes and stale-catalogue response suppression | App (M5) scope, end-to-end UNRUN |
+| Real header trigger / plain-wording trigger on two headless runs | passing under local mocks (the model is a fixed script and proves nothing about real models); event records not committed, fixtures not forged |
 
-所有测试命令显式 TZ=Asia/Shanghai。
+All test commands explicitly set TZ=Asia/Shanghai.

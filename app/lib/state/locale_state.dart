@@ -4,7 +4,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../l10n/l10n.dart';
 
-/// 设置 → 语言.
+/// Settings → Language.
 enum AppLanguage {
   system,
   zh,

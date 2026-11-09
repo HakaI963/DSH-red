@@ -22,7 +22,7 @@ import java.util.concurrent.FutureTask
 import io.github.ccch1mneyyy.dsh_app.phone.PhoneTasks
 
 /**
- * The 不打扰模式 surface the core's `PhonePlugin` calls into: the `background` block of `status`,
+ * The Non-disruptive mode surface the core's `PhonePlugin` calls into: the `background` block of `status`,
  * and the actions behind `setBackgroundMode`, `requestShizukuPermission`, `adbStartPairing`,
  * `adbPair`, `adbConnect`. It owns the shared Shizuku/Sui, self-ADB and explicit root starters,
  * probes whether a trusted virtual display and input injection work here, and retains
@@ -670,7 +670,7 @@ class BackgroundControl private constructor(context: Context) {
                 when (selected) {
                     "off" -> { notifyChanged(); return mapOf("ok" to true) }
                     "shizuku", "sui" -> shizuku.ensureListeners()
-                    // 不打扰模式's only su; tasks just connect() to what it leaves.
+                    // Non-disruptive mode's only su; tasks just connect() to what it leaves.
                     "root" -> root.start(allowed)?.let { connected ->
                         val changed = synchronized(this) {
                             synchronized(keepGuard) { allowed() && replaceChannel(connected) }
@@ -801,14 +801,14 @@ class BackgroundControl private constructor(context: Context) {
         }
     }
 
-    // ---- 自动恢复无障碍 (WRITE_SECURE_SETTINGS through the engine) -------------
+    // ---- Restore accessibility automatically (WRITE_SECURE_SETTINGS through the engine) -------------
 
     /** The one-tap way to the permission right now ([SecureSettingsGrant.path]). */
     fun grantPath(granted: Boolean): String =
         if (granted) SecureSettingsGrant.GRANTED else SecureSettingsGrant.path(false, shizuku.status(), adb.status())
 
     /**
-     * Has the engine grant the permission over [via] (`shizuku` / `adb`): 不打扰模式's channel when it
+     * Has the engine grant the permission over [via] (`shizuku` / `adb`): Non-disruptive mode's channel when it
      * uses the same starter, else one opened for this and closed after. Blocks (an adb connect can
      * take seconds). Retains this attempt before closing any temporary channel.
      */

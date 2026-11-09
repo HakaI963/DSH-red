@@ -1,14 +1,14 @@
 // `dshgo://open/<page>` opens one of the app's pages and
 // does nothing else. The bundled guide (docs/guide, the dsh-go-guide skill)
-// links to pages this way, so a reply can say 「在这里打开」. A reply's
+// links to pages this way, so a reply can say "Open here". A reply's
 // Markdown link reaches the router through [openReplyPageLink]
 // (ui/chat/render/markdown_body.dart); a link from outside the app arrives
 // through [LinkHost] like any other.
 //
 // Pages only, from a fixed list: the settings index's pages and rows (a row
-// opens its page) and a few 全部功能 pages; nothing that switches the
+// opens its page) and a few All features pages; nothing that switches the
 // conversation or the host, opens a sheet, runs an action, or needs an open
-// conversation. An unknown page gets the router's 「无法打开这个链接」.
+// conversation. An unknown page gets the router's "Can’t open this link".
 
 import 'dart:async';
 
@@ -23,13 +23,13 @@ import 'app_links.dart';
 /// The host of page links: `dshgo://open/<page>`.
 const pageLinkHost = 'open';
 
-/// 全部功能 pages a link may open that aren't settings, by their
+/// All features pages a link may open that aren't settings, by their
 /// [FeatureItem.id]: each is a native page that needs no open conversation.
 /// Settings pages and rows answer through the settings index
 /// ([SettingsIndex.linkIds]).
 const catalogPageLinks = <String>{'schedules', 'cordis', 'agent-team', 'forum', 'community', 'ds-bot', 'workspaces'};
 
-/// 伙伴小屋: the home-screen widget opens it (android companion/CompanionWidget.kt).
+/// Companion room: the home-screen widget opens it (android companion/CompanionWidget.kt).
 const companionPageLink = 'companion';
 
 /// Every page a link may name.
@@ -47,7 +47,7 @@ String? pageLinkId(Uri uri) {
 }
 
 /// The page for [id] ([pageLinkIds]); [sessionId] is the conversation open in
-/// the chat, as 全部功能 passes it.
+/// the chat, as All features passes it.
 Widget? pageForId(String id, String? sessionId) {
   if (settingsPageForLink(id, sessionId: sessionId) case final page?) return page;
   if (id == companionPageLink) return const CompanionPage();

@@ -115,7 +115,7 @@ class SeatInventory {
   final bool webReachable;
 
   /// Native panels the host's plugins declare (switched-on ones): they
-  /// occupy 对话详情's 「插件」 tab (`session.tab`) and 全部功能 (`features`)
+  /// occupy Chat details's "Plugins" tab (`session.tab`) and All features (`features`)
   /// as cells `dsh-go:<id>`, ahead of their package's web entries.
   final List<NativePanel> nativePanels;
 

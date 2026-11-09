@@ -19,8 +19,8 @@ import io.github.ccch1mneyyy.dsh_app.shortcuts.EntryActivity
 import io.github.ccch1mneyyy.dsh_app.shortcuts.ShortcutsPlugin
 
 /**
- * 图片快捷方式: MethodChannel `dsh/picture_shortcut`. Android has no way for an app to make its
- * launcher icon an arbitrary picture (the 桌面图标 aliases are fixed resources); a pinned
+ * Picture shortcut: MethodChannel `dsh/picture_shortcut`. Android has no way for an app to make its
+ * launcher icon an arbitrary picture (the app-icon aliases are fixed resources); a pinned
  * shortcut with the user's picture that opens the app is the honest stand-in.
  *
  * - `pin {label, png}` → `{supported, requested}`: asks the launcher (its own confirmation

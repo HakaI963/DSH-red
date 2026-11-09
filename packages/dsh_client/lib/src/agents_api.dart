@@ -282,7 +282,7 @@ extension SubagentsApi on DshClient {
   }) async {
     final resolved = await resolveSubagentMode(route);
     if (resolved.mode == SubagentMode.oneShot) {
-      throw const SubagentReadOnlyException('一次性子代理只能查看记录');
+      throw const SubagentReadOnlyException('One-shot subagents can only view the transcript');
     }
     final id = requestId ?? uuidV4();
     try {
@@ -302,8 +302,8 @@ extension SubagentsApi on DshClient {
       });
     } on DshRemoteException catch (e) {
       throw switch (e.code) {
-        'subagent/parent-unavailable' => const SubagentReadOnlyException('上级对话不在运行，回到上级对话后再继续'),
-        'subagent/not-resumable' => const SubagentReadOnlyException('这个子代理不能继续对话'),
+        'subagent/parent-unavailable' => const SubagentReadOnlyException('The parent conversation is not running; return to it before continuing'),
+        'subagent/not-resumable' => const SubagentReadOnlyException('This subagent cannot continue the conversation'),
         _ => e,
       };
     }

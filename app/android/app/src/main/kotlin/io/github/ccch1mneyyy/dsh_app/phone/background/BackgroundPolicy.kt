@@ -1,6 +1,6 @@
 package io.github.ccch1mneyyy.dsh_app.phone.background
 
-// Pure decision logic for 不打扰模式: display sizing, the hard-gate on which
+// Pure decision logic for Non-disruptive mode: display sizing, the hard-gate on which
 // screens/windows must be handed back, and the sensitive-action test. No Android types,
 // so it is unit-tested on the JVM and shared by the engine and the driver.
 

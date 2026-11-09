@@ -1,14 +1,14 @@
-// 启动画面的动效：一条时间线，从系统启动画面交到 App 手里那一刻算起。
+// Launch screen motion: one timeline, counted from the moment the system splash hands over to the app.
 //
-//   0 ms      图标正在系统画它的地方：160 × 160，屏幕正中
-//             （系统阶段没画图标时，它在 0–320 ms 里淡入，Cubic(.2, 0, 0, 1)，边淡入边落定）
-//   0–640     落定：缩到 0.8，上移给字标让出半行（Cubic(.4, 0, .2, 1)：从静止起步、长尾减速）
-//   200–640   字标「DSH Go」：透明度 0 → 1，自下 10 升起（Cubic(0, 0, .2, 1)）
-//   560–1360  一道细光自左向右扫过图标一次（Cubic(.45, 0, .55, 1)）
-//   1360 起   静止，等界面可用
-//   界面可用   整层 300 ms 淡出（AppMotion.std）；可能在任何时刻到来，不等动画播完
+//   0 ms      the icon sits where the system drew it: 160 × 160, screen center
+//             (when the system phase drew no icon, it fades in over 0–320 ms, Cubic(.2, 0, 0, 1), settling as it fades)
+//   0–640     settle: shrink to 0.8, lift up to free half a line for the wordmark (Cubic(.4, 0, .2, 1): start from rest, long tail deceleration)
+//   200–640   wordmark "DSH Go": opacity 0 → 1, rising 10 from below (Cubic(0, 0, .2, 1))
+//   560–1360  a thin light sweeps across the icon once, left to right (Cubic(.45, 0, .55, 1))
+//   from 1360 at rest, waiting for the UI to be ready
+//   UI ready   the whole layer fades out over 300 ms (AppMotion.std); this can come at any time, without waiting for the animation to finish
 //
-// 系统要求减少动画时只有静止的图标，界面可用就直接切走。
+// When the system asks to reduce motion there is only the still icon, and the UI cuts straight in when ready.
 
 import 'package:flutter/animation.dart';
 

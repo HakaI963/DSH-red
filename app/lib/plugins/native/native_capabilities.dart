@@ -445,7 +445,7 @@ class NativeCapabilityRuntime {
     final kind = value['kind'];
     final reason = value['reason'] is String ? value['reason'] as String : null;
     if (kind == 'owner.revoked') {
-      // The 停止 on the listening indicator, dictation taking the
+      // The Stop on the listening indicator, dictation taking the
       // microphone, the app leaving the screen: the native side has stopped
       // everything already.
       unawaited(_revokeOwner(o));
@@ -653,7 +653,7 @@ final nativeCapabilityRuntimeProvider = Provider.autoDispose<NativeCapabilityRun
   // notification shade) keeps it; hidden / paused stops it.
   final lifecycle = AppLifecycleListener(onStateChange: (s) => runtime.foreground(onScreen(s)));
   ref.listen(nativeContributionsProvider, (previous, next) => runtime.revalidate());
-  // The plugin's 「听你开口」 switch turned off while it listens: stop listening.
+  // The plugin's "Hear you speak" switch turned off while it listens: stop listening.
   ref.listen(nativeVoiceConsentProvider, (previous, next) {
     final o = runtime._owner;
     if (o != null && o.roles.contains('voice') && next[NativeVoiceConsents.keyOf(host, o.pkg)] != true) {
@@ -684,7 +684,7 @@ final nativeOverlayTopProvider = NotifierProvider<NativeOverlayTop, double?>(Nat
 
 /// Whether a plugin may listen for the person speaking, per host and plugin:
 /// true allowed, false declined, missing never asked. Turned back on or off
-/// with the plugin's 「听你开口」 switch.
+/// with the plugin's "Hear you speak" switch.
 class NativeVoiceConsents extends Notifier<Map<String, bool>> {
   static const prefsKey = 'native_plugins.voice';
 

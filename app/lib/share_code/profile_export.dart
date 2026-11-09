@@ -1,4 +1,4 @@
-// 「分享配置」: what the active engine can put in a profile share, as a checklist
+// "Share configuration": what the active engine can put in a profile share, as a checklist
 // (with sizes), and the [ProfileShare] built from the ticked items.
 //
 // Settings: each namespace's user layer, cleaned by settings_sanitizer.dart.

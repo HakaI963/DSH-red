@@ -23,7 +23,7 @@ import io.github.ccch1mneyyy.dsh_app.launch.LaunchThemeSync
 import io.github.ccch1mneyyy.dsh_app.shortcuts.ShortcutsPlugin
 
 /**
- * 桌面图标: MethodChannel `dsh/launcher_icon`. The rules are [LauncherIcons]'s.
+ * App icon: MethodChannel `dsh/launcher_icon`. The rules are [LauncherIcons]'s.
  *
  * - `state` → `{current: mist | night | frost | ink, mask: [x0, y0, x1, y1, …]?}`: the icon on the
  *   launcher, and the system's adaptive-icon mask as a closed outline in 0…1 (null if unknown) so

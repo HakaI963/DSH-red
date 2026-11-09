@@ -102,7 +102,7 @@ String diagnosticsErrorText(Object error) => switch (error) {
   _ => appL10n.stateDiagnosticsExportFailed,
 };
 
-/// `已存到 下载/DSH-Go/…` for a saved bundle.
+/// `Saved to Downloads/DSH-Go/…` for a saved bundle.
 String diagnosticsSavedText(String where) =>
     appL10n.stateDiagnosticsSaved(where.replaceFirst(RegExp(r'^Download/'), appL10n.stateDownloadsPrefix));
 

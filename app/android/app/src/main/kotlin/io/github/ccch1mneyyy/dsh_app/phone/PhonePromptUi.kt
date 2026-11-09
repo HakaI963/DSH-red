@@ -36,7 +36,7 @@ internal object PhonePromptUi {
         PromptKind.HANDOFF -> R.string.phone_prompt_handoff_title
     })
 
-    /** The card's title: a handoff behind a hard rule names the rule (「密码和验证码需要你来输入」). */
+    /** The card's title: a handoff behind a hard rule names the rule ("You need to enter passwords and codes"). */
     fun title(ctx: Context, content: PromptContent): String =
         content.cause?.let { "DSH Go · " + handoffCause(ctx, it) } ?: title(ctx, content.kind)
 

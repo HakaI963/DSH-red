@@ -9,7 +9,7 @@ import io.github.ccch1mneyyy.dsh_app.phone.SensitiveWords
 // The virtual-display engine walks AccessibilityNodeInfo into [Element]s (that part
 // is Android-only) and calls [render] here.
 
-/** Vertical zone a line sits in (顶部 / 中部 / 底部). */
+/** Vertical zone a line sits in (top / middle / bottom). */
 enum class Region { TOP, MIDDLE, BOTTOM }
 
 /** Screen-pixel bounds, only supplied by explicit detailed background observations. */
@@ -22,14 +22,14 @@ data class ElementBounds(val left: Int, val top: Int, val right: Int, val bottom
 data class Element(
     /** 1-based number, valid only for the snapshot it belongs to. */
     val id: Int,
-    /** Chinese role word (按钮, 输入框, 开关, 勾选框, 标签, 图片, 链接, 列表, 文本). */
+    /** The role word as rendered, in Chinese (button, input, switch, checkbox, tab, image, link, list, text). */
     val role: String,
     /** Visible text / description / hint, length-capped and redacted. Never password contents. */
     val label: String,
     val region: Region,
     /** One indent level when inside a scrollable container. */
     val indent: Int = 0,
-    /** State words: 已聚焦, 已选, 已勾选, 不可用, 可下滑, 密码·不可代填. */
+    /** State words, in Chinese: focused, selected, checked, disabled, can-scroll-down, password · not for the agent. */
     val states: List<String> = emptyList(),
     /** Hit by the SafetyGate sensitive-word list: rendered with a ⚠ prefix. */
     val sensitive: Boolean = false,
@@ -100,7 +100,7 @@ object BackgroundTree {
         else -> redact(cap(text))
     }
 
-    /** Mask bank-card / ID-card runs to «银行卡 ****1234» style. Pure. */
+    /** Mask bank-card / ID-card runs to «bank card ****1234» style. Pure. */
     fun redact(text: String): String {
         var out = text
         // Mainland ID card first (17 digits + digit/X), so the broader card pattern can't swallow it.
@@ -123,7 +123,7 @@ object BackgroundTree {
     }
 
     /**
-     * Render the screen text. [screenId] e.g. "b1"; background screens carry the 后台屏 marker.
+     * Render the screen text. [screenId] e.g. "b1"; background screens carry the background-screen marker.
      * [overflow] is the count dropped past [SCREEN_CAP]; when > 0 a trailing hint is appended.
      */
     fun render(

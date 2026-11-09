@@ -16,10 +16,10 @@ import android.util.Log
  * ```
  * adb shell am broadcast -a io.github.ccch1mneyyy.dsh_app.PET_PROBE --es cmd push \
  *     --es pet whale-girl --es state working --ei tier 1 --es session s1 \
- *     [--ez active true --es size medium --es bubble 做完了 --es title 修复登录 --es bubbleId b1 --el ttl 6000]
- *     [--es detail '回复的头两行' | --es askText '运行：git push' --es askKind approval --ez approvable true
- *      --es choices 'A|B|C' --es eventId e1] [--ez canStop true --es hosts '本机|电脑 · SSH']
- * … --es cmd ask [--ez fresh true]   (问一句's bar, as the menu opens it)
+ *     [--ez active true --es size medium --es bubble Done --es title "Fix the login" --es bubbleId b1 --el ttl 6000]
+ *     [--es detail 'the reply's first two lines' | --es askText 'Run: git push' --es askKind approval --ez approvable true
+ *      --es choices 'A|B|C' --es eventId e1] [--ez canStop true --es hosts 'This phone|PC · SSH']
+ * … --es cmd ask [--ez fresh true]   (Quick ask's bar, as the menu opens it)
  * adb shell am broadcast -a io.github.ccch1mneyyy.dsh_app.PET_PROBE --es cmd enable --ez on true
  * … --es cmd always --ez on true | --es cmd unsnooze | --es cmd permission | --es cmd state
  * … --es cmd notify [--ez attention true --es key k2]   (a chat notification, for ResultSilence)

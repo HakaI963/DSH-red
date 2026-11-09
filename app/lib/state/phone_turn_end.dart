@@ -26,7 +26,7 @@ void _trace(String message) {
   }
 }
 
-/// 设置 → 手机操控 → 「完成后返回 dsh-go」, on by default.
+/// Settings → Phone control → "Back to DSH Go when done", on by default.
 class PhoneReturnPrefController extends Notifier<bool> {
   static const key = 'phone_return_after_done';
 

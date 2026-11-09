@@ -449,7 +449,7 @@ class DrawerSelectionController extends Notifier<Set<String>?> {
     state = current.contains(id) ? ({...current}..remove(id)) : {...current, id};
   }
 
-  /// Chooses exactly [ids] (全选 / 取消全选).
+  /// Chooses exactly [ids] (Select all / Deselect all).
   void setAll(Iterable<String> ids) {
     if (state != null) state = ids.toSet();
   }
@@ -662,7 +662,7 @@ final class FilteredBlock extends DrawerBlock {
 }
 
 /// The drawer list as blocks. Every conversation shows once: in its folder
-/// if it has one, else under 置顶 if pinned, else under its day.
+/// if it has one, else under Pinned if pinned, else under its day.
 List<DrawerBlock> drawerBlocks({
   required List<SessionSummary> sessions,
   required List<String> pinnedIds,
@@ -732,7 +732,7 @@ List<DrawerBlock> drawerBlocks({
   return blocks;
 }
 
-/// What 全选 picks: every conversation on screen (members of a collapsed
+/// What Select all picks: every conversation on screen (members of a collapsed
 /// folder are not).
 List<String> drawerSelectableIds(List<DrawerBlock> blocks) => [
   for (final block in blocks)

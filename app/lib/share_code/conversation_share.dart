@@ -1,4 +1,4 @@
-// A conversation as a share code (对话文件, docs/design/share-codes.md). Not DSH's
+// A conversation as a share code (conversation file, docs/design/share-codes.md). Not DSH's
 // event log: a small, versioned, normalised schema that the app's replay page
 // and the web viewer (site/share/viewer.js) both render, with times for
 // replaying it.
@@ -19,7 +19,7 @@ import 'share_codec.dart';
 import 'share_models.dart';
 
 /// Body version a conversation is written with. Older apps read `v: 1`
-/// only, so they say 「需要更新」 instead of failing on an unknown kind.
+/// only, so they say "Update the app to open this" instead of failing on an unknown kind.
 const conversationBodyVersion = 2;
 
 /// Version of the conversation schema below. A reader refuses newer ones.
@@ -295,7 +295,7 @@ final class ToolEntry extends ConversationEntry {
   /// One line, as the app's tool row shows it (command, path, query…).
   final String summary;
 
-  /// The row's verb (「运行」「读取」…).
+  /// The row's verb ("Run", "Read"…).
   final String? verb;
   final ToolOutcome status;
 

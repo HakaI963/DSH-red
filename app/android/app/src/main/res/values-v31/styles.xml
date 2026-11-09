@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- Android 12+ always shows the system splash. This theme can't know which 桌面图标 is on
+    <!-- Android 12+ always shows the system splash. This theme can't know which app icon is on
          the launcher (an activity-alias has no theme), so its splash has no icon: the page colour
          alone, which Dart's first frame repeats before it brings the chosen icon in. Android 13+
          is given the chosen icon's own theme below for its next launches
@@ -31,7 +31,7 @@
     </style>
 
     <!-- Android 13+ (SplashScreen.setSplashScreenTheme, launch/LaunchThemes.kt): the splash of
-         the next launches. Each 桌面图标's own icon, the same one its activity-alias names. -->
+         the next launches. Each app icon's own icon, the same one its activity-alias names. -->
     <style name="LaunchTheme.Mist">
         <item name="android:windowSplashScreenAnimatedIcon">@mipmap/ic_launcher</item>
     </style>

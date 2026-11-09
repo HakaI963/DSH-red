@@ -1,5 +1,5 @@
-// The restore point a profile import leaves on the on-device engine, so 安全模式's
-// 「恢复上次正常的配置」 undoes it.
+// The restore point a profile import leaves on the on-device engine, so Safe mode's
+// "Restore the last working configuration" undoes it.
 //
 // That feature restores the record native code keeps at
 // `filesDir/runtime/lkg/lkg.json` (runtime/LastKnownGood.kt): the main

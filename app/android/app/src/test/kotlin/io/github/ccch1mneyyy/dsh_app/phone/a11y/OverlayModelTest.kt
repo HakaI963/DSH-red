@@ -12,7 +12,7 @@ class OverlayModelTest {
     private val zh = StatusLines("免确认 · %1\$s", "DSH 正在操作 · %1\$s")
     private val en = StatusLines("No approval needed · %1\$s", "DSH is acting · %1\$s")
 
-    // ---- 状态行：胶囊只说正在做的事 ------------------------------------------------------------------
+    // ---- Status line: the capsule only says what is happening now ------------------------------------
 
     @Test fun theCapsuleShowsTheActionWithoutTheCoresPrefixes() {
         assertEquals(StatusLine("点「发送」", waived = false, acting = true), zh.parse("DSH 正在操作 · 点「发送」"))
@@ -41,7 +41,7 @@ class OverlayModelTest {
         assertEquals("DSH 正在操作 · 点「发送」", StatusLines("x", "y").parse("DSH 正在操作 · 点「发送」").text)
     }
 
-    // ---- 最近几步 ------------------------------------------------------------------------------------
+    // ---- Recent steps --------------------------------------------------------------------------------
 
     @Test fun theCardListsTheActionsBeforeTheLineNewestFirst() {
         val h = StepHistory()
@@ -67,12 +67,12 @@ class OverlayModelTest {
         assertEquals(emptyList<String>(), h.before(null, 3))
     }
 
-    // ---- 头部：停止永远在同一个位置，一步可达 ---------------------------------------------------------
+    // ---- Header: Stop always in the same place, one step away ------------------------------------------
 
     @Test fun stopIsAlwaysTheLastKeyWithPauseBesideIt() {
         val running = CapsuleMetrics.slots(stopped = false)
         assertEquals(listOf(Slot.MARK, Slot.LINE, Slot.PAUSE, Slot.STOP), running)
-        // 停止 at the right end: the same place in the capsule and the card, never behind a menu.
+        // Stop at the right end: the same place in the capsule and the card, never behind a menu.
         assertEquals(Slot.STOP, running.last())
         // Once stopped there is nothing left to stop.
         assertFalse(Slot.STOP in CapsuleMetrics.slots(stopped = true))
@@ -86,7 +86,7 @@ class OverlayModelTest {
         assertTrue(CapsuleMetrics.KEY_GAP_DP > 0)
     }
 
-    // ---- 宽度：跟着这行字，长了立刻长，短了过一会儿再缩 ------------------------------------------------
+    // ---- Width: follows the line, grows at once, shrinks only after a while ---------------------------
 
     private val d = 2.625f
     private val screen = 1080
@@ -138,7 +138,7 @@ class OverlayModelTest {
     @Test fun theAlternatingLinesKeepItSteady() {
         val w = CapsuleWidth(slack = 60)
         w.offer(800, 0)
-        // 「正在看屏幕」, 「点「…」」, every second: a wide line back in time keeps the width.
+        // "Watching the screen", "tap "…"", every second: a wide line back in time keeps the width.
         var t = 0L
         repeat(10) {
             t += 500
@@ -169,7 +169,7 @@ class OverlayModelTest {
         assertEquals(0, w.width)
     }
 
-    // ---- 按住小球停止 ---------------------------------------------------------------------------------
+    // ---- Hold the ball to stop -----------------------------------------------------------------------
 
     private val arm = HoldToStop.ARM_MS
     private val full = HoldToStop.ARM_MS + HoldToStop.FILL_MS
@@ -233,7 +233,7 @@ class OverlayModelTest {
         assertEquals(Release.NONE, h.up(10 * full))
     }
 
-    // ---- 卡片列几步 -----------------------------------------------------------------------------------
+    // ---- Card shows a few steps -----------------------------------------------------------------------
 
     @Test fun aShortScreenListsOneStep() {
         assertEquals(1, CapsuleMetrics.steps(411f))

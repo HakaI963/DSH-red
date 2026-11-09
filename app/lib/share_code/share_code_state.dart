@@ -39,7 +39,7 @@ String? _codeOf(String fileText) {
   }
 }
 
-/// Engines an import can go to: 本机 when its engine runs, and the active
+/// Engines an import can go to: this phone when its engine runs, and the active
 /// remote host when connected. The active host comes first.
 final importTargetsProvider = Provider.autoDispose<List<ImportTarget>>((ref) {
   final local = ref.watch(localConnectionProvider).value;
@@ -51,7 +51,7 @@ final importTargetsProvider = Provider.autoDispose<List<ImportTarget>>((ref) {
   ];
 });
 
-/// The checklist for 「分享配置」 on the active engine; null while disconnected.
+/// The checklist for "Share configuration" on the active engine; null while disconnected.
 final profileExportProvider = FutureProvider.autoDispose<ProfileExportSource?>((ref) async {
   final connection = ref.watch(activeConnectionProvider).value;
   if (connection == null) return null;

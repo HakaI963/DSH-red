@@ -16,7 +16,7 @@ import io.github.ccch1mneyyy.dsh_app.R
 /**
  * LADB-style pairing helper: a heads-up notification carrying a [RemoteInput] text box, so the
  * person types the 6-digit code straight from the notification while the system's
- * 「无线调试 → 使用配对码配对设备」dialog (and Settings' pairing sheet) is on screen. The code is
+ * "Wireless debugging → Pair device with pairing code" dialog (and Settings' pairing sheet) is on screen. The code is
  * handed to [BackgroundControl.adbPairFromNotification]; it is never sent anywhere else. Uses framework
  * android.app APIs only (minSdk 26), so no extra support-library dependency.
  */

@@ -307,7 +307,7 @@ class RuntimeStatus {
   );
 }
 
-/// What "恢复上次正常的配置" would change in the main profile.
+/// What "Restore the last working configuration" would change in the main profile.
 class LastKnownGood {
   const LastKnownGood({
     required this.available,
@@ -453,7 +453,7 @@ List<RuntimeLogEntry> _logEntries(Object? raw) => [
   for (final entry in raw as List) RuntimeLogEntry.fromMap(entry as Map<Object?, Object?>),
 ];
 
-/// One-off message from the native side, e.g. "已用安全模式启动".
+/// One-off message from the native side, e.g. "Started in Safe mode".
 class RuntimeNoticeEvent extends RuntimeEvent {
   const RuntimeNoticeEvent(this.text);
   final String text;
@@ -466,7 +466,7 @@ class BackgroundSettingsInfo {
   final String? label;
 }
 
-/// What 「重置运行环境」 keeps of the old /root (Kotlin `ResetKeep`); the next
+/// What "Reset runtime" keeps of the old /root (Kotlin `ResetKeep`); the next
 /// install puts it back.
 class ResetKeep {
   const ResetKeep({this.uiAndSkills = false, this.pluginsAndSettings = false});

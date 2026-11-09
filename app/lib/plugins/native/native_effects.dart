@@ -33,7 +33,7 @@ final class CommandEffect extends NativeEffect {
   String get line => args == null || args!.isEmpty ? '/$name' : '/$name $args';
 }
 
-/// An app page (a 全部功能 id, `new-chat`, `settings`) or one of the
+/// An app page (an All features id, `new-chat`, `settings`) or one of the
 /// plugin's own panels ([panel]).
 final class OpenEffect extends NativeEffect {
   const OpenEffect({this.page, this.panel}) : assert((page == null) != (panel == null));

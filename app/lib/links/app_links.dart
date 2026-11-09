@@ -8,7 +8,7 @@
 //   final router = ref.read(linkRouterProvider);
 //   final off = router.registerLinkHandler('forum', (uri) async {
 //     … ;
-//     return true; // took it; false → the calm 「无法打开这个链接」 toast
+//     return true; // took it; false → the calm "Can’t open this link" toast
 //   });
 //   router.registerLinkHandler('forum/auth', …); // host + path prefix, longest wins
 //   router.registerLinkHandler('example.com/s', …); // https: the URL's host
@@ -19,7 +19,7 @@
 //   router.context — a BuildContext under the home route (sheets, dialogs,
 //   toasts), null while the home shell isn't on screen.
 //
-// Reserved hosts: `share` (分享码, lib/share_code), `forum` (community login,
+// Reserved hosts: `share` (share code, lib/share_code), `forum` (community login,
 // e.g. `dshgo://forum/auth?payload=…`), `open` (a page of the app,
 // links/page_links.dart), and the share host's own name for
 // hosted conversation links (`dshgo://go.dshtui.com/c/…`, the same as its

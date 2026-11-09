@@ -200,7 +200,7 @@ class LauncherIconsTest {
     }
 
     @Test fun theNextStartThroughTheNewEntryEndsTwoEntriesLeftByAnEndedProcess() {
-        // Switched to 夜幕 from a task opened through the original, then the process ended before
+        // Switched to Nightfall from a task opened through the original, then the process ended before
         // the original went: two entries, and the old task only a card in Recents.
         val device = Device()
         device.apply(LauncherIcons.plan(NIGHT, device.stateOf, originalInUse = true))
@@ -252,7 +252,7 @@ class LauncherIconsTest {
         device.apply(back)
         assertEquals(listOf(MIST_ALT), device.on())
         assertEquals(MIST, LauncherIcons.current(device.stateOf, null))
-        // Away from 雾蓝 again: its twin goes back to the manifest's "off", nothing is DISABLED.
+        // Away from Mist again: its twin goes back to the manifest's "off", nothing is DISABLED.
         val again = LauncherIcons.plan(INK, device.stateOf, originalInUse = true)
         assertEquals("[LauncherMistAlt=$STATE_DEFAULT]", again.disable.toString())
         assertFalse(again.deferred)

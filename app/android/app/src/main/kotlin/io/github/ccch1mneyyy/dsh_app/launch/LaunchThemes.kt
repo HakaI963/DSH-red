@@ -13,7 +13,7 @@ import org.json.JSONObject
 
 /**
  * Which theme the system's launch window is drawn from, so that it never shows an icon other than
- * the one the person chose (桌面图标) or a colour that doesn't lead into their launch screen.
+ * the one the person chose (app icon) or a colour that doesn't lead into their launch screen.
  * Pure, unit-tested on the JVM; [LaunchThemeSync] applies it.
  *
  * A theme is fixed per activity, and an activity-alias can't have its own, so the manifest's

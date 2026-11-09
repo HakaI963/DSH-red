@@ -1,34 +1,34 @@
 # @ccch1mneyyy/dsh-media
 
-DSH Go 的主机侧媒体插件，版本 `0.3.0`。提供生成图片、用一句话编辑图片、后台生成视频；服务密钥留在 Host credentials，原件保存到当前工作区。设置命名空间保持 `dsh-media`，媒体结果使用冻结的 `meta["dsh-go/media"]` v1。
+The Host-side media plugin for DSH Go, version `0.3.0`. It generates images, edits images from a single sentence, and produces videos as background jobs; service keys stay in Host credentials and originals are saved into the current workspace. The settings namespace remains `dsh-media`, and media results use the frozen `meta["dsh-go/media"]` v1.
 
-0.3.0 声明兼容 DSH `0.2.1-rc.4` 与 `0.2.2-rc.1`，验证使用各版已有 runtime 锁，不重新解析生产依赖。实际验证范围与未验证项见 `VERIFICATION.md`。模型可用性、审核、配额和最终费用由供应商决定。App 内置的是设置与媒体展示入口，主机插件仍单独安装；本次不发布 npm、不预装或自动启用插件，也不调用真实付费服务。
+0.3.0 declares compatibility with DSH `0.2.1-rc.4` and `0.2.2-rc.1`, validated with each version's existing runtime locks without re-resolving production dependencies. For the actual validation scope and unverified items see `VERIFICATION.md`. Model availability, moderation, quotas and final charges are decided by the providers. The App ships only the settings and media-display entry points; the Host plugin is still installed separately. This change does not publish to npm, preinstall or auto-enable the plugin, and calls no real paid service.
 
-## 支持范围
+## Supported scope
 
-| 服务 / profile | 图片与编辑 | 视频 | 取消 |
+| Service / profile | Image & edit | Video | Cancellation |
 |---|---|---|---|
-| OpenAI / `openai-gpt-image` | GPT Image 2、2.5 Sunburst / Flare；单参考图编辑 | 无 | 同步请求停止等待不等于供应商停止计费 |
-| Gemini OpenAI 兼容 / `openai-compatible` | Gemini 2.5 Flash Image，单张、显式 `b64_json` | 无 | 同上 |
-| 火山方舟 / `ark-image`、`ark-video` | Seedream 5.0 Pro；单参考图编辑 | Seedance 2.5 文生 / 单首帧图生 | 仅 queued，真实 DELETE 后再查询确认 |
-| 阿里云百炼 / `ali-wan-image`、`ali-video` | Wan 2.7 Image；单参考图编辑 | Wan 2.7 文生 / 单首帧图生 | 仅 PENDING，真实取消请求后再查询确认 |
-| 硅基流动 / `silicon-image`、`silicon-video` | Qwen Image；Qwen Image Edit 2509 单参考图编辑 | Wan 2.2 T2V / I2V | 当前官方接口未提供取消；停止本地等待可能继续收费 |
+| OpenAI / `openai-gpt-image` | GPT Image 2, 2.5 Sunburst / Flare; single-reference edit | none | stopping the wait on a sync request does not mean the vendor stopped billing |
+| Gemini OpenAI-compatible / `openai-compatible` | Gemini 2.5 Flash Image, single image, explicit `b64_json` | none | same as above |
+| Volcengine Ark / `ark-image`, `ark-video` | Seedream 5.0 Pro; single-reference edit | Seedance 2.5 text-to-video / single first-frame image-to-video | only while queued; confirm via a follow-up query after a real DELETE |
+| Alibaba Model Studio / `ali-wan-image`, `ali-video` | Wan 2.7 Image; single-reference edit | Wan 2.7 text-to-video / single first-frame image-to-video | only while PENDING; confirm via a follow-up query after a real cancel request |
+| SiliconFlow / `silicon-image`, `silicon-video` | Qwen Image; Qwen Image Edit 2509 single-reference edit | Wan 2.2 T2V / I2V | the current official API offers no cancellation; stopping the local wait may still incur charges |
 
-确切模型 ID、地址、参数白名单与官方资料在 `data/models.json`。本版本只开放有文档依据的子集，不代表供应商完整能力。Seedream Lite 已停止新购，因此使用官方列出的 Pro 替代型号；不会发送 Pro 不支持的 Lite 组图字段。[方舟下线公告](https://docs.volcengine.com/docs/ark/model-deprecation-notice?lang=en)
+Exact model IDs, endpoints, parameter whitelists and official references live in `data/models.json`. This version opens only the documented subset and does not represent full provider capability. Seedream Lite stopped new purchases, so the officially listed Pro replacement is used; Lite multi-image fields that Pro does not support are never sent. [Ark deprecation notice](https://docs.volcengine.com/docs/ark/model-deprecation-notice?lang=en)
 
-没有启用且凭据已配置的服务时，不注册生成工具或系统提示。`edit_image` 只在配置了支持编辑的模型时出现。原生服务只接受目录中核实的 HTTPS 主机和路径；OpenAI 兼容服务可配置 HTTPS API 根路径，仍执行公网地址与下载安全校验。
+When no enabled service has configured credentials, no generation tools or system prompt are registered. `edit_image` appears only when an edit-capable model is configured. Native services accept only the HTTPS hosts and paths verified in the catalogue; OpenAI-compatible services take a configurable HTTPS API root and still run public-address and download-safety checks.
 
-## 配置
+## Configuration
 
-三步即可开始：
+Three steps to get started:
 
-1. **添加服务**：从服务商预设中选择图片或视频（火山方舟、阿里云百炼、硅基流动、OpenAI、Gemini）。服务 ID、请求协议、API 根地址、返回格式和模型 ID 会按预设自动带入，无需手动拼写。图片与视频分别建一个服务；同一服务商的图片和视频可以共用同一个凭据。
-2. **填 API Key**：新版 App 会为每个服务自动生成凭据名（例如方舟图片和视频都用 `DSH_MEDIA_ARK_API_KEY`，同一服务商复用同一个），只需要在服务详情里保存一次 Key；也可以在「高级」里改成任意已配置的 env 风格凭据名来引用已有 Key。旧版四个固定槽 `DSH_MEDIA_SLOT_1_API_KEY` 至 `DSH_MEDIA_SLOT_4_API_KEY` 仍可用，但仅为兼容保留，新版设置不需要在这里重复填写。
-3. **启用**：分别选择图片默认服务和模型、视频默认服务和模型，检查费用保护后启用。`generate_image` / `edit_image` 使用图片默认值，`generate_video` 使用视频默认值；类型默认值解析不到时回落旧版通用 `defaults.serviceId` / `defaults.modelId`，再回落首个可用候选。
+1. **Add a service**: pick image or video from a provider preset (Volcengine Ark, Alibaba Model Studio, SiliconFlow, OpenAI, Gemini). The service ID, request protocol, API root, return format and model IDs are filled from the preset automatically — nothing to spell by hand. Create one service each for image and video; image and video services of the same provider can share one credential.
+2. **Fill the API key**: new App builds auto-generate a credential name per service (e.g. Ark image and video both use `DSH_MEDIA_ARK_API_KEY`, reused across the same provider), so the key is saved once in the service detail; you can also switch to any configured env-style credential name under "advanced" to reference an existing key. The four legacy fixed slots `DSH_MEDIA_SLOT_1_API_KEY` through `DSH_MEDIA_SLOT_4_API_KEY` still work but are kept only for compatibility; new settings need not be duplicated there.
+3. **Enable**: pick the image default service and model and the video default service and model separately, review cost protection, then enable. `generate_image` / `edit_image` use the image defaults, `generate_video` uses the video defaults; when the per-kind defaults resolve to nothing, fall back to the legacy generic `defaults.serviceId` / `defaults.modelId`, then to the first available candidate.
 
-预设来自 `data/models.json` 的 `presets[]`，App 通过服务的目录元数据读取；旧版 App 忽略该字段，现有配置与旧版通用默认值保持原行为。
+Presets come from `presets[]` in `data/models.json`, read by the App through the service's catalogue metadata; legacy App builds ignore the field and existing configs with legacy generic defaults behave exactly as before.
 
-例如方舟图片与视频服务（只有引用，不含 Key）：
+For example, Ark image and video services (references only, no keys):
 
 ```yaml
 services:
@@ -58,27 +58,27 @@ limits:
   maxImages: 1
 ```
 
-百炼两个 profile 的根地址都是 `https://dashscope.aliyuncs.com`，也支持目录声明的北京工作空间地址。硅基流动为 `https://api.siliconflow.cn`；OpenAI 为 `https://api.openai.com/v1`。Gemini 兼容根地址为 `https://generativelanguage.googleapis.com/v1beta/openai`，`responseFormat: b64_json`。其他 profile 的 `responseFormat` 留空；预设已包含上述值。
+Both Bailian profiles use root `https://dashscope.aliyuncs.com` and also accept the Beijing workspace addresses declared by the catalogue. SiliconFlow is `https://api.siliconflow.cn`; OpenAI is `https://api.openai.com/v1`. The Gemini compatibility root is `https://generativelanguage.googleapis.com/v1beta/openai` with `responseFormat: b64_json`. `responseFormat` stays empty for other profiles; the presets already carry these values.
 
-## 使用与恢复
+## Usage and recovery
 
-普通对话可要求“画一张蓝色的猫”“用这张参考图把背景改成夜晚”“生成一个 5 秒视频”。生成模式沿用普通用户消息参数头，不新增命令或自定义会话事件。视频可用参数依模型决定；硅基流动当前只开放尺寸映射，不猜测秒数或分辨率字段。首帧图生视频省略 `aspect`。
+Ordinary chat can ask for "画一张蓝色的猫" (draw a blue cat), "用这张参考图把背景改成夜晚" (use this reference image to change the background to night) or a 5-second video. Generation mode reuses the ordinary user-message parameter header; no new commands or custom session events are added. Video parameters depend on the model; SiliconFlow currently opens only the size mapping, with no guessed seconds or resolution fields. First-frame image-to-video omits `aspect`.
 
-`generate_image` / `edit_image` 完成后返回实际文件和 v1 元数据。`generate_video` 立即返回 `rid` 和后台 job：真实 `ctx.jobs` 跟踪排队、运行、终态，完成通知叫醒 Agent，再调用 `get_media_result(job_id)` 获取最终媒体卡片。插件不调用 `jobs.wait`，不自行伪造会话事件。v1 没有独立 cancelled 状态，确认取消使用 `status: failed` 和 `error.code: cancelled`；未确认远端取消使用 `remote_may_continue`。
+`generate_image` / `edit_image` return the actual file plus v1 metadata when done. `generate_video` immediately returns an `rid` and a background job: real `ctx.jobs` track queued/running/terminal state, the completion notice wakes the Agent, and `get_media_result(job_id)` then fetches the final media card. The plugin never calls `jobs.wait` and never forges session events. v1 has no separate cancelled status; a confirmed cancellation uses `status: failed` with `error.code: cancelled`; an unconfirmed remote cancellation uses `remote_may_continue`.
 
-Host 重启后，原会话可调用 `resume_media(rid)` 继续查询已保存的供应商 task ID。恢复不新建供应商任务，不再次预留费用；仅接受原 session、工作区、服务端点、凭据引用和模型身份。已完成的本地索引可直接复用。此版本是**显式恢复**，尚不自动重建全部 jobs；POST 已受理但响应丢失、没有 task ID 时不能自动找回，也绝不重试创建。
+After a Host restart, the original session can call `resume_media(rid)` to keep querying the saved provider task ID. Recovery creates no new provider task and reserves no new cost; it accepts only the original session, workspace, service endpoint, credential ref and model identity. Completed local indexes can be reused directly. This version is **explicit recovery**: it does not yet rebuild all jobs automatically, and when a POST was accepted but the response lost without a task ID, it cannot be auto-found and creation is never retried.
 
-图片原件写入 `<cwd>/generated/<UTC 日期>/`，视频为原始 MP4（上限 300 MiB）。视频宽高、时长、编码从文件头读取，不冒充完整解码验证。支持目录校验的 MP4 编码不等于每台 Android 都能硬解。Host 私有索引与预算账本位于 `<DSH_HOME>/media/dsh-media/`，包含 prompt 与任务恢复身份，不应纳入公开诊断包。
+Image originals are written to `<cwd>/generated/<UTC date>/`; videos are raw MP4 (max 300 MiB). Video width/height, duration and codec are read from the file header and not passed off as full decode validation. A catalogue-verified MP4 codec still does not guarantee hardware decode on every Android device. The plugin's private index and budget ledger live in `<DSH_HOME>/media/dsh-media/`, contain prompts and task-recovery identities, and must not enter public diagnostic bundles.
 
-参考图限当前可写工作区内的普通 PNG / JPEG / WebP 文件，最多一张、10 MiB。拒绝符号链接、命名管道和工作区外路径。每次审批列出实际路径与目标服务；内容在审批前读取并固定，审批后文件身份改变则拒绝提交，不上传替换后的文件。
+Reference images are limited to one regular PNG / JPEG / WebP file inside the currently writable workspace, max 10 MiB. Symlinks, named pipes and out-of-workspace paths are rejected. Each approval lists the actual paths and target service; content is read and pinned before approval, and if the file identity changes after approval the submission is refused — never upload the substituted file.
 
-## 费用保护的实际含义
+## What cost protection actually means
 
-当前没有足够可靠、覆盖所有输入计费项的报价，因此**每次图片、编辑、视频均须单次明确同意**，卡片不显示虚构估价。默认每天本地预算 ¥20、每次未知价请求预留 ¥20；默认设置一天只容纳一次此类预留。日期按上海时区。
+There are currently no quotes reliable enough to cover every billable input, so **every image, edit and video requires an explicit one-time consent**, and the card shows no fictional estimate. Defaults: ¥20 daily local budget and a ¥20 hold per unknown-price request; the default settings fit only one such hold per day. Dates roll by the Shanghai timezone.
 
-预留是本地记账护栏，**不是供应商实际金额的硬上限**。实际账单可能高于预留。调低未知价预留会放行更多请求，不会降低供应商价格。账本在提交前持久化不确定状态，接受后的失败、超时、取消或断网均保留预留；本插件不声称退款。明确尚未提交的请求才释放预留。账本的内部 `basis: estimate` 记录本地预留结算，不是经过核实的供应商报价。
+The hold is a local accounting guardrail, **not a hard cap on the provider's actual amount**. The real bill may exceed the hold. Lowering the unknown-price hold admits more requests; it does not change provider prices. The ledger persists the uncertain state before submission; failures, timeouts, cancellations or disconnects after acceptance keep the hold; this plugin never claims refunds. Only requests proven never submitted release the hold. The ledger's internal `basis: estimate` records settle local holds and are not verified provider quotes.
 
-方舟和百炼仅排队时可能取消。取消请求与状态变化可能竞争，只有后续查询明确 cancelled / CANCELED 才显示已取消；运行中、查询失败、供应商不支持时都提示服务端可能继续生成并收费。付费 POST 不自动重试。
+Ark and Bailian may cancel only while queued. Cancel requests can race with state changes; "cancelled" is shown only when a follow-up query explicitly returns cancelled / CANCELED; while running, on query failure, or when the vendor does not support cancellation, the message says the server may continue generating and charging. Paid POSTs are never auto-retried.
 
 ## English
 

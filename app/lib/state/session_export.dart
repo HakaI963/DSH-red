@@ -1,4 +1,4 @@
-// The official session-log download (`/export`, "下载 Session 日志") for the
+// The official session-log download (`/export`, "Download session log") for the
 // app: the Host's ZIP of a conversation, handed to the share sheet or the
 // phone's Downloads instead of a browser download.
 

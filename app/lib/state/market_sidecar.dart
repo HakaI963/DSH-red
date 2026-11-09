@@ -81,7 +81,7 @@ class DshGoListing {
   /// Withdrawn versions: people who have one installed are warned.
   final Set<String> blockedVersions;
 
-  /// Goes under 「适配 DSH Go」 (a community entry): declares the protocol and
+  /// Goes under "Made for DSH Go" (a community entry): declares the protocol and
   /// the checks didn't flag it as not adapted.
   bool get isAdapted => adapted && !flags.contains('not-adapted');
 

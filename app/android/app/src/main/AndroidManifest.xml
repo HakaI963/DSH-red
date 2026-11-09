@@ -15,7 +15,7 @@
     <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" />
     <!-- Composer voice input (voice/VoicePlugin.kt), asked for on the first tap of the mic. -->
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
-    <!-- Remote 扫码配对电脑 (ui/remote/pairing_page.dart, mobile_scanner), asked for when the
+    <!-- Remote: pairing with a computer by scanning its QR code (ui/remote/pairing_page.dart, mobile_scanner), asked for when the
          scanner opens; the photo and paste paths work without it. Never required. -->
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-feature android:name="android.hardware.camera" android:required="false" />
@@ -24,23 +24,23 @@
          <intent><action android:name="android.speech.RecognitionService" /></intent> -->
     <!-- Phone control `intent kind=alarm/timer` (normal permission; some clock apps require it). -->
     <uses-permission android:name="com.android.alarm.permission.SET_ALARM" />
-    <!-- Optional "访问手机文件" mode: shared storage is bind-mounted at /sdcard in the Linux env. -->
+    <!-- Optional "Access phone files" mode: shared storage is bind-mounted at /sdcard in the Linux env. -->
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission
         android:name="android.permission.MANAGE_EXTERNAL_STORAGE"
         tools:ignore="ScopedStorage" />
 
-    <!-- 不打扰模式 (optional, default off): Shizuku provides the shell-uid channel. -->
+    <!-- Non-disruptive mode (optional, default off): Shizuku provides the shell-uid channel. -->
     <uses-permission android:name="moe.shizuku.manager.permission.API_V23" />
 
-    <!-- App 外悬浮窗 (pet/PetOverlay.kt): the floating pet over other apps, off until the person turns it on. -->
+    <!-- The pet outside the app (pet/PetOverlay.kt): the floating pet over other apps, off until the person turns it on. -->
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
 
     <!-- In-app update: installs the downloaded APK through a PackageInstaller session (update/). -->
     <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
 
-    <!-- libadb-android declares no targetSdk, so the merger implies READ_PHONE_STATE ("读取手机状态");
+    <!-- libadb-android declares no targetSdk, so the merger implies READ_PHONE_STATE ("read phone state");
          nothing here reads it. -->
     <uses-permission android:name="android.permission.READ_PHONE_STATE" tools:node="remove" />
     <!-- flutter_webrtc's AudioSwitch asks for these; DSH Remote's direct path is data only and
@@ -82,12 +82,12 @@
                  (MainActivity.getMetaData reads the meta-data above whichever alias opened it.) -->
         </activity>
 
-        <!-- 桌面图标 (icons/LauncherIcons.kt): one launcher entry per icon, all opening MainActivity;
-             exactly one is enabled. Each carries the long-press shortcuts (新对话, 语音输入;
+        <!-- App icon (icons/LauncherIcons.kt): one launcher entry per icon, all opening MainActivity;
+             exactly one is enabled. Each carries the long-press shortcuts (New chat, Voice input;
              recent conversations are moved over by shortcuts/ShortcutsPlugin.rebind).
              LauncherMist is every install's entry; the others start disabled, and switching one
              off puts it back to that default rather than disabling it, which would close a task
-             opened through it. LauncherMistAlt is 雾蓝 again once LauncherMist has been switched
+             opened through it. LauncherMistAlt is Mist again once LauncherMist has been switched
              off. Keep names: a launcher's home-screen icon points at one of them. -->
         <activity-alias
             android:name=".LauncherMist"
@@ -155,7 +155,7 @@
             <meta-data android:name="android.app.shortcuts" android:resource="@xml/shortcuts" />
         </activity-alias>
 
-        <!-- 分享码: dshgo:// links and .dshgo files, handed to MainActivity's own task
+        <!-- Share codes: dshgo:// links and .dshgo files, handed to MainActivity's own task
              (links/LinkTrampolineActivity.kt → links/LinksPlugin.kt). https App Links need an
              assetlinks.json on the landing domain first (docs/design/share-codes.md §6). -->
         <activity
@@ -221,7 +221,7 @@
             android:excludeFromRecents="true"
             android:theme="@android:style/Theme.Material.Light.NoActionBar" />
 
-        <!-- Quick Settings tile 「新对话」 (tile/NewChatTileService.kt). -->
+        <!-- Quick Settings tile "New chat" (tile/NewChatTileService.kt). -->
         <service
             android:name=".tile.NewChatTileService"
             android:exported="true"
@@ -254,7 +254,7 @@
                 android:value="Shows the user's floating assistant pet while their remote agent session runs" />
         </service>
 
-        <!-- 手机操控: reads and drives the main screen, owns the status bar / confirm overlay (phone/a11y). -->
+        <!-- Phone control: reads and drives the main screen, owns the status bar / confirm overlay (phone/a11y). -->
         <service
             android:name=".phone.a11y.PhoneA11yService"
             android:label="@string/phone_a11y_label"
@@ -268,7 +268,7 @@
                 android:resource="@xml/phone_accessibility_service" />
         </service>
 
-        <!-- 不打扰模式: Shizuku binder provider (shell-uid channel). -->
+        <!-- Non-disruptive mode: Shizuku binder provider (shell-uid channel). -->
         <provider
             android:name="rikka.shizuku.ShizukuProvider"
             android:authorities="${applicationId}.shizuku"
@@ -277,7 +277,7 @@
             android:exported="true"
             android:permission="android.permission.INTERACT_ACROSS_USERS_FULL" />
 
-        <!-- 不打扰模式: self-ADB wireless-debugging pairing code, typed in the notification. -->
+        <!-- Non-disruptive mode: self-ADB wireless-debugging pairing code, typed in the notification. -->
         <receiver
             android:name=".phone.background.AdbPairingNotification$Receiver"
             android:exported="false">
@@ -286,7 +286,7 @@
             </intent-filter>
         </receiver>
 
-        <!-- 伙伴小屋 on the home screen (companion/CompanionWidget.kt). -->
+        <!-- The Companion room on the home screen (companion/CompanionWidget.kt). -->
         <receiver
             android:name=".companion.CompanionWidgetProvider"
             android:exported="false"
@@ -347,7 +347,7 @@
             <action android:name="android.intent.action.PROCESS_TEXT"/>
             <data android:mimeType="text/plain"/>
         </intent>
-        <!-- 伙伴小屋's voice (CompanionVoicePlugin): finding the system's speech engine once the
+        <!-- The Companion room's voice (CompanionVoicePlugin): finding the system's speech engine once the
              target SDK reaches 30. Harmless at 28. -->
         <intent>
             <action android:name="android.intent.action.TTS_SERVICE"/>

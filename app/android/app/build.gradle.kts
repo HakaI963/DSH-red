@@ -147,7 +147,7 @@ dependencies {
     // .tar.xz support for the rootfs bundle.
     implementation("org.tukaani:xz:1.10")
 
-    // 不打扰模式 (phone/background): a shell-uid privileged display via Shizuku or self-ADB.
+    // Non-disruptive mode (phone/background): a shell-uid privileged display via Shizuku or self-ADB.
     implementation("dev.rikka.shizuku:api:13.1.5")       // MIT
     implementation("dev.rikka.shizuku:provider:13.1.5")  // MIT
     implementation("com.github.MuntashirAkon:libadb-android:3.1.1") // used under its Apache-2.0 option; pulls in spake2-android (LGPL-3.0)

@@ -1,5 +1,5 @@
 // What the person chose about the wide-screen columns (sidebar unfolded,
-// detail panel shown), kept across launches, and the one 对话详情 tab shared
+// detail panel shown), kept across launches, and the one Chat details tab shared
 // by the page, the sheet and the panel.
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -14,7 +14,7 @@ class LayoutPrefs {
   /// The conversation list unfolds into a sidebar when it fits.
   final bool sidebarOpen;
 
-  /// 对话详情 stays open beside the chat.
+  /// Chat details stays open beside the chat.
   final bool panelOpen;
 
   /// The stored values are in (until then, the defaults show).
@@ -89,7 +89,7 @@ class LayoutPrefsController extends Notifier<LayoutPrefs> {
 
 final layoutPrefsProvider = NotifierProvider<LayoutPrefsController, LayoutPrefs>(LayoutPrefsController.new);
 
-/// The 对话详情 tab on screen. One value for every form the detail takes, so
+/// The Chat details tab on screen. One value for every form the detail takes, so
 /// folding a sheet into the panel, or reopening the panel, keeps the tab.
 class SessionDetailTabController extends Notifier<SessionTab> {
   @override

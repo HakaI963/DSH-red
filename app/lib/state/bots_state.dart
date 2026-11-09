@@ -450,7 +450,7 @@ class DsBotController extends Notifier<DsBotStatus> {
     }
   }
 
-  /// Asks DS Bot again now (「重试」, after an install).
+  /// Asks DS Bot again now ("Retry", after an install).
   void retry() => ref.invalidateSelf();
 
   /// Reads the team again after a change made here.

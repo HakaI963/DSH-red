@@ -21,7 +21,7 @@ enum HostLinkPhase {
   reconnecting,
 
   /// Gave up: a non-retryable error (auth, host key, missing dsh) or too
-  /// many attempts. Needs the person to act or to tap "重试".
+  /// many attempts. Needs the person to act or to tap "Retry".
   failed,
 }
 
@@ -52,7 +52,7 @@ class HostLinkError implements Exception {
   /// One sentence for the UI; diagnostics and recovery steps belong in detail.
   final String message;
 
-  /// Raw technical detail (exception text, remote log tail) for "详情".
+  /// Raw technical detail (exception text, remote log tail) for "Details".
   final String? detail;
 
   /// Network-ish failures are retried automatically; the rest need the person.
@@ -212,7 +212,7 @@ class HostLinkStatus {
   final int attempt;
   final DateTime? nextRetryAt;
 
-  /// Optional one-line progress note ("复用已在运行的 DSH" …).
+  /// Optional one-line progress note ("Using running DSH" …).
   final String? detail;
 
   /// DSH Remote, connected: how the tunnel travels.
@@ -281,7 +281,7 @@ abstract class HostLink {
   /// Network changed / app resumed: check now instead of waiting for backoff.
   void kick();
 
-  /// Gives up any backoff and tries again from scratch (the "重试" button).
+  /// Gives up any backoff and tries again from scratch (the "Retry" button).
   void retry();
 
   Future<void> close();

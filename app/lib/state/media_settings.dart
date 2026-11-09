@@ -1,4 +1,4 @@
-// The 「图像与视频」 settings page's edits of the media plugin's namespace
+// The "Images and video" settings page's edits of the media plugin's namespace
 // (media-generation §5.8): `value.services[]` in the plugin's own shape, the
 // default model per kind, and the credential reference a new service starts
 // with. Pure except for the small map conversions, so the page's rules are

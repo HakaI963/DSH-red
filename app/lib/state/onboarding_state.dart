@@ -3,16 +3,16 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 /// First-run flags that outlive a single launch.
 ///
-/// - [welcomeSeen]: the user tapped "开始" once. If the process dies mid-unpack, the
+/// - [welcomeSeen]: the user tapped "Start" once. If the process dies mid-unpack, the
 ///   next launch resumes at the setup screen instead of showing the welcome again.
-/// - [keySkipped]: the user chose "稍后设置" on the API key step. We don't nag on
+/// - [keySkipped]: the user chose "Set up later" on the API key step. We don't nag on
 ///   every launch after that (they may have configured the key inside DSH's own
 ///   Web UI); settings shows the key as missing instead.
 /// - [localDeclined]: the app runs without the on-device runtime: first run
-///   went to a remote host instead (「远程主机」), or it was uninstalled in
+///   went to a remote host instead ("Remote host"), or it was uninstalled in
 ///   settings. A launch without the runtime then goes straight home; any
 ///   install clears it.
-/// - [setupStep]: first run picked 「本机」 and is setting up while the runtime
+/// - [setupStep]: first run picked "This phone" and is setting up while the runtime
 ///   unpacks; the page to come back to after the app was killed. Cleared once
 ///   first run reaches home (or goes to a remote host instead).
 class OnboardingPrefs {
@@ -48,13 +48,13 @@ class OnboardingPrefs {
 /// The first-run pages that run while the runtime unpacks
 /// (docs/design/onboarding-parallel-setup.md), in order.
 enum SetupStep {
-  /// 选择外观.
+  /// "Choose a look".
   appearance,
 
-  /// 想让 DSH Go 帮你做哪些事, and the permissions that takes.
+  /// "What should DSH Go help with?", and the permissions that takes.
   access,
 
-  /// 连接 DeepSeek.
+  /// "Connect DeepSeek".
   connect,
 
   /// Everything set; waiting for the unpack to finish.

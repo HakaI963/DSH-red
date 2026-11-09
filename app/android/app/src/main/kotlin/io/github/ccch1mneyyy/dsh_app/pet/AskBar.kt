@@ -24,19 +24,19 @@ import android.widget.LinearLayout
 import android.widget.TextView
 
 /**
- * Where 问一句 sends, as Dart answers `askTarget` (docs/design/pets.md §2.7): the conversation the
+ * Where Quick ask sends, as Dart answers `askTarget` (docs/design/pets.md §2.7): the conversation the
  * pet stands for when it has one and it is idle ([current]), else a new chat on the host in use
  * ([fresh]); [problem] when nothing can be sent there (the engine is off, no host); whether the
  * offline voice model can take a recording ([voice]).
  */
 data class AskTarget(val current: AskChat?, val fresh: AskChat?, val problem: String?, val voice: String, val offer: Long? = null) {
-    /** One conversation (null [sessionId]: a new one) and its one line, 「修复登录 · 本机」. */
+    /** One conversation (null [sessionId]: a new one) and its one line, "Fix the login · this phone". */
     data class AskChat(val sessionId: String?, val host: String?, val line: String)
 
-    /** Where a send goes: [fresh] when asked for (「新对话」) or when there is no [current]. */
+    /** Where a send goes: [fresh] when asked for ("New chat") or when there is no [current]. */
     fun chat(wantFresh: Boolean): AskChat? = if (wantFresh || current == null) fresh else current
 
-    /** The 「新对话」 switch shows: there is a conversation to switch away from. */
+    /** The "New chat" switch shows: there is a conversation to switch away from. */
     val canSwitch: Boolean get() = current != null && fresh != null
 
     companion object {
@@ -90,7 +90,7 @@ object AskPlace {
 }
 
 /**
- * 问一句's input bar (docs/design/pets.md §2.7): the target in one line with a 「新对话」 switch, the
+ * Quick ask's input bar (docs/design/pets.md §2.7): the target in one line with a "New chat" switch, the
  * text, hold-to-talk and send, a status line for what can't be done. A window of its own that
  * takes focus while it is open, so the keyboard comes; a touch outside or back closes it.
  */
@@ -233,7 +233,7 @@ internal class AskBarView(context: Context, private val listener: Listener) : Li
         isFocusable = true
     }
 
-    /** The target's line, and the switch: [on] when 「新对话」 is chosen. */
+    /** The target's line, and the switch: [on] when "New chat" is chosen. */
     fun setTarget(line: String?, switchShown: Boolean, on: Boolean) {
         target.text = line ?: ""
         setSwitch(on, switchShown)

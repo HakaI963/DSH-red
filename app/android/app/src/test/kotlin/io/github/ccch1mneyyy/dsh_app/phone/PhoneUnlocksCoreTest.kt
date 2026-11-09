@@ -6,7 +6,7 @@ import org.junit.Assert.*
 import org.junit.Test
 
 /**
- * 解除限制 through the real PhoneCore: a password typed once allowed never shows its value in the
+ * Lifted limits through the real PhoneCore: a password typed once allowed never shows its value in the
  * action log or the status line, and a handoff after a hard refusal names the rule on its card.
  */
 class PhoneUnlocksCoreTest {

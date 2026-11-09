@@ -11,11 +11,11 @@ import android.util.Log
 import io.github.ccch1mneyyy.dsh_app.phone.PhoneControl
 
 /**
- * 自动恢复无障碍. With phone control switched on in DSH Go and WRITE_SECURE_SETTINGS granted
+ * Restore accessibility automatically. With phone control switched on in DSH Go and WRITE_SECURE_SETTINGS granted
  * (`pm grant` from a computer or a root shell, or the one tap through the privileged channel), it
  * puts [PhoneA11yService] back into ENABLED_ACCESSIBILITY_SERVICES when something took it out (a
  * force stop does, on stock Android too), and takes it out and back in when it stays listed but
- * unbound (the system's 「无法运行」 state) so the system binds it afresh. It writes that list and
+ * unbound (the system's "Can't run as other services" state) so the system binds it afresh. It writes that list and
  * ACCESSIBILITY_ENABLED, no other setting, and backs off so it can't loop.
  *
  * Checked when [PhoneControl] comes up (the app's start), after an update ([Receiver]), when a

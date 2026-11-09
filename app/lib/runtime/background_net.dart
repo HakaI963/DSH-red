@@ -1,9 +1,9 @@
 // Some phone makers cut an app's network as soon as it
-// leaves the screen, foreground service or not (vivo until 「允许后台高耗电」 is
+// leaves the screen, foreground service or not (vivo until "Allow high background power usage" is
 // on). The engine runs as this app, so a turn left running in the background
 // stalls on failed requests and picks up again only when the app comes back.
 // This decides when to say so: one quiet line in the chat on the way back,
-// leading to 后台保活 (ui/notify/background_net_host.dart draws it).
+// leading to background keep-alive (ui/notify/background_net_host.dart draws it).
 
 import 'dart:async';
 
@@ -102,7 +102,7 @@ class BackgroundNetController extends Notifier<BackgroundNetReason?> {
   @override
   BackgroundNetReason? build() {
     _loading ??= _load();
-    // Turn ends on the on-device engine: when to introduce 后台保活.
+    // Turn ends on the on-device engine: when to introduce background keep-alive.
     ref.listen(localHostEventsProvider, (_, next) => _follow(next), fireImmediately: true);
     ref.onDispose(() => unawaited(_events?.cancel()));
     return null;
@@ -215,7 +215,7 @@ class BackgroundNetController extends Notifier<BackgroundNetReason?> {
     state = reason;
   }
 
-  /// Tapped away, or 去放行 was tapped.
+  /// Tapped away, or "Allow access" was tapped.
   void dismiss() => state = null;
 }
 

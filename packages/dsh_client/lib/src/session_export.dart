@@ -1,5 +1,5 @@
 /// The official session-log download (`@deepseek-ai/dsh-session-log-export`,
-/// the Web client's `/export` and "下载 Session 日志"):
+/// the Web client's `/export` and "下载 Session 日志" ("Download session log")):
 /// `GET /api/session.export?sessionId=…&includeDescendants=true` streams the
 /// session tree (the session, its child sessions, their attachments) as one
 /// ZIP. It is an HTTP route, so only the HTTP carrier (local engine, SSH

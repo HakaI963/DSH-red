@@ -17,7 +17,7 @@ import 'forum_models.dart';
 const _baseUrlPref = 'forum.baseUrl';
 
 /// The forum's base URL: [forumDefaultBaseUrl], or the address set in
-/// 论坛设置.
+/// Forum settings.
 class ForumBaseUrlController extends Notifier<String> {
   @override
   String build() {

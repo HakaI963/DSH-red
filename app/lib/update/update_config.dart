@@ -95,7 +95,7 @@ class UpdateMirror {
 
   final String id;
 
-  /// Shown under the download progress ("经由 ghfast.top").
+  /// Shown under the download progress ("Via ghfast.top").
   final String label;
   final String? prefix;
 

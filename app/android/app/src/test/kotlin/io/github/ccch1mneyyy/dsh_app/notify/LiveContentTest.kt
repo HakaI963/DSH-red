@@ -39,7 +39,7 @@ class LiveContentTest {
         assertNull(LiveContent.fromMap(running - "title"))
         assertNull(LiveContent.fromMap(running + ("title" to "  ")))
         assertNull(LiveContent.fromMap(running + ("kind" to "sleeping")))
-        // Phone control is native's alone: Dart can't post a 「正在操作手机」.
+        // Phone control is native's alone: Dart can't post an "Operating your phone".
         assertNull(LiveContent.fromMap(running + ("kind" to "phone")))
     }
 

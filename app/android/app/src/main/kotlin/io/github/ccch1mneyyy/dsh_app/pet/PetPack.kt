@@ -6,7 +6,7 @@ import kotlin.math.roundToInt
 /** One frame: which cell of the sheet, and for how long. */
 data class PetFrame(val cell: Int, val ms: Int)
 
-/** The three sizes in 宠物设置, by body height (dp) — the app's PetSize (`pet_state.dart` §2.10). */
+/** The three sizes in Pet settings, by body height (dp) — the app's PetSize (`pet_state.dart` §2.10). */
 enum class PetSize(val dp: Float) {
     SMALL(22f),
     MEDIUM(30f),
@@ -146,7 +146,7 @@ class PetPack(
 
     /**
      * The out-of-app window at rest, on the canvas: `hitBoxes.wide` with the idle picture's cell (the
-     * hit box, measured on the body, leaves out the idle art's bottom row: 鲸娘's outline, Deepy's
+     * hit box, measured on the body, leaves out the idle art's bottom row: the whale girl's outline, Deepy's
      * shadow), else every state animation's box (roam aside). Held, the window adds the drag pose;
      * showing an animation that reaches past it, that animation's cell ([PetFrames]).
      */

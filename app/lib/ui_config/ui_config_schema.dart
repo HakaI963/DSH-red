@@ -112,7 +112,7 @@ abstract final class UiSchema {
 
   // ── plugins ────────────────────────────────────────────────────────────
 
-  /// `plugins.seats` values; `web` is the seat planner's 「在网页版打开」.
+  /// `plugins.seats` values; `web` is the seat planner's "Open in DSH Web".
   static const seatModes = ['native', 'island', 'web', 'hidden'];
 
   // ── actions ────────────────────────────────────────────────────────────

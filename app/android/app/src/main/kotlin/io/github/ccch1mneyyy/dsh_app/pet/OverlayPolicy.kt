@@ -4,7 +4,7 @@ package io.github.ccch1mneyyy.dsh_app.pet
 data class PetBubble(
     val id: String,
     val kind: String,
-    /** The whole line as Dart wrote it: 「做完了」「标题 · 等你确认」「3 个对话做完了」. */
+    /** The whole line as Dart wrote it: "Done", "Title · needs approval", "3 chats finished". */
     val text: String,
     /** The conversation's title (masked), for the open-notice fallback only. */
     val title: String?,
@@ -12,7 +12,7 @@ data class PetBubble(
     val host: String?,
     /** Device clock; the bubble goes at this time without waiting for another push. */
     val untilMs: Long,
-    /** The reply's first lines, under the line: only for 问一句's own answer. */
+    /** The reply's first lines, under the line: only for Quick ask's own answer. */
     val detail: String? = null,
     /** A request answered on the bubble itself. */
     val ask: PetAsk? = null,
@@ -32,9 +32,9 @@ data class PetAsk(
     val kind: String,
     /** Shown in full before any button: an approval's exact action, a question's text. */
     val text: String,
-    /** An approval whose exact call Dart could show: 拒绝 / 允许 may go on the bubble. */
+    /** An approval whose exact call Dart could show: Decline / Allow may go on the bubble. */
     val approvable: Boolean,
-    /** A question's 1–3 choices, each answered with one tap; empty: 去回答. */
+    /** A question's 1–3 choices, each answered with one tap; empty: go answer it. */
     val choices: List<String>,
 ) {
     companion object {
@@ -86,7 +86,7 @@ data class BubbleAction(val kind: Kind, val choice: String? = null) {
     }
 }
 
-/** A host 切换主机 offers: its encoded ref, its label, whether it is the one in use. */
+/** A host Switch host offers: its encoded ref, its label, whether it is the one in use. */
 data class PetHost(val ref: String, val label: String, val current: Boolean)
 
 /** The long-press menu's rows (docs/design/pets.md §2.7): shortcuts only where they apply. */
@@ -129,7 +129,7 @@ internal class PetCaptureState {
  * is going on, the pack and size. Nothing is reduced again here.
  */
 data class PetPush(
-    /** Pack id; null when the person picked 「不显示」 (`none`). */
+    /** Pack id; null when the person picked "None" (`none`). */
     val packId: String?,
     val state: String,
     val tier: Int,
@@ -141,12 +141,12 @@ data class PetPush(
     val active: Boolean,
     /** small / medium / large. */
     val size: String,
-    /** 安静模式 or pet alerts off: no bubbles, so results still need their notification to ring. */
+    /** Quiet mode or pet alerts off: no bubbles, so results still need their notification to ring. */
     val quiet: Boolean = false,
     val reduceMotion: Boolean = false,
-    /** The conversation the pet stands for runs on the host in use: 「停止当前任务」 applies. */
+    /** The conversation the pet stands for runs on the host in use: "Stop current task" applies. */
     val canStop: Boolean = false,
-    /** The hosts 切换主机 offers; empty with only one. */
+    /** The hosts Switch host offers; empty with only one. */
     val hosts: List<PetHost> = emptyList(),
 ) {
     /** Idle and asleep play a still frame with an occasional action; the rest plays at full speed. */
@@ -280,14 +280,14 @@ data class Decision(
  * The out-of-app pet's visibility and power rules:
  *
  * - shows only while the app is in the background and something is going on ([PetPush.active]),
- *   or always with 「一直显示」;
+ *   or always with "Always show";
  * - hides while the app is on screen, during a phone-control task (its own status pill is up),
- *   and for the rest of the day after 「今天不再显示」;
+ *   and for the rest of the day after "Hidden for today";
  * - pauses with the screen off or locked;
- * - collapses [IDLE_COLLAPSE_MS] after the last thing going on (not with 「一直显示」);
+ * - collapses [IDLE_COLLAPSE_MS] after the last thing going on (not with "Always show");
  * - stays lit while active; after activity ends, dims after [DIM_AFTER_MS] idle unless a touch
  *   or a new call for attention restarts the wait: whole where it docks, at [DIM_ALPHA], animation paused;
- * - neither collapses nor dims while 问一句 is open ([holding]);
+ * - neither collapses nor dims while Quick ask is open ([holding]);
  * - keeps the process up with its own foreground service only when it is out and DshService is
  *   not running (remote hosts only).
  */
@@ -305,7 +305,7 @@ class OverlayMachine {
     var phoneTask = false
     var dshService = false
 
-    /** 问一句 is open, or an answer from a bubble is on its way: the pet stays out and lit. */
+    /** Quick ask is open, or an answer from a bubble is on its way: the pet stays out and lit. */
     var holding = false
 
     var appForeground = true

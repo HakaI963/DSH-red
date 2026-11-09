@@ -89,7 +89,7 @@ class ScreenFormatTest {
         assertFalse(unreadable.text.contains(ScreenFormat.POOR_TREE_NOTE))
         assertTrue(unreadable.text.contains("这一屏读不到"))
 
-        // 同样的空树,没有"被过滤"的证据时,照旧说文字信息不足。
+        // The same empty tree, with no evidence of filtering, still says the text is thin.
         val poor = ScreenFormat.format(ScreenInput("s2", "GitHub", "com.github.android", 400, 800, false, windows))
         assertTrue(poor.text.contains(ScreenFormat.POOR_TREE_NOTE))
     }

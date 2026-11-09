@@ -14,7 +14,7 @@ import java.io.File
 import java.util.Locale
 
 /**
- * Her voice in 伙伴小屋: the phone's own text-to-speech, MethodChannel `dsh/companion_voice`
+ * Her voice in the Companion room: the phone's own text-to-speech, MethodChannel `dsh/companion_voice`
  * (lib/companion/companion_voice.dart). The app keeps no audio; the system's engine does what it
  * does with the text.
  *

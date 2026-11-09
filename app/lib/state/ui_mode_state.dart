@@ -1,5 +1,5 @@
 // The two ways to use the app, side by side — the native interface and the
-// official DSH Web in the app (网页模式). The choice is kept and the next
+// official DSH Web in the app (web mode). The choice is kept and the next
 // launch opens straight into it (lib/ui/web/mode_home.dart).
 //
 // Both modes share one idea of "where you are": the active host
@@ -17,12 +17,12 @@ import '../l10n/l10n.dart';
 import '../ui/web/web_target.dart';
 import 'compose_inbox.dart';
 
-/// 界面: the native interface or the official web one.
+/// Interface: the native interface or the official web one.
 enum UiMode {
   native,
   web;
 
-  /// Short name for the switch (设置 › 界面).
+  /// Short name for the switch (Settings › Interface).
   String get label => switch (this) {
     native => appL10n.stateUiNative,
     web => appL10n.stateUiWeb,
@@ -73,7 +73,7 @@ class UiModeController extends Notifier<UiModeState> {
 final uiModeProvider = NotifierProvider<UiModeController, UiModeState>(UiModeController.new);
 
 /// Something outside the web page asks it to show [target] (a share, a
-/// launcher shortcut, 「在网页版打开」 from a native page): the web home takes
+/// launcher shortcut, "Open in DSH Web" from a native page): the web home takes
 /// it as soon as its page can.
 class WebOpenRequest {
   WebOpenRequest(this.target, {this.compose});

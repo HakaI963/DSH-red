@@ -70,7 +70,7 @@ class IncomingShare {
     return findHostedUrl(body);
   }
 
-  /// A share link inside shared text (a 分享码 forwarded from a chat app).
+  /// A share link inside shared text (a share code forwarded from a chat app).
   ShareLink? get shareLink {
     final body = text;
     if (body == null || files.isNotEmpty || skipped.isNotEmpty) return null;

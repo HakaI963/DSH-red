@@ -49,7 +49,7 @@ enum InboxSlot {
 /// it has its own quiet row ([PendingPrompt.isBackgroundTask]). A source the
 /// app does not know keeps the ordinary waiting bubble.
 const engineNoteSources = {
-  // dsh-user-approval: 「权限」 switched (ApprovalService.setPolicy).
+  // dsh-user-approval: "Permissions" switched (ApprovalService.setPolicy).
   'user-approval',
   // dsh-plan-mode: plan mode switched on or off (form `notice`).
   'plan-mode',
@@ -112,7 +112,7 @@ class PendingPrompt {
   final InboxSlot? slot;
 
   /// Its whole content is at hand, so it can be taken out of the inbox and
-  /// sent again (「立即发送」): sent from here, or plain text sent elsewhere.
+  /// sent again ("Send now"): sent from here, or plain text sent elsewhere.
   final bool resendable;
 
   /// Host producer metadata, independent of the message's role or text.
@@ -303,7 +303,7 @@ class ChatState {
   /// Prompts sent from here and not yet echoed by the transcript.
   final List<PendingPrompt> pending;
 
-  /// "本对话都允许": this client answers every approval of the session with
+  /// "Allow for chat": this client answers every approval of the session with
   /// allow-once as soon as it arrives. In memory only (reset on app restart).
   final bool autoApprove;
 
@@ -439,7 +439,7 @@ class ChatController extends Notifier<ChatState> {
   List<PendingPrompt> _pending = const [];
 
   /// Prompts removed elsewhere or consumed by a finished turn: dropped at
-  /// the next publish unless they are back by then (「改为插话」 removes,
+  /// the next publish unless they are back by then ("Steer instead" removes,
   /// then adds).
   final _withdrawn = <String>{};
 
@@ -449,7 +449,7 @@ class ChatController extends Notifier<ChatState> {
   final _retryingFailed = <String>{};
 
   /// Our prompts taken out of the inbox to be sent again ([_takeOut]): their
-  /// bubbles stay, as 「发送中」, until they are back.
+  /// bubbles stay, as "Sending", until they are back.
   final _moving = <String, _ChatOperation>{};
   var _stopAttempt = 0;
   Object _listenOwner = Object();
@@ -998,7 +998,7 @@ class ChatController extends Notifier<ChatState> {
     }
   }
 
-  /// "本对话都允许": allows [request] (and anything else pending) once, then
+  /// "Allow for chat": allows [request] (and anything else pending) once, then
   /// keeps allowing every new approval of this conversation.
   Future<void> allowAll(ApprovalRequest request) async {
     setAutoApprove(true);
@@ -1240,7 +1240,7 @@ class ChatController extends Notifier<ChatState> {
   /// empty): the pending bubble, the retry key and the prompt all carry it.
   /// [beforeDeliver] runs once this send has chosen its request id (a retry of
   /// an unsettled send keeps the old one) and before anything goes out, for a
-  /// side channel keyed by that id (伙伴小屋's context). Its failure fails the
+  /// side channel keyed by that id (Companion room's context). Its failure fails the
   /// send like any other; false drops the send quietly.
   Future<bool> send(
     String text, {
@@ -1288,7 +1288,7 @@ class ChatController extends Notifier<ChatState> {
         final go = await beforeDeliver(requestId);
         if (!_currentOperation(operation)) return false;
         if (!go) {
-          // The caller let it go (伙伴小屋 left this conversation meanwhile):
+          // The caller let it go (Companion room left this conversation meanwhile):
           // nothing went out, so nothing waits and nothing failed.
           _pending = List.unmodifiable(_pending.where((p) => p.requestId != requestId));
           state = state.copyWith(pending: _placePending());
@@ -1525,7 +1525,7 @@ class ChatController extends Notifier<ChatState> {
 
   void dismissNotice() => state = state.copyWith(clearNotice: true);
 
-  /// 「正在停止」 until the turn ends; a turn still going after 10 s gets its
+  /// "Stopping" until the turn ends; a turn still going after 10 s gets its
   /// stop key back.
   void _beginStopping(_ChatOperation operation) {
     operation.stopAttempt = ++_stopAttempt;
@@ -1542,14 +1542,14 @@ class ChatController extends Notifier<ChatState> {
     });
   }
 
-  /// 「正在停止」 is over: the turn ended, or the stop failed ([error]).
+  /// "Stopping" is over: the turn ended, or the stop failed ([error]).
   void _endStopping([String? error]) {
     _stopTimeout?.cancel();
     _stoppingOperation = null;
     state = state.copyWith(stopping: false, error: error);
   }
 
-  /// `session/cancel` behind 「正在停止」; false, with the stop key back and
+  /// `session/cancel` behind "Stopping"; false, with the stop key back and
   /// [failure] in the banner, when it did not go through.
   Future<bool> _stop(_ChatOperation operation, {String? failure}) async {
     if (!_currentOperation(operation)) return false;
@@ -1582,8 +1582,8 @@ class ChatController extends Notifier<ChatState> {
     return _putBack(operation, [last]);
   }
 
-  /// 「立即发送」: stops the running turn so [prompt] goes right away, in its
-  /// place among what else waits (「发送」 does the same for a prompt left
+  /// "Send now": stops the running turn so [prompt] goes right away, in its
+  /// place among what else waits ("Send" does the same for a prompt left
   /// waiting with no turn running). It is taken out of the inbox first: gone
   /// already means the agent has read it, and nothing is stopped. After the
   /// stop it goes back, which starts the next turn, and prompts queued
@@ -1942,7 +1942,7 @@ class ChatController extends Notifier<ChatState> {
     _replyIds.clear();
   }
 
-  /// Where "从这里分叉" cuts for [item]: the `turn/end` of the turn it
+  /// Where "Branch here" cuts for [item]: the `turn/end` of the turn it
   /// closes; null when it is not the last thing of a finished turn (the
   /// official web client's rule).
   int? branchPointAfter(AssistantChatItem item) {
@@ -1969,7 +1969,7 @@ class ChatController extends Notifier<ChatState> {
     });
   }
 
-  /// "从这里分叉": a new conversation with everything through [item]'s turn.
+  /// "Branch here": a new conversation with everything through [item]'s turn.
   /// Null on failure (the reason is in [ChatState.error]).
   Future<ForkOutcome?> branchAfter(AssistantChatItem item) async {
     final cut = branchPointAfter(item);
@@ -1980,8 +1980,8 @@ class ChatController extends Notifier<ChatState> {
     return _forkAt(cut);
   }
 
-  /// "编辑后重发": a new conversation with everything before [item], so the
-  /// prompt can be rewritten and sent again there (「重新回答」 sends it
+  /// "Edit and resend": a new conversation with everything before [item], so the
+  /// prompt can be rewritten and sent again there ("Regenerate" sends it
   /// again as it was). Null on failure; [action] names what failed in the
   /// error banner.
   Future<ForkOutcome?> forkBeforePrompt(UserChatItem item, {String? action}) async {

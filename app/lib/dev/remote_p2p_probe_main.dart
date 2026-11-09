@@ -1,5 +1,5 @@
 // Development entry point (DSH Remote's direct path end to end): signs in to a
-// Server with email + password, connects the first online Host with 直连优先
+// Server with email + password, connects the first online Host with Direct-first
 // on (flutter_webrtc), and pushes traffic both ways through the tunnel. It
 // prints `[p2p-probe] …` lines to logcat and ends with the path the tunnel
 // took. Never sends prompts. Not part of any release.

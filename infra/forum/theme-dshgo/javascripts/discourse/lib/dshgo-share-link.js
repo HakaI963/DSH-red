@@ -1,16 +1,16 @@
-// dsh-go 分享链接的解析与解码（不依赖 Discourse，可单独测试）。
+// Parsing and decoding of dsh-go share links (no Discourse dependency; standalone-testable).
 //
-// 格式与 App 一致（app/lib/share_code/share_link.dart、share_codec.dart，
-// 规范见 docs/design/share-codes.md）：
+// The format matches the App (app/lib/share_code/share_link.dart, share_codec.dart,
+// spec in docs/design/share-codes.md):
 //
 //   dshgo://share/<kind>?p=<code>              kind = plugin | profile
-//   dshgo://share/profile?gist=<id>&c=<sum>    放不进链接的大配置
-//   <落地页>#p=<code>                          网页形式，kind 在 code 里
-//   <落地页>#gist=<id>&c=<sum>
+//   dshgo://share/profile?gist=<id>&c=<sum>    large configs that do not fit a link
+//   <landing page>#p=<code>                    web form, kind lives inside the code
+//   <landing page>#gist=<id>&c=<sum>
 //
 //   code = base64url(deflate-raw(json)) + "." + base64url(sha256(json)[0..6])
 //
-// 如果分享码格式变了，只需要改这个文件。
+// If the share-code format changes, this file is the only thing to change.
 
 const KINDS = ["plugin", "profile"];
 const CODE_RE = /^[A-Za-z0-9_-]+\.[A-Za-z0-9_-]{8}$/;
@@ -20,7 +20,7 @@ const APP_RE = /^dshgo:\/\/share\/([^?#]*)(?:\?([^#]*))?/i;
 const MAX_CODE_CHARS = 1024 * 1024;
 const MAX_BODY_BYTES = 1024 * 1024;
 
-// 在纯文本里找 dshgo://share/… 的正则（全局匹配用）。
+// Regex that finds dshgo://share/… in plain text (for global matching).
 export const APP_LINK_TEXT_RE = /dshgo:\/\/share\/[A-Za-z0-9_.\-\/?=&%]+/gi;
 
 function landingKey(url) {
@@ -46,8 +46,8 @@ function fromParams(params, kind) {
 }
 
 /**
- * 解析一个链接；不是分享链接时返回 null。
- * 返回 { kind, code, gistId, gistSum }，网页形式的 kind 为 null（解码后才知道）。
+ * Parses one link; returns null when it is not a share link.
+ * Returns { kind, code, gistId, gistSum }; kind is null for the web form (known only after decoding).
  */
 export function parseShareLink(href, landingUrls = []) {
   if (typeof href !== "string") {
@@ -79,7 +79,7 @@ export function parseShareLink(href, landingUrls = []) {
   return fromParams(new URLSearchParams(value.slice(hashAt + 1)), null);
 }
 
-/** 在 App 里打开的链接（与 ShareLink.appLink 相同）。kind 未知时返回 null。 */
+/** The link that opens in the App (same as ShareLink.appLink). Returns null when kind is unknown. */
 export function appLinkFor(link) {
   if (link.gistId) {
     return `dshgo://share/profile?gist=${link.gistId}&c=${link.gistSum}`;
@@ -135,7 +135,7 @@ async function inflateRaw(bytes) {
   return body;
 }
 
-/** 解码并校验 code，返回 JSON 对象；损坏时抛错。 */
+/** Decodes and validates the code, returning the JSON object; throws when corrupted. */
 export async function decodeShareCode(code) {
   if (!CODE_RE.test(code || "") || code.length > MAX_CODE_CHARS) {
     throw new Error("malformed");
@@ -145,7 +145,7 @@ export async function decodeShareCode(code) {
   }
   const dot = code.indexOf(".");
   const body = await inflateRaw(base64UrlToBytes(code.slice(0, dot)));
-  // 校验和只在安全上下文（https）可用；拿不到 SubtleCrypto 时跳过校验，只用于展示
+  // The checksum is only available in secure contexts (https); skip validation when SubtleCrypto is missing, the result is display-only
   if (globalThis.crypto?.subtle) {
     const digest = new Uint8Array(await crypto.subtle.digest("SHA-256", body));
     if (bytesToBase64Url(digest.slice(0, 6)) !== code.slice(dot + 1)) {
@@ -171,7 +171,7 @@ function count(value) {
 }
 
 /**
- * 解码后的 JSON → 卡片要显示的内容。
+ * Decoded JSON → the content the card shows.
  * { kind, title, author, version, summary, counts: { plugins, skills, presets } }
  */
 export function describePayload(json) {

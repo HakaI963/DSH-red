@@ -12,7 +12,7 @@ import io.github.ccch1mneyyy.dsh_app.phone.Json
 import io.github.ccch1mneyyy.dsh_app.runtime.VendorSettings
 
 /**
- * HyperOS 焦点通知 / 超级岛: the live activity's notification with a `miui.focus.param` template
+ * HyperOS focus notifications / Super Island: the live activity's notification with a `miui.focus.param` template
  * and its picture (dev.mi.com/xiaomihyperos/documentation/detail?pId=2131, limits pId=2146).
  *
  * Only for an app SystemUI lets through (`canShowFocus`): domestic HyperOS grants that after
@@ -101,7 +101,7 @@ object XiaomiFocus {
         return ok
     }
 
-    /** 1: HyperOS 1, 2: HyperOS 2, 3: HyperOS 3 (超级岛); 0 elsewhere. */
+    /** 1: HyperOS 1, 2: HyperOS 2, 3: HyperOS 3 (Super Island); 0 elsewhere. */
     fun protocol(context: Context): Int {
         if (VendorSettings.vendorOf(Build.MANUFACTURER, Build.BRAND) != VendorSettings.XIAOMI) return 0
         return runCatching { Settings.System.getInt(context.contentResolver, PROTOCOL_SETTING, 0) }.getOrDefault(0)

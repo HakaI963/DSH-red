@@ -19,8 +19,8 @@ Future<void> _startApp() async {
   if (!frameProbeEnabled) SteadyFrameBinding();
   WidgetsFlutterBinding.ensureInitialized();
   appErrorCapture.install();
-  // The first frame is already in the chosen language (设置 → 语言), and is the launch
-  // window's own picture (启动画面, lib/launch/launch_state.dart).
+  // The first frame is already in the chosen language (Settings → Language), and is the launch
+  // window's own picture (launch screen, lib/launch/launch_state.dart).
   await Future.wait([AppLanguageController.load(), LaunchController.begin()]);
   // MIT / OFL notices must ship with the APK, not just the sources.
   registerThirdPartyLicenses();

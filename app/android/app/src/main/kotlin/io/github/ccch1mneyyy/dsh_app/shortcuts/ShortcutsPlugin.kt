@@ -27,15 +27,15 @@ import java.util.concurrent.Executors
  * calls, `{kind: new | voice | chat | screenshot, sessionId?, host?, text?, path?}`, after
  * Dart's `ready` (held until then, like links/LinksPlugin). An entry without this process's
  * [token] is ignored. `text` is
- * 问一句's text the floating pet couldn't send itself (pet/PetOverlay.kt): it waits in the composer.
+ * Quick ask's text the floating pet couldn't send itself (pet/PetOverlay.kt): it waits in the composer.
  *
  * - `setRecent {items: [{id, title, host}]}`: the recent conversations as dynamic shortcuts
  *   (newest first, at most [MAX_RECENT]; an empty list clears them). Pinned copies of a
  *   conversation that is still recent are retitled with it.
  *
- * The two static shortcuts (新对话, 语音输入) are res/xml/shortcuts.xml, on every launcher alias.
+ * The two static shortcuts (New chat, Voice input) are res/xml/shortcuts.xml, on every launcher alias.
  * The recent ones belong to the alias that is the launcher entry now ([LauncherIconPlugin.entry]);
- * a new 桌面图标 moves them over ([rebind]) — the system drops shortcuts of a disabled entry.
+ * a new app icon moves them over ([rebind]) — the system drops shortcuts of a disabled entry.
  */
 class ShortcutsPlugin : FlutterPlugin, ActivityAware, MethodChannel.MethodCallHandler, PluginRegistry.NewIntentListener {
 
@@ -177,7 +177,7 @@ class ShortcutsPlugin : FlutterPlugin, ActivityAware, MethodChannel.MethodCallHa
         const val MAX_RECENT = 3
         const val RECENT_PREFIX = "chat:"
 
-        /** 新对话 and 语音输入 in res/xml/shortcuts.xml. */
+        /** New chat and Voice input in res/xml/shortcuts.xml. */
         private const val STATIC_SHORTCUTS = 2
 
         /** Per process, never leaves it: proves an entry came through [EntryActivity]. */
@@ -185,7 +185,7 @@ class ShortcutsPlugin : FlutterPlugin, ActivityAware, MethodChannel.MethodCallHa
 
         /**
          * ShortcutManager and launcher-entry changes are binder calls: off the main thread, and
-         * one at a time (a new 桌面图标 and a new recents list must not interleave).
+         * one at a time (a new app icon and a new recents list must not interleave).
          */
         internal val worker: ExecutorService =
             Executors.newSingleThreadExecutor { r -> Thread(r, "dsh-shortcuts").apply { isDaemon = true } }

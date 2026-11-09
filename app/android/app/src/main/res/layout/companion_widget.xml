@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- 伙伴小屋 on the home screen (CompanionWidget.kt): the little pixel whale, her name, what
+<!-- The Companion room on the home screen (CompanionWidget.kt): the little pixel whale, her name, what
      she's doing, the last thing she said, and how well she knows you. Tapping opens the room. -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/companion_widget_root"

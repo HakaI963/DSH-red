@@ -1,6 +1,6 @@
-// 自定义启动画面的导入：系统选择器（插件 v2 的 pickFile 通道，照片 + 视频）→ 按字节上限
-// （视频 30 MB，图片和动图 8 MB）流式拷进 App 私有目录 → 看文件头认类型 → 解码一遍确认能读
-// （视频由原生量时长和尺寸、截首帧，时长不设上限）→ 落盘，换掉旧文件。
+// Custom launch screen import: system picker (plugin v2's pickFile channel, photos + videos) → streamed
+// into the app's private dir under a byte cap (30 MB video, 8 MB for pictures and animations) → type read from the file header → decoded
+// once to confirm it's readable (native measures video duration and size and grabs the first frame; no duration cap) → saved, replacing the old file.
 
 import 'dart:async';
 import 'dart:io';

@@ -24,17 +24,17 @@ import io.github.ccch1mneyyy.dsh_app.notify.LiveActivity
  *   live activity's portrait read it again;
  * - `setEnabled {enabled}`, `setAlwaysShow {on}`, `unsnooze` → status;
  * - `status` → status; `permissionStatus` → status after adding a test window (the real check);
- * - `requestPermission` → bool: opens 「显示在其他应用上层」 for this app;
+ * - `requestPermission` → bool: opens "Display over other apps" for this app;
  * - `openAppDetails` → bool: the app's system info page (restricted settings, vendor switches).
  *
- * Here → Dart: `status {…}` when it changes; `openSettings` after 「宠物设置」 in the pet's menu; and
+ * Here → Dart: `status {…}` when it changes; `openSettings` after "Pet settings" in the pet's menu; and
  * what the bar, the bubble and the menu ask, each answered by Dart (`lib/pets/pet_overlay_actions.dart`):
  * - `askTarget {fresh}` → `{offer, current?: {sessionId, host, line}, fresh: {host, line}, problem?, voice}`;
  * - `ask {offer, text, fresh, sessionId?, host?}` → `{sent: true}` | `{problem}`;
  * - `answer {host, sessionId, eventId, token, kind, decision?: allow|reject, choice?}` → `{result: handled|gone|failed}`;
  * - `transcribe {wav}` → `{text}` | `{problem}`; `stop {host, sessionId}`; `switchHost {host}`.
  * - `voiceFallback {text}` → `{text}` after foreground offline recording, then return to the overlay.
- * No answer (no handler yet, the engine going away) reads as null: 问一句 then hands its text to the app.
+ * No answer (no handler yet, the engine going away) reads as null: Quick ask then hands its text to the app.
  *
  * Status: `{enabled, alwaysShow, permission: accessibility|granted|blocked|denied, canDraw,
  * accessibility, snoozed, showing, sdk, manufacturer}`.

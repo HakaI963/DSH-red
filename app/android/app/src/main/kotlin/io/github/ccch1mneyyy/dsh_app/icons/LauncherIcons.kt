@@ -1,7 +1,7 @@
 package io.github.ccch1mneyyy.dsh_app.icons
 
 /**
- * 桌面图标: which `<activity-alias>` (AndroidManifest.xml) is the launcher entry, and how to move
+ * App icon: which `<activity-alias>` (AndroidManifest.xml) is the launcher entry, and how to move
  * between them. Pure, unit-tested on the JVM; [LauncherIconPlugin] reads and writes the states.
  *
  * Every alias points at MainActivity and carries only MAIN / LAUNCHER (plus the static shortcuts);
@@ -13,7 +13,7 @@ package io.github.ccch1mneyyy.dsh_app.icons
  *   and switching off one of those means DEFAULT, never DISABLED.
  * - [ORIGINAL] (enabled in the manifest: fresh installs need an entry) can only be switched off
  *   with DISABLED. That waits while its task is visible or has another app on top ([Plan.deferred]);
- *   going Home settles it immediately. It happens once: going back to 雾蓝 later uses its twin,
+ *   going Home settles it immediately. It happens once: going back to Mist later uses its twin,
  *   [MIST_ALT]. No activity is recreated to switch an icon.
  *
  * New entry first, old ones after, so the app never has none.
@@ -44,7 +44,7 @@ internal object LauncherIcons {
     /** The entry every install starts with. */
     val ORIGINAL = Alias(MIST, "$PKG.LauncherMist", enabledByManifest = true)
 
-    /** 雾蓝 again, once [ORIGINAL] has been switched off. */
+    /** Mist again, once [ORIGINAL] has been switched off. */
     val MIST_ALT = Alias(MIST, "$PKG.LauncherMistAlt", enabledByManifest = false)
 
     val aliases = listOf(
@@ -83,7 +83,7 @@ internal object LauncherIcons {
         return plan(target, stateOf, originalInUse)
     }
 
-    /** The alias that shows [variant]: [ORIGINAL] for 雾蓝 while it is still on, else its own. */
+    /** The alias that shows [variant]: [ORIGINAL] for Mist while it is still on, else its own. */
     fun aliasFor(variant: String, stateOf: (String) -> Int): Alias =
         if (variant == MIST && isOn(ORIGINAL, stateOf(ORIGINAL.className))) ORIGINAL
         else aliases.first { it.variant == variant && it !== ORIGINAL }

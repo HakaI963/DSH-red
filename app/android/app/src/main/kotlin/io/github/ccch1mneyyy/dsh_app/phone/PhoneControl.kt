@@ -397,8 +397,8 @@ class PhoneControl private constructor(private val app: Context) : PhoneEnv, Con
             commit = { app.getSharedPreferences(MlKitLocalOcr.PREFS, Context.MODE_PRIVATE)
                 .edit().putBoolean(MlKitLocalOcr.KEY, it).commit() },
         )?.let { return it }
-        // Partial updates keep what they don't mention (the 免确认 switch sends only its flag).
-        // 解除限制 is refused while any task, selected or not, may still act; restoring never is.
+        // Partial updates keep what they don't mention (the skip-confirmation switch sends only its flag).
+        // Lifting limits is refused while any task, selected or not, may still act; restoring never is.
         val p = sessions.updatePolicies(map, { policiesCache }, { policiesCache = it }) ?: return false
         // The plugin serializes setters on its IO executor; never hold admission over preferences IO.
         prefs.edit().putString(K_POLICIES, Json.write(p.toMap())).apply()
@@ -530,7 +530,7 @@ class PhoneControl private constructor(private val app: Context) : PhoneEnv, Con
         return sessions.stop(record, state, reason)
     }
 
-    /** A notification's 停止操作: only the task it was shown for, and only while that task still runs. */
+    /** A notification's Stop action: only the task it was shown for, and only while that task still runs. */
     fun stopShownTask(reason: String, taskId: Long): Boolean {
         val task = sessions.task(taskId)?.tasks ?: return false
         return stopOwner(task, task.activeOwner(taskId) ?: return false, reason)
@@ -737,7 +737,7 @@ class PhoneControl private constructor(private val app: Context) : PhoneEnv, Con
     }
 
     /**
-     * 「读一下当前屏幕」: the person's own on-device check, never sent to a model, so it shows
+     * "Read current screen": the person's own on-device check, never sent to a model, so it shows
      * whatever is in front (DSH's own settings page included; the own-app rule is for tool calls).
      */
     fun testScreen(): Map<String, Any?> {
@@ -860,7 +860,7 @@ class PhoneControl private constructor(private val app: Context) : PhoneEnv, Con
         linkedMapOf("mode" to "off", "ready" to false, "reason" to (e.message ?: AppStrings.get(app, R.string.phone_background_error)), "androidOk" to (Build.VERSION.SDK_INT >= 34), "preview" to mapOf("v" to 1, "enabled" to preview.enabled))
     }
 
-    /** 自动恢复无障碍: whether it may work (the permission), the one-tap way to it, the command for the other. */
+    /** Restore accessibility automatically: whether it may work (the permission), the one-tap way to it, the command for the other. */
     private fun keeperStatus(): Map<String, Any?> {
         val granted = A11yKeeper.granted(app)
         return linkedMapOf(
@@ -871,7 +871,7 @@ class PhoneControl private constructor(private val app: Context) : PhoneEnv, Con
     }
 
     /**
-     * 自动恢复无障碍 → the one tap: the shell-uid engine grants WRITE_SECURE_SETTINGS over Shizuku or
+     * Restore accessibility automatically → the one tap: the shell-uid engine grants WRITE_SECURE_SETTINGS over Shizuku or
      * self-ADB. Shizuku without its own permission asks for that first (`pending`) and grants once
      * the person allows. Blocks; the plugin thread.
      */
@@ -948,7 +948,7 @@ class PhoneControl private constructor(private val app: Context) : PhoneEnv, Con
         }
     }
 
-    /** Every 2 s: end idle tasks; 自动恢复无障碍; push status changes we can't observe (accessibility connecting). */
+    /** Every 2 s: end idle tasks; restore accessibility automatically; push status changes we can't observe (accessibility connecting). */
     private fun tick() {
         try {
             sessions.all().forEach { it.tasks.expireIdle() }
@@ -958,7 +958,7 @@ class PhoneControl private constructor(private val app: Context) : PhoneEnv, Con
         }
     }
 
-    // ── ControlListener (the overlay's 暂停 / 停止 / 插话, the service's own stops) ──
+    // ── ControlListener (the overlay's Pause / Stop / Steer, the service's own stops) ──
 
     override fun shownControls(): TaskControls? =
         displaySelection.controls { task, owner, reason -> stopOwner(task, owner, reason) }
@@ -983,7 +983,7 @@ class PhoneControl private constructor(private val app: Context) : PhoneEnv, Con
 
     /**
      * The background driver is registered per task: bring it up on first use (worker thread; may
-     * connect). The main one may be on its way back (自动恢复无障碍): give it a few seconds.
+     * connect). The main one may be on its way back (restore accessibility automatically): give it a few seconds.
      */
     override fun driver(screen: PhoneScreen): PhoneDriver? {
         val owner = tasks.activeOwner() ?: return null
@@ -1060,7 +1060,7 @@ class PhoneControl private constructor(private val app: Context) : PhoneEnv, Con
         private const val CHANNEL_FIX = "dsh-phone-fix"
         private const val NOTIFY_FIX_ID = 4099
 
-        /** How long a call needing the main screen waits for 自动恢复无障碍 to bring it back. */
+        /** How long a call needing the main screen waits for restore-accessibility-automatically to bring it back. */
         private const val KEEPER_WAIT_MS = 3_000L
 
         /** Installer packages of app stores; anything else (or none) counts as sideloaded. */
@@ -1081,7 +1081,7 @@ class PhoneControl private constructor(private val app: Context) : PhoneEnv, Con
         /** Without creating it (DshService builds notifications before anything else may exist). */
         fun peek(): PhoneControl? = instance
 
-        /** The master switch 「手机操控」, without creating the controller. */
+        /** The master switch "Phone control", without creating the controller. */
         fun switchedOn(context: Context): Boolean =
             context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).getBoolean(K_ENABLED, false)
     }

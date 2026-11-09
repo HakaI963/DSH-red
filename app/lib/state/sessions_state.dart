@@ -48,13 +48,13 @@ class PendingSessionArchive {
   Future<void> get windowClosed => _window.future;
 
   /// The archive's outcome; null when nothing was archived because it was
-  /// dropped before sending (撤销, a Host change, a reconnect).
+  /// dropped before sending (Undo, a Host change, a reconnect).
   Future<ArchiveCommitResult?> get done => _done.future;
 
   /// Drops the plan if nothing has been sent yet.
   bool cancel() => _cancel();
 
-  /// 撤销: [cancel], remembered as the user's choice.
+  /// Undo: [cancel], remembered as the user's choice.
   bool undo() {
     if (!canUndo || _committing) return false;
     _undone = true;
@@ -67,7 +67,7 @@ class PendingSessionArchive {
   /// screen, or a newer undo notice takes this one's place.
   bool commitNow() => _commitNow();
 
-  /// Dropped with 撤销.
+  /// Dropped with Undo.
   bool get undone => _undone;
 
   /// Archiving has started on the Host; it can no longer be taken back.
@@ -332,7 +332,7 @@ class SessionsController extends AsyncNotifier<List<SessionSummary>> {
 
   List<SessionSummary> _visible() {
     final pendingIds = {for (final pending in _archives) ...pending.ids};
-    // Her conversation lives in 伙伴小屋, not the drawer.
+    // Her conversation lives in the Companion room, not the drawer.
     final companion = ref.read(companionSessionFilterProvider);
     final host = ref.read(activeHostProvider);
     return ref
@@ -357,7 +357,7 @@ class SessionsController extends AsyncNotifier<List<SessionSummary>> {
   List<SessionSummary> _rows() => _titles.isEmpty ? _all : [for (final s in _all) _withTitle(s)];
 
   /// [s] with what was read for it: its title where the list had none (an
-  /// older read beats 「未命名」 until the newer one lands), and blank only
+  /// older read beats "Untitled chat" until the newer one lands), and blank only
   /// while the row is as it was read.
   SessionSummary _withTitle(SessionSummary s) {
     final read = _titles[s.sessionId];
@@ -591,7 +591,7 @@ class SessionsController extends AsyncNotifier<List<SessionSummary>> {
 
   /// Creates a session in the workspace the drawer shows (else the default
   /// directory) and returns its id. [autoApprove] false keeps the host's
-  /// permission preset even when 自动批准命令 is on (the companion's).
+  /// permission preset even when Auto-run commands is on (the companion's).
   Future<String> create({bool autoApprove = true}) async {
     final conn = ref.read(activeConnectionProvider).value;
     if (conn == null) throw StateError('not connected');
@@ -792,7 +792,7 @@ class SessionsController extends AsyncNotifier<List<SessionSummary>> {
       return pending;
     }
     // Leaving the screen (Home, recents, another app on top; the process may be
-    // killed from there) sends the archive at once: the notice said 已归档,
+    // killed from there) sends the archive at once: the notice said Archived,
     // and the undo it offered is gone with the screen.
     final lifecycle = AppLifecycleListener(
       onStateChange: (state) {
@@ -933,7 +933,7 @@ class CurrentSessionController extends Notifier<String?> {
   int _selectionRevision = 0;
   int get selectionRevision => _selectionRevision;
 
-  /// Something was chosen before the last conversation was read back (新对话
+  /// Something was chosen before the last conversation was read back (New chat
   /// from a share or a launcher shortcut on a cold start): that choice stands.
   bool _touched = false;
 

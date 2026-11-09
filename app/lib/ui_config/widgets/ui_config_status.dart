@@ -1,5 +1,5 @@
-// ui.json's one quiet line in settings and the sheet behind it: 「界面配置 · 2
-// 处没生效」, and on tap what did not apply, with the JSON Pointer of each. No
+// ui.json's one quiet line in settings and the sheet behind it: "Interface settings · 2 issues
+// not applied", and on tap what did not apply, with the JSON Pointer of each. No
 // banners, no notifications. Without a ui.json the line is not there — except
 // on a remote host without the dsh-go-ui skill, where it offers to install it
 // (when the app's wiring provides an installer).
@@ -22,14 +22,14 @@ import '../ui_config_state.dart';
 import '../ui_skill.dart';
 import '../../ui/common/brief_notice.dart';
 
-/// The row's value: 「2 处没生效」「已应用 12 项」「没有生效」.
+/// The row's value: "2 issues not applied", "Applied 12 items", "Not applied".
 String uiConfigSummary(UiConfigLoad load) {
   if (load.fatal) return appL10n.shellConfigNotApplied;
   final dropped = load.notAppliedCount;
   return dropped > 0 ? appL10n.shellConfigDroppedCount(dropped) : appL10n.shellConfigAppliedCount(load.appliedCount);
 }
 
-/// 「界面配置」 for the active host; nothing when it has no ui.json.
+/// "Interface settings" for the active host; nothing when it has no ui.json.
 class UiConfigStatusTile extends ConsumerWidget {
   const UiConfigStatusTile({super.key, this.icon, this.tinted = false, this.tint = 0});
 

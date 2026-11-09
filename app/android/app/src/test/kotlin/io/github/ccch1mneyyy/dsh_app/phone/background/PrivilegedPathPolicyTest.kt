@@ -44,7 +44,7 @@ class PrivilegedPathPolicyTest {
         assertTrue(PrivilegedPathPolicy.closesOnInterrupt("shizuku"))
         assertTrue(PrivilegedPathPolicy.closesOnInterrupt("adb"))
         // A closed root connection stays closed (tasks never run su) until root is chosen again,
-        // so closing it on every screen-off would break root 不打扰模式 after the first lock.
+        // so closing it on every screen-off would break root Non-disruptive mode after the first lock.
         val state = RootState()
         state.finish(state.begin(), null)
         state.disconnect()

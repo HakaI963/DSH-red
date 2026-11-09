@@ -37,11 +37,11 @@ const mediaSettingsNamespaces = ['dsh-media', 'media'];
 
 /// Where the media plugin stands on the current host.
 enum MediaPluginState {
-  /// Not in the host's list at all: no 生成 tile.
+  /// Not in the host's list at all: no Create tile.
   absent,
 
   /// Offered (the official catalogue lists it) but not installed, or
-  /// installed and off: 生成 opens 「在此主机上安装」.
+  /// installed and off: Create opens "Install on this host".
   installable,
 
   /// Installed and on.
@@ -59,7 +59,7 @@ MediaPluginState mediaPluginStateOf(List<PluginBundle>? bundles, {bool offered =
   return MediaPluginState.installable;
 }
 
-/// The media plugin in the official market, which 「在此主机上安装」 installs;
+/// The media plugin in the official market, which "Install on this host" installs;
 /// null while the market loads, when it failed or doesn't list one.
 final mediaMarketEntryProvider = Provider<MarketEntry?>(
   (ref) => ref.watch(
@@ -136,7 +136,7 @@ class GenerateParams {
   /// Pictures (image).
   final int count;
 
-  /// The catalogue's own value (image); null: 「自动」, the host's.
+  /// The catalogue's own value (image); null: "Auto", the host's.
   final String? quality;
 
   /// Length (video).
@@ -220,7 +220,7 @@ class GenerateParams {
   GenerateParams startOn(MediaCatalog catalog) =>
       (catalog.resolve(model, kind) == null ? copyWith(model: null) : this).fitTo(catalog);
 
-  /// A header sent earlier (编辑后重发) as a mode: exactly its values — an
+  /// A header sent earlier ("Edit and resend") as a mode: exactly its values — an
   /// omitted one stays the host's — and its model by marker, else by a name
   /// only one choice has (§4.6.5); then fitted.
   factory GenerateParams.fromHeader(GenerateHeader header, MediaCatalog catalog) => GenerateParams(
@@ -233,7 +233,7 @@ class GenerateParams {
     resolution: header.resolution,
   ).fitTo(catalog);
 
-  /// A card's batch (↻, 修改) as a mode: its request's values, the model by
+  /// A card's batch (↻, Edit) as a mode: its request's values, the model by
   /// provider and id when only one choice fits.
   factory GenerateParams.fromMeta(MediaMeta meta, MediaCatalog catalog) {
     final request = meta.request;
@@ -282,7 +282,7 @@ class GenerateModes {
   final GenerateParams? lastVideo;
   final GenerateKind lastKind;
 
-  /// What 「生成」 starts with: the kind used last, with its last values.
+  /// What "Create" starts with: the kind used last, with its last values.
   GenerateParams get start => switch (lastKind) {
     GenerateKind.image => lastImage ?? const GenerateParams(),
     GenerateKind.video => lastVideo ?? GenerateParams.video,

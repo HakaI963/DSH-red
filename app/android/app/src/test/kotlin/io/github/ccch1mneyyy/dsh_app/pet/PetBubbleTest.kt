@@ -21,7 +21,7 @@ class PetBubbleTest {
     }
 
     // A 1080×2400 phone at 2.75 px per dp: 96 px status bar, 63 px gesture bar; the overlay's
-    // 8 dp edge and 4 dp gap; a 「标题 · 做完了」 card about 110 × 35 dp with its 6 dp tail.
+    // 8 dp edge and 4 dp gap; a "Title · Done" card about 110 × 35 dp with its 6 dp tail.
     private val area = SafeArea(1080, 2400, left = 0, top = 96, right = 0, bottom = 63)
     private val margin = 22
     private val gap = 11

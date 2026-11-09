@@ -8,7 +8,7 @@ abstract class ProviderBackend {
   /// The on-device engine (keys typed here are also kept on the phone).
   bool get isLocal;
 
-  /// "本机", "电脑 · SSH" …
+  /// "This phone", "Computer · SSH" …
   String get hostLabel;
 
   /// Fires when the pi-ai section, a credential or the route set changes.

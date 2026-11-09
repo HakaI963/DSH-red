@@ -169,7 +169,7 @@ class NotifyPlugin :
     /** Opens the system notification settings (or the app info page on ROMs without one). */
     private fun openSettings(channel: String?): Boolean = start(listOf(notifier.settingsIntent(channel), notifier.detailsIntent()))
 
-    /** This app's 「实时活动」 switch where the system has one, else its notification settings. */
+    /** This app's "Live activity" switch where the system has one, else its notification settings. */
     private fun openLiveSettings(): Boolean =
         start(listOf(LiveActivity.settingsIntent(appContext), notifier.settingsIntent(null), notifier.detailsIntent()))
 

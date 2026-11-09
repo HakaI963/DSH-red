@@ -91,7 +91,7 @@ class SshHostLink implements HostLink {
   /// Bounds the initial probe and subsequent forwarded channel opens.
   final Duration tunnelProbeTimeout;
 
-  /// False for "测试连接": report the first failure instead of retrying.
+  /// False for "Test connection": report the first failure instead of retrying.
   final bool retryFirstOpen;
 
   final _statuses = StreamController<HostLinkStatus>.broadcast(sync: true);

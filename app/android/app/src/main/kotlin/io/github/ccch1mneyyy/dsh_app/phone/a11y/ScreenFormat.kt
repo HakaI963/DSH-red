@@ -4,20 +4,20 @@ import io.github.ccch1mneyyy.dsh_app.phone.SensitiveWords
 
 // The compact screen text the model reads:
 //
-//   屏幕 s7 · 高德地图 · 竖屏 · 键盘收起 · 共 12 项
-//   顶部
-//     [1] 按钮 返回
-//     [2] 输入框 "瑞幸咖啡" 已聚焦
-//   列表 [4] 可下滑
-//     [5] 瑞幸咖啡(科技园店) · 4.6分 · 320m · 营业中
-//         [6] 按钮 路线   [7] 按钮 电话
-//   底部
-//     [11] 标签 综合排序 · 已选   [12] 标签 距离优先
+//   Screen s7 · AMap · portrait · keyboard hidden · 12 items in all  (illustrated in English; the real dump renders in Chinese)
+//   Top
+//     [1] button Back
+//     [2] input "Luckin Coffee" focused
+//   list [4] can scroll down
+//     [5] Luckin Coffee (Science Park store) · 4.6 stars · 320 m · open
+//         [6] button Route   [7] button Call
+//   Bottom
+//     [11] tab Sort by relevance · selected   [12] tab Sort by distance
 //
 // Rules: one element per "interactive or has text" node, layout nodes folded, a
 // clickable row takes the text of its non-interactive descendants (TalkBack's
 // reading unit); text → contentDescription → hint → view-id tail; 60 chars per
-// label, ~3000 per page with "…另有 N 项"; zones 顶部 / 中部 / 底部 by position, one
+// label, ~3000 per page with "…N more items"; zones top / middle / bottom by position, one
 // indent level per scrollable; `⚠` where SafetyGate will ask, `+` on what is new
 // since the previous snapshot; password contents never rendered. Plain Kotlin.
 
@@ -28,7 +28,7 @@ class ScreenInput(
     val screenWidth: Int,
     val screenHeight: Int,
     val keyboardShown: Boolean?,
-    /** Top-most first; the last one is the main window, the others render as 弹窗. */
+    /** Top-most first; the last one is the main window, the others render as pop-ups. */
     val windows: List<UiWindow>,
     val detail: Boolean = false,
     /** Element keys of the previous snapshot of the same app (`+` marks); null = no marks. */
@@ -69,7 +69,7 @@ class ScreenElement(
     val sensitiveWord: String?,
     /** Enclosing list's id. */
     val listId: Int?,
-    /** Enclosing row's id, for a control inside a row (路线 inside a POI card). */
+    /** Enclosing row's id, for a control inside a row (a route button inside a POI card). */
     val parentId: Int?,
     /** Re-verified before every action: window | bounds | role | text / view id (| checked). */
     val fingerprint: String,
@@ -135,11 +135,11 @@ object ScreenFormat {
         val header = StringBuilder()
         val notes = input.notes.toMutableList()
         val poor = textNodes < POOR_TREE && windows.isNotEmpty()
-        // 读不到内容(大概率被敏感视图策略挡了)不能说成"游戏、自绘界面",那会把模型带到
-        // 另一个方向;这时 publish() 已经给了一条更准确的说明。
+        // "No readable content (most likely blocked by the sensitive-view policy)" must not be reported as
+        // "a game or self-drawn UI" — that would steer the model the wrong way; publish() already gives a more accurate note.
         if (poor && !input.unreadable) notes += POOR_TREE_NOTE
 
-        // Page budget: keep the 底部 zone (navigation) and cut the middle with a hint.
+        // Page budget: keep the bottom zone (navigation) and cut the middle with a hint.
         val headerLen = 40 + (input.appLabel?.length ?: 0) + notes.sumOf { it.length + 1 }
         val lengths = lines.map { it.estimate(input.detail) }
         val total = headerLen + lengths.sum()
@@ -539,7 +539,7 @@ object ScreenFormat {
         val byZone = items.groupBy(::zone)
         byZone[Zone.TOP]?.let { out += Line.Header(Zone.TOP.title); emit(it, 2, out, false, null, null) }
         byZone[Zone.MIDDLE]?.let { middle ->
-            // A list in the middle stands as its own header (the example's `列表 [4] 可下滑`).
+            // A list in the middle stands as its own header (the example's `list [4] can scroll down`).
             var needHeader = true
             var run = mutableListOf<Item>()
             fun flush() { if (run.isNotEmpty()) { if (needHeader) out += Line.Header(Zone.MIDDLE.title); needHeader = false; emit(run, 2, out, false, null, null); run = mutableListOf() } }

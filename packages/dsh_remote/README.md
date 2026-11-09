@@ -1,6 +1,6 @@
 # dsh_remote
 
-Pure-Dart client for [ds-harness-remote](https://github.com/liguobao/ds-harness-remote) (李国宝, MIT). It reaches a remote Host's DSH Harness API through the Server Relay, or directly over a WebRTC DataChannel (LAN / P2P / TURN) when the app supplies a WebRTC stack, end-to-end encrypted with `Noise_IK_25519_ChaChaPoly_SHA256` either way. The result is an ordinary `DshClient` from `package:dsh_client`, so chat, watch, approvals, models and keys work exactly as they do with the local engine.
+Pure-Dart client for [ds-harness-remote](https://github.com/liguobao/ds-harness-remote) (Li Guobao, MIT). It reaches a remote Host's DSH Harness API through the Server Relay, or directly over a WebRTC DataChannel (LAN / P2P / TURN) when the app supplies a WebRTC stack, end-to-end encrypted with `Noise_IK_25519_ChaChaPoly_SHA256` either way. The result is an ordinary `DshClient` from `package:dsh_client`, so chat, watch, approvals, models and keys work exactly as they do with the local engine.
 
 Status (2026-10-30, upstream `7e387df`, Host plugin 0.6.0):
 

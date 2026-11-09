@@ -7,11 +7,11 @@ import java.util.concurrent.CopyOnWriteArrayList
  * and ends on stop (overlay, notification, Flutter, screen off), or after [idleMs] without calls.
  * A paused task is never idle, nor is one with a call still running: a pause holds the task — its
  * waiver included — until the person resumes or stops it, and the idle clock restarts on resume.
- * Holds the per-task app approvals and 本任务免确认 waiver, pause, and the person's interjections
+ * Holds the per-task app approvals and the per-task skip-confirmation waiver, pause, and the person's interjections
  * for the agent.
  *
  * After a stop, calls are refused until [stopHoldMs] pass without any: the turn that was running
- * gets "已停止" on every retry, and the next turn starts a fresh task. Plain Kotlin (injected clock).
+ * gets "Stopped" on every retry, and the next turn starts a fresh task. Plain Kotlin (injected clock).
  */
 class PhoneTasks(
     private val clock: () -> Long = System::currentTimeMillis,
@@ -28,7 +28,7 @@ class PhoneTasks(
         /** Within the hold after a stop. */
         val stopped: Boolean,
         val stopReason: String?,
-        /** 本任务免确认 granted for this task. */
+        /** Per-task skip-confirmation granted for this task. */
         val waived: Boolean = false,
         /** Native-only lifetime; never inferred from a session id or a Flutter page. */
         internal val lifecycle: Long = 0,
@@ -409,7 +409,7 @@ class PhoneTasks(
         approved += pkg
     }
 
-    /** 本任务免确认 granted: the rest of this task asks nothing. Cleared when the task ends. */
+    /** Per-task skip-confirmation granted: the rest of this task asks nothing. Cleared when the task ends. */
     val isWaived: Boolean get() = synchronized(lock) { waived }
 
     fun waive() {

@@ -16,7 +16,7 @@ import io.github.ccch1mneyyy.dsh_app.R
 import java.util.Calendar
 
 /**
- * 伙伴小屋 on the home screen: the little pixel whale, her name, what she's doing, the last thing
+ * The Companion room on the home screen: the little pixel whale, her name, what she's doing, the last thing
  * she said, and how well she knows you (lib/companion/companion_widget.dart).
  *
  * The app sends what the room looks like through MethodChannel `dsh/companion_widget` (`update`);

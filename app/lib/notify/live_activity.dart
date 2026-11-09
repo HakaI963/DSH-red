@@ -7,12 +7,12 @@
 // reducer, so the island and the pet never disagree; it shows the pet's own
 // picture for that state. Phone control is added natively and outranks this.
 //
-// | 宠物状态 | 实时活动 |
+// | Pet state | Live activity |
 // |---|---|
 // | thinking / working / juggling / sweeping | running: the clock in the chip |
-// | notification | waiting: 「待确认」/「待回答」 |
-// | attention | done: 「完成」 for the pet's moment, app in the background only |
-// | error | failed: 「出错」, same |
+// | notification | waiting: "Waiting for approval" / "Waiting for answer" |
+// | attention | done: "Done" for the pet's moment, app in the background only |
+// | error | failed: "Failed", same |
 // | anything else | running while something runs, else nothing |
 
 import 'package:flutter/foundation.dart';
@@ -99,7 +99,7 @@ class LiveActivity {
 ///
 /// [titles] holds the titles of conversations seen running (unmasked), so a
 /// finished one keeps its name for its moment. [showDone] / [showFailed]
-/// follow the 「一轮完成」 / 「出错或被停下」 notification switches.
+/// follow the "Turn complete" / "Error or stopped" notification switches.
 LiveActivity? liveActivityOf({
   required PetState pet,
   required List<PetRun> runs,
@@ -140,7 +140,7 @@ LiveActivity? liveActivityOf({
     title = focusedTitle;
   }
 
-  // More conversations than the one it names: 「· 3 个对话在跑」.
+  // More conversations than the one it names: "· 3 chats running".
   String counted(String line) => roots.length > 1 ? '$line · ${l10n.liveRunsCount(roots.length)}' : line;
 
   LiveActivity make(LiveKind kind, String text, String chip, String publicText, {String? eventId}) => LiveActivity(

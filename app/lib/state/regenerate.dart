@@ -1,5 +1,5 @@
-// 「重新回答」. DSH keeps an append-only log and has no regenerate call, and
-// the official web client offers none. It is done the way 「编辑后重发」 is —
+// "Regenerate". DSH keeps an append-only log and has no regenerate call, and
+// the official web client offers none. It is done the way "Edit and resend" is —
 // `session/fork` just before the prompt (`forkPointBeforePrompt`) — and then
 // the same prompt, text and images, is sent again in the fork. The source
 // conversation stays as it was.
@@ -12,7 +12,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'attachments.dart';
 import 'chat_state.dart';
 
-/// The prompt 「重新回答」 sends again for [reply]; null when it is not
+/// The prompt "Regenerate" sends again for [reply]; null when it is not
 /// offered:
 /// * [reply] is not the conversation's last word (only notices may follow
 ///   it), or it is still streaming;

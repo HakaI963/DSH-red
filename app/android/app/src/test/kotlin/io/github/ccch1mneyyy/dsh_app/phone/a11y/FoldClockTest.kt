@@ -19,7 +19,7 @@ class FoldClockTest {
         start(now)
     }
 
-    // ---- 胶囊：默认形态，闲置后变淡，一碰就恢复 --------------------------------------------------------
+    // ---- Capsule: the default form, dims when idle, a touch restores it ------------------------------
 
     @Test fun itStartsAsTheCapsuleAndFadesWhenLeftAlone() {
         val c = open(1_000)
@@ -29,7 +29,7 @@ class FoldClockTest {
         assertEquals(Tick.NONE, c.tick(1_000 + dim - 1))
         assertEquals(Tick.DIM, c.tick(1_000 + dim))
         assertTrue(c.dimmed)
-        // Faded, it stays the capsule: without 自动收起 nothing more is due.
+        // Faded, it stays the capsule: without auto-collapse nothing more is due.
         assertNull(c.nextAt)
         assertEquals(Tick.NONE, c.tick(1_000 + 100 * dim))
         assertEquals(Form.CAPSULE, c.form)
@@ -70,7 +70,7 @@ class FoldClockTest {
         assertEquals(Tick.FOLD, c.tick(fold))
     }
 
-    // ---- 卡片：从胶囊长出来，闲置后收回 -----------------------------------------------------------
+    // ---- Card: grows from the capsule, folds back when idle -------------------------------------------
 
     @Test fun theLineOpensTheCardAndItGoesBackWhenLeftAlone() {
         val c = open()
@@ -125,7 +125,7 @@ class FoldClockTest {
         }
     }
 
-    // ---- 小球：手动收起，本任务里一直保持，直到点开 -------------------------------------------------
+    // ---- Ball: folded by hand, kept for the rest of the task until tapped open -----------------------
 
     @Test fun theMarkFoldsUntilTheBallIsTapped() {
         val c = open()
@@ -178,7 +178,7 @@ class FoldClockTest {
         assertEquals(Form.CAPSULE, c.form)
     }
 
-    // ---- 自动收起 ---------------------------------------------------------------------------------
+    // ---- Auto-collapse -------------------------------------------------------------------------------
 
     @Test fun autoFoldFoldsAnIdleCapsule() {
         val c = open(auto = true)
@@ -210,7 +210,7 @@ class FoldClockTest {
             assertTrue("$h opens it", c.hold(h, fold + 1))
             assertEquals(Form.CAPSULE, c.form)
         }
-        // The 已停止 note doesn't: it is gone in a moment anyway.
+        // The Stopped note doesn't: it is gone in a moment anyway.
         val c = open(auto = true)
         c.tick(fold)
         assertFalse(c.hold(Hold.STOPPED, fold + 1))
@@ -226,7 +226,7 @@ class FoldClockTest {
         assertEquals(2_000 + dim, c.nextAt)
     }
 
-    // ---- 等待：确认、交还、插话、已停止时什么都不变 ----------------------------------------------------
+    // ---- Holds: nothing changes during a confirm, a handoff, steering, or after a stop ----------------
 
     @Test fun holdsStopEveryCount() {
         for (h in Hold.values()) {

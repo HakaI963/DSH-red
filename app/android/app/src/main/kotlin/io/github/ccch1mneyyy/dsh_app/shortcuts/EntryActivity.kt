@@ -39,7 +39,7 @@ class EntryActivity : Activity() {
                     screenshot?.let { putExtra(ShortcutsPlugin.EXTRA_PATH, it.path) }
                     intent.getStringExtra(EXTRA_SESSION)?.let { putExtra(ShortcutsPlugin.EXTRA_SESSION, it) }
                     intent.getStringExtra(EXTRA_HOST)?.let { putExtra(ShortcutsPlugin.EXTRA_HOST, it) }
-                    // 问一句's text the pet couldn't send: into the composer, unsent. Only from the pet.
+                    // Quick ask's text the pet couldn't send: into the composer, unsent. Only from the pet.
                     if (intent.hasExtra(EXTRA_PET_GENERATION)) {
                         intent.getStringExtra(EXTRA_TEXT)?.take(MAX_TEXT)?.let { putExtra(ShortcutsPlugin.EXTRA_TEXT, it) }
                     }

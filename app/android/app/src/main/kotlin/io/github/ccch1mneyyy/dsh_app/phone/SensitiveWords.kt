@@ -49,7 +49,7 @@ object SensitiveWords {
     /**
      * Labels longer than this are content (a chat line, a card), not a control: they only
      * count when the word opens or closes the label. Keeps `⚠` off every message that
-     * happens to contain "发送".
+     * happens to contain "send".
      */
     const val SHORT_LABEL = 24
 

@@ -1,14 +1,14 @@
-// 对话终端:官方网页版右侧栏「终端」(dsh-client-ui-sidebar-terminal)在手机上的
-// 状态层。一个对话一组终端页签;每个页签是 Host 上的一个 PTY,外加本地的
-// xterm 屏幕模型。
+// Chat terminal: the phone-side state layer for the official web UI's right-rail "Terminal"
+// (dsh-client-ui-sidebar-terminal). One set of terminal tabs per conversation; each tab is a PTY on the Host plus a local
+// xterm screen model.
 //
-// 行为照官方 TerminalView(dsh-api-terminal-controller/client):
-// * 打开时先列出 Host 保留的终端并逐个恢复;一个都没有就新建一个;
-// * 新建前先定好 id(重复 create 幂等,关闭过的 id 不能再用);
-// * 先 retain 再 attach;每次 attach 都从完整屏幕快照开始,换一块新屏幕;
-// * 断线只丢输入权,进程还在:连接恢复(新的 mux 代)或回到前台时重新 attach;
-// * 进程退出不自动重开,页签停在「已结束」,由用户在原位置新建。
-// 页面离开只断开连接,不结束进程;关闭页签才结束进程。
+// Behavior follows the official TerminalView (dsh-api-terminal-controller/client):
+// * on open, list the terminals the Host kept and restore each; create one if there are none;
+// * fix the id before creating (repeated creates are idempotent; closed ids can't be reused);
+// * retain before attaching; every attach starts from a full screen snapshot on a fresh screen;
+// * a drop only loses input rights — the process lives: re-attach when the link returns (new mux generation) or the app comes to the foreground;
+// * an exited process isn't reopened: the tab stays "Ended" and the user creates a new one in place.
+// Leaving the page only disconnects; it doesn't end the process. Closing a tab does.
 
 import 'dart:async';
 import 'dart:async' as dart_async show AsyncError; // Riverpod exports its own AsyncError.

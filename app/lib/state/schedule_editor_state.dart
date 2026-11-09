@@ -1,8 +1,8 @@
 // State behind the native automation-task editor: the phone's time zone, the
 // Host's workspaces, a new conversation to receive a task, the creation
-// request (the Host has no create Remote — like the official 「新建」, the
+// request (the Host has no create Remote — like the official "New", the
 // task is made by the model's `schedule_create` in its conversation) and
-// 「立即运行」.
+// "Run now".
 
 import 'dart:async';
 import 'dart:convert';
@@ -174,7 +174,7 @@ Future<ScheduleTask> requestSchedule(
   }
 }
 
-/// 「立即运行」: uses the Host target-aware run API on 0.2.2; legacy Hosts
+/// "Run now": uses the Host target-aware run API on 0.2.2; legacy Hosts
 /// retain the queued conversation prompt behavior.
 Future<void> runScheduleNow(DshClient client, ScheduleTask task, {String? timeZone}) =>
     client.runScheduledTask(task, timeZone: timeZone);

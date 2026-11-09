@@ -29,7 +29,7 @@ import java.nio.file.StandardOpenOption
 import kotlin.concurrent.thread
 
 /**
- * Images from chats into the phone's gallery (「保存到相册」): MethodChannel `dsh/media`.
+ * Images from chats into the phone's gallery ("Save to gallery"): MethodChannel `dsh/media`.
  *
  * - `saveImage {bytes, name, mime}` → where it landed, as the gallery shows it
  *   (`Pictures/DSH Go/x.png`). Android 10+: MediaStore Images under `Pictures/DSH Go`,

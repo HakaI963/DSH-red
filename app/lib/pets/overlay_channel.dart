@@ -1,7 +1,7 @@
 // The Dart side of the out-of-app pet (MethodChannel `dsh/pet_overlay`;
 // native: android/.../pet/PetOverlayPlugin.kt). Dart pushes every new
 // [PetState] (and says when a brought pet's files changed); the overlay's own
-// switches, 「一直显示」, 「今天不再显示」 and the permission live natively and
+// switches, "Always", "Hidden for today" and the permission live natively and
 // are read and set here. Rules:
 // `docs/design/pets.md` §2.7, §6.
 //
@@ -20,7 +20,7 @@ enum PetOverlayPermission {
   /// The phone-control accessibility service is on: its overlay needs nothing else.
   accessibility,
 
-  /// 「显示在其他应用上层」 works.
+  /// "Display over other apps" works.
   granted,
 
   /// The system reports the permission, but the window was refused: a
@@ -65,27 +65,27 @@ class PetOverlayStatus {
 
   final bool native;
 
-  /// The person turned 「App 外显示」 on (it may still lack the permission).
+  /// The person turned "Show outside the app" on (it may still lack the permission).
   final bool enabled;
 
-  /// 「一直显示」 instead of 「有事时显示」.
+  /// "Always" instead of "When active".
   final bool alwaysShow;
   final PetOverlayPermission permission;
 
-  /// 「今天不再显示」 until midnight.
+  /// "Hidden for today" until midnight.
   final bool snoozed;
 
   /// The pet is on screen right now.
   final bool showing;
 
-  /// Android API level (Android 13 = 33: sideloaded apps hit 「受限制的设置」).
+  /// Android API level (Android 13 = 33: sideloaded apps hit "Allow restricted settings").
   final int sdk;
 
   /// `Build.MANUFACTURER`, for the vendor-specific guide.
   final String manufacturer;
 
   /// Not native: set by [PetOverlayController] when a trip to system
-  /// settings came back without the permission (the row says 「未授权」).
+  /// settings came back without the permission (the row says "Not allowed").
   final bool refused;
 
   PetOverlayStatus copyWith({bool? refused}) => PetOverlayStatus(
@@ -176,10 +176,10 @@ class PetOverlayChannel {
 
   Future<PetOverlayStatus> setAlwaysShow(bool on) => _call('setAlwaysShow', {'on': on});
 
-  /// Ends 「今天不再显示」.
+  /// Ends "Hidden for today".
   Future<PetOverlayStatus> unsnooze() => _call('unsnooze');
 
-  /// Opens 「显示在其他应用上层」 for this app (else its app info page).
+  /// Opens "Display over other apps" for this app (else its app info page).
   Future<bool> requestPermission() => _bool('requestPermission');
 
   /// Opens the app's system info page (restricted settings, vendor switches).
@@ -192,7 +192,7 @@ class PetOverlayChannel {
     return _statusEvents.stream;
   }
 
-  /// 「宠物设置」 tapped in the floating pet's menu: the app is coming to the
+  /// "Pet settings" tapped in the floating pet's menu: the app is coming to the
   /// front; open the pet settings page.
   Stream<void> get settingsRequests {
     _listen();
@@ -244,7 +244,7 @@ class PetOverlayChannel {
 
 final petOverlayChannelProvider = Provider<PetOverlayChannel>((ref) => PetOverlayChannel());
 
-/// 「宠物设置」 from the floating pet's menu. Whoever owns navigation listens
+/// "Pet settings" from the floating pet's menu. Whoever owns navigation listens
 /// and opens `PetSettingsPage`.
 final petOverlaySettingsRequestsProvider = StreamProvider<void>(
   (ref) => ref.watch(petOverlayChannelProvider).settingsRequests,
@@ -293,7 +293,7 @@ class PetOverlayController extends Notifier<PetOverlayStatus> {
     return state;
   }
 
-  /// 「App 外显示」 on: with the accessibility overlay or a working
+  /// "Show outside the app" on: with the accessibility overlay or a working
   /// permission it just turns on; otherwise to system settings first.
   Future<void> turnOn() async {
     final s = await _channel.setEnabled(true);
@@ -318,7 +318,7 @@ class PetOverlayController extends Notifier<PetOverlayStatus> {
 
   Future<void> unsnooze() async => _set(await _channel.unsnooze());
 
-  /// To 「显示在其他应用上层」 again (the restricted-settings guide): the
+  /// To "Display over other apps" again (the restricted-settings guide): the
   /// switch turns on with it, so coming back granted is all it takes.
   Future<bool> openPermission() async {
     _set(await _channel.setEnabled(true));

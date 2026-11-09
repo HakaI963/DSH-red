@@ -1,8 +1,8 @@
-// 把帖子里的 dsh-go 分享链接显示成安装卡片：名称、类型、「用 dsh-go 安装」「下载 dsh-go」。
-// 链接格式的解析与解码在 ../lib/dshgo-share-link.js。
+// Turns dsh-go share links in posts into install cards: name, kind, "Install with dsh-go", "Get dsh-go".
+// Parsing and decoding of the link format live in ../lib/dshgo-share-link.js.
 //
-// 前提：站点设置 allowed_href_schemes 包含 dshgo，否则 dshgo:// 链接在烹饪时会被去掉 href
-// （infra/forum/settings/site_settings.yml 已经加上）。
+// Prerequisite: the site setting allowed_href_schemes contains dshgo, otherwise dshgo:// links lose their href during cooking
+// (infra/forum/settings/site_settings.yml already adds it).
 
 import { apiInitializer } from "discourse/lib/api";
 import { i18n } from "discourse-i18n";
@@ -44,7 +44,7 @@ function make(tag, className, text) {
   return node;
 }
 
-// 正文里没写成链接的 dshgo://share/… 文本 → <a>，之后与普通链接走同一条路。
+// dshgo://share/… text in the body that was not written as a link → <a>, then the same path as ordinary links.
 function linkifyPlainText(root) {
   const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
     acceptNode(node) {
@@ -76,7 +76,7 @@ function linkifyPlainText(root) {
   }
 }
 
-// 链接独占一段时用卡片替换这一段；嵌在句子里时保留链接，卡片放在段落后面。
+// When the link owns a whole paragraph, the card replaces it; inline in a sentence, the link stays and the card follows the paragraph.
 function placeCard(root, anchorNode, card) {
   const onebox = anchorNode.closest("aside.onebox");
   if (onebox && root.contains(onebox)) {

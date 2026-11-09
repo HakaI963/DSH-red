@@ -1,9 +1,9 @@
-// 壁纸烘焙：解码一次（按屏幕需要的尺寸，动图只取首帧）→ 取景、模糊画进一张屏幕大小的位图 →
-// 逐格量背景亮度，算出每格最少要叠多少页面色才让字够清楚（wallpaper_look.dart）→ 扩散、
-// 抹匀成一张小遮罩 → 和用户的提亮 / 压暗取大，叠上去，得到最终一张位图。
+// Wallpaper baking: decode once (at the size the screen needs; animations take only the first frame) → frame and blur into a screen-sized bitmap →
+// measure background luminance cell by cell, work out the least page color each cell needs for text to stay readable (wallpaper_look.dart) → spread and
+// smooth it into one small mask → take the larger of it and the user's Lighten / Dim, layer it on, and the final bitmap is done.
 //
-// 每帧只画这一张图：没有实时 BackdropFilter，也不再解码。越模糊烘得越小（模糊本来就不需要
-// 细节），轻量档（低端机、过热、用户选了轻量）模糊减半、封顶，按每 dp 一个像素烘。
+// Every frame draws just this image: no live BackdropFilter, no decoding either. The blurrier, the smaller it bakes (blur needs no detail anyway); the
+// light tier (low-end phone, overheating, or the user chose light) halves the blur, caps it, and bakes at one pixel per dp.
 
 import 'dart:async';
 import 'dart:math' as math;

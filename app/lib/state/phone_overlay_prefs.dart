@@ -2,7 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'phone_state.dart';
 
-/// 设置 → 手机操控 → 悬浮条: 闲置时不透明度 and 闲置时自动收起, kept on the
+/// Settings → Phone control → Floating bar: idle opacity and collapse-when-idle, kept on the
 /// native side (the overlay reads them there, live). The page shows a change at
 /// once and sends it on; without the native side the change stays for this run.
 class PhoneOverlayPrefsController extends Notifier<PhoneOverlayPrefs> {

@@ -10,13 +10,13 @@ import kotlin.math.roundToInt
 // capsule. ControlOverlay, OverlayCapsule and OverlayBall draw what these decide.
 
 /**
- * A status line as the capsule shows it. The core says 「免确认 · DSH 正在操作 · 点「发送」」; the
- * capsule is DSH's own, so it shows 「点「发送」」 and keeps 免确认 for the card.
+ * A status line as the capsule shows it. The core says "confirmations skipped · DSH is acting · tap "Send""; the
+ * capsule is DSH's own, so it shows "tap "Send"" and keeps the skip-confirmation tag for the card.
  */
 internal data class StatusLine(
     /** What the capsule shows. */
     val text: String,
-    /** The 免确认 prefix was there: nothing in this task asks. */
+    /** The skip-confirmation prefix was there: nothing in this task asks. */
     val waived: Boolean,
     /** An action (tap, type, scroll, key) rather than reading the screen: it goes into the steps. */
     val acting: Boolean,
@@ -48,7 +48,7 @@ internal class StatusLines(waivedFormat: String, actingFormat: String) {
     }
 
     companion object {
-        /** What a one-argument format says before the argument (「免确认 · %1$s」 → 「免确认 · 」); null unless it ends in it. */
+        /** What a one-argument format says before the argument ("confirmations skipped · %1$s" → "confirmations skipped · "); null unless it ends in it. */
         fun prefixOf(format: String): String? {
             for (arg in ARGS) if (format.endsWith(arg)) return format.dropLast(arg.length).takeIf { it.isNotBlank() }
             return null
@@ -83,7 +83,7 @@ internal class StepHistory(private val capacity: Int = CAPACITY) {
     }
 }
 
-/** The header's keys, left to right: the same in the capsule and the card, so 停止 never moves. */
+/** The header's keys, left to right: the same in the capsule and the card, so Stop never moves. */
 internal enum class Slot { MARK, LINE, PAUSE, STOP }
 
 /**
@@ -95,14 +95,14 @@ internal object CapsuleMetrics {
     const val HEIGHT_DP = 48
     const val RADIUS_DP = 24
 
-    /** Touch target of the mark, 暂停 and 停止 (≥ 48 dp). */
+    /** Touch target of the mark, Pause and Stop (≥ 48 dp). */
     const val KEY_DP = 48
 
-    /** The visible disc of 暂停 / 停止: concentric with the capsule's round end (6 dp in all round). */
+    /** The visible disc of Pause / Stop: concentric with the capsule's round end (6 dp in all round). */
     const val DISC_DP = 36
     const val KEY_GAP_DP = 4
 
-    /** 已解除限制's lock before the line, when any limit is lifted. */
+    /** The lock before the "Limits lifted" line, when any limit is lifted. */
     const val LOCK_DP = 14
     const val LOCK_GAP_DP = 6
 
@@ -155,7 +155,7 @@ internal object CapsuleMetrics {
 /**
  * The capsule's width over time. It grows at once (a longer line is never cut while there is
  * room), but shrinks only after the lines have been narrower for [shrinkAfterMs], and only by
- * more than [slack] px: the agent alternates 「正在看屏幕」 and 「点「…」」 every second, and a
+ * more than [slack] px: the agent alternates "watching the screen" and "tap "…"" every second, and a
  * capsule pulsing with them would be restless.
  */
 internal class CapsuleWidth(private val slack: Int, private val shrinkAfterMs: Long = SHRINK_AFTER_MS) {
@@ -195,7 +195,7 @@ internal class CapsuleWidth(private val slack: Int, private val shrinkAfterMs: L
         return true
     }
 
-    /** At once, whatever it was (a state change, such as 已停止, rather than a new line). */
+    /** At once, whatever it was (a state change, such as Stopped, rather than a new line). */
     fun force(wanted: Int): Boolean {
         since = null
         if (width == wanted) return false

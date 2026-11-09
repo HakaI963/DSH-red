@@ -1,6 +1,6 @@
-// 自定义壁纸的导入：就是启动画面那条链路（lib/launch/launch_import.dart：系统选择器 → 按字节
-// 上限流式拷进私有目录 → 看文件头认类型 → 解码一遍确认能读、取边缘色），换成壁纸的预算：
-// 只要照片、15 MB 以内、放 `<support>/wallpaper/`。动图只用第一帧（渲染时只取首帧）。
+// Custom wallpaper import: exactly the launch-screen pipeline (lib/launch/launch_import.dart: system picker → streamed into the private
+// dir under a byte cap → type read from the file header → decoded once to confirm it's readable and take edge colors), only with the wallpaper's budget:
+// photos only, up to 15 MB, stored under `<support>/wallpaper/`. Animations use only the first frame (render takes just the first frame too).
 
 import 'dart:async';
 import 'dart:io';

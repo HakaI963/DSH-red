@@ -1,4 +1,4 @@
-// Which DSH events become "看一眼" alerts, independent of how they are shown
+// Which DSH events become "take a look" alerts, independent of how they are shown
 // (system notification or in-app banner).
 //
 // Event source: the Host-wide `$events` stream every client already holds
@@ -95,11 +95,11 @@ class ChatAlert {
   /// The conversation's title.
   final String title;
 
-  /// One line: what happened ("已完成 · 回复开头", "等你确认：运行命令").
+  /// One line: what happened ("Completed · start of reply", "Needs approval: run commands").
   final String text;
   final String? eventId;
 
-  /// An approval whose exact tool call is known: the notification offers 拒绝 / 允许本次.
+  /// An approval whose exact tool call is known: the notification offers Decline / Allow once.
   final bool canApprove;
 
   /// The expanded notification text (an approval's command up to its first blank line); null: [text].
@@ -119,7 +119,7 @@ class ChatAlert {
   /// A question's one-tap answers for the pet's bubble ([petChoices]).
   final List<String>? choices;
 
-  /// A finished turn's reply, masked, on one line: 问一句's answer.
+  /// A finished turn's reply, masked, on one line: Quick ask's answer.
   final String? reply;
 
   /// Metadata projection keeps the actual source distinct from navigation.
@@ -227,7 +227,7 @@ String approvalText(ApprovalRequest request) {
 }
 
 /// An approval's notification lines from its tool call: what runs, is written or
-/// opened ("运行：git push"), and the first paragraph of it for the expanded view.
+/// opened ("Run: git push"), and the first paragraph of it for the expanded view.
 /// Null unless [call] is exactly the approved call with something to show; such an
 /// approval gets no buttons.
 ({String text, String fullText})? approvalPreview(ApprovalRequest request, ToolCallPart? call) {
@@ -282,7 +282,7 @@ String? phoneApprovalPreview(ApprovalRequest request, ToolCallPart? call) {
 const petApprovalMax = 120;
 
 /// An approval as the floating pet's bubble shows it, whole, on one line:
-/// "运行：git push origin main". Null unless [call] is exactly the approved call,
+/// "Run: git push origin main". Null unless [call] is exactly the approved call,
 /// of a tool the chat's card names (command, file, page), and all of it shows:
 /// one line, nothing masked, no invisible direction marks, at most
 /// [petApprovalMax] characters. Only then may the bubble answer it.
@@ -302,7 +302,7 @@ String? petApprovalText(ApprovalRequest request, ToolCallPart? call) {
 
 /// A question the pet's bubble takes with one tap: exactly one, single choice,
 /// one to three short options, and nothing more to read first (no detail, no
-/// plan to review). Null: 「去回答」 in the chat.
+/// plan to review). Null: "Go answer" in the chat.
 List<String>? petChoices(UserQuestionRequest request) {
   if (request.questions.length != 1) return null;
   final q = request.questions.single;
@@ -460,7 +460,7 @@ class HostAlertTracker {
   final void Function(HostRef host, String sessionId) onSessionGone;
 
   /// True when this device answers [sessionId]'s approvals by itself
-  /// (「本对话都允许」): no alert for those.
+  /// ("Allow for chat"): no alert for those.
   final bool Function(String sessionId)? skipApproval;
 
   /// A still-pending request redelivered on a new connection needs a fresh

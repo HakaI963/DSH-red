@@ -198,7 +198,7 @@ extension EditorsApi on DshClient {
   }
 
   /// `agentPresets/select`: switches a blank session's preset (how the
-  /// official creator entry turns a new conversation into 创造模式).
+  /// official creator entry turns a new conversation into Creator mode).
   Future<String> selectAgentPreset(String sessionId, String preset) async {
     final value = await rpc.call('agentPresets/select', {'agentId': sessionId, 'agentPreset': preset});
     return asString(value) ?? preset;

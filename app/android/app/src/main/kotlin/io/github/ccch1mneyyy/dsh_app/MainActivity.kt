@@ -76,15 +76,15 @@ class MainActivity : FlutterActivity() {
     /**
      * This activity's own <meta-data> (normal theme, Flutter deep linking off), whichever launcher
      * alias opened it: Flutter reads it for getComponentName(), which is the alias — that has
-     * none of it, and is disabled once the user picks another 桌面图标 (icons/).
+     * none of it, and is disabled once the user picks another app icon (icons/).
      */
     override fun getMetaData(): Bundle? =
         packageManager.getActivityInfo(ComponentName(this, MainActivity::class.java), PackageManager.GET_META_DATA).metaData
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        // 「打开 App 时自动启动」: DSH boots while Flutter starts, not after its first frame.
+        // "Start when DSH Go opens": DSH boots while Flutter starts, not after its first frame.
         LaunchStart.onActivityCreate(this)
-        // 启动画面: the first activity of a cold start hands the system's launch window to Dart's.
+        // Launch screen: the first activity of a cold start hands the system's launch window to Dart's.
         LaunchScreen.onActivityCreate(this, coldDart = FlutterEngineCache.getInstance().get(ENGINE_ID) == null)
         // Recreated, or reopened from recents: the launch intent is an old notification tap or
         // link that was handled back then. Don't let the plugins route it again.
@@ -128,7 +128,7 @@ class MainActivity : FlutterActivity() {
      * `preferredDisplayModeId = 0` means "no preference": the system picks, and its own
      * refresh-rate setting and power saving still decide. Apps that never ask stay at 60 or
      * 90 Hz on some 120 Hz phones (OriginOS, HyperOS, ColorOS); once an app does ask, those
-     * systems show their per-app switch as an in-app setting – hence the setting in 设置 › 性能.
+     * systems show their per-app switch as an in-app setting – hence the setting in Settings › Performance.
      *
      * auto: fastest mode while Flutter is producing frames, released after the last one.
      * max: pinned. system: never declared.
@@ -166,7 +166,7 @@ class MainActivity : FlutterActivity() {
                 "getTimeZoneId" -> result.success(TimeZone.getDefault().id)
                 // A browser sign-in finished (a Custom Tab on top of this task): clearing down
                 // to this activity closes the tab and shows the app again.
-                // 设置 → 性能 → 刷新率: auto | max | system, and whether Flutter is drawing.
+                // Settings → Performance → Refresh rate: auto | max | system, and whether Flutter is drawing.
                 "setRefreshRateMode" -> {
                     when (call.argument<String>("mode")) {
                         "auto", "max", "system" -> refreshMode = call.argument<String>("mode")!!
@@ -201,7 +201,7 @@ class MainActivity : FlutterActivity() {
     // (Android 12's default for launcher roots): coming back finds it as it was.
     override fun popSystemNavigator(): Boolean = moveTaskToBack(true)
 
-    /** 设置 › 性能 › 刷新率; the Flutter side owns the stored choice. */
+    /** Settings › Performance › Refresh rate; the Flutter side owns the stored choice. */
     private var refreshMode = "auto"
 
     /** Flutter produced a frame recently (see RefreshRateService): auto mode follows it. */
