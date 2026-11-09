@@ -55,7 +55,7 @@ class LocalizedText {
   /// Plain text is what `.description()` gave before `.i18n()` added
   /// languages (schemastery keeps it under `''`): a Chinese plugin that only
   /// translated into English must still read in Chinese for a Chinese UI.
-  String resolve([String locale = 'zh']) {
+  String resolve([String locale = 'en']) {
     final tagged = {for (final MapEntry(:key, :value) in values.entries) _tag(key): value};
     final wanted = _tag(locale);
     final language = wanted.split('-').first;
@@ -852,9 +852,9 @@ class MarketPlugin {
 
   MarketVersion get latest => versions.first;
 
-  String displayTitle([String locale = 'zh']) => title?.resolve(locale) ?? name;
+  String displayTitle([String locale = 'en']) => title?.resolve(locale) ?? name;
 
-  String? displayDescription([String locale = 'zh']) => description?.resolve(locale);
+  String? displayDescription([String locale = 'en']) => description?.resolve(locale);
 }
 
 class MarketIndex {

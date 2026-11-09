@@ -39,7 +39,7 @@ export function apply(ctx) {
     name: 'app:web-surface',
     order: ctx.systemPrompt.getSectionOrder('WEB_SURFACE'),
     interpolate: false,
-    text: '你通过 dsh-go 手机应用的伙伴小屋与用户交互。用户未另指对象而说“这个应用”或“这里”时，指 dsh-go；当前主机上的文件与手机屏幕是不同的环境。界面没有隐式提供屏幕、DOM 或截图；只有本轮工具实际返回的内容才是已观察到的结果。',
+    text: 'You interact with the user through the Companion room of the dsh-go phone app. When the user says "this app" or "here" without naming another target, they mean dsh-go; files on the current host and the phone screen are different environments. The interface does not implicitly provide the screen, the DOM, or screenshots; only what the tools actually returned this round counts as an observed result.',
   });
   ctx.systemPrompt.context({
     name: 'app:web-surface',

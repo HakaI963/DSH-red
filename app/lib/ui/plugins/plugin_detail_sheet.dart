@@ -28,6 +28,7 @@ import 'plugin_actions.dart';
 import 'plugin_load_status.dart';
 import 'plugin_widgets.dart';
 import 'seats/plugin_web_places.dart';
+import '../engine_settings/namespace_copy.dart' show namespaceTitles;
 
 /// Market entry detail and the install confirmation: what it is, where it
 /// comes from, the trust warning, live progress and the one primary action.
@@ -495,7 +496,7 @@ class BundleSheet extends ConsumerWidget {
                 Padding(
                   padding: const EdgeInsets.fromLTRB(16, 10, 16, 0),
                   child: Text(
-                    [for (final row in bundle.rows) row.meta?.title?.resolve() ?? row.moduleName]
+                    [for (final row in bundle.rows) namespaceTitles[row.rowId] ?? row.meta?.title?.resolve() ?? row.moduleName]
                         .join(l10n.hubPluginComponentSeparator),
                     style: theme.textTheme.bodySmall?.copyWith(color: colors.textTertiary, height: 1.6),
                   ),
@@ -537,7 +538,7 @@ class BundleSheet extends ConsumerWidget {
                           icon: AppIcons.configure,
                           title: configurable.length == 1
                               ? l10n.commonSettings
-                              : row.meta?.title?.resolve() ?? row.rowId,
+                              : namespaceTitles[row.rowId] ?? row.meta?.title?.resolve() ?? row.rowId,
                           chevron: true,
                           onTap: () => unawaited(
                             openSettingsPage(

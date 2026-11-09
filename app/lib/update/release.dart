@@ -301,9 +301,10 @@ String releaseNotesFor(ReleaseInfo release, String language) {
   final lang = language == 'en' ? 'en' : 'zh';
   final split = release.notesByLocale;
   if (split[lang]?.trim() case final text? when text.isNotEmpty) return text;
+  if (split['en']?.trim() case final text? when text.isNotEmpty) return text;
   if (split['zh']?.trim() case final text? when text.isNotEmpty) return text;
   final sections = _notesSections(release.notes);
-  return (sections[lang] ?? sections['zh'] ?? release.notes).trim();
+  return (sections[lang] ?? sections['en'] ?? sections['zh'] ?? release.notes).trim();
 }
 
 /// `### 中文` / `### English` sections of [notes]; empty without them.

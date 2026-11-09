@@ -56,7 +56,7 @@ test('ten ordinary turns do not repeat names or timestamps in dynamic context', 
     assert(prompt.includes('{{unknown}}'));
     service.end('s');
   }
-  assert(companionFullRules.includes('真实点按'));
+  assert(companionFullRules.includes('real tap'));
 });
 
 test('events bind to exact owner rpcId, never another session or principal', () => {

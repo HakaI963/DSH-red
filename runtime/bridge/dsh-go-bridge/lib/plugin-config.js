@@ -12,14 +12,14 @@ const serviceIdentity=value=>value?.[Symbol.for('cordis.original')]??value;
 const own=(o,k)=>o!=null&&Object.hasOwn(o,k);
 const record=v=>v!==null&&typeof v==='object'&&!Array.isArray(v);
 const MESSAGES=Object.freeze({
- 'invalid-operation':'此配置操作无效，或字段不允许通过此接口修改。',
- 'entry-unavailable':'此插件配置当前不可用，或不属于此接口的可访问范围。',
- conflict:'配置已发生变化，请刷新后重试。',
- overridden:'此配置由主机或命令行覆盖层控制，无法在插件表单中修改。',
- 'apply-failed':'新配置未能应用，已恢复原配置。',
- 'invalid-config':'提交的配置不符合字段要求，请检查对应操作。',
- 'host-unavailable':'主机配置服务暂不可用，请稍后重试。',
- 'recovery-failed':'配置应用失败，恢复状态也未能确认，请重新读取并检查主机状态。',
+ 'invalid-operation':'This configuration action is invalid, or the field may not be changed through this interface.',
+ 'entry-unavailable':'This plugin configuration is currently unavailable, or it is outside the scope this interface may access.',
+ conflict:'The configuration has changed; please refresh and try again.',
+ overridden:'This configuration is controlled by the host or a command-line overlay and cannot be changed in the plugin form.',
+ 'apply-failed':'The new configuration could not be applied; the original configuration was restored.',
+ 'invalid-config':'The submitted configuration does not meet the field requirements; please check the corresponding operation.',
+ 'host-unavailable':'The host configuration service is temporarily unavailable; please try again later.',
+ 'recovery-failed':'Applying the configuration failed and the recovery state could not be confirmed; please re-read and check the host state.',
 });
 const FAULTS=new WeakSet();
 function fault(status,code,path){const error=Object.assign(new Error(code),{status,code,...path?{path}:{}});FAULTS.add(error);return error;}
@@ -293,7 +293,7 @@ export function createPluginConfig(ctx,{readBody,send}){
  return {statusChanged,async handle(req,res,path){
   if(path!==BASE&&!path.startsWith(BASE+'/'))return false;
   try{
-   if(path===BASE){if(req.method!=='GET')send(res,405,{v:1,code:'invalid-operation',message:'此接口不支持该请求方法。'});else send(res,200,{v:1,entries:(await rows()).map(x=>x.summary)});return true;}
+   if(path===BASE){if(req.method!=='GET')send(res,405,{v:1,code:'invalid-operation',message:'This interface does not support that request method.'});else send(res,200,{v:1,entries:(await rows()).map(x=>x.summary)});return true;}
    let id;try{id=decodeURIComponent(path.slice(BASE.length+1));}catch{throw fault(400,'invalid-operation');}
    if(!id||id.length>512)throw fault(404,'entry-unavailable');
    if(req.method==='GET')send(res,200,(await snapshot(id)).body);
@@ -304,7 +304,7 @@ export function createPluginConfig(ctx,{readBody,send}){
     if(String(req.headers['content-type']).split(';')[0].trim().toLowerCase()!=='application/json'){req.resume();throw fault(400,'invalid-operation');}
     let input;try{input=JSON.parse((await readBody(req,512*1024)).toString('utf8'));}catch{throw fault(400,'invalid-operation');}
     send(res,200,await update(id,input));
-   }else send(res,405,{v:1,code:'invalid-operation',message:'此接口不支持该请求方法。'});
+   }else send(res,405,{v:1,code:'invalid-operation',message:'This interface does not support that request method.'});
   }catch(error){const known=FAULTS.has(error),code=known?error.code:'host-unavailable',path=known?publicPath(error.path):undefined;send(res,known?error.status:503,{v:1,code,message:MESSAGES[code],...path?{path}:{}});}
   return true;
  }};

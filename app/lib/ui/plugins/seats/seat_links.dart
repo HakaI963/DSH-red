@@ -17,6 +17,7 @@ import '../../theme/app_icons.dart';
 import '../../web/dsh_web_launcher.dart';
 import '../../web/web_target.dart';
 import 'plugin_seat_page.dart';
+import '../../engine_settings/namespace_copy.dart' show namespaceTitles;
 
 /// Opens DSH Web on a target (in Web mode the web home itself goes there);
 /// tests swap it for a recorder.
@@ -65,7 +66,9 @@ String seatEntryTitle(SlotOccupant o, {SeatInventory? inventory, PluginBundle? b
 String seatConfigTitle(SlotOccupant o, {PluginBundle? bundle}) {
   if (o.slot != Slots.rowConfig) return appL10n.commonSettings;
   final row = o.cell.substring(o.cell.lastIndexOf('#') + 1);
-  return bundle?.rows.where((r) => r.rowId == row).firstOrNull?.meta?.title?.resolve() ?? appL10n.commonSettings;
+  return namespaceTitles[row] ??
+      bundle?.rows.where((r) => r.rowId == row).firstOrNull?.meta?.title?.resolve() ??
+      appL10n.commonSettings;
 }
 
 /// Where [o] lands in DSH Web. The open bridge (`assets/web/dsh_web_open.js`)

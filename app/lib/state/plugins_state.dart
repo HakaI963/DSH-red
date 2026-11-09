@@ -153,10 +153,10 @@ class MarketEntry {
   };
 
   /// The sidecar's title in [locale], else the index's.
-  String title([String locale = 'zh']) => listing?.title?.resolve(locale) ?? plugin.displayTitle(locale);
+  String title([String locale = 'en']) => listing?.title?.resolve(locale) ?? plugin.displayTitle(locale);
 
   /// The sidecar's summary in [locale], else the index's description.
-  String? summary([String locale = 'zh']) => listing?.summary?.resolve(locale) ?? plugin.displayDescription(locale);
+  String? summary([String locale = 'en']) => listing?.summary?.resolve(locale) ?? plugin.displayDescription(locale);
 
   static String _haystack(MarketPlugin p, DshGoListing? listing) => [
     p.name,
@@ -186,7 +186,7 @@ class MarketCatalog {
           MarketEntry(
             plugin,
             webOnly: isWebOnlyPlugin(plugin, index),
-            categoryTitle: index.categories[plugin.category]?.title.resolve('zh'),
+            categoryTitle: index.categories[plugin.category]?.title.resolve('en'),
             category: index.categories[plugin.category],
             listing: listings[plugin.name]?.version == plugin.latest.version ? listings[plugin.name] : null,
           ),

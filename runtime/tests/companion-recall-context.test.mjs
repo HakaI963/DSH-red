@@ -44,8 +44,8 @@ test('the existing full context still mounts without an available recall service
   assert.deepEqual(sections.map(section => section.name), [
     'deployment:persona-prefix', 'deployment:persona-suffix', 'app:web-surface',
   ]);
-  assert(sections[0].text().includes('鲸鱼女孩'));
-  assert(sections[1].text.includes('应用固定规则'));
+  assert(sections[0].text().includes('whale girl'));
+  assert(sections[1].text.includes('fixed by the app'));
   assert.equal(contexts.length, 1);
   assert.equal(contexts[0].name, 'app:web-surface');
 });

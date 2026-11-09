@@ -1117,7 +1117,7 @@ String? chineseText(LocalizedText? text) {
       }
       return (source: null, bundle: null, version: null);
     }
-    final title = owner.meta?.title?.resolve('zh');
+    final title = owner.meta?.title?.resolve('en');
     final name =
         _bundleNames[owner.name] ?? (title == null || title == owner.name ? shortModuleName(owner.name) : title);
     return (source: name, bundle: owner.name, version: owner.version);

@@ -17,6 +17,7 @@ import '../../settings/settings_widgets.dart';
 import '../../theme/app_icons.dart';
 import 'plugin_seat_page.dart';
 import 'seat_links.dart';
+import '../../engine_settings/namespace_copy.dart' show namespaceTitles;
 
 /// The slots the hub seats, in order.
 const pluginSettingsSlots = [Slots.settingsSection, Slots.generalItem];
@@ -55,7 +56,9 @@ class PluginSettingsTile extends ConsumerWidget {
     final bundle = seatBundleOf(ref.watch(installedPluginsProvider.select((s) => s.value)), o.package);
     if (item.configNamespace case final ns?) {
       final title =
-          bundle?.rows.where((row) => row.rowId == ns).firstOrNull?.meta?.title?.resolve() ?? namespaceTitle(ns);
+          namespaceTitles[ns] ??
+          bundle?.rows.where((row) => row.rowId == ns).firstOrNull?.meta?.title?.resolve() ??
+          namespaceTitle(ns);
       return SchemaUnsupportedField(title: title, ns: ns);
     }
     final title = seatEntryTitle(o, inventory: ref.watch(seatInventoryProvider), bundle: bundle);

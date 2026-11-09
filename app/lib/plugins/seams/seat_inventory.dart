@@ -41,7 +41,7 @@ class SeatInventory {
     ClientInventory inventory, {
     Map<String, SettingsNamespaceView>? namespaces,
     bool webReachable = false,
-    String locale = 'zh',
+    String locale = 'en',
     List<NativePanel> nativePanels = const [],
   }) {
     return SeatInventory(
