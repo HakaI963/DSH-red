@@ -1,5 +1,5 @@
-// About DSH Go: app information, the original author and personal profiles,
-// then the brand mark, slogan and unofficial-app disclaimer.
+// About DSH Go: app information and the fork credits, then the brand mark,
+// slogan and unofficial-app disclaimer.
 
 import 'dart:async';
 
@@ -61,29 +61,6 @@ class AboutPage extends ConsumerWidget {
                 applicationIcon: const Padding(padding: EdgeInsets.all(12), child: BrandMark(size: 56, tile: true)),
                 applicationLegalese: AppInfo.disclaimer,
               ),
-            ),
-          ],
-        ),
-        SettingsSection(
-          title: l10n.hubAboutAuthor,
-          children: [
-            const SettingsTile(title: AppInfo.author),
-            _authorLink(
-              context,
-              ref,
-              'about-author-bilibili',
-              l10n.hubAboutBilibili,
-              AppInfo.authorBilibiliName,
-              AppInfo.authorBilibiliUrl,
-            ),
-            _authorLink(context, ref, 'about-author-x', l10n.hubAboutX, AppInfo.authorXHandle, AppInfo.authorXUrl),
-            _authorLink(
-              context,
-              ref,
-              'about-author-github',
-              l10n.hubAboutGithub,
-              '@${AppInfo.author}',
-              AppInfo.authorGithubUrl,
             ),
           ],
         ),
