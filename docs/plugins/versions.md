@@ -1,105 +1,105 @@
-# 兼容与版本
+# Compatibility and versions
 
-## 三个版本号
+## Three versions
 
-| 版本 | 在哪 | 谁管 | 现在 |
+| Version | Where | Who | Now |
 |---|---|---|---|
-| 协议 `v` | 清单 `dshGo.v` | 主版本，不兼容才升 | `1` |
-| 视图格式 `v` | 视图根节点 `v`（可选） | 样式和组件语言，独立于 NA | `1` 与 `2` 并存；省略为 `1` |
-| App 版本 `minApp` | 清单 `dshGo.minApp` | 你写，插件依赖某个 App 版本才有的东西时 | 不写 |
+| Protocol `v` | `dshGo.v` | Major version, bumped only for breaking changes | `1` |
+| View format `v` | The view root's `v` (optional) | Style and component language, separate from NA | `1` and `2`; omitted means `1` |
+| `minApp` | `dshGo.minApp` | You, when you need something only newer apps have | unset |
 
-另外，`package.json` 的 `engines.dsh` 写插件支持的 DSH 版本（DSH 安装时检查）。
+Also declare the DSH versions you support in `package.json` `engines.dsh` (DSH checks it on install).
 
-## v1 内怎么演进
+## How v1 evolves
 
-v1 内只**加**不**改**：新组件、新属性、新插槽、新效果、新的可选字段。老 App 遇到不认识的东西：
+Within v1 things are only **added**: components, properties, slots, effects, optional fields. Older apps meeting something new:
 
-| 不认识的 | 老 App 怎么做 |
+| Unknown | Older app |
 |---|---|
-| 组件 | 画成一行灰色占位，其余照画 |
-| 组件属性 | 忽略 |
-| 插槽 | 忽略 |
-| 效果 | 丢弃，其余效果照常 |
-| 清单字段 | 忽略 |
+| Component | A grey placeholder line; the rest draws |
+| Component property | Ignored |
+| Slot | Ignored |
+| Effect | Dropped; other effects run |
+| Manifest field | Ignored |
 
-NA 的破坏性变化需要另升主版本。视图 v2 则是明确选择的新渲染分支：保留 v1，不改变旧视图的含义。
+Breaking NA changes require a new protocol major. View v2 is an explicitly selected rendering branch that preserves v1 and its existing meanings.
 
-## 视图 v2：显式启用样式
+## View v2: explicitly enable styles
 
-在根节点写 `v: 2` 开启 [样式](styles.md)。没有版本或 `v: 1` 的旧插件继续原样渲染；未知版本记录诊断并按 v1 处理。NA 信封、清单仍写 `v: 1`，不要改成 2。
+Set `v: 2` on the root for [Styles](styles.md). Existing plugins with no version or `v: 1` retain the original rendering. Unknown versions produce a diagnostic and use v1. NA envelopes and manifests still use `v: 1`; do not change those to 2.
 
-旧 App 忽略新 style / accent / spans 属性，继续画原来的 text / value。因此 text 节点同时写 spans 时，text 仍必填。未知新组件依照原规则变成局部占位；不要把仅新 App 认识的组件放在根节点，也不要让整棵树只剩未知组件。按 `caps.components` 选组件或用 `adaptView` 准备回退。
+Old apps ignore new style / accent / spans properties and continue to draw text / value. A text node using spans must therefore retain its required text fallback. Unknown components become local placeholders as before: do not use a component unknown to old apps as the root or leave a tree containing only unknown components. Choose components using `caps.components` or prepare fallbacks with `adaptView`.
 
-后加的 `emptyState`、`gallery` 也按这条：老 App 画占位，`adaptView` 换成 `callout` 加按钮、`grid`（或竖排）里的 `image`。`progress.shape: "ring"` 和 `metric.trend` 是属性，老 App 忽略，照旧画进度条和数字；`accent: "app"` 老 App 按默认蓝色画。
+The later `emptyState` and `gallery` follow the same rule: an older app draws a placeholder, and `adaptView` turns them into a `callout` with its button and `image`s in a `grid` (or stacked). `progress.shape: "ring"` and `metric.trend` are properties an older app ignores, drawing the bar and the figure as before; it draws `accent: "app"` in the default blue.
 
-v1 golden 仍用原基准，不因 v2 更新；v2 的浅深色、窄屏、大字号用独立 golden。工具卡中已有 v1 字段的含义不变。
+Existing v1 golden baselines are unchanged. V2 light, dark, narrow-screen and enlarged-text cases have separate goldens. Old fields in stored tool cards retain their meanings.
 
-## 较新的位置
+## Newer places
 
-`composer.tools`、`session.actions`、`turn.note`、面板 `placement: "plugin"`、`presentation: "sheet"` 在协议 v1 内增加，不改已有含义。App 在 `caps.surfaces` 里列出自己能画的；视图函数用 `hasSurface(caps, …)` 判断。
+`composer.tools`, `session.actions`, `turn.note`, panel `placement: "plugin"` and `presentation: "sheet"` were added within protocol v1 and change no existing meaning. The app lists what it can draw in `caps.surfaces`; view functions check with `hasSurface(caps, …)`.
 
-| 组合 | 结果 |
+| Combination | Result |
 |---|---|
-| 新桥接 + 老 App | 老 App 忽略这些键。只放在 `plugin` 的面板退回 `session.tab`，不会消失；`presentation` 被忽略，仍然推页 |
-| 老桥接 + 新 App | 这些键不存在，也不算错误；清单里写了新位置时老桥接记一条 `unknown-surface` |
+| New bridge + old app | The old app ignores these keys. A panel placed only in `plugin` falls back to `session.tab` and doesn't vanish; `presentation` is ignored and it pushes a page |
+| Old bridge + new app | The keys are absent, which is not an error; a manifest using a new place gets one `unknown-surface` issue from the old bridge |
 
-尾注的上限收紧过一次：一段对话最多跟前 8 个开着尾注的插件，第 9 个起不再显示。之前没有这个上限，排在后面的插件在前面的没占满一轮 2 个名额时也能显示。
+The turn note limit was tightened once: a chat follows the first 8 plugins with turn notes switched on, and the ninth and later ones no longer show. Before that there was no such limit, and a later plugin could show when earlier ones left one of a turn's 2 places free.
 
-## NA v1.3：选择文件
+## NA v1.3: selected files
 
-新增可选能力 `files`、直接点按效果 `pickFile` / `pickImage`、invoke 可选字段 `userGesture`，以及桥接专用的有界上传/一次性读取句柄。协议主版本仍为 `1`，NA 的小版本与视图版本分别演进。
+Adds the optional `files` capability, direct-tap effects `pickFile` / `pickImage`, optional invoke field `userGesture`, and bounded bridge uploads with one-shot read handles. The protocol major version stays `1`; NA minor revisions and view versions evolve separately.
 
-新旧双方必须在 `hello` / `welcome` 协商 `files`。旧 App 不发送该能力，清单中的 `requires: ["files"]` 项被隐藏，插件未声明或设备未协商的选择效果被忽略且不算违规；旧桥不返回它，新 App 不启用。面板用 `caps.features` 显示说明文字，保留普通内容。旧插件、旧效果、旧视图的语义与预算不变。见[选择文件与图片](files.md)。
+Both sides must negotiate `files` in `hello` / `welcome`. Older apps omit it: manifest items requiring it are hidden, undeclared or unnegotiated selection effects are ignored without a violation. Older bridges omit it from `welcome`, so newer apps keep it off. Panels use `caps.features` to show explanatory text while retaining ordinary content. Existing plugins, effects, views and their budgets keep their semantics. See [Selecting files and images](files.md).
 
-## v1.2：可选能力
+## v1.2: optional capabilities
 
-声音、开口检测、小字幕通道、悬浮字幕（[声音与字幕](voice.md)）是 v1 里的可选能力，靠协商而不是版本号：
+Sound, speech detection, the small caption channel and the floating caption ([Sound and captions](voice.md)) are optional capabilities within v1, negotiated rather than versioned:
 
-| 情形 | 结果 |
+| Case | Result |
 |---|---|
-| 插件不写 `capabilities` | 与 v1.1 完全一样 |
-| App 不支持某能力（老 App、中转主机、设备没有麦克风） | 带 `requires` 的按钮不出现；返回的这类效果被丢弃（记一条问题，不算违规） |
-| 桥接比 App 旧 | `welcome` 里没有 `features`：App 不启用这些能力 |
+| The plugin declares no `capabilities` | Exactly v1.1 |
+| The app lacks a capability (an older app, a relay host, no microphone) | Buttons with `requires` don't show; such effects are dropped (one issue, not a violation) |
+| The bridge is older than the app | No `features` in `welcome`: the app turns none of this on |
 
-视图函数的 `caps.features` 是这次请求里 App 提出的能力，可以据此决定要不要放字幕之类的内容。
+A view function's `caps.features` lists what the app asked for in this request, if you want to add a caption only when it can be shown.
 
-## 按 App 能力降级
+## Degrading by capability
 
-视图函数的第二个参数 `caps` 告诉你 App 能画什么：
+The second argument of a view function, `caps`, says what the app can draw:
 
 ```js
 import { hasComponent, adaptView, localize } from '@dsh-go/plugin-kit'
 
 view: (scope, caps) => {
   const v = buildView(scope)
-  return adaptView(v, caps)          // App 不认识的新组件换成老组件，按钮、图片去掉
+  return adaptView(v, caps)          // newer components become older ones; buttons and images go
 }
 ```
 
-| 工具 | 用途 |
+| Helper | For |
 |---|---|
-| `hasComponent(caps, 'table')` | App 认不认识这个组件 |
-| `hasSurface(caps, 'composer.strip')` | App 显不显示这个插槽 |
-| `appAtLeast(caps, '0.10.0')` | App 版本 |
-| `localize(caps, { zh, en })` | 按 App 语言取字 |
-| `adaptView(view, caps, fallbacks?)` | 整棵视图按能力降级 |
+| `hasComponent(caps, 'table')` | Does the app know this component |
+| `hasSurface(caps, 'composer.strip')` | Does the app show this slot |
+| `appAtLeast(caps, '0.10.0')` | App version |
+| `localize(caps, { zh, en })` | Text in the app's language |
+| `adaptView(view, caps, fallbacks?)` | Degrade a whole view |
 
-工具卡没有 `caps`（它写进记录，以后的 App 也要能画），所以工具卡只用最稳的组件：`stack` `row` `text` `metric` `chart` `compare` `steps` `callout`。
+Tool cards have no `caps` (they are stored in the log and future apps must draw them), so keep cards to the steadiest components: `stack` `row` `text` `metric` `chart` `compare` `steps` `callout`.
 
-## 工具卡永久兼容
+## Tool cards stay drawable
 
-工具卡写进对话记录，一年后打开老对话也要能画。App 对 `meta["dsh-go/view"]` 只增不删，老格式永久能画。你这边：
+Cards live in the conversation log; a chat opened a year later must still draw. The app only adds to `meta["dsh-go/view"]`, never removes, and draws old formats forever. On your side:
 
-- 改工具卡结构时，不要删老字段的含义；
-- 不要在工具卡里放会过期的东西（临时链接、带时效的图片地址）。
+- When you change a card's structure, keep what old fields meant;
+- Don't put expiring things in a card (temporary links, time-limited image URLs).
 
-## 和 DSH 版本的关系
+## DSH versions
 
-| DSH | 状态 |
+| DSH | Status |
 |---|---|
-| 0.2.2-rc.1 | DSH Go 内置的引擎：插槽目录（109 个）和网页岛配方按它核对 |
-| 0.2.1-rc.4 | 开发基线：插槽目录（103 个）和网页岛配方按它核对 |
-| 0.2.1-rc.2 | 已验证（工具卡链路、插件安装、桥接） |
-| 0.2.x 其他 | 按 `engines.dsh` 自行声明；`presentationMeta` 自 0.2.0 起存在 |
+| 0.2.2-rc.1 | The engine DSH Go ships: the slot catalog (109 slots) and the web island recipes are checked against it |
+| 0.2.1-rc.4 | Development baseline: the slot catalog (103 slots) and the web island recipes are checked against it |
+| 0.2.1-rc.2 | Verified (tool card path, plugin install, bridge) |
+| Other 0.2.x | Declare in `engines.dsh`; `presentationMeta` exists since 0.2.0 |
 
-将来官方 `@dsh-std/ui` 定稿了面板格式，我们会换坐标，渲染器和这套格式不动。
+If the official `@dsh-std/ui` settles a panel format, we move to it; the renderer and this format stay.

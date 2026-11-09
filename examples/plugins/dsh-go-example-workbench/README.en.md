@@ -15,4 +15,4 @@ node examples/plugins/dsh-go-example-workbench/test/workbench.test.js
 node sdk/plugin-kit/bin/check.mjs examples/plugins/dsh-go-example-workbench --load
 ```
 
-The app needs F1 and F2. The example's JavaScript does not require the SDK package. See [Inputs and forms](../../../docs/plugins/en/inputs.md) for the public contract.
+The app needs F1 and F2. The example's JavaScript does not require the SDK package. See [Inputs and forms](../../../docs/plugins/inputs.md) for the public contract.

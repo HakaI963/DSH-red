@@ -12,7 +12,6 @@ const usage = `node sdk/plugin-kit/bin/preview.mjs view.json --out NEW_DIRECTORY
   [--data data.json] [--budget toolCard|panel|strip] [--lang zh|en]
   [--width 320] [--height 960] [--scale 1.3] [--theme light|dark|both]
   [--flutter /path/to/flutter]
-输出真实 Flutter 视口 PNG 和诊断；不连接主机、不执行插件动作、不更新 golden。
 Renders native Flutter viewport PNGs and diagnostics; no host, plugin actions or golden updates.`
 
 function jsonFile(path) {

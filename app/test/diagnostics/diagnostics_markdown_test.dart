@@ -56,29 +56,29 @@ void main() {
 
   test('the report has the sections a support skill needs', () {
     final text = diagnosticsMarkdown(snapshot());
-    expect(text, contains('# DSH Go 本机诊断'));
-    expect(text, contains('## 环境'));
+    expect(text, contains('# DSH Go Local Diagnostics'));
+    expect(text, contains('## Environment'));
     expect(text, contains('vivo'));
     expect(text, contains('V2405A'));
     expect(text, contains('Android 16 (SDK 36)'));
-    expect(text, contains('设备资源：内存 12288 MB · 剩余存储 4096 MB'));
+    expect(text, contains('Device resources: RAM 12288 MB · free storage 4096 MB'));
     expect(text, contains('0.2.1-rc.4'));
-    expect(text, contains('## 设置'));
-    expect(text, contains('API Key：已设置'));
-    expect(text, contains('## 连接'));
-    expect(text, contains('## 性能'));
+    expect(text, contains('## Settings'));
+    expect(text, contains('API Key: set'));
+    expect(text, contains('## Connection'));
+    expect(text, contains('## Performance'));
   });
 
   test('resource sizes preserve native MB, including small and missing values', () {
     final cases = <(Map<String, Object?>, String)>[
-      ({'memoryMb': 11323, 'freeStorageMb': 64512}, '- 设备资源：内存 11323 MB · 剩余存储 64512 MB'),
-      ({'memoryMb': 0, 'freeStorageMb': 1}, '- 设备资源：内存 0 MB · 剩余存储 1 MB'),
-      ({'memoryMb': 2048}, '- 设备资源：内存 2048 MB'),
-      ({}, '- 设备资源：'),
+      ({'memoryMb': 11323, 'freeStorageMb': 64512}, '- Device resources: RAM 11323 MB · free storage 64512 MB'),
+      ({'memoryMb': 0, 'freeStorageMb': 1}, '- Device resources: RAM 0 MB · free storage 1 MB'),
+      ({'memoryMb': 2048}, '- Device resources: RAM 2048 MB'),
+      ({}, '- Device resources: '),
     ];
     for (final (device, expected) in cases) {
       final report = diagnosticsMarkdown(snapshot(device: device));
-      expect(report.split('\n').singleWhere((line) => line.startsWith('- 设备资源：')), expected);
+      expect(report.split('\n').singleWhere((line) => line.startsWith('- Device resources: ')), expected);
     }
   });
 
@@ -106,9 +106,9 @@ void main() {
     final many = [for (var i = 0; i < 3000; i++) 'line $i: ${'x' * 40}'];
     final text = diagnosticsMarkdown(snapshot(engineLog: many), maxBytes: 4096);
     expect(text.length, lessThanOrEqualTo(4096 + 80));
-    expect(text, contains('已截断'));
+    expect(text, contains('truncated'));
     final capped = diagnosticsMarkdown(snapshot(engineLog: many));
-    expect(capped, contains('取最后 80 行'));
+    expect(capped, contains('showing last 80'));
     expect(capped, isNot(contains('line 0:')));
     expect(capped, contains('line 2999:'));
   });
@@ -122,7 +122,7 @@ void main() {
         },
       ),
     );
-    expect(text, contains('显示：1208×2624 · 420dpi · 2.625× · 字号 1.0'));
+    expect(text, contains('Display: 1208×2624 · 420dpi · 2.625× · font scale 1.0'));
   });
 
   test('connection and performance maps are printed as facts', () {
@@ -135,8 +135,8 @@ void main() {
         },
       ),
     );
-    expect(text, contains('state：connected'));
-    expect(text, contains('route：relay'));
+    expect(text, contains('state: connected'));
+    expect(text, contains('route: relay'));
     expect(text, contains('tier=high'));
   });
 
@@ -148,10 +148,10 @@ void main() {
     for (final raw in [null, 'PRIVATE_RAW', {}, {'v': 2, 'observed': true, 'result': 'success'},
       {'v': 1.0, 'observed': true}, {'v': 1, 'observed': 'true'}]) {
       final text = probeReport(raw);
-      expect(text, contains('后台输入探针事实（不是实时自检）：不可用或版本未知'));
+      expect(text, contains('input probe facts (not a live self-check): unavailable or unknown version'));
       expect(text, isNot(contains('PRIVATE_')));
-      expect(text, isNot(contains('自检）：通过')));
-      expect(text, isNot(contains('自检）：失败')));
+      expect(text, isNot(contains('self-check): passed')));
+      expect(text, isNot(contains('self-check): failed')));
     }
   });
 
@@ -160,10 +160,10 @@ void main() {
       'v': 1, 'observed': false, 'result': 'success', 'connectionFailure': false,
       'stage': 'input_send', 'exceptionType': 'SecurityException', 'elapsedMs': 100,
     });
-    expect(text, contains('未运行或无保留观察'));
-    expect(text, contains('保留连接失败事实：false（不表示当前连接状态）'));
-    expect(text, isNot(contains('自检）：通过')));
-    expect(text, isNot(contains('失败细节')));
+    expect(text, contains('not run or no retained observation'));
+    expect(text, contains('Retained connection failure fact: false (does not indicate current connection state)'));
+    expect(text, isNot(contains('self-check): passed')));
+    expect(text, isNot(contains('failure details')));
   });
 
   test('last accepted success and a later connection failure remain separate facts', () {
@@ -171,9 +171,9 @@ void main() {
       'v': 1, 'observed': true, 'result': 'success', 'connectionFailure': true,
       'stage': 'input_send', 'exceptionType': 'SecurityException', 'elapsedMs': 100,
     });
-    expect(text, contains('最近接受的后台输入探针事实（不是实时自检）：通过'));
-    expect(text, contains('保留连接失败事实：true（不表示当前连接状态）'));
-    expect(text, isNot(contains('失败细节')));
+    expect(text, contains('Last accepted background input probe facts (not a live self-check): passed'));
+    expect(text, contains('Retained connection failure fact: true (does not indicate current connection state)'));
+    expect(text, isNot(contains('failure details')));
   });
 
   test('known native failure categories survive the actual Markdown entry', () {
@@ -186,7 +186,7 @@ void main() {
         final text = probeReport({
           'v': 1, 'observed': true, 'result': 'failure', 'stage': stage, 'exceptionType': type, 'elapsedMs': 60000,
         });
-        expect(text, contains('自检）：失败'));
+        expect(text, contains('self-check): failed'));
         expect(text, contains('stage=$stage · type=$type · elapsedMs=60000'));
       }
     }
@@ -200,13 +200,13 @@ void main() {
         'stage': 'PRIVATE_PAGE', 'exceptionType': 'PRIVATE_ERROR', 'elapsedMs': elapsed,
         'packageName': 'PRIVATE_PACKAGE', 'message': 'PRIVATE_MESSAGE', 'imageBytes': [80, 81],
       });
-      expect(text, contains('自检）：失败'));
+      expect(text, contains('self-check): failed'));
       expect(text, isNot(contains('PRIVATE_')));
-      expect(text, isNot(contains('失败细节')));
-      expect(text, isNot(contains('保留连接失败事实')));
+      expect(text, isNot(contains('failure details')));
+      expect(text, isNot(contains('Retained connection failure fact')));
     }
     final unknown = probeReport({'v': 1, 'observed': true, 'result': 'PRIVATE_RESULT', 'stage': 'input_send'});
-    expect(unknown, contains('自检）：结果未知'));
+    expect(unknown, contains('self-check): result unknown'));
     expect(unknown, isNot(contains('PRIVATE_')));
     expect(unknown, isNot(contains('stage=')));
   });
@@ -217,7 +217,7 @@ void main() {
       'exceptionType': 'IllegalStateException', 'elapsedMs': 17,
     }, engineLog: List.generate(8, (_) => '汉' * 1000));
     expect(text, contains('stage=presentation_show'));
-    expect(text, contains('已截断'));
+    expect(text, contains('truncated'));
     expect(utf8.encode(text).length, lessThanOrEqualTo(diagnosticsMarkdownBytes));
     expect(utf8.decode(utf8.encode(text)), text);
   });

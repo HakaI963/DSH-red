@@ -8,7 +8,7 @@
 //   const host = createTestHost({ dir })            // reads <dir>/package.json
 //   plugin.apply(host.ctx)
 //   host.contributions()                            // the row the app would get
-//   await host.invoke('translate', { context: { clipboard: '你好' } })
+//   await host.invoke('translate', { context: { clipboard: 'hello' } })
 //   await host.view('usage', { sessionId: 's1' })   // { view, stats, issues }
 //   const feed = host.subscribe('usage', { sessionId: 's1' })  // feed.data, feed.history
 import { AUDIO_TYPES, CAP_LIMITS, microModel } from './bridge/capabilities.js'

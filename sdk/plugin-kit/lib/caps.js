@@ -46,7 +46,7 @@ export function appAtLeast(caps, min) {
 }
 
 /**
- * Pick a string for the app's locale from `{ zh: '用量', en: 'Usage' }` with
+ * Pick a string for the app's locale from `{ en: 'Usage', fr: 'Utilisation' }` with
  * the bridge's order: exact tag, language part, en, zh, first value.
  * A plain string is returned as is.
  * @param {{ locale?: string } | string | undefined} capsOrLocale

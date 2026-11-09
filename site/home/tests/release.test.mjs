@@ -11,82 +11,82 @@ const dist = resolve(projectRoot, 'dist');
 /** The handoff template's placeholders (the live config is filled in). */
 function template() {
   const config = structuredClone(original);
-  config.author = { ...config.author, avatar: 'assets/dsh-go.svg', id: 'DSH Go 作者' };
-  config.download = { ...config.download, description: '公测已经开始，下载信息即将公布。', qrImage: '', url: '', altUrl: '' };
-  config.repository = { label: 'github / 仓库即将公布', url: '' };
+  config.author = { ...config.author, avatar: 'assets/dsh-go.svg', id: 'DSH Go author' };
+  config.download = { ...config.download, description: 'The public beta has started; download details are coming soon.', qrImage: '', url: '', altUrl: '' };
+  config.repository = { label: 'github / repository coming soon', url: '' };
   config.metadata = { ...config.metadata, siteUrl: '', shareImage: '' };
   config.contributors = [];
   return config;
 }
 function filled() {
   const config = template();
-  config.author.id = '测试作者';
-  config.repository = { label: 'github / 测试仓库', url: 'https://example.com/repository' };
-  config.download.description = '下载 Android 安装包';
+  config.author.id = 'Test author';
+  config.repository = { label: 'github / test repository', url: 'https://example.com/repository' };
+  config.download.description = 'Download the Android package';
   config.download.url = 'https://example.com/app.apk';
   config.metadata.siteUrl = 'https://example.com/dsh/';
   return config;
 }
 
-test('交付模板阻止正式发布，并明确指出未填字段', async () => {
+test('the handoff template blocks a public release and names the unfilled fields', async () => {
   const report = await validateConfig(template(), dist);
   for (const field of ['author.id', 'repository.url', 'repository.label', 'download']) assert(report.errors.some(item => item.startsWith(field)));
 });
-test('当前配置可以正式发布，二维码文件存在', async () => {
+test('the current config is ready for release and the QR code file exists', async () => {
   const report = await validateConfig(original, dist);
   assert.deepEqual(report.errors, []);
   assert.equal(original.download.qrImage, 'assets/author/download-qr-v2.png');
 });
-test('只填下载直链、品牌头像和空贡献者都合法，不要求二维码', async () => {
+test('a direct download URL, the brand avatar and empty contributors are all valid; no QR code required', async () => {
   const report = await validateConfig(filled(), dist);
   assert.deepEqual(report.errors, []);
   assert(!report.warnings.some(item => /qrImage|author.avatar|contributors/.test(item)));
 });
-test('二维码单独存在也可用，但检查器不假装验证扫码内容', async () => {
+test('a QR code alone also works, but the checker never pretends to verify what it encodes', async () => {
   const config = filled();
   config.download.url = '';
   config.download.qrImage = 'assets/dsh-go.svg'; // Test file existence only, never a real download QR.
   assert.deepEqual((await validateConfig(config, dist)).errors, []);
 });
-test('第二个下载链接可选，填了就要是有效地址', async () => {
+test('the second download link is optional, but must be a valid URL when provided', async () => {
   const config = filled();
   config.download.altUrl = 'https://github.com/example/app/releases/latest';
   assert.deepEqual((await validateConfig(config, dist)).errors, []);
   config.download.altUrl = 'javascript:alert(1)';
   assert((await validateConfig(config, dist)).errors.some(item => item.startsWith('download.altUrl')));
 });
-test('有有效下载直链时，另一个已填但错误的二维码仍需修正或清空', async () => {
+test('with a valid direct download URL, a filled-in but broken QR code path still needs fixing or clearing', async () => {
   const config = filled();
   config.download.qrImage = 'dist/assets/qr.png';
   assert((await validateConfig(config, dist)).errors.some(item => item.startsWith('download.qrImage')));
 });
-test('本地图片缺失和大小写错误都能指出', async () => {
+test('missing local images and case mistakes are both reported', async () => {
   for (const path of ['assets/author/missing.png', 'assets/DSH-GO.svg']) {
     const config = filled();
     config.author.avatar = path;
     assert((await validateConfig(config, dist)).errors.some(item => item.startsWith('author.avatar')));
   }
 });
-test('页面与自检共享 URL 规则，拒绝脚本、凭据和编码后的路径越界', () => {
+test('the page and the checker share URL rules, rejecting scripts, credentials and encoded path escapes', () => {
   for (const url of ['javascript:alert(1)', 'https://user:pass@example.com', 'assets/../private.png', 'assets/%2e%2e/private.png', 'assets/%252e%252e/private.png', 'assets/avatar.png?v=2', 'dist/assets/avatar.png']) assert.equal(safeUrl(url, true), '');
   assert.equal(safeUrl('assets/avatar-v2.png', true), 'assets/avatar-v2.png');
   assert.equal(safeUrl('https://example.com/avatar.png?v=2', true), 'https://example.com/avatar.png?v=2');
 });
-test('四种贡献者格式与无链接平台 ID 均合法；非法行号被报告', async () => {
+test('all four contributor shapes and link-less platform IDs are valid; an illegal row number is reported', async () => {
   const config = filled();
-  config.contributors = [{ name: '名字', row: 1 }, { github: { label: 'ID', url: '' } }, { bilibili: { label: '昵称', url: 'https://example.com/profile' } }, { github: { label: 'ID', url: 'https://example.com' }, bilibili: { label: '昵称', url: '' } }];
+  config.contributors = [{ name: 'Name', row: 1 }, { github: { label: 'ID', url: '' } }, { bilibili: { label: 'Nickname', url: 'https://example.com/profile' } }, { github: { label: 'ID', url: 'https://example.com' }, bilibili: { label: 'Nickname', url: '' } }];
   assert.deepEqual((await validateConfig(config, dist)).errors, []);
   config.contributors[0].row = 4;
   assert((await validateConfig(config, dist)).errors.some(item => item.includes('.row')));
 });
-test('畸形配置产生可读错误，不崩溃', async () => {
+test('a malformed config produces readable errors without crashing', async () => {
   assert((await validateConfig(null, dist)).errors.length);
   const config = filled();
   config.author = [];
   config.contributors = {};
   assert((await validateConfig(config, dist)).errors.some(item => item.startsWith('contributors')));
 });
-test('本地分享封面必须存在且可解析为正式域名下的 PNG/JPEG', async t => {
+test('a local share cover must exist and resolve to a PNG/JPEG under the final domain', async t => {
   const root = await fixture(t);
   const config = filled();
   config.metadata.shareImage = 'assets/author/share.png';
@@ -96,20 +96,20 @@ test('本地分享封面必须存在且可解析为正式域名下的 PNG/JPEG',
   config.metadata.siteUrl = '';
   assert((await validateConfig(config, resolve(root, 'dist'))).errors.some(item => item.startsWith('metadata.siteUrl')));
 });
-test('生成静态分享标签并转义内容，删除封面不会遗留旧图片标签', () => {
-  const metadata = { ...filled().metadata, title: '<script> & "标题" $&', shareImage: 'https://example.com/share.jpg' };
+test('static share tags are generated with escaped content; removing the cover leaves no stale image tags', () => {
+  const metadata = { ...filled().metadata, title: '<script> & "Title" $&', shareImage: 'https://example.com/share.jpg' };
   const block = metadataBlock(metadata);
-  assert(block.includes('&lt;script&gt; &amp; &quot;标题&quot; $&'));
+  assert(block.includes('&lt;script&gt; &amp; &quot;Title&quot; $&'));
   assert(block.includes('summary_large_image'));
   assert(!block.includes('<script>'));
-  const html = `<!doctype html>\n<head>\n${block}\n</head><body>不改正文</body>`;
+  const html = `<!doctype html>\n<head>\n${block}\n</head><body>body unchanged</body>`;
   const updated = applyMetadata(html, { ...metadata, shareImage: '' });
   assert(!updated.includes('og:image'));
   assert(!updated.includes('twitter:image'));
-  assert(updated.endsWith('<body>不改正文</body>'));
+  assert(updated.endsWith('<body>body unchanged</body>'));
   assert.equal(applyMetadata(updated, { ...metadata, shareImage: '' }), updated);
 });
-test('交付首页元信息与默认配置一致，Star 气泡是指向仓库的链接', async () => {
+test('the delivered home page metadata matches the default config; the Star bubble links to the repository', async () => {
   const html = await readFile(resolve(dist, 'index.html'), 'utf8');
   assert.equal(applyMetadata(html, original.metadata), html);
   assert(html.includes('<a class="star-callout" aria-disabled="true">'));
@@ -133,7 +133,7 @@ async function fixture(t) {
 async function saveConfig(root, config) {
   await writeFile(resolve(root, 'dist/site-config.js'), `window.DSH_GO_CONFIG = ${JSON.stringify(config)};`);
 }
-test('命令行：缺失资料退出 1，发布准备不会改写页面', async t => {
+test('CLI: missing content exits 1 and publish preparation does not rewrite the page', async t => {
   const root = await fixture(t);
   await saveConfig(root, template());
   const before = await readFile(resolve(root, 'dist/index.html'));
@@ -144,26 +144,26 @@ test('命令行：缺失资料退出 1，发布准备不会改写页面', async 
   }
   assert.deepEqual(await readFile(resolve(root, 'dist/index.html')), before);
 });
-test('命令行：填写完整后通过，提醒同步元信息，发布生成静态 HTML 且可重复运行', async t => {
+test('CLI: a complete config passes, reminds to sync metadata, and publishing generates static HTML repeatably', async t => {
   const root = await fixture(t);
   const config = filled();
-  config.metadata.title = '作者提供的分享标题';
+  config.metadata.title = 'Share title provided by the author';
   await saveConfig(root, config);
   const check = spawnSync(process.execPath, [resolve(root, 'scripts/check-content.mjs')], { encoding: 'utf8' });
   assert.equal(check.status, 0);
-  assert(check.stderr.includes('尚未同步'));
+  assert(check.stderr.includes('not in sync'));
   const command = () => spawnSync(process.execPath, [resolve(root, 'scripts/prepare-publish.mjs')], { encoding: 'utf8' });
   assert.equal(command().status, 0);
   const html = await readFile(resolve(root, 'dist/index.html'), 'utf8');
-  assert(html.includes('<title>作者提供的分享标题</title>'));
+  assert(html.includes('<title>Share title provided by the author</title>'));
   assert(html.includes('<link rel="canonical" href="https://example.com/dsh/">'));
   assert.equal(command().status, 0);
   assert.equal(await readFile(resolve(root, 'dist/index.html'), 'utf8'), html);
 });
-test('命令行：配置语法错误可诊断', async t => {
+test('CLI: a config syntax error is diagnosable', async t => {
   const root = await fixture(t);
   await writeFile(resolve(root, 'dist/site-config.js'), 'window.DSH_GO_CONFIG = {');
   const result = spawnSync(process.execPath, [resolve(root, 'scripts/check-content.mjs')], { encoding: 'utf8' });
   assert.equal(result.status, 1);
-  assert(result.stderr.includes('无法检查配置'));
+  assert(result.stderr.includes('cannot check config'));
 });

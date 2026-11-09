@@ -37,8 +37,8 @@ void main() {
     final call = calls.single;
     expect(call.method, 'publishDiagnostics');
     final markdown = (call.arguments as Map<Object?, Object?>)['markdown'] as String;
-    expect(markdown, contains('# DSH Go 本机诊断'));
-    expect(markdown, contains('## 环境'));
+    expect(markdown, contains('# DSH Go Local Diagnostics'));
+    expect(markdown, contains('## Environment'));
   });
 
   testWidgets('a missing runtime (null reply) is reported as not published', (tester) async {

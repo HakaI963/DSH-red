@@ -1,70 +1,72 @@
-# 设计规则
+# Design rules
 
-插件给出内容、结构和有界样式，App 负责实际几何、可读色和归属边界。v1 保留原观感；显式 v2 开放 [文字、颜色与容器样式](styles.md)，同时保留系统字号和深浅色适配。
+A plugin supplies content, structure and bounded styles. The app owns actual geometry, readable colours and attribution. V1 keeps its original appearance; explicit v2 enables [text, colour and container styles](styles.md) while retaining system text scaling and both themes.
 
-## 不能自定义的
+## What you cannot customize
 
-| 不开放 | 为什么 | 用什么代替 |
+| Closed | Why | Use instead |
 |---|---|---|
-| 作者透明度、渐变 | 背景复合会扩大对比度验证范围 | v2 支持 accent、命名色、#RRGGBB，并自动校正文字；背景为固定浅底 |
-| 字体文件、任意字号、行高 | 保留 App 字体和系统字号 | v2 的六档字号、四档字重和 spans；v1 继续原样 |
-| 任意尺寸、圆角、定位、层叠 | 对称和内容边界由 App 保证 | v2 卡片变体、S/M/L 间距和四边内边距、比例列；窄屏折行 |
-| 动画 | App 统一：首次出现淡入上移；系统关闭动画时无动画 | — |
-| 外部图片地址、SVG | 不让插件埋追踪像素；SVG 能引用外部资源 | 插件自己的图片（清单 `assets` 目录，写 `asset:icons/a.png`）或 ≤ 64 KiB 的 `data:` |
-| 文字里的链接、HTML | 链接必须让用户看到域名再确认 | 按钮 + `link` 效果 |
-| 审批卡、授权按钮、密码框 | 不属于插件权限；永远没有密码类型 | v2 操作用插件描边样式，普通交互见组件目录 |
-| 自定义组件、脚本、任意表达式 | App 不执行任何外来代码 | 按视图版本使用[组件目录](components.md)；公式只用[有界求值器](inputs.md#有界公式) |
-| 替换官方界面、改主题 | 插件只能加，不能换 | 用户自己的 ui.json |
+| Author opacity and gradients | Compositing expands the contrast proof surface | V2 accent, named colours and #RRGGBB are corrected; backgrounds use fixed tints |
+| Font files, arbitrary sizes and line heights | Keep app fonts and system text scaling | Six semantic sizes, four weights and spans in [v2 styles](styles.md); v1 remains unchanged |
+| Arbitrary dimensions, radii, positioning and layers | The app owns symmetry and content boundaries | Card variants, S/M/L gaps and equal padding, proportional columns and narrow-screen wrapping |
+| Animation parameters | Motion and reduced-motion settings belong to the app | Existing app motion |
+| External image URLs and SVG | No tracking pixels or external resources | Plugin assets and bounded inline bitmaps |
+| Clickable inline links and HTML | Links retain domain confirmation | An invoke link effect |
+| Approval cards, grant buttons and password fields | These powers do not belong to a plugin view | Plugin outline actions; ordinary controls are documented in the catalogue |
+| Custom components, code and arbitrary expressions | No external code executes in the renderer | The catalogue; formulas only through a separately bounded evaluator |
+| Replacing official UI or changing the app theme | Plugins add content within their own area | User-controlled ui.json |
 
-## 署名
+V2 panels and tool cards additionally carry a fixed “Plugin content” mark outside the author tree. Structural checks cannot identify the meaning of arbitrary bitmaps or wording; [Styles](styles.md#boundaries-that-stay-closed) separates mechanical guarantees from the remaining impersonation risk.
 
-插件内容一律带署名，用户随时知道是谁在说话：
+## Attribution
 
-| 位置 | 署名方式 |
+Plugin content is always attributed, so people know who is speaking:
+
+| Place | How |
 |---|---|
-| 面板 | 外框顶部一行：插件图标 + 插件名 |
-| 消息菜单 | 按插件分组，组名是插件 `title` |
-| 状态条 | 前面是插件图标 |
-| 工具卡 | 所在的工具行就是署名 |
+| Panel | A top line in the frame: plugin icon + plugin name |
+| Reply menu | Grouped per plugin under its `title` |
+| Strip | Led by the plugin icon |
+| Tool card | The tool row it sits in |
 
-v2 面板和工具卡还带固定「插件内容」标记，作者样式不能覆盖；位图和文案的含义无法由结构规则识别，完整的机械保证与残余风险见 [样式边界](styles.md#保留的边界)。所以 `title` 写产品名，不要写「点我」「重要」这类字。
+So make `title` a product name, not "Tap me" or "Important".
 
-## 文案
+## Copy
 
-dsh-go 的文案短、笃定、像商业产品。插件出现在同一屏上，也照这个来：
+dsh-go copy is short, confident and product-like. Plugins share the screen, so the same applies:
 
-| 要 | 不要 |
+| Do | Don't |
 |---|---|
-| 「用量」「译成英文」「已复制」 | 「点击这里查看用量统计信息」 |
-| 数字带单位：`12.4k`、`63%`、`¥0.42` | 一长串原始数字 `12403` |
-| 报错像人话：「剪贴板里没有文字」 | `Error: clipboard is empty` |
-| 中文全角标点 | 中英标点混用 |
-| 不加「实验」「beta」标签、不写免责 | 「本功能为测试版，结果仅供参考」 |
+| "Usage", "To English", "Copied" | "Click here to view usage statistics" |
+| Numbers with units: `12.4k`, `63%`, `¥0.42` | Raw numbers like `12403` |
+| Human errors: "The clipboard is empty" | `Error: clipboard is empty` |
+| Full-width punctuation in Chinese | Mixed punctuation |
+| No "experimental" / "beta" labels or disclaimers | "This feature is in beta; results may vary" |
 
-- 胶囊 ≤ 10 字、菜单项 ≤ 12 字、状态条 ≤ 24 字、面板标题 ≤ 16 字，超了会截断。
-- 中英文都写（`{ "zh": "…", "en": "…" }`），App 有英文界面。
+- Capsules ≤ 10, menu items ≤ 12, strip ≤ 24, panel titles ≤ 16 characters; longer is cut.
+- Write both Chinese and English (`{ "zh": "…", "en": "…" }`); the app has an English UI.
 
-## 组件怎么选
+## Choosing components
 
-| 内容 | 组件 |
+| Content | Component |
 |---|---|
-| 两三个关键数字 | `row` 里放 `metric` |
-| 趋势、对比 | `chart`（不超过 6 组、60 个点） |
-| 明细：名称 …… 值 | `keyValue` |
-| 一组可点的条目 | `list`，行带 `action` |
-| 规整的二维数据 | `table`（≤ 8 列；手机上能少就少） |
-| 额度、完成度 | `progress` |
-| 一两个操作 | `actions`，至多一个 `primary` |
-| 一句提醒 | `callout` |
+| Two or three key numbers | `metric`s in a `row` |
+| Trends, comparisons | `chart` (≤ 6 series, 60 points) |
+| Details: name …… value | `keyValue` |
+| Tappable items | `list` with row `action`s |
+| Regular two-dimensional data | `table` (≤ 8 columns; fewer on a phone) |
+| Quota, completion | `progress` |
+| One or two operations | `actions`, at most one `primary` |
+| A single warning | `callout` |
 
-一张卡只讲一件事。能用一个 `metric` 说清的，不要上图表。
+One card, one topic. If a `metric` says it, skip the chart.
 
-## 性能
+## Performance
 
-| 规矩 | 原因 |
+| Rule | Why |
 |---|---|
-| 工具卡 ≤ 8 KiB | 写进对话记录，每次重放都要解析 |
-| 面板视图只放结构，数字用绑定 | 数据变了只推补丁，视图不重发 |
-| `emit` 给完整数据，别自己算差量 | 桥接会算，并限到 4 次每秒 |
-| 数据函数要返回取消函数 | 没人看时桥接会停掉它，省电 |
-| handler 3 秒内返回；慢活用延后效果 | 迟到的效果不执行 |
+| Tool cards ≤ 8 KiB | They are written into the log and parsed on every replay |
+| Panel views hold structure; numbers are bindings | Data changes become patches; the view is not resent |
+| `emit` the whole data; don't diff yourself | The bridge diffs and throttles to 4 per second |
+| Data functions return a cancel function | The bridge stops them when nobody is looking |
+| Handlers answer within 3 s; slow work uses a deferred result | Late effects do not run |

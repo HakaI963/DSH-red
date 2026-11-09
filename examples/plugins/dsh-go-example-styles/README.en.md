@@ -19,4 +19,4 @@ node --test examples/plugins/dsh-go-example-styles/test/*.test.js
 node sdk/plugin-kit/bin/check.mjs examples/plugins/dsh-go-example-styles --load
 ```
 
-Colour-correction notes are expected: the app generates light and dark colours and enforces at least 4.5:1 text contrast. See [Styles](../../../docs/plugins/en/styles.md). The separate interaction example covers the new inputs and forms.
+Colour-correction notes are expected: the app generates light and dark colours and enforces at least 4.5:1 text contrast. See [Styles](../../../docs/plugins/styles.md). The separate interaction example covers the new inputs and forms.

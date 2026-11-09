@@ -5,18 +5,18 @@
 /// The self-contained conversation page 「导出为网页」 fills in
 /// (`__DSHGO_TITLE__`, `__DSHGO_DATA__`; see conversation_html.dart).
 const replayViewerPage = r'''<!doctype html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="referrer" content="no-referrer">
 <meta name="robots" content="noindex">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-SQx9DjHcIv7KDXzxussj4x+ZyUAaCegGkYXT1lOZc8A='; style-src 'unsafe-inline'; img-src data: blob:; connect-src 'none'; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-OeNtFblY82SWt6RFjZcYRgzWnSNR5uCtvvX/tbOl0FU='; style-src 'unsafe-inline'; img-src data: blob:; connect-src 'none'; base-uri 'none'; form-action 'none'">
 <meta name="color-scheme" content="light dark">
 <title>__DSHGO_TITLE__</title>
 <style>/* dsh-go conversation viewer (viewer.js). Shared by the landing page and the
    self-contained page the app exports (app/tool/make_replay_viewer.py inlines
-   it). Colours follow the app's default theme (雾蓝), light and dark. */
+   it). Colours follow the app's default theme (Mist Blue), light and dark. */
 
 .dv {
   --dv-bg-top: #ebf1fe;
@@ -248,7 +248,7 @@ const replayViewerPage = r'''<!doctype html>
 // three ways a conversation arrives ([boot]):
 //
 //   - a `.dshgo` file picked or dropped on the landing page (site/share/);
-//   - the app's 「导出为网页」: this script inlined into one self-contained
+//   - the app's "Export as web page": this script inlined into one self-contained
 //     page with the file in it (app/tool/make_replay_viewer.py →
 //     app/lib/share_code/replay_viewer.g.dart);
 //   - a hosted link `https://<host>/c/<id>#k=<key>`: the page fetches
@@ -262,71 +262,87 @@ const replayViewerPage = r'''<!doctype html>
 'use strict';
 
 (function (root) {
-  // A non-browser runtime may expose a default navigator; keep tests in Chinese.
+  // A non-browser runtime may expose a default navigator; fall back to 'zh'.
+  // Both locales are English now that the repo has been converted.
   var browserLanguage = typeof document !== 'undefined' && typeof navigator !== 'undefined' ? navigator.language || '' : '';
   var lang = !browserLanguage || /^zh/i.test(browserLanguage) ? 'zh' : 'en';
   if (typeof document !== 'undefined' && document.documentElement) document.documentElement.lang = lang === 'zh' ? 'zh-CN' : 'en';
   var I18N = {
     "zh": {
-      "chat": "对话",
-      "copy": "复制",
-      "copied": "已复制",
-      "allText": "全文",
-      "progress": "回放进度",
-      "speed": "倍速",
-      "openApp": "用 dsh-go 打开",
-      "download": "下载 dsh-go",
-      "saveChat": "存为对话文件",
-      "pause": "暂停",
-      "replay": "重新播放",
-      "play": "播放",
-      "goalResume": "目标续跑",
-      "schedule": "定时任务",
-      "auto": "自动",
-      "image": "图片",
-      "thinkingActive": "思考中",
-      "thinking": "思考",
-      "interrupted": "已中断",
-      "declined": "已拒绝",
-      "failed": "失败",
-      "cancelled": "已取消",
-      "outputCut": "输出（已截断）",
-      "output": "输出",
-      "stopped": "已停止",
-      "error": "出错了",
-      "completed": "已完成",
-      "allDone": "全部完成",
-      "now": "正在：",
-      "next": "下一步：",
-      "goal": "目标",
-      "paused": "已暂停",
-      "blocked": "受阻",
-      "achieved": "已达成",
-      "pickFile": "选择文件",
-      "viewChat": "查看对话",
-      "pickHint": "选择或拖入 .dshgo 文件",
-      "fileTooLarge": "文件太大",
-      "drop": "松手打开",
-      "opening": "正在打开…",
-      "errorNewer": "需要更新 dsh-go 才能打开",
-      "errorBrowser": "这个浏览器打不开，换个新版浏览器试试",
-      "errorKind": "这不是对话文件",
-      "errorGone": "链接已过期或被删除",
-      "errorNetwork": "没能打开，检查网络后重试",
-      "errorKey": "链接不完整",
-      "errorFormat": "这个文件不完整或已损坏",
-      "seconds": "{n} 秒",
-      "minutes": "{n} 分钟",
-      "hours": "{n} 小时",
-      "date": "{year} 年 {month} 月 {day} 日",
-      "turnRangeOne": "第 {from} 轮，共 {total} 轮",
-      "turnRange": "第 {from}–{to} 轮，共 {total} 轮",
-      "steps": "{n} 步",
-      "toolCalls": "{n} 次工具调用",
-      "messages": "{n} 条消息",
-      "thoughts": "{n} 段思考",
-      "tokenCount": "{count} tokens",
-      "viewerTitle": "查看对话 · dsh-go"
+      "chat": "Chat",
+      "copy": "Copy",
+      "copied": "Copied",
+      "allText": "Full text",
+      "progress": "Replay progress",
+      "speed": "Speed",
+      "openApp": "Open in dsh-go",
+      "download": "Download dsh-go",
+      "saveChat": "Save chat file",
+      "pause": "Pause",
+      "replay": "Replay",
+      "play": "Play",
+      "goalResume": "Goal resumed",
+      "schedule": "Automation",
+      "auto": "Automatic",
+      "image": "Image",
+      "thinkingActive": "Thinking…",
+      "thinking": "Thinking",
+      "interrupted": "Interrupted",
+      "declined": "Declined",
+      "failed": "Failed",
+      "cancelled": "Cancelled",
+      "outputCut": "Output (truncated)",
+      "output": "Output",
+      "stopped": "Stopped",
+      "error": "Something went wrong",
+      "completed": "Completed",
+      "allDone": "All done",
+      "now": "Now: ",
+      "next": "Next: ",
+      "goal": "Goal",
+      "paused": "Paused",
+      "blocked": "Blocked",
+      "achieved": "Achieved",
+      "pickFile": "Choose file",
+      "viewChat": "View chat",
+      "pickHint": "Choose or drop a .dshgo file",
+      "fileTooLarge": "File is too large",
+      "drop": "Drop to open",
+      "opening": "Opening…",
+      "errorNewer": "Update dsh-go to open this",
+      "errorBrowser": "Can’t open this in your browser. Try a newer one.",
+      "errorKind": "This isn’t a chat file",
+      "errorGone": "This link has expired or was deleted",
+      "errorNetwork": "Couldn’t open. Check your network and try again.",
+      "errorKey": "This link is incomplete",
+      "errorFormat": "This file is incomplete or damaged",
+      "seconds": "{n} s",
+      "minutes": "{n} min",
+      "hours": "{n} h",
+      "date": "{year}-{month}-{day}",
+      "turnRangeOne": "Turn {from} of {total}",
+      "turnRange": "Turns {from}–{to} of {total}",
+      "steps": {
+        "one": "{n} step",
+        "other": "{n} steps"
+      },
+      "toolCalls": {
+        "one": "{n} tool call",
+        "other": "{n} tool calls"
+      },
+      "messages": {
+        "one": "{n} message",
+        "other": "{n} messages"
+      },
+      "thoughts": {
+        "one": "{n} thought",
+        "other": "{n} thoughts"
+      },
+      "tokenCount": {
+        "one": "{count} token",
+        "other": "{count} tokens"
+      },
+      "viewerTitle": "View chat · dsh-go"
     },
     "en": {
       "chat": "Chat",
@@ -1762,7 +1778,7 @@ const replayViewerPage = r'''<!doctype html>
     return c;
   }
 
-  /** 「查看对话」: pick a `.dshgo` file or drop one anywhere on the page. */
+  /** "View chat": pick a `.dshgo` file or drop one anywhere on the page. */
   function opener(host, opts) {
     opts = opts || {};
     var input = el('input');
@@ -1891,4 +1907,4 @@ DshgoViewer.boot();
 ''';
 
 /// What the page was built from (test/share_code/replay_viewer_sync_test.dart).
-const replayViewerSourceHash = '676f55f8a99ddb882587d2a928116e5ee77900c9c399b08085815875c23b881b';
+const replayViewerSourceHash = '6e06f53bb4a400ad13bce7b3e80b2e412db1041c1459f733fba0ea18ae27aac3';

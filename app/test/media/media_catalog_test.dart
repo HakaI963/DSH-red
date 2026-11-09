@@ -404,7 +404,7 @@ void main() {
       _catalog(describe)['presets'] = [
         {
           'id': 'ark-image',
-          'label': '火山方舟 · 图片',
+          'label': 'Volcano Ark · Image',
           'labelEn': 'Volcengine Ark · Image',
           'provider': 'ark',
           'profile': 'ark-image',

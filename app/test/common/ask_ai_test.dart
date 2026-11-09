@@ -35,9 +35,8 @@ import '../shell/golden_harness.dart';
 
 /// The bundled guide pages, as a map (tests don't read the asset bundle).
 Future<String> _pages(String asset) async => switch (asset) {
-  'assets/skills/dsh-go-guide/zh-04-phone-control.md' => '# 手机操控\n让 DSH 看屏幕。',
   'assets/skills/dsh-go-guide/en-04-phone-control.md' => '# Phone control\nLet DSH read the screen.',
-  'assets/skills/dsh-go-guide/zh-03-engine-hosts.md' => '# 本机引擎与远程主机',
+  'assets/skills/dsh-go-guide/en-03-engine-hosts.md' => '# Engine and remote hosts',
   _ => throw StateError('no asset $asset'),
 };
 
@@ -67,18 +66,9 @@ void main() {
       final file = request.attachments.single;
       expect(file.name, 'dsh-go-guide-phone-control.md');
       expect(file.isImage, isFalse);
-      expect(utf8.decode(file.bytes), '# 手机操控\n让 DSH 看屏幕。');
+      // The guide ships in English only, whatever the app's language.
+      expect(utf8.decode(file.bytes), '# Phone control\nLet DSH read the screen.');
       expect(request.note, isNull);
-    });
-
-    test('English picks the English page', () async {
-      final request = await askAiRequest(
-        AskAiTopic.phoneControl,
-        route: GuideRoute.attachment,
-        read: _pages,
-        english: true,
-      );
-      expect(utf8.decode(request.attachments.single.bytes), startsWith('# Phone control'));
     });
 
     test('a host without files, or a page that cannot be read: the question and a note', () async {
@@ -99,10 +89,8 @@ void main() {
       );
       final files = (manifest as Map)['files'] as Map;
       for (final topic in AskAiTopic.values) {
-        for (final english in [false, true]) {
-          final asset = guidePageAsset(topic.guidePage, english: english);
-          expect(files.keys, contains(asset.split('/').last), reason: '$topic → $asset');
-        }
+        final asset = guidePageAsset(topic.guidePage);
+        expect(files.keys, contains(asset.split('/').last), reason: '$topic → $asset');
         expect(topic.question, isNotEmpty);
       }
     });

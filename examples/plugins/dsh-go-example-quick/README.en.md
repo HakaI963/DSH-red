@@ -43,7 +43,7 @@ return {
 }
 ```
 
-The result may carry only `insert`, `copy`, `toast` and `patch`; cancel, timeout or disconnect fire `signal` and void the result. See [`docs/plugins/en/actions.md`](../../../docs/plugins/en/actions.md).
+The result may carry only `insert`, `copy`, `toast` and `patch`; cancel, timeout or disconnect fire `signal` and void the result. See [`docs/plugins/actions.md`](../../../docs/plugins/actions.md).
 
 ## Check
 

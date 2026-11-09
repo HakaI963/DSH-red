@@ -29,7 +29,7 @@ void main() {
 
   Directory installed() => Directory('${root.path}/root/.dsh/skills/$guideSkillName');
 
-  test('the bundle: every asset mapped, both languages page for page, links resolve, SKILL.md managed and last', () {
+  test('the bundle: every asset mapped, links resolve, SKILL.md managed and last', () {
     final assets = Directory('$appDir/assets/skills/$guideSkillName');
     final manifest = jsonDecode(File('${assets.path}/manifest.json').readAsStringSync()) as Map;
     expect(manifest['name'], guideSkillName);
@@ -38,21 +38,19 @@ void main() {
 
     expect(guide.name, guideSkillName);
     expect(guide.files.keys.toSet(), files.values.toSet());
-    expect(
-      guide.files.keys,
-      containsAll(['SKILL.md', 'README.md', 'zh/04-phone-control.md', 'en/04-phone-control.md']),
-    );
+    expect(guide.files.keys, containsAll(['SKILL.md', 'README.md', 'en/04-phone-control.md']));
     expect(guide.writeOrder.last.key, 'SKILL.md');
     expect(guide.skillMd.split('\n').first, '---');
     expect(isManagedUiSkill(guide.skillMd), isTrue);
     expect(guide.skillMd, contains('name: $guideSkillName\n'));
 
+    // The guide ships in English only.
     Set<String> pages(String locale) => {
       for (final path in guide.files.keys)
         if (path.startsWith('$locale/')) path.substring(locale.length + 1),
     };
-    expect(pages('zh'), isNotEmpty);
-    expect(pages('en'), pages('zh'));
+    expect(pages('en'), isNotEmpty);
+    expect(pages('zh'), isEmpty);
 
     // Relative links land on a file of the bundle, wherever it is installed.
     final link = RegExp(r'\]\(([^)\s]+)\)');
@@ -74,10 +72,10 @@ void main() {
     expect(File('${installed().path}/SKILL.md').readAsStringSync(), contains(uiSkillManagedMarker));
     expect(await installUiSkill(root, guide), UiSkillInstallResult.unchanged);
 
-    final page = File('${installed().path}/zh/04-phone-control.md');
+    final page = File('${installed().path}/en/04-phone-control.md');
     page.writeAsStringSync('outdated');
     expect(await installUiSkill(root, guide), UiSkillInstallResult.updated);
-    expect(page.readAsStringSync(), guide.files['zh/04-phone-control.md']);
+    expect(page.readAsStringSync(), guide.files['en/04-phone-control.md']);
 
     // The person deletes the managed line: the folder is theirs from now on.
     final skill = File('${installed().path}/SKILL.md');

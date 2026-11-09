@@ -4,22 +4,22 @@
     python3 app/tool/guide_sync.py           # check, then write app/assets/skills/dsh-go-guide/
     python3 app/tool/guide_sync.py --check   # check only, write nothing; exit 1 on any problem
 
-The guide lives in docs/guide/ (SKILL.md, README.md, zh/*.md, en/*.md) and ships
+The guide lives in docs/guide/ (SKILL.md, README.md, en/*.md) and ships
 as the dsh-go-guide skill: the app installs it into the on-device engine
 (lib/ui_config/ui_skill.dart), flat in app/assets/skills/dsh-go-guide/ with
-manifest.json mapping each file back to its place. Rules for the pages:
+manifest.json mapping each file back to its place. The guide is English-only.
+Rules for the pages:
 
-- zh/ and en/ hold the same pages. README.md says `> dsh-go <version>`, the
-  version name in app/pubspec.yaml (without `+N`).
+- README.md says `> dsh-go <version>`, the version name in app/pubspec.yaml
+  (without `+N`).
 - A UI path is a code span `A › B › C` on the line right after
   `<!-- nav: keyA,keyB,keyC -->`, which names each label's ARB key
-  (app/lib/l10n/parts/*_<locale>.arb); a `›` without that line fails.
-- **Bold** is for UI text only: each must be a label of that locale, from the
-  ARB or the Android string resources.
+  (app/lib/l10n/parts/*_en.arb); a `›` without that line fails.
+- **Bold** is for UI text only: each must be an English label, from the ARB
+  or the Android string resources.
 - Relative links resolve; `dshgo://open/<id>` names a page or a row a link
   may open: app/lib/links/page_links.dart and the settings index
   (app/lib/ui/settings/index/spots.dart).
-- Chinese pages say 对话, never 会话, and never 实验.
 """
 from __future__ import annotations
 
@@ -31,13 +31,12 @@ import xml.etree.ElementTree as ET
 from pathlib import Path
 
 SKILL = 'dsh-go-guide'
-LOCALES = ('zh', 'en')
+LOCALES = ('en',)
 NAV = re.compile(r'^<!-- nav: ([A-Za-z][A-Za-z0-9_]*(?:,[A-Za-z][A-Za-z0-9_]*)*) -->$')
 SPAN = re.compile(r'`([^`\n]+)`')
 BOLD = re.compile(r'\*\*([^*\n]+)\*\*')
 LINK = re.compile(r'\]\(([^)\s]+)\)')
 VERSION_LINE = re.compile(r'^> dsh-go (\S+)$', re.MULTILINE)
-BANNED = {'zh': ('会话', '实验'), 'en': ()}
 
 
 def read_arb(directory: Path, locale: str) -> dict[str, str]:
@@ -55,8 +54,8 @@ def read_arb(directory: Path, locale: str) -> dict[str, str]:
     return labels
 
 
-def read_android(res: Path, locale: str) -> set[str]:
-    folder = res / ('values-zh' if locale == 'zh' else 'values')
+def read_android(res: Path) -> set[str]:
+    folder = res / 'values'
     out: set[str] = set()
     for file in sorted(folder.glob('*.xml')):
         for node in ET.parse(file).getroot().iter('string'):
@@ -66,8 +65,8 @@ def read_android(res: Path, locale: str) -> set[str]:
 
 
 def read_page_ids(links: Path, index: Path) -> set[str]:
-    """Page link ids: 全部功能's own pages (page_links.dart) and every page and
-    row link of the settings index (ui/settings/index/spots.dart)."""
+    """Page link ids: the feature catalog's own pages (page_links.dart) and
+    every page and row link of the settings index (ui/settings/index/spots.dart)."""
     text = links.read_text(encoding='utf-8')
     ids: set[str] = set()
     catalog = re.search(r'catalogPageLinks = <String>\{(.*?)\};', text, re.S)
@@ -130,9 +129,6 @@ def check_page(path: Path, guide: Path, locale: str, arb: dict[str, str], labels
         for bold in BOLD.findall(line):
             if bold not in labels:
                 errors.append(f'{name}:{i + 1}: **{bold}** is not a {locale} UI label')
-        for word in BANNED[locale]:
-            if word in line:
-                errors.append(f'{name}:{i + 1}: avoid 「{word}」')
     return errors + check_links(path, guide, ids)
 
 
@@ -186,16 +182,13 @@ def check(repo: Path, guide: Path) -> list[str]:
     for required in ('SKILL.md', 'README.md'):
         if not (guide / required).is_file():
             return [f'{guide}: missing {required}']
-    pages = {locale: {p.name for p in (guide / locale).glob('*.md')} for locale in LOCALES}
-    if not pages['zh']:
-        errors.append(f'{guide}/zh: no pages')
-    if pages['zh'] != pages['en']:
-        errors.append(f'zh/en pages differ: only zh {sorted(pages["zh"] - pages["en"])}, '
-                      f'only en {sorted(pages["en"] - pages["zh"])}')
+    pages = {p.name for p in (guide / 'en').glob('*.md')}
+    if not pages:
+        errors.append(f'{guide}/en: no pages')
     for other in guide.rglob('*'):
         rel = other.relative_to(guide).as_posix()
         if other.is_file() and rel not in guide_files(guide):
-            errors.append(f'{rel}: not part of the guide (SKILL.md, README.md, zh/*.md, en/*.md)')
+            errors.append(f'{rel}: not part of the guide (SKILL.md, README.md, en/*.md)')
     version = app_version(repo / 'app/pubspec.yaml')
     stated = VERSION_LINE.findall((guide / 'README.md').read_text(encoding='utf-8'))
     if stated != [version]:
@@ -205,7 +198,7 @@ def check(repo: Path, guide: Path) -> list[str]:
     res = repo / 'app/android/app/src/main/res'
     for locale in LOCALES:
         arb = read_arb(repo / 'app/lib/l10n/parts', locale)
-        labels = set(arb.values()) | read_android(res, locale)
+        labels = set(arb.values()) | read_android(res)
         for page in sorted((guide / locale).glob('*.md')):
             errors += check_page(page, guide, locale, arb, labels, ids)
     for name in ('SKILL.md', 'README.md'):

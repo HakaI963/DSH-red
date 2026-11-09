@@ -223,10 +223,10 @@ Map<String, Object?> testMediaService(String id, String label, String models, {b
   'keyRef': '${id.toUpperCase()}_API_KEY',
 };
 
-/// 火山方舟 (Seedream, Seedance) and 阿里云百炼 (千问).
+/// Volcano Ark (Seedream, Seedance) and Alibaba Cloud Model Studio (Qwen).
 List<Map<String, Object?>> testMediaServices() => [
-  testMediaService('ark', '火山方舟', 'doubao-seedream-5-0-pro,doubao-seedance-2-0'),
-  testMediaService('bailian', '阿里云百炼', 'qwen-image-3.0-pro'),
+  testMediaService('ark', 'Volcano Ark', 'doubao-seedream-5-0-pro,doubao-seedance-2-0'),
+  testMediaService('bailian', 'Alibaba Cloud Model Studio', 'qwen-image-3.0-pro'),
 ];
 
 /// The plugin's namespace of settings/describe: [catalog] on the services

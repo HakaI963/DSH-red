@@ -22,9 +22,9 @@ const diagnosticsMarkdownBytes = 16 * 1024;
 /// [redactDiagnostics] on the way out. The UTF-8 budget includes the notice.
 String diagnosticsMarkdown(DiagnosticsSnapshot s, {int maxBytes = diagnosticsMarkdownBytes}) {
   final b = StringBuffer()
-    ..writeln('# DSH Go 本机诊断')
+    ..writeln('# DSH Go Local Diagnostics')
     ..writeln()
-    ..writeln('> App 写在引擎里的环境快照，给排查问题用；已脱敏。生成时间：${_time(s.at)}。')
+    ..writeln('> Environment snapshot the app writes inside the engine, for troubleshooting; secrets redacted. Generated at: ${_time(s.at)}.')
     ..writeln();
   _systemIme(b, s);
   _environment(b, s);
@@ -32,12 +32,12 @@ String diagnosticsMarkdown(DiagnosticsSnapshot s, {int maxBytes = diagnosticsMar
   _phone(b, s);
   _performance(b, s);
   _errors(b, s);
-  _log(b, '引擎日志（尾部）', s.engineLog, diagnosticsEngineLines);
-  _log(b, '失败前后的日志（尾部）', s.failureLog, diagnosticsFailureLines);
+  _log(b, 'Engine log (tail)', s.engineLog, diagnosticsEngineLines);
+  _log(b, 'Log around the failure (tail)', s.failureLog, diagnosticsFailureLines);
   final text = redactDiagnostics(b.toString());
   final bytes = utf8.encode(text);
   if (bytes.length <= maxBytes) return text;
-  const notice = '\n…（诊断文件过长，已截断；完整内容用 设置 → 诊断 的导出包）\n';
+  const notice = '\n…(diagnostics file too long, truncated; use the export bundle in Settings → Diagnostics for the full content)\n';
   final noticeBytes = utf8.encode(notice);
   final contentBudget = maxBytes - noticeBytes.length;
   if (contentBudget < 0) return _utf8Prefix(noticeBytes, maxBytes);
@@ -81,70 +81,70 @@ void _environment(StringBuffer b, DiagnosticsSnapshot s) {
   final device = s.native.device;
   final manifest = s.native.manifest;
   b
-    ..writeln('## 环境')
-    ..writeln('- App：${_join([AppInfo.version, app['versionName'], app['versionCode']?.toString()])}')
-    ..writeln('- 设备：${_join([device['manufacturer'], device['brand'], device['model'], _android(device)], mono: true)}')
-    ..writeln('- 设备资源：${_join([_mb(device['memoryMb'], '内存'), _mb(device['freeStorageMb'], '剩余存储')])}')
-    ..writeln('- ABI：${st.abi ?? '—'}');
+    ..writeln('## Environment')
+    ..writeln('- App: ${_join([AppInfo.version, app['versionName'], app['versionCode']?.toString()])}')
+    ..writeln('- Device: ${_join([device['manufacturer'], device['brand'], device['model'], _android(device)], mono: true)}')
+    ..writeln('- Device resources: ${_join([_mb(device['memoryMb'], 'RAM'), _mb(device['freeStorageMb'], 'free storage')])}')
+    ..writeln('- ABI: ${st.abi ?? '—'}');
   final display = device['display'];
   if (display is Map) {
     final d = {for (final e in display.entries) '${e.key}': e.value};
     b.writeln(
-      '- 显示：${_join([if (d['widthPx'] != null && d['heightPx'] != null) '${d['widthPx']}×${d['heightPx']}', if (d['densityDpi'] != null) '${d['densityDpi']}dpi', if (d['density'] != null) '${d['density']}×', if (d['fontScale'] != null) '字号 ${d['fontScale']}'])}',
+      '- Display: ${_join([if (d['widthPx'] != null && d['heightPx'] != null) '${d['widthPx']}×${d['heightPx']}', if (d['densityDpi'] != null) '${d['densityDpi']}dpi', if (d['density'] != null) '${d['density']}×', if (d['fontScale'] != null) 'font scale ${d['fontScale']}'])}',
     );
   }
   if (manifest.isNotEmpty) {
     b.writeln(
-      '- 内置运行时：${_join([manifest['runtimeVersion'], manifest['dshVersion'], manifest['nodeVersion']], mono: true)}',
+      '- Bundled runtime: ${_join([manifest['runtimeVersion'], manifest['dshVersion'], manifest['nodeVersion']], mono: true)}',
     );
   }
   b
     ..writeln(
-      '- 运行时状态：${st.phase.name} · 模式 ${st.mode.name}'
-      '${st.safeState.name != 'off' ? ' · 安全模式 ${st.safeState.name}${st.safeReason == null ? '' : '（${st.safeReason}）'}' : ''}'
-      '${st.strikes > 0 ? ' · 连续失败 ${st.strikes}' : ''}',
+      '- Runtime state: ${st.phase.name} · mode ${st.mode.name}'
+      '${st.safeState.name != 'off' ? ' · safe mode ${st.safeState.name}${st.safeReason == null ? '' : ' (${st.safeReason})'}' : ''}'
+      '${st.strikes > 0 ? ' · consecutive failures ${st.strikes}' : ''}',
     )
     ..writeln(
-      '- 版本：内置 ${_short(st.bundledVersion)} · 已装 ${_short(st.installedVersion)} · DSH ${st.dshVersion ?? '—'} · Node ${st.nodeVersion ?? '—'}',
+      '- Versions: bundled ${_short(st.bundledVersion)} · installed ${_short(st.installedVersion)} · DSH ${st.dshVersion ?? '—'} · Node ${st.nodeVersion ?? '—'}',
     )
     ..writeln(
-      '- 启动方式：${st.currentExecutionMode ?? st.launchSelectedMode ?? (st.directEngineEnabled ? 'direct（未观测）' : 'proot')}'
-      '${st.launchFailureReason == null ? '' : ' · 最近失败 ${st.launchFailureReason}'}'
-      '${st.directEngineFallbackReason == null ? '' : ' · 回退 ${st.directEngineFallbackReason}'}',
+      '- Launch mode: ${st.currentExecutionMode ?? st.launchSelectedMode ?? (st.directEngineEnabled ? 'direct (not observed)' : 'proot')}'
+      '${st.launchFailureReason == null ? '' : ' · last failure ${st.launchFailureReason}'}'
+      '${st.directEngineFallbackReason == null ? '' : ' · fallback ${st.directEngineFallbackReason}'}',
     )
-    ..writeln('- 引擎地址：${st.baseUrl ?? '—'}（token 不回传）');
-  if (st.error case final error? when error.isNotEmpty) b.writeln('- 最近错误：$error');
-  if (st.networkBlocked) b.writeln('- 系统限制联网：${_time(st.networkBlockedAt ?? s.at)} 起');
+    ..writeln('- Engine URL: ${st.baseUrl ?? '—'} (token not reported)');
+  if (st.error case final error? when error.isNotEmpty) b.writeln('- Last error: $error');
+  if (st.networkBlocked) b.writeln('- Network blocked by system since ${_time(st.networkBlockedAt ?? s.at)}');
   b
     ..writeln()
-    ..writeln('## 设置')
+    ..writeln('## Settings')
     ..writeln(
-      '- API Key：${s.settings.hasApiKey ? '已设置' : '未设置'} · 自定义服务商 ${s.settings.customProviderIds.length}'
-      ' · 主题 ${s.settings.themeMode.name} · 对话字号 ${s.settings.chatTextScale}',
+      '- API Key: ${s.settings.hasApiKey ? 'set' : 'not set'} · custom providers ${s.settings.customProviderIds.length}'
+      ' · theme ${s.settings.themeMode.name} · chat text scale ${s.settings.chatTextScale}',
     )
     ..writeln(
-      '- 自动起本机引擎 ${s.settings.autoStartLocal} · 自动批准命令 ${s.settings.autoApproveCommands}'
-      ' · 手机存储 ${s.settings.phoneStorage} · 完成后收起过程 ${s.settings.foldCompletedTurns}'
-      ' · 可视化回复 ${s.settings.visualReplies}',
+      '- auto-start local engine ${s.settings.autoStartLocal} · auto-approve commands ${s.settings.autoApproveCommands}'
+      ' · phone storage ${s.settings.phoneStorage} · fold completed turns ${s.settings.foldCompletedTurns}'
+      ' · visual replies ${s.settings.visualReplies}',
     )
     ..writeln();
 }
 
 void _connection(StringBuffer b, DiagnosticsSnapshot s) {
-  b.writeln('## 连接');
+  b.writeln('## Connection');
   final entries = s.connection.entries
       .where((e) => e.key != 'history' && e.value != null && '${e.value}'.isNotEmpty)
       .toList();
   if (entries.isEmpty) {
-    b.writeln('- 没有正在观察的连接');
+    b.writeln('- No observed connections');
   } else {
     for (final e in entries) {
-      b.writeln('- ${e.key}：${e.value}');
+      b.writeln('- ${e.key}: ${e.value}');
     }
   }
   final history = s.connection['history'];
   if (history is Map && history['events'] is List) {
-    b.writeln('- 已观察的连接历史（已丢弃 ${history['dropped']} 条；不代表观察间隙的完整时序）：');
+    b.writeln('- Observed connection history (${history['dropped']} events dropped; not the full timeline across observation gaps):');
     for (final event in (history['events'] as List).whereType<Map>()) {
       final fields = [
         '#${event['sequence']}',
@@ -166,14 +166,14 @@ void _connection(StringBuffer b, DiagnosticsSnapshot s) {
 }
 
 void _phone(StringBuffer b, DiagnosticsSnapshot s) {
-  b.writeln('## 手机操控（本机）');
+  b.writeln('## Phone control (local)');
   final phone = s.phone;
   if (!phone.ready) {
-    b.writeln('- 手机状态不可用');
+    b.writeln('- Phone state unavailable');
   } else {
     b
-      ..writeln('- 手机操控开关：${phone.enabled} · 桥接监听：${phone.bridgeListening}')
-      ..writeln('- 无障碍开关：${phone.a11y.enabled} · 服务已连接：${phone.a11y.serviceConnected}');
+      ..writeln('- Phone control enabled: ${phone.enabled} · bridge listening: ${phone.bridgeListening}')
+      ..writeln('- Accessibility enabled: ${phone.a11y.enabled} · service connected: ${phone.a11y.serviceConnected}');
   }
   _backgroundInputProbe(b, s.native.device['backgroundInputProbe']);
   b.writeln();
@@ -182,23 +182,23 @@ void _phone(StringBuffer b, DiagnosticsSnapshot s) {
 /// Last accepted native probe facts, not a fresh test or current connectivity.
 /// Keep this allowlist aligned with native InputProbeDiagnostics; never print a raw map.
 void _backgroundInputProbe(StringBuffer b, Object? raw) {
-  const label = '- 最近接受的后台输入探针事实（不是实时自检）';
+  const label = '- Last accepted background input probe facts (not a live self-check)';
   if (raw is! Map || raw['v'] is! int || raw['v'] != 1 || raw['observed'] is! bool) {
-    b.writeln('$label：不可用或版本未知');
+    b.writeln('$label: unavailable or unknown version');
     return;
   }
   final result = raw['result'];
   final outcome = raw['observed'] == false
-      ? '未运行或无保留观察'
+      ? 'not run or no retained observation'
       : result == 'success'
-      ? '通过'
+      ? 'passed'
       : result == 'failure'
-      ? '失败'
-      : '结果未知';
-  b.writeln('$label：$outcome');
+      ? 'failed'
+      : 'result unknown';
+  b.writeln('$label: $outcome');
   final connectionFailure = raw['connectionFailure'];
   if (connectionFailure is bool) {
-    b.writeln('- 保留连接失败事实：$connectionFailure（不表示当前连接状态）');
+    b.writeln('- Retained connection failure fact: $connectionFailure (does not indicate current connection state)');
   }
   if (raw['observed'] != true || result != 'failure') return;
   const stages = {
@@ -218,21 +218,21 @@ void _backgroundInputProbe(StringBuffer b, Object? raw) {
     if (type is String && types.contains(type)) 'type=$type',
     if (elapsed is int && elapsed >= 0 && elapsed <= 60000) 'elapsedMs=$elapsed',
   ];
-  if (details.isNotEmpty) b.writeln('- 后台输入探针失败细节：${details.join(' · ')}');
+  if (details.isNotEmpty) b.writeln('- Background input probe failure details: ${details.join(' · ')}');
 }
 
 void _performance(StringBuffer b, DiagnosticsSnapshot s) {
-  b.writeln('## 性能');
+  b.writeln('## Performance');
   final p = s.performance;
   if (p.isEmpty) {
-    b.writeln('- 没有采样');
+    b.writeln('- No samples');
   } else {
     for (final e in p.entries) {
       final value = e.value;
       if (value is Map) {
-        b.writeln('- ${e.key}：${value.entries.map((x) => '${x.key}=${x.value}').join(' ')}');
+        b.writeln('- ${e.key}: ${value.entries.map((x) => '${x.key}=${x.value}').join(' ')}');
       } else {
-        b.writeln('- ${e.key}：$value');
+        b.writeln('- ${e.key}: $value');
       }
     }
   }
@@ -241,9 +241,9 @@ void _performance(StringBuffer b, DiagnosticsSnapshot s) {
 
 void _errors(StringBuffer b, DiagnosticsSnapshot s) {
   if (s.appErrors.isEmpty) return;
-  b.writeln('## 最近错误（App 内捕获）');
+  b.writeln('## Recent errors (caught in app)');
   for (final e in s.appErrors.reversed.take(diagnosticsErrorLines).toList().reversed) {
-    b.writeln('- ${_time(e.at)} · ${e.source.name}：${_firstLine(e.message)}');
+    b.writeln('- ${_time(e.at)} · ${e.source.name}: ${_firstLine(e.message)}');
   }
   b.writeln();
 }
@@ -252,7 +252,7 @@ void _log(StringBuffer b, String title, List<String> lines, int maxLines) {
   if (lines.isEmpty) return;
   final tail = lines.length <= maxLines ? lines : lines.sublist(lines.length - maxLines);
   b
-    ..writeln('## $title（${lines.length} 行，取最后 ${tail.length} 行）')
+    ..writeln('## $title (${lines.length} lines, showing last ${tail.length})')
     ..writeln('```log')
     ..writeln(tail.join('\n'))
     ..writeln('```')

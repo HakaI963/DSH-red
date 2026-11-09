@@ -18,6 +18,6 @@ node --test examples/plugins/dsh-go-example-files/test/*.test.js
 node --test runtime/tests/native-files.test.mjs
 ```
 
-The last command runs real HTTP/WebSocket through production bridge routes and this example's handler, without requiring a DSH engine. System chooser UI and remote devices still need device verification; see the [author guide](../../../docs/plugins/en/files.md).
+The last command runs real HTTP/WebSocket through production bridge routes and this example's handler, without requiring a DSH engine. System chooser UI and remote devices still need device verification; see the [author guide](../../../docs/plugins/files.md).
 
 A handle is valid only within the awaited selection callback. Copy or persist bytes before it ends if later work needs them. `file.name` is not a path and MIME is not content validation. Read-only bridge delivery is not a sandbox for host Node plugins.

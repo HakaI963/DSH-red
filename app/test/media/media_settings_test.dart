@@ -1,4 +1,4 @@
-// The 「图像与视频」 page's pure edits (media-generation §5.8): service rows,
+// The image & video page's pure edits (media-generation §5.8): service rows,
 // provider presets, one credential per provider group, per-kind defaults.
 
 import 'package:dsh_app/state/media_catalog.dart';
@@ -8,7 +8,7 @@ import 'package:flutter_test/flutter_test.dart';
 
 MediaPreset _preset({
   String id = 'ark-image',
-  String label = '火山方舟 · 图片',
+  String label = 'Volcano Ark · Image',
   String labelEn = 'Volcengine Ark · Image',
   String provider = 'ark',
   String profile = 'ark-image',
@@ -40,7 +40,7 @@ void main() {
     test('a plugin row reads its comma-separated models and writes them back', () {
       final service = MediaServiceConfig.tryFrom({
         'id': 'ark_image',
-        'label': '火山方舟',
+        'label': 'Volcano Ark',
         'enabled': true,
         'provider': 'ark',
         'baseUrl': 'https://ark.cn-beijing.volces.com',
@@ -54,7 +54,7 @@ void main() {
       expect(service.modelsValue, 'seedream, seedance');
       expect(service.toJson(), {
         'id': 'ark_image',
-        'label': '火山方舟',
+        'label': 'Volcano Ark',
         'enabled': true,
         'provider': 'ark',
         'baseUrl': 'https://ark.cn-beijing.volces.com',
@@ -130,7 +130,7 @@ void main() {
       final video = mediaServiceFromPreset(
         preset: _preset(
           id: 'ark-video',
-          label: '火山方舟 · 视频',
+          label: 'Volcano Ark · Video',
           labelEn: 'Volcengine Ark · Video',
           profile: 'ark-video',
           models: const ['seedance'],
@@ -182,7 +182,7 @@ void main() {
       expect(_preset().catalogModels(_catalog()).map((m) => m.id), ['seedream']);
       final service = mediaServiceFromPreset(preset: _preset(), catalog: _catalog(), existing: const [])!;
       expect(mediaServiceTitle(service, [_preset()], english: true), 'Volcengine Ark · Image');
-      expect(mediaServiceTitle(service, [_preset()], english: false), '火山方舟 · 图片');
+      expect(mediaServiceTitle(service, [_preset()], english: false), 'Volcano Ark · Image');
       expect(
         mediaServiceTitle(
           const MediaServiceConfig(

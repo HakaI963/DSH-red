@@ -594,7 +594,7 @@
     "richSpans": {"anyOf": [{"type": "array", "maxItems": 32, "items": {"$ref": "#/$defs/richSpan"}}, {"$ref": "#/$defs/binding"}]},
     "accent": {
       "anyOf": [
-        {"const": "app", "description": "The person's accent from the app's palette (设置 › 主题); checkers assume appAccent."},
+        {"const": "app", "description": "The person's accent from the app's palette (Settings › Theme); checkers assume appAccent."},
         {"enum": ["red", "orange", "amber", "green", "teal", "blue", "indigo", "violet", "pink", "gray"]},
         {"type": "string", "pattern": "^#[0-9a-fA-F]{6}$"},
         {"$ref": "#/$defs/binding"}

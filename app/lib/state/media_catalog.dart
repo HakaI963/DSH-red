@@ -412,7 +412,7 @@ List<MediaPreset> mediaPresetsOf(SettingsNamespaceView view) {
 const fallbackMediaPresets = <MediaPreset>[
   MediaPreset(
     id: 'ark-image',
-    label: '火山方舟 · 图片',
+    label: 'Volcano Ark · Image',
     labelEn: 'Volcengine Ark · Image',
     provider: 'ark',
     profile: 'ark-image',
@@ -423,7 +423,7 @@ const fallbackMediaPresets = <MediaPreset>[
   ),
   MediaPreset(
     id: 'ark-video',
-    label: '火山方舟 · 视频',
+    label: 'Volcano Ark · Video',
     labelEn: 'Volcengine Ark · Video',
     provider: 'ark',
     profile: 'ark-video',
@@ -434,7 +434,7 @@ const fallbackMediaPresets = <MediaPreset>[
   ),
   MediaPreset(
     id: 'aliyun-image',
-    label: '阿里云百炼 · 图片',
+    label: 'Alibaba Cloud Model Studio · Image',
     labelEn: 'Alibaba Model Studio · Image',
     provider: 'aliyun',
     profile: 'ali-wan-image',
@@ -445,7 +445,7 @@ const fallbackMediaPresets = <MediaPreset>[
   ),
   MediaPreset(
     id: 'aliyun-video',
-    label: '阿里云百炼 · 视频',
+    label: 'Alibaba Cloud Model Studio · Video',
     labelEn: 'Alibaba Model Studio · Video',
     provider: 'aliyun',
     profile: 'ali-video',
@@ -456,7 +456,7 @@ const fallbackMediaPresets = <MediaPreset>[
   ),
   MediaPreset(
     id: 'siliconflow-image',
-    label: '硅基流动 · 图片',
+    label: 'SiliconFlow · Image',
     labelEn: 'SiliconFlow · Image',
     provider: 'siliconflow',
     profile: 'silicon-image',
@@ -467,7 +467,7 @@ const fallbackMediaPresets = <MediaPreset>[
   ),
   MediaPreset(
     id: 'siliconflow-video',
-    label: '硅基流动 · 视频',
+    label: 'SiliconFlow · Video',
     labelEn: 'SiliconFlow · Video',
     provider: 'siliconflow',
     profile: 'silicon-video',
@@ -478,7 +478,7 @@ const fallbackMediaPresets = <MediaPreset>[
   ),
   MediaPreset(
     id: 'openai-image',
-    label: 'OpenAI · 图片',
+    label: 'OpenAI · Image',
     labelEn: 'OpenAI · Image',
     provider: 'openai',
     profile: 'openai-gpt-image',
@@ -489,7 +489,7 @@ const fallbackMediaPresets = <MediaPreset>[
   ),
   MediaPreset(
     id: 'gemini-image',
-    label: 'Gemini · 图片',
+    label: 'Gemini · Image',
     labelEn: 'Gemini · Image',
     provider: 'gemini',
     profile: 'openai-compatible',

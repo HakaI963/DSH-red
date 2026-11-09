@@ -1,6 +1,6 @@
 /* dsh-go conversation viewer (viewer.js). Shared by the landing page and the
    self-contained page the app exports (app/tool/make_replay_viewer.py inlines
-   it). Colours follow the app's default theme (雾蓝), light and dark. */
+   it). Colours follow the app's default theme (Mist Blue), light and dark. */
 
 .dv {
   --dv-bg-top: #ebf1fe;

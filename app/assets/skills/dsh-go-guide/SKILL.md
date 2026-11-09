@@ -1,18 +1,18 @@
 ---
 # dsh-go:managed — the dsh-go app keeps this skill up to date; delete this line to keep your own edits.
 name: dsh-go-guide
-description: dsh-go 手机 App 自带的使用说明（中文 / English）：功能在哪、怎么用、每个设置的作用、删除或重置会丢什么。用户问 dsh-go App 本身怎么用时先加载它，比如「悬浮条怎么调透明度」「怎么接入自己的模型」「本机环境能卸载吗」「分享链接怎么删」「宠物不见了」。The dsh-go app's own user guide — where each feature is, what each setting does, what an action deletes.
-whenToUse: The user asks how to use the dsh-go app (手机 App) itself. Not for changing the app's layout (dsh-go-ui) or writing a plugin (dsh-go-plugin).
+description: The dsh-go app's own user guide — where each feature is, how to use it, what each setting does, what an action deletes. Load it first when the user asks how to use the dsh-go phone app itself, such as adjusting the floating bar's transparency, connecting a custom model, uninstalling the on-device engine, deleting a share link, or a missing pet.
+whenToUse: The user asks how to use the dsh-go app (phone app) itself. Not for changing the app's layout (dsh-go-ui) or writing a plugin (dsh-go-plugin).
 ---
 
-# dsh-go 使用说明
+# dsh-go User guide
 
-说明文件都在本技能目录里：`README.md`、`zh/`、`en/`，按需读取。
+The guide's files are all in this skill's directory, `README.md` and `en/`; read them as needed.
 
-1. 先读 `README.md`：适用版本和每页的内容。再只读和问题相关的一两页：用户说中文读 `zh/`，其他语言读 `en/`，用用户的语言回答。
-2. 只照说明回答。入口路径和按钮名照页面原文写；说明里没有的，直说说明里没有写到，不猜、不编，也不拿网页版或其他 App 的做法顶替。
-3. 先给结论，再给入口和步骤，越短越好。
-4. 入口行后面带 `dshgo://open/…` 链接的，回答里原样附上，例如 `[打开手机操控](dshgo://open/phone)`，用户点按即可直达。只用说明里出现过的链接。
-5. 涉及删除、重置、卸载、授予权限、放宽确认的，先讲清后果：删什么、留什么、能否撤销。
-6. 只读不改：不替用户改设置、不执行命令、不操作手机、不安装或卸载任何东西。用户让你直接改，告诉他在哪里改。
-7. 用户的 App 版本（设置里的「版本」）和 README 的适用版本不同，或描述和界面对不上时，说明界面可能已经更新，以 App 为准。
+1. Read `README.md` first for the covered app version and what each page holds, then read only the one or two pages relevant to the question. The guide is written in English; answer in the user's own language.
+2. Answer only from the guide. Write entry paths and button names exactly as the pages do. Where the guide says nothing, say plainly that the guide doesn't cover it — don't guess, don't invent, and don't substitute how the web version or another app does it.
+3. Give the conclusion first, then the entry point and the steps; keep it as short as possible.
+4. Where an entry line carries a `dshgo://open/…` link, keep it verbatim in the answer, e.g. `[Turn on phone control](dshgo://open/phone)`, so one tap goes straight there. Only use links that appear in the guide.
+5. For anything that deletes, resets, uninstalls, grants a permission or relaxes confirmations, spell out the consequences first — what gets deleted, what is kept, and whether it can be undone.
+6. Read only, never act: don't change settings for the user, run commands, operate the phone, or install or uninstall anything. When the user asks you to change something directly, tell them where to change it.
+7. When the user's app version (**Version** in Settings) differs from the version README.md covers, or their description doesn't match the guide, say the interface may have been updated and treat the app as the source of truth.

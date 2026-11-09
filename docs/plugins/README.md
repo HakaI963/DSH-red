@@ -1,45 +1,45 @@
-# 给 dsh-go 写原生插件
+# Writing native plugins for dsh-go
 
-从空目录创建、验证、安装并发布一个插件：见[从零到市场](from-zero.md)。
+Create, validate, install and publish a plugin from an empty directory: [From zero to the market](from-zero.md).
 
-**不知道从哪开始？** 先看[选一条路](choose-path.md)：已有插件、已有网页界面、专门给 dsh-go 写，各走哪条路。想知道哪些能依赖，看[稳定性承诺](stability.md)。
+**Not sure where to start?** Read [Choose a path](choose-path.md): an existing plugin, an existing web interface, or writing for dsh-go from scratch. For what you can rely on, read the [stability promises](stability.md).
 
-[English](en/README.md)
 
-dsh-go 的原生界面可以显示 DSH 插件的内容：工具结果画成卡片，输入框上方加胶囊，消息菜单加操作，再加状态条和面板。插件照常是一个 DSH 插件（npm 包，逻辑跑在引擎里），只是多给 App 一份**声明**和一些 **JSON 视图**；App 用自己的组件画出来，不执行插件的任何代码。
+The dsh-go app can show a DSH plugin's content with native UI: tool results as cards, capsules above the composer, items in a reply's menu, a status strip and panels. The plugin stays an ordinary DSH plugin (an npm package whose logic runs in the engine); it only hands the app a **declaration** and some **JSON views**. The app draws them with its own components and never runs plugin code.
 
-| 你想要 | 要写的 | 读 |
+| You want | You write | Read |
 |---|---|---|
-| 工具结果显示成原生卡片 | 工具的 `presentationMeta` 里加一个视图，5 分钟 | [快速开始](quickstart.md) |
-| 先看看什么已经是原生的 | 命令、技能、设置表单、dsh-ui 卡——都不用写 App 代码 | [不写 App 代码就原生显示的东西](native-for-free.md) |
-| 胶囊、消息菜单、状态条、面板 | `package.json` 的 `dshGo` 清单 + `ctx.dshGo` | [插槽参考](slots.md) |
-| 加号面板工具、对话操作、回合尾注 | 同上，较新的位置 | [插槽参考](slots.md#较新的位置) |
-| 视图里能放什么 | v1 / v2 组件、绑定、上限 | [组件目录](components.md) |
-| 原生输入与表单 | v2 输入、结构组件、双向绑定、有界公式 | [输入与表单](inputs.md) |
-| 点了之后能做什么 | 8 种效果，3 秒窗口 | [动作与效果](actions.md) |
-| 朗读、开口即停、高频字幕、悬浮字幕 | `capabilities` + `media` / `micro` / `overlays`（v1.2，可选） | [声音与字幕](voice.md) |
-| 在哪些主机上有、怎么装 | 本机 / SSH / 中转；按路径安装 | [主机覆盖、安装与降级](hosts.md) |
-| 什么不能自定义、为什么 | 有界样式、字体文件、尺寸、链接 | [设计规则](design-rules.md) |
-| 新旧 App 都能用 | `caps`、`adaptView` | [兼容与版本](versions.md) |
-| 发出去之前 | 逐条过 | [自查清单](checklist.md) |
+| A tool's result as a native card | A view in the tool's `presentationMeta` — 5 minutes | [Quick start](quickstart.md) |
+| To see what is native already | Commands, skills, settings forms, dsh-ui cards — no app code | [Native for free](native-for-free.md) |
+| Capsules, reply menu items, a strip, panels | The `dshGo` manifest in `package.json` + `ctx.dshGo` | [Slots](slots.md) |
+| Plus panel tools, chat actions, turn notes | The same manifest, newer places | [Slot reference](slots.md#newer-places) |
+| What a view can hold | v1 / v2 components, bindings, limits | [Components](components.md) |
+| Native inputs and forms | v2 inputs, structured content, two-way binding, bounded formulas | [Inputs and forms](inputs.md) |
+| What a tap can do | 8 effects, the 3 s window, deferred results | [Actions and effects](actions.md) |
+| Read aloud, stop on speech, live and floating captions | `capabilities` + `media` / `micro` / `overlays` (v1.2, optional) | [Sound and captions](voice.md) |
+| Which hosts, how to install | On-device / SSH / relay; install by path | [Hosts, install, fallbacks](hosts.md) |
+| What you cannot customize, and why | Bounded styles, font files, dimensions, links | [Design rules](design-rules.md) |
+| Old and new apps alike | `caps`, `adaptView` | [Compatibility](versions.md) |
+| Before you share it | Go through the list | [Checklist](checklist.md) |
 
-## 工具
+## Tools
 
-| 件 | 在哪 | 用途 |
+[Local native preview](preview.md) renders view JSON and a data snapshot through the App's Flutter renderer, with light/dark viewport PNGs and diagnostics.
+
+| Part | Where | For |
 |---|---|---|
-| `@dsh-go/plugin-kit` | [`sdk/plugin-kit/`](../../sdk/plugin-kit/) | 类型、组件构造函数、`toolCard()`、`caps` 工具、测试宿主、`check` 命令。零运行时依赖 |
-| 原生视图本地预览 | [使用说明](preview.md) | 用 App 的 Flutter 渲染器把视图 JSON 和数据快照画成深浅色 PNG，附诊断 |
-| 示例插件 | [`examples/plugins/`](../../examples/plugins/) | 天气（工具卡）、用量（状态条 + 面板）、快捷（胶囊 + 消息菜单）、朗读（声音 + 开口即停 + 字幕），MIT |
-| 技能 `dsh-go-plugin` | App 自动装进本机引擎的 `$DSH_HOME/skills/` | 让你自己的 agent 写一个本地小插件并自查 |
+| `@dsh-go/plugin-kit` | [`sdk/plugin-kit/`](../../sdk/plugin-kit/) | Types, component builders, `toolCard()`, `caps` helpers, a test host, the `check` command. Zero runtime dependencies |
+| Example plugins | [`examples/plugins/`](../../examples/plugins/) | Weather (tool card), usage (strip + panel), quick (capsules + reply menu + a deferred result), read-aloud (sound + stop on speech + captions). MIT |
+| The `dsh-go-plugin` skill | Installed by the app into the on-device engine's `$DSH_HOME/skills/` | Lets your own agent write a small local plugin and check it |
 
-## 一张图
+## In one picture
 
 ```
-插件（DSH 插件，跑在引擎里）
- ├─ 工具 presentationMeta → { "dsh-go/view": 视图 }   ─── 对话记录 ──▶ App：工具卡（任何主机）
- ├─ package.json "dshGo"：胶囊、菜单、状态条、面板     ─┐
- └─ ctx.dshGo：视图、数据推送、点按处理                 ├─ dsh-go 桥接 ──▶ App：原生插槽（本机引擎）
-                                                      ─┘
+plugin (a DSH plugin, runs in the engine)
+ ├─ tool presentationMeta → { "dsh-go/view": view }     ── conversation log ──▶ app: tool card (any host)
+ ├─ package.json "dshGo": capsules, menu, strip, panels ─┐
+ └─ ctx.dshGo: views, data, tap handlers                 ├─ dsh-go bridge ──▶ app: native slots (on-device engine)
+                                                         ─┘
 ```
 
-规格原文：[`docs/design/native-plugins-protocol.md`](../design/native-plugins-protocol.md)（协议）、[`docs/design/native-plugins-views.md`](../design/native-plugins-views.md)（视图）。
+Specs: [`docs/design/native-plugins-protocol.md`](../design/native-plugins-protocol.md) (protocol), [`docs/design/native-plugins-views.md`](../design/native-plugins-views.md) (views).

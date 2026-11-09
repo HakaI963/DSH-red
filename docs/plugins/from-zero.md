@@ -1,18 +1,16 @@
-# 从空目录到市场：做一个原生工具卡插件
+# From an empty directory to the market: a native tool-card plugin
 
-[English](en/from-zero.md)
+Build an installable DSH plugin from an empty directory. It counts Unicode code points, UTF-8 bytes and lines, displays a native card in dsh-go, and keeps an ordinary tool result for the model and the DSH web client. The example does not make network requests, write files or read the clipboard. Its output contains counts only.
 
-这篇从空目录做一个可安装的 DSH 插件。它统计输入文本的 Unicode 码点、UTF-8 字节和行数，在 dsh-go 中显示原生卡片，同时保留模型和网页版可读的普通工具结果。示例不联网、不写文件、不读剪贴板；输出只含计数。
+The sequence is: write the bundle, test and check its view, install it on a host, inspect the release tarball, publish your package, then verify the market index. Each step has an observable result.
 
-完成路径是：写出 bundle → 跑测试和原生视图检查 → 安装到主机 → 检查发布 tarball → 发布自己的包 → 核对市场索引。每一步都可以单独确认。
+## 1. Prepare the development environment
 
-## 1. 准备开发环境
+The example targets **DSH and dsh-tools 0.2.1-rc.4** and needs Node 22.19 or later (this guide was verified on Node 24). DSH Go now ships 0.2.2-rc.1 (which needs Node 24.9 or later), and the repository's example plugins run their tests on it.
 
-示例基于 **DSH / dsh-tools 0.2.1-rc.4**，需要 Node 22.19 或以上（本文在 Node 24 上验证）。DSH Go 现在内置 0.2.2-rc.1（要求 Node 24.9 或以上），仓库里的示例插件也在它上面跑测试。
+`engines.dsh` and the dsh-tools dependencies name a **tested version range**, the same as the example plugins in this repository: `">=0.2.1-rc.2 <0.3.0-0"`. DSH compares versions with semver when it installs a plugin, so a single exact version gets the plugin refused as soon as the engine moves on (rc.2 → rc.4, say) even if not a line changed. The lower bound is the oldest version you tested; the upper bound stops before the next minor version, because a 0.x minor may break things. To support a version outside the range, run the same tests on it first, then widen the range.
 
-`engines.dsh` 和 dsh-tools 的依赖写**验证过的版本范围**，和仓库里的示例插件一样：`">=0.2.1-rc.2 <0.3.0-0"`。DSH 安装时按 semver 比较，写成一个精确版本，引擎一升级（例如 rc.2 → rc.4）插件就会被拒装，哪怕代码一行没变。下限写你测过的最低版本；上限停在下一个次版本之前，因为 0.x 的次版本可以有破坏性改动。要支持范围以外的版本，先在那个版本上跑一遍同样的测试，再放宽。
-
-需要一个已安装的 `dsh` CLI，以及一份包含 `sdk/plugin-kit/` 的 dsh-go 开发源码。SDK 目前随仓库分发，没有发布到 npm；不要把示例中的名称 `@dsh-go/plugin-kit` 当成可直接安装的公共包。本文直接调用源码中的检查器，插件运行时只依赖 DSH 提供的 `dsh-tools`。
+You need an installed `dsh` CLI and a complete dsh-go development checkout containing `sdk/plugin-kit/`. The SDK is distributed with the repository and is not published to npm. The name `@dsh-go/plugin-kit` in examples is not an instruction to install a public npm package. This guide invokes the checker from the checkout; the plugin itself uses DSH's `dsh-tools` at runtime.
 
 ```sh
 node --version
@@ -20,19 +18,19 @@ npm --version
 pnpm --version
 dsh --version
 
-# 替换成你取得的完整 dsh-go 开发源码根目录。
+# Replace this with your complete dsh-go development checkout.
 DSHGO_DEV_ROOT=/absolute/path/to/dsh-go
 mkdir -p dsh-text-metrics-demo/lib dsh-text-metrics-demo/test
 cd dsh-text-metrics-demo
 ```
 
-## 2. 写出完整插件
+## 2. Write the complete plugin
 
-以下七个文件都位于刚创建的目录中。`package.json` 的 `dsh.bundle.patch` 声明安装层，`cordis.patch.yml` 把这个包的入口挂入 DSH。这里没有 `dshGo` 清单：**只显示工具结果卡片并不需要桥接清单**。
+Put these seven files in the new directory. `dsh.bundle.patch` in `package.json` declares the installation layer, and `cordis.patch.yml` mounts the package entry point. There is no `dshGo` manifest: **a tool-result card does not need the native bridge manifest**.
 
-`render` 返回模型读取的普通文本；`presentationMeta` 提供 App 的卡片。卡片使用固定组件和具体数值，没有工具卡不支持的数据绑定或按钮。`toolCard` 将视图变成纯 JSON，并在构造失败或超过 8 KiB 时退回没有卡片的正常工具结果。
+`render` produces ordinary text for the model; `presentationMeta` supplies the app card. The card uses fixed components and concrete values, with no tool-card data bindings or buttons. `toolCard` converts the view to plain JSON and falls back to a normal result without a card if construction fails or the view exceeds 8 KiB.
 
-输入上限按 UTF-16 码元计数；输出码点不是字形，组合字符和 emoji 可能不同。CRLF 算一个换行，空文本算 0 行。这些定义写进测试，避免把不明确的“字数”做成误导结果。
+The input limit counts UTF-16 code units. Output code points are not grapheme clusters, so combining characters and emoji can differ from a visual character count. CRLF is one line break; empty text has zero lines. Tests make these definitions explicit.
 
 ### package.json
 
@@ -224,9 +222,9 @@ Run `npm install --ignore-scripts` and `npm test` before installing this local b
 This tutorial package is private; choose a unique name and a license before publishing.
 ```
 
-## 3. 测试并检查原生视图
+## 3. Test and check the native view
 
-在插件目录执行：
+Run inside the plugin directory:
 
 ```sh
 npm install --ignore-scripts
@@ -234,9 +232,9 @@ npm test
 node "$DSHGO_DEV_ROOT/sdk/plugin-kit/bin/check.mjs" . --load
 ```
 
-这里的单测使用真实的 `@deepseek-ai/dsh-tools` 定义和输出校验。注册用的 `ctx.tools.register` 是测试收集器；这一步不等于主机完整启动。正常结果为 4 项通过，检查器显示注册了 `text_metrics`。“没有 dshGo 清单：只有工具卡（presentationMeta）这类零成本扩展”是这个示例的正常提示。
+The tests use the real `@deepseek-ai/dsh-tools` definition and output validator. Their `ctx.tools.register` is a collector, so this step is not a complete host boot. Expect four passing tests and `text_metrics` in the checker's registered tools. “No dshGo manifest: only zero-cost extensions such as tool cards (presentationMeta)” is expected for this example.
 
-把一个确定的调用结果导出为视图 JSON，供检查器和预览使用：
+Export a deterministic result as JSON for the checker and preview:
 
 ```sh
 node --input-type=module > card.json <<'JS'
@@ -249,11 +247,11 @@ JS
 node "$DSHGO_DEV_ROOT/sdk/plugin-kit/bin/check.mjs" card.json --lang en
 ```
 
-结果应是 4 个码点、8 个 UTF-8 字节、2 行，卡片检查无问题。中文与英文显示都要检查，不能只在一种语言里量标题。
+Expect four code points, eight UTF-8 bytes and two lines, with no view issues. Check both Chinese and English labels; title length in one language does not establish that the other fits.
 
-### 可选：用 App 的原生组件生成图片
+### Optional: render images with the app's native components
 
-开发源码中的 App 已装好 Flutter 依赖、生成本地化并备齐字体时，可以用 App 自己的渲染器出图（详见[在本机预览视图 JSON](preview.md)）：
+When the checkout's app has its Flutter dependencies, generated localization and fonts in place, you can render the card with the app's own renderer (see [Preview view JSON locally](preview.md)):
 
 ```sh
 node "$DSHGO_DEV_ROOT/sdk/plugin-kit/bin/preview.mjs" card.json \
@@ -261,37 +259,37 @@ node "$DSHGO_DEV_ROOT/sdk/plugin-kit/bin/preview.mjs" card.json \
   --theme both --lang en --flutter /absolute/path/to/flutter/bin/flutter
 ```
 
-输出目录必须是新目录。查看 `light.png`、`dark.png` 和对应的 JSON 诊断，再换一个新目录用 `--scale 1.3 --lang zh` 跑一次。图片只包含第一屏，`remainingScrollExtent` 大于零表示下面还有内容；预览不连接主机，也不执行按钮动作。
+Use a new output directory. Inspect `light.png`, `dark.png` and their JSON diagnostics, then run again into another new directory with `--scale 1.3 --lang zh`. Images cover the first viewport only; a positive `remainingScrollExtent` means more content below. The preview connects to no host and runs no actions.
 
-## 4. 安装到你实际使用的主机
+## 4. Install on the host you actually use
 
 ```sh
-# 仍在插件目录；路径属于引擎所在的那台机器。
+# Still inside the plugin directory. The path belongs to the engine's machine.
 DSH_TUTORIAL_PLUGIN_DIR="$PWD"
 dsh plugin --profile web add "$DSH_TUTORIAL_PLUGIN_DIR"
 dsh --profile web --dump-config
 ```
 
-`--dump-config` 只能确认 bundle 层被组合，不能证明 JavaScript 入口已成功加载。还要在运行中的 `web` profile 查看插件加载结果；尚未启动时运行 `dsh web`。然后让模型调用 `text_metrics`，文本传入两行的“你好”和“A”，应同时看到普通结果和原生卡片。
+`--dump-config` confirms that the bundle layer composes; it does not prove that the JavaScript entry point loaded. Check loading in the running `web` profile as well, or start it with `dsh web`. Ask the model to call `text_metrics` with two lines, “你好” and “A”. The ordinary result and the native card should both appear.
 
-| 主机 | 安装位置与检查 |
+| Host | Where to install and check |
 |---|---|
-| 手机本机引擎 | 在 App 的本机终端中执行，插件目录要留在本机环境内 |
-| SSH 主机 | 在远端终端中执行；本地电脑上的路径不会自动传到远端 |
-| relay 主机 | 在实际运行 DSH 的机器上安装；工具卡随已有工具记录传给 App，本例不需要新增 REST 隧道 |
+| On-device engine | Use the app's local terminal and keep the directory inside that environment |
+| SSH host | Use the remote terminal; a development-computer path is not automatically copied there |
+| Relay host | Install on the machine running DSH; tool cards travel with existing tool records and this example needs no additional REST tunnel |
 
-这个版本的本地路径安装会链接目录，删除目录会使入口失效。修改 `lib/` 后按[本地重载说明](local-development.md)处理；本机重启内核会中断当前任务。卸载再安装不应被当作一定使模块缓存失效。旧聊天记录也不会重新计算新卡片，要做一次新的工具调用。
+This release links a local directory, so removing it breaks the entry point. After editing `lib/`, follow [local reloading](local-development.md). Restarting the on-device engine interrupts current work. Uninstalling and reinstalling is not a guarantee that an already loaded module is invalidated. Existing conversation records do not recompute presentation metadata; make a new tool call.
 
-## 5. 检查真正要分发的包
+## 5. Inspect the package you will distribute
 
 ```sh
 npm pack --dry-run --json --ignore-scripts
 npm pack --ignore-scripts
 ```
 
-检查 tarball 中确有 `package.json`、`cordis.patch.yml`、`lib/index.js`、`lib/measure.js`、`lib/view.js` 和 README；它应能独立装载，不能依赖开发仓库的相对路径。检查输出中不要包含账号配置、测试主机状态或临时数据。开发依赖不会随 `node_modules` 打包；宿主共享实例依赖由 peer 声明约束。
+Check that the tarball contains `package.json`, `cordis.patch.yml`, `lib/index.js`, `lib/measure.js`, `lib/view.js` and the README. It must load without paths back to the development checkout. Account configuration, temporary host state and test data do not belong in the release. Development `node_modules` are not bundled; peer declarations constrain dependencies that share the host's instances.
 
-再用一个空的测试 home 安装实际 tarball，避免原目录链接掩盖漏文件：
+Install the actual tarball in an empty test home so a directory link cannot hide missing files:
 
 ```sh
 DSH_TUTORIAL_HOME="$(mktemp -d)/dsh-home"
@@ -299,26 +297,26 @@ DSH_HOME="$DSH_TUTORIAL_HOME" dsh plugin --profile web add "$PWD/dsh-text-metric
 DSH_HOME="$DSH_TUTORIAL_HOME" dsh web --no-open
 ```
 
-修改包名后，请使用 `npm pack` 实际报告的 tarball 文件名。
+After renaming the package, use the tarball filename reported by `npm pack`.
 
-这是独立的配置目录，不会自动带上原主机的模型设置。可先核对启动与加载；需要通过模型调用时，在这个测试环境配置模型后再验。tarball 验证结束后退出这个测试进程。纯 JavaScript 示例无需安装时构建；如果以后改成 TypeScript，请先生成入口再打包，并实际检查 tarball。Git 源码安装有独立的构建脚本许可规则，不能据 npm 包测试推断它一定能用。
+This separate configuration directory does not inherit your existing model setup. Check boot and loading first; configure a model there if you want to invoke the tool through a model. Stop the test process when finished. The plain JavaScript example needs no install-time build. If you later switch to TypeScript, generate the entry points before packing and inspect the actual tarball. Git source installation has separate build-script permission rules; an npm-package test does not establish that path works.
 
-## 6. 发布自己的版本
+## 6. Publish your own version
 
-练习包使用 `private:true` 防止误发布。真正发布前，把下面各项改成自己的值并重跑第 3–5 步：
+The exercise uses `private:true` to prevent accidental publication. Before a real release, replace the following values and repeat steps 3–5:
 
-| 位置 | 要做的改动 |
+| Location | Required preparation |
 |---|---|
-| `package.json.name` | 使用自己拥有的唯一包名，例如 `@your-scope/dsh-text-metrics`，替换示意 scope |
-| `cordis.patch.yml` 的 `name` | 与包名完全一致 |
-| patch 的 `id`、模块的 `export const name`、工具的 `name` | 选择自己的前缀，避免多个教程衍生包占用同一行或同名工具；同步测试期望 |
-| `version`、`engines.dsh` 与 peer 范围 | `engines.dsh` 和 peer 写实际验证过的版本范围（下限是测过的最低版本，上限停在下一个次版本之前）；已发布的同名同版本不能重复使用 |
-| `repository` | 指向这个包的真实公开 GitHub 仓库；单仓多包还应填写正确的 `directory` |
-| `keywords` | 可加入 `dsh-plugin` 和 `dsh-bundle`，使发现源能识别用途 |
-| README、许可与 `files` | 说明安装、用途、数据流、兼容版本；选择许可并提供相应 LICENSE，元数据与实际内容一致 |
-| `private` | 确认其余准备完成后才删除 |
+| `package.json.name` | Choose a unique name you own, such as `@your-scope/dsh-text-metrics`, replacing the example scope |
+| `name` in `cordis.patch.yml` | Match the package name exactly |
+| Patch `id`, module `export const name`, tool `name` | Use your own prefix so derivative packages do not compete for the same row or tool; update test expectations |
+| `version`, `engines.dsh`, peer ranges | `engines.dsh` and the peer name the version range actually tested (lower bound: the oldest tested; upper bound: before the next minor); a published name/version pair cannot be reused |
+| `repository` | Point to the package's real public GitHub repository; use the correct `directory` for a monorepo package |
+| `keywords` | Include `dsh-plugin` and `dsh-bundle` when applicable to aid discovery |
+| README, license, `files` | Explain installation, purpose, data flow and compatibility; choose a license and supply a matching LICENSE and metadata |
+| `private` | Remove only after the rest of the release preparation is complete |
 
-包名/仓库元数据示意，需合入自己的完整 `package.json`，不是替代整个文件：
+These package and repository fields are examples to merge into your complete manifest, not a replacement for the entire file:
 
 ```json
 {
@@ -328,7 +326,7 @@ DSH_HOME="$DSH_TUTORIAL_HOME" dsh web --no-open
 }
 ```
 
-带 scope 的包名以 `@` 开头，在 YAML 中要加引号。例如重命名后的 patch：
+A scoped package name starts with `@` and must be quoted in YAML. For example, after renaming:
 
 ```yaml
 - insert:
@@ -336,32 +334,32 @@ DSH_HOME="$DSH_TUTORIAL_HOME" dsh web --no-open
       name: "@your-scope/dsh-text-metrics"
 ```
 
-离线的 `npm publish --dry-run --offline` 可检查本地打包结果，但不验证账号权限、包名可用性或能否被市场收录。
+An offline `npm publish --dry-run --offline` checks local packaging; it does not validate account rights, name availability or market acceptance.
 
-在自己的 npm 账号中确认目标 registry、包名和访问范围，再预演：
+In your own npm account, verify the target registry, package name and visibility, then rehearse:
 
 ```sh
 npm publish --dry-run --access public --ignore-scripts
 ```
 
-预演不会真正发布。确认文件清单无误后正式发布，按 npm 的登录与 2FA 流程完成：
+A dry run publishes nothing. Once the file list looks right, publish for real and complete npm's login and 2FA flow:
 
 ```sh
 npm publish --access public --ignore-scripts
 npm view @your-scope/dsh-text-metrics name version repository dist.integrity --json
 ```
 
-示例没有 `prepare`/`prepublishOnly` 等构建脚本，所以这里明确关闭脚本；将来依赖这些脚本构建时，先完成构建与测试再采用相应发布流程。不要仅把 GitHub 源码仓库上传成功当成 npm 包已可安装。npm 的[发布说明](https://docs.npmjs.com/cli/v11/commands/npm-publish/)是账号操作和参数的依据。
+The example has no `prepare` or `prepublishOnly` build scripts, so these commands explicitly disable scripts. If later versions require them, complete the build and tests before following the appropriate release process. Uploading a source repository alone does not publish an installable npm package. Refer to [npm's publication documentation](https://docs.npmjs.com/cli/v11/commands/npm-publish/) for account operations and command options.
 
-## 7. 核对 dsh-go 实际使用的市场索引
+## 7. Verify the market index dsh-go actually consumes
 
-当前 App 默认读取 dshfind 的 **format-1 索引**：`https://api.dshfind.com/market/dsh-index.json`。dshfind 网站目录发现和这个索引有不同的准入规则。
+The app currently reads dshfind's **format-1 index** at `https://api.dshfind.com/market/dsh-index.json`. Website discovery and inclusion in this index have different requirements.
 
-先在自己的公开 GitHub 仓库添加 `dsh-plugin` topic，并核对 npm 包的 `repository` 回链。dshfind 的发现任务会在后续刷新时处理它；不能承诺固定几分钟到账。仓库中的发现逻辑也会识别 npm 的 `dsh-plugin` / `dsh-bundle` 关键词。
+Add the `dsh-plugin` topic to your own public GitHub repository and check the npm package's `repository` backlink. dshfind processes discoveries on a subsequent refresh; this is not a fixed delivery-time guarantee. Its discovery code also recognizes npm's `dsh-plugin` and `dsh-bundle` keywords.
 
-索引的收录条件（2026 年 10 月）：被识别为插件、未被标记风险、带 bundle、已发布到 npm、npm 的仓库回链匹配、包名和版本有效；DSH 自带的 `@deepseek-ai/*` 包不收录。版本兼容性由安装端另行检查；风险标记由市场给出，作者无法自行设置。
+Inclusion rules (as of October 2026): a recognized plugin, no risk flag, a bundle, a published npm package, a matching repository backlink, and a valid package name and exact version. Built-in `@deepseek-ai/*` packages are excluded. Installation checks runtime compatibility separately; the risk flag comes from the market and cannot be set by the author.
 
-用精确包名核对索引：
+Look up the exact package name:
 
 ```sh
 DSH_PLUGIN_PACKAGE_NAME=@your-scope/dsh-text-metrics node --input-type=module <<'JS'
@@ -373,22 +371,22 @@ console.log(entry ? JSON.stringify(entry, null, 2) : 'Not in this index yet')
 JS
 ```
 
-最后在 App 的插件市场搜索包名，核对显示的版本、来源和安装目标主机，安装后再做一次工具调用。网站已有页面、npm 已发布、索引已有条目、App 已能安装是四个独立的状态，逐一确认即可。若迟迟未被收录，可附上公开仓库地址、准确的 npm 版本和索引查询结果，通过 dshfind 的反馈渠道联系；无需在 dsh-go 提交上架申请。
+Finally search for the package in the app, verify version, source and target host, install it and make a fresh tool call. A website page, an npm release, an index entry and a working app installation are four separate states; confirm each one. If the package stays unlisted, contact dshfind through its feedback channel with the public repository URL, the exact npm version and the index result. No listing request to dsh-go is needed.
 
-## 8. 常见问题
+## 8. Troubleshooting
 
-| 现象 | 先核对 |
+| Symptom | Check first |
 |---|---|
-| 安装后插件不挂载 | `dsh.bundle.patch`、tarball 中的 patch 文件、patch `name` 与包名是否一致 |
-| CLI 认为版本不兼容 | `dsh --version` 与 `engines.dsh`；先验证目标版本，不靠删除约束跳过问题 |
-| `--load` 过了但真实主机加载失败 | 实际 profile、模块解析、peer 依赖、日志；测试收集器不是完整主机 |
-| 普通工具结果成功但没有卡片 | 新工具调用的 `meta`；构造异常、体积超限会正常退回 `{}` |
-| 卡片局部出现占位 | 运行检查器查看具体 JSON 路径，修该节点并重新调用工具 |
-| 改代码没有生效 | 引擎实际加载的文件位置和模块重载；不要只检查开发副本 |
-| 网站能搜到，App 仍没有 | npm 回链、bundle、精确版本、format-1 索引结果及 App 当前筛选 |
+| Installed but not mounted | `dsh.bundle.patch`, the patch in the tarball, and its `name` matching the package |
+| Version rejected by the CLI | `dsh --version` against `engines.dsh`; test the target version before changing the range |
+| `--load` passes but the real host fails | Actual profile, module resolution, peers and logs; a test collector is not a complete host |
+| Tool succeeds without a card | Metadata of a new call; view exceptions or size limits correctly fall back to `{}` |
+| One part of the card is a placeholder | Run the checker for the precise JSON path, fix that node and make another call |
+| Code changes have no effect | Files actually loaded by the engine and module reload behavior |
+| Website lists it but the app does not | npm backlink, bundle, exact version, format-1 index result and current app filters |
 
-## 参考
+## References
 
-实现细节可对照仓库的[快速开始](quickstart.md)、[主机覆盖](hosts.md)、[自查清单](checklist.md)，以及 SDK 和 [weather 示例](../../examples/plugins/dsh-go-example-weather/)源码。
+Compare the implementation with this repository's [quick start](quickstart.md), [host support](hosts.md), [checklist](checklist.md), the SDK and the [weather example](../../examples/plugins/dsh-go-example-weather/).
 
-发布层参考 [DSH 官方 bundle/profile 教程](https://github.com/deepseek-ai/deepseek-harness/blob/master/docs/user/develop/basic/publish.md)。市场条件来自 [dshfind 发现说明](https://github.com/hikariming/dshfind/blob/3ee8543f3ec60792cae0523d4a149cba0d68770c/README.zh-CN.md)及[索引生成器](https://github.com/hikariming/dshfind/blob/3ee8543f3ec60792cae0523d4a149cba0d68770c/scripts/lib/dsh-index.mjs)。
+Bundle/profile behavior is documented in the [official DSH publishing guide](https://github.com/deepseek-ai/deepseek-harness/blob/master/docs/user/develop/basic/publish.md). Market requirements come from [dshfind's discovery documentation](https://github.com/hikariming/dshfind/blob/3ee8543f3ec60792cae0523d4a149cba0d68770c/README.zh-CN.md) and its [index generator](https://github.com/hikariming/dshfind/blob/3ee8543f3ec60792cae0523d4a149cba0d68770c/scripts/lib/dsh-index.mjs).

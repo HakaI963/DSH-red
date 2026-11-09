@@ -1,56 +1,56 @@
-# 主机覆盖、安装与降级
+# Hosts, install, fallbacks
 
-dsh-go 连的主机有三种：手机本机引擎、SSH 主机、中转主机。工具卡走对话记录，哪里都有；其余插槽走 dsh-go 桥接（`dsh-go-bridge`），只有装了桥接的主机才有。
+dsh-go connects to three kinds of host: the on-device engine, SSH hosts and relay hosts. Tool cards travel in the conversation log and show everywhere; the other slots go through the dsh-go bridge (`dsh-go-bridge`) and need it on the host.
 
-| | 工具卡 | 胶囊 · 菜单 · 状态条 · 面板 | 网页版插件（网页岛） |
+| | Tool cards | Capsules · menu · strip · panels | Web plugins (web islands) |
 |---|---|---|---|
-| 本机引擎 | ✅ | ✅ 桥接随 App 的运行时安装 | ✅ |
-| SSH 主机 | ✅ | 第二期（桥接还不能装到 SSH 主机） | ✅ |
-| 中转主机 | ✅（随对话记录走） | ❌ 中转不放行 `/dsh-go/*` | ❌ |
+| On-device engine | ✅ | ✅ the bridge ships with the app's runtime | ✅ |
+| SSH host | ✅ | Phase 2 (the bridge cannot be installed on SSH hosts yet) | ✅ |
+| Relay host | ✅ (with the log) | ❌ the relay does not pass `/dsh-go/*` | ❌ |
 
-## 装一个本地插件
+## Installing a local plugin
 
-插件就是一个 npm 包目录。不用发布，按绝对路径装进 profile：
+A plugin is an npm package directory. No publishing: install it into the profile by absolute path.
 
 ```sh
-dsh plugin --profile web add /绝对路径/my-plugin
+dsh plugin --profile web add /absolute/path/to/my-plugin
 ```
 
-| 主机 | 在哪执行 | profile |
+| Host | Where | Profile |
 |---|---|---|
-| 手机本机引擎 | App 的「终端」（本机环境里的 shell） | `web`（App 启动引擎用的就是它） |
-| 远程主机 | 主机自己的终端 | 那台主机 `dsh` 实际用的 profile，通常是 `web` |
+| On-device engine | The app's Terminal (a shell in the on-device environment) | `web` (the app starts the engine with it) |
+| Remote host | The host's own shell | The profile that host's `dsh` uses, usually `web` |
 
-- 装上即生效，不用重启（DSH 0.2.1-rc.2 实测：`dsh web` 运行中执行 `add`，几秒内 App 就拿到新清单）。
-- 装的是**指向这个目录的链接**：目录要留着，删了插件就起不来。
-- 改了 `package.json` 的 `dshGo`：桥接按文件修改时间自动重读，App 下次拉清单就是新的。
-- 改了 `lib/` 里的代码：要重启引擎（本机引擎在 App 的「引擎」页；开发机重启 `dsh web`）。卸了再装不会重新加载已经载入的代码。
-- 卸载：`dsh plugin --profile web remove 包名`。
-- `engines.dsh` 写清支持的 DSH 版本（例如 `>=0.2.1-rc.2 <0.3.0-0`），版本不对时 DSH 会拒装并说明原因。
+- Takes effect at once, no restart (measured on DSH 0.2.1-rc.2: `add` while `dsh web` runs, the app has the new manifest within seconds).
+- What gets installed is **a link to the directory**: keep the directory.
+- Changed the `dshGo` manifest: the bridge re-reads `package.json` by modification time.
+- Changed code under `lib/`: restart the engine (on-device: the app's Engine page; dev machine: restart `dsh web`). Removing and re-adding does not reload code already loaded.
+- Uninstall: `dsh plugin --profile web remove <package name>`.
+- Declare the DSH versions you support in `engines.dsh` (e.g. `>=0.2.1-rc.2 <0.3.0-0`); DSH refuses incompatible installs and says why.
 
-### 把文件夹放进本机环境
+### Getting the folder into the on-device environment
 
-本机引擎跑在 App 自带的 Linux 环境里（`/root` 是家目录）。建议放在 `/root/.dsh/dsh-go/plugins/<插件名>/`：「重置引擎」时这个目录默认保留；没选保留插件配置（profile）时，重置后再 `add` 一次即可。三种办法：
+The on-device engine runs in the app's own Linux environment (`/root` is home). Use `/root/.dsh/dsh-go/plugins/<name>/`: it is kept when the engine is reset; if the plugin profile was not kept, `add` it again after the reset.
 
-| 办法 | 怎么做 |
+| Way | How |
 |---|---|
-| 让 agent 写 | 直接说想要什么（「输入框上面加个按钮，把剪贴板译成英文」）。App 自带的 `dsh-go-plugin` 技能会让它照规矩写、自查、安装 |
-| 终端里拉 | `git clone` 或 `curl` 到 `/root/.dsh/dsh-go/plugins/` |
-| 手机存储 | 文件夹拷到手机的「下载」里；在「设置」里打开「访问手机文件」后，本机环境里是 `/sdcard/Download/`，再 `cp -r` 到 `/root/.dsh/dsh-go/plugins/`。开发时用 `adb push 文件夹 /sdcard/Download/` |
+| Let the agent write it | Say what you want ("a button above the composer that translates the clipboard into English"). The app's bundled `dsh-go-plugin` skill has it write, check and install the plugin |
+| From the terminal | `git clone` or `curl` into `/root/.dsh/dsh-go/plugins/` |
+| Phone storage | Copy the folder into the phone's Download; after turning on "Access phone files" in Settings it is `/sdcard/Download/` in the environment; `cp -r` it into `/root/.dsh/dsh-go/plugins/`. During development: `adb push folder /sdcard/Download/` |
 
-## 降级
+## Fallbacks
 
-| 情形 | App 显示 |
+| Case | The app shows |
 |---|---|
-| 主机没有桥接（SSH、中转） | 只有工具卡；插件的其余部分按网页版插件处理（网页岛或「在网页版打开」） |
-| 插件 `minApp` 高于 App | 原生部分不显示，提示需要更新 App |
-| 插件 `v` 不被支持 | 同上 |
-| 某一项写错 | 只丢那一项，插件详情页「原生界面 · N 项有误」 |
-| 插件运行中连续 5 次违规 | 本次运行降级成网页版；重启引擎或重新启用插件后恢复 |
-| 宿主半侧没有注册处理 | 那一项置灰（`ready: false`） |
-| 视图组件 App 不认识 | 那个组件画成灰色占位，其余照画 |
-| 网页版 DSH | 工具卡显示官方通用卡；其余插槽在网页版不出现 |
+| No bridge on the host (SSH, relay) | Tool cards only; the rest is treated as a web plugin (web island or "Open in web") |
+| `minApp` newer than the app | No native part; a hint to update the app |
+| Unsupported `v` | Same |
+| One wrong entry | Only that entry is dropped; plugin details shows "Native UI · N issues" |
+| 5 violations in a row | Degraded to the web version for this run; back after an engine restart or re-enabling the plugin |
+| No handler registered | That entry is greyed out (`ready: false`) |
+| A component the app does not know | A grey placeholder for that component; the rest draws |
+| DSH web UI | The official generic tool card; the other slots do not appear |
 
-## 同一个插件，两边都能用
+## One plugin, both UIs
 
-`dshGo` 清单和 `ctx.dshGo` 只对 App 生效，DSH 网页版看不到它们，所以一个插件可以同时带网页半侧（`dsh.client`）和 `dshGo` 清单：网页版用网页界面，App 用原生界面，互不影响。
+The `dshGo` manifest and `ctx.dshGo` only matter to the app; the DSH web UI ignores them. So a plugin can carry a web half (`dsh.client`) and a `dshGo` manifest at once: web UI on the web, native UI in the app.

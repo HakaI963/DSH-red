@@ -1,4 +1,4 @@
-// The curated 「图像与视频」 page (media-generation §5.8) against the fake
+// The curated image & video page (media-generation §5.8) against the fake
 // Host: the defaults from the catalogue, services added from provider presets
 // (one credential per provider), the key written into the credential store,
 // and deleting a service clearing the defaults that named it.
@@ -64,7 +64,7 @@ Map<String, Object?> _catalog({bool presets = true, bool video = true}) => {
     'presets': [
       _preset(
         id: 'ark-image',
-        label: '火山方舟 · 图片',
+        label: 'Volcano Ark · Image',
         labelEn: 'Volcengine Ark · Image',
         provider: 'ark',
         profile: 'ark-image',
@@ -76,7 +76,7 @@ Map<String, Object?> _catalog({bool presets = true, bool video = true}) => {
       if (video)
         _preset(
           id: 'ark-video',
-          label: '火山方舟 · 视频',
+          label: 'Volcano Ark · Video',
           labelEn: 'Volcengine Ark · Video',
           provider: 'ark',
           profile: 'ark-video',
@@ -87,7 +87,7 @@ Map<String, Object?> _catalog({bool presets = true, bool video = true}) => {
         ),
       _preset(
         id: 'openai-image',
-        label: 'OpenAI · 图片',
+        label: 'OpenAI · Image',
         labelEn: 'OpenAI · Image',
         provider: 'openai',
         profile: 'openai-gpt-image',
@@ -98,7 +98,7 @@ Map<String, Object?> _catalog({bool presets = true, bool video = true}) => {
       ),
       _preset(
         id: 'gemini-image',
-        label: 'Gemini · 图片',
+        label: 'Gemini · Image',
         labelEn: 'Gemini · Image',
         provider: 'gemini',
         profile: 'openai-compatible',
@@ -114,7 +114,7 @@ Map<String, Object?> _catalog({bool presets = true, bool video = true}) => {
 /// One row of the plugin's `value.services`.
 Map<String, Object?> _service({
   String id = 'ark_image',
-  String label = '火山方舟',
+  String label = 'Volcano Ark',
   bool enabled = true,
   String provider = 'ark',
   String baseUrl = 'https://ark.cn-beijing.volces.com',
@@ -268,7 +268,7 @@ void main() {
     expect(find.text(_zh.mediaKindVideo), findsOneWidget);
     expect(find.text(_zh.mediaSettingsServices), findsOneWidget);
     // The one service: its preset name, its models, and its key is set.
-    expect(find.text('火山方舟'), findsOneWidget);
+    expect(find.text('Volcano Ark'), findsOneWidget);
     expect(find.textContaining('Seedream 5.0'), findsWidgets);
     expect(find.textContaining(_zh.mediaSettingsKeyMissing), findsNothing);
     // There is a video model in the catalogue but no ready video service:
@@ -301,7 +301,7 @@ void main() {
     await open(tester, describe: _describe(services: []));
     await tester.tap(find.text(_zh.mediaSettingsAddService));
     await settle(tester);
-    await tester.tap(find.text('火山方舟 · 图片'));
+    await tester.tap(find.text('Volcano Ark · Image'));
     await flush(tester);
 
     expect(host.mutates().last['ns'], 'dsh-media');
@@ -333,7 +333,7 @@ void main() {
     expect(row['models'], 'doubao-seedream-5-0-pro');
     expect(row['keyRef'], 'DSH_MEDIA_ARK_API_KEY');
     // The preset's own page opened, ready for its key.
-    expect(find.text('火山方舟 · 图片'), findsWidgets);
+    expect(find.text('Volcano Ark · Image'), findsWidgets);
     expect(find.text(_zh.mediaSettingsApiKey), findsOneWidget);
   });
 
@@ -341,7 +341,7 @@ void main() {
     await open(tester, describe: _describe(services: [_service()]));
     await tester.tap(find.text(_zh.mediaSettingsAddService));
     await settle(tester);
-    await tester.tap(find.text('火山方舟 · 视频'));
+    await tester.tap(find.text('Volcano Ark · Video'));
     await flush(tester);
 
     final rows = lastOp()['value']! as List;
@@ -361,7 +361,7 @@ void main() {
 
   testWidgets('the service page writes its key through credentials/set', (tester) async {
     await open(tester, describe: _describe(services: [_service()]));
-    await tester.tap(find.text('火山方舟'));
+    await tester.tap(find.text('Volcano Ark'));
     await flush(tester);
     expect(find.text(_zh.mediaSettingsApiKey), findsOneWidget);
     expect(find.text(_zh.engineFieldNotConfigured), findsOneWidget);
@@ -394,7 +394,7 @@ void main() {
       ),
       credentials: const {'DSH_MEDIA_ARK_API_KEY': 'fake-key'},
     );
-    await tester.tap(find.text('火山方舟'));
+    await tester.tap(find.text('Volcano Ark'));
     await flush(tester);
     expect(find.text(_zh.mediaConfigKeySaved), findsOneWidget);
     expect(find.textContaining('Shared media (dsh-media/other)'), findsOneWidget);
@@ -414,7 +414,7 @@ void main() {
         services: [_service(profile: 'openai-compatible', baseUrl: 'https://example.test/v1')],
       ),
     );
-    await tester.tap(find.text('火山方舟'));
+    await tester.tap(find.text('Volcano Ark'));
     await flush(tester);
     await tester.scrollUntilVisible(find.text(_zh.mediaSettingsBaseUrl), 250);
     await tester.tap(find.text(_zh.mediaSettingsBaseUrl));
@@ -436,7 +436,7 @@ void main() {
       ),
       credentials: const {'DSH_MEDIA_ARK_API_KEY': 'fake-key'},
     );
-    await tester.tap(find.text('火山方舟'));
+    await tester.tap(find.text('Volcano Ark'));
     await flush(tester);
     await tester.scrollUntilVisible(find.text(_zh.mediaSettingsBaseUrl), 250);
     await tester.tap(find.text(_zh.mediaSettingsBaseUrl));
@@ -466,7 +466,7 @@ void main() {
         services: [_service(profile: 'openai-compatible', baseUrl: 'https://example.test/v1')],
       ),
     );
-    await tester.tap(find.text('火山方舟'));
+    await tester.tap(find.text('Volcano Ark'));
     await flush(tester);
     await tester.scrollUntilVisible(find.text(_zh.mediaSettingsBaseUrl), 250);
     await tester.tap(find.text(_zh.mediaSettingsBaseUrl));
@@ -483,7 +483,7 @@ void main() {
 
   testWidgets('local checks report missing key and disabled service without claiming verification', (tester) async {
     await open(tester, describe: _describe(services: [_service(enabled: false)]));
-    await tester.tap(find.text('火山方舟'));
+    await tester.tap(find.text('Volcano Ark'));
     await flush(tester);
     await tester.tap(find.text(_zh.mediaConfigCheck));
     await settle(tester);
@@ -502,7 +502,7 @@ void main() {
       ),
       credentials: const {'OPENAI_API_KEY': 'sk-openai'},
     );
-    await tester.tap(find.text('火山方舟'));
+    await tester.tap(find.text('Volcano Ark'));
     await flush(tester);
     expect(find.textContaining(_zh.mediaSettingsKeyExternal), findsOneWidget);
     await tester.tap(find.text(_zh.mediaSettingsApiKey));
@@ -520,7 +520,7 @@ void main() {
       describe: _describe(services: [_service()]),
       envCredentials: const {'DSH_MEDIA_ARK_API_KEY'},
     );
-    await tester.tap(find.text('火山方舟'));
+    await tester.tap(find.text('Volcano Ark'));
     await flush(tester);
     expect(find.text(_zh.engineFieldFromEnvironment), findsOneWidget);
     await tester.tap(find.text(_zh.mediaSettingsApiKey));
@@ -536,7 +536,7 @@ void main() {
           _service(),
           _service(
             id: 'ark_video',
-            label: '火山方舟 · 视频',
+            label: 'Volcano Ark · Video',
             profile: 'ark-video',
             models: 'doubao-seedance-2-0',
             keyRef: 'DSH_MEDIA_ARK_VIDEO_API_KEY',
@@ -545,7 +545,7 @@ void main() {
       ),
       credentials: const {'DSH_MEDIA_ARK_API_KEY': 'sk-image', 'DSH_MEDIA_ARK_VIDEO_API_KEY': 'sk-video'},
     );
-    await tester.tap(find.text('火山方舟'));
+    await tester.tap(find.text('Volcano Ark'));
     await flush(tester);
     expect(find.text(_zh.mediaSettingsReuseKey), findsOneWidget);
     await tester.tap(find.text(_zh.mediaSettingsReuseKey));
@@ -562,7 +562,7 @@ void main() {
       describe: _describe(services: [_service()]),
       credentials: const {'DSH_MEDIA_ARK_API_KEY': 'sk-ark'},
     );
-    await tester.tap(find.text('火山方舟'));
+    await tester.tap(find.text('Volcano Ark'));
     await flush(tester);
     await tester.tap(find.text(_zh.mediaSettingsApiKey));
     await settle(tester);
@@ -587,7 +587,7 @@ void main() {
     await tester.tap(find.text(_zh.mediaKindImage));
     await settle(tester);
     expect(find.text(_zh.engineFieldAuto), findsWidgets);
-    await tester.tap(find.text('Seedream 5.0 · 火山方舟'));
+    await tester.tap(find.text('Seedream 5.0 · Volcano Ark'));
     await flush(tester);
 
     final op = lastOp();
@@ -625,7 +625,7 @@ void main() {
       describe: _describe(
         services: [
           _service(),
-          _service(id: 'ark_video', label: '火山方舟 · 视频', profile: 'ark-video', models: 'doubao-seedance-2-0'),
+          _service(id: 'ark_video', label: 'Volcano Ark · Video', profile: 'ark-video', models: 'doubao-seedance-2-0'),
         ],
         defaults: const {
           'serviceId': 'ark_image',
@@ -638,7 +638,7 @@ void main() {
       ),
       credentials: const {'DSH_MEDIA_ARK_API_KEY': 'sk-keep'},
     );
-    await tester.tap(find.text('火山方舟'));
+    await tester.tap(find.text('Volcano Ark'));
     await flush(tester);
     await tester.tap(find.text(_zh.mediaSettingsDelete));
     await settle(tester);
@@ -669,7 +669,7 @@ void main() {
     );
     await tester.tap(find.text(_zh.mediaSettingsAddService));
     await settle(tester);
-    await tester.tap(find.text('OpenAI · 图片'));
+    await tester.tap(find.text('OpenAI · Image'));
     await flush(tester);
 
     final row = (lastOp()['value']! as List).single as Map;
@@ -718,7 +718,7 @@ void main() {
     expect(find.text(_zh.mediaSettingsNoVideoModels), findsNothing, reason: 'no per-kind rows on 0.2.1');
     await tester.tap(find.text(_zh.mediaSettingsDefaultModel));
     await settle(tester);
-    await tester.tap(find.text('Seedream 5.0 · 火山方舟'));
+    await tester.tap(find.text('Seedream 5.0 · Volcano Ark'));
     await flush(tester);
 
     final op = lastOp();
@@ -733,7 +733,7 @@ void main() {
     await open(
       tester,
       describe: _describe(
-        services: [for (var i = 0; i < 8; i++) _service(id: 'ark_$i', label: '火山方舟 $i')],
+        services: [for (var i = 0; i < 8; i++) _service(id: 'ark_$i', label: 'Volcano Ark $i')],
       ),
     );
     expect(find.text(_zh.mediaSettingsServiceLimit(8)), findsOneWidget);
@@ -744,7 +744,7 @@ void main() {
 
   testWidgets('a service deleted elsewhere leaves its page with a word, not a crash', (tester) async {
     await open(tester, describe: _describe(services: [_service()]));
-    await tester.tap(find.text('火山方舟'));
+    await tester.tap(find.text('Volcano Ark'));
     await flush(tester);
     expect(find.text(_zh.mediaSettingsApiKey), findsOneWidget);
     host.externalSet('dsh-media', const ['services'], const <Object?>[], notify: false);
@@ -773,7 +773,7 @@ void main() {
       describe: _describe(services: [_service()], catalog: {'v': 2, 'models': <Object?>[]}),
     );
     expect(find.text(_zh.mediaSettingsCatalogBroken), findsOneWidget);
-    expect(find.text('火山方舟'), findsOneWidget);
+    expect(find.text('Volcano Ark'), findsOneWidget);
     await tester.tap(find.text(_zh.mediaSettingsAddService));
     await settle(tester);
     expect(find.byType(BottomSheet), findsNothing, reason: 'the add row is disabled');

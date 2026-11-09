@@ -9,7 +9,7 @@ import 'package:dsh_app/state/settings_state.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-const _notice = '\n…（诊断文件过长，已截断；完整内容用 设置 → 诊断 的导出包）\n';
+const _notice = '\n…(diagnostics file too long, truncated; use the export bundle in Settings → Diagnostics for the full content)\n';
 
 DiagnosticsSnapshot _snapshot({List<String> engineLog = const []}) => DiagnosticsSnapshot(
   at: DateTime(2026, 11, 3, 12),

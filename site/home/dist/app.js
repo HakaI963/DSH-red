@@ -15,8 +15,8 @@ function setPaused(value) {
   hero.classList.toggle('motion-paused', value);
   document.body.classList.toggle('motion-paused', value);
   motion.setAttribute('aria-pressed', String(value));
-  motion.setAttribute('aria-label', value ? '继续背景动效' : '暂停背景动效');
-  motion.querySelector('.motion-text').textContent = value ? '继续动效' : '暂停动效';
+  motion.setAttribute('aria-label', value ? 'Resume background motion' : 'Pause background motion');
+  motion.querySelector('.motion-text').textContent = value ? 'Resume motion' : 'Pause motion';
   motion.querySelector('.pause-symbol').textContent = value ? '▷' : 'Ⅱ';
   refreshGalleryMotion();
 }
@@ -38,8 +38,8 @@ function syncMotionPreference() {
   document.body.classList.toggle('reduced', preference.matches);
   motion.disabled = preference.matches;
   replay.disabled = preference.matches;
-  motion.title = preference.matches ? '已遵循系统的减少动态效果设置' : '';
-  replay.title = preference.matches ? '已遵循系统的减少动态效果设置' : '重新播放手机与插件的开场动画';
+  motion.title = preference.matches ? 'Following the system reduced-motion setting' : '';
+  replay.title = preference.matches ? 'Following the system reduced-motion setting' : 'Replay the phone-and-plugins intro animation';
   refreshGalleryMotion();
 }
 preference.addEventListener('change', syncMotionPreference);

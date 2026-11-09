@@ -1,50 +1,48 @@
-# 在本机预览视图 JSON
+# Preview view JSON locally
 
-[English](en/preview.md)
+The checker reports problems by path. To inspect actual layout, the repository's preview command runs the App's `PluginView` and renders static view JSON plus a data snapshot into light and dark PNGs. It uses the App's Flutter parser, components and themes. It does not start DSH, load plugin JavaScript or send actions.
 
-检查器能列出视图的路径问题。需要看实际排版时，可用仓库内的预览命令调用 App 的 `PluginView`，把一份静态 JSON 和数据快照画成浅色、深色 PNG。它使用 App 的 Flutter 解析器、组件和主题；不启动 DSH，不加载插件 JavaScript，也不发送动作。
+## Prepare the checkout
 
-## 准备
+Use a complete dsh-go checkout, Node 22.19+, the repository's Flutter version, and an `app/` with dependencies, localization, App fonts and test fonts prepared through the normal project workflow. The preview uses the strict font setup in `test/flutter_test_config.dart`; missing fonts fail the run. `DSH_TEST_FONT_DIR` can point to the Noto Sans CJK directory; see `app/test/support/test_fonts.dart`.
 
-需要完整 dsh-go 源码、Node 22.19+、仓库指定的 Flutter，以及已经准备好依赖、本地化、App 字体和测试字体的 `app/`。预览沿用 `test/flutter_test_config.dart` 的严格字体检查；缺字体会失败，不静默换成占位字体。`DSH_TEST_FONT_DIR` 可指定 Noto Sans CJK 字体目录，见 `app/test/support/test_fonts.dart`。
+The command runs `flutter test --no-pub`. It does not install dependencies, change build configuration or generate localization. This is a source-checkout developer tool, separate from the skill installed on a phone.
 
-先按项目现有流程准备 App；预览本身运行 `flutter test --no-pub`，不改依赖、构建配置或生成本地化。它是源码仓库内的开发工具，不是手机内置技能的一部分。
+## Run it
 
-## 一条命令
-
-在仓库根目录执行，输出目录必须尚不存在：
+From the repository root, choose an output directory that does not exist:
 
 ```sh
-node sdk/plugin-kit/bin/preview.mjs /绝对路径/view.json \
-  --data /绝对路径/data.json \
-  --out /绝对路径/新的预览目录 \
+node sdk/plugin-kit/bin/preview.mjs /absolute/path/view.json \
+  --data /absolute/path/data.json \
+  --out /absolute/path/new-preview-directory \
   --width 320 --height 960 --scale 1.3
 ```
 
-`--data` 可省略。原始视图默认按面板检查；形如 `{ "dsh-go/view": ... }` 的工具结果元数据自动使用工具卡上限，工具卡不会读取数据模型。也可以显式传 `--budget panel|strip|toolCard`。
+`--data` is optional. Raw views default to the panel budget. A tool-result envelope such as `{ "dsh-go/view": ... }` selects the tool-card budget automatically; tool cards do not acquire a data model. Override with `--budget panel|strip|toolCard` when needed.
 
-| 参数 | 默认值与范围 |
+| Option | Default and range |
 |---|---|
-| `--width` | 390 逻辑像素，整数 240–800 |
-| `--height` | 960 逻辑像素，整数 240–2400 |
-| `--scale` | 1，范围 1–2；大字号可用 1.3 或 2 |
-| `--theme` | `both`；也可 `light` 或 `dark` |
-| `--lang` | `zh`；也可 `en`，影响 App 文案而不翻译插件内容 |
-| `--flutter` | PATH 上的 `flutter`；可传 Flutter 可执行文件的绝对路径 |
+| `--width` | 390 logical pixels; integer 240–800 |
+| `--height` | 960 logical pixels; integer 240–2400 |
+| `--scale` | 1; range 1–2, including 1.3 and 2 |
+| `--theme` | `both`, or `light` / `dark` |
+| `--lang` | `zh`, or `en`; changes App wording, not plugin content |
+| `--flutter` | `flutter` on PATH, or an absolute executable path |
 
-每个输入文件上限 1 MiB，这只是预览读入保护；实际视图仍遵守 App 的工具卡、面板或状态条预算。先用已有 `check.mjs` 调整输入，再看排版。预览命令也先输出检查诊断；根节点整体无效时直接返回 2，不调用 Flutter。局部错误保留占位后仍可预览。
+Each input file is limited to 1 MiB for preview loading. Actual views still use the App's tool-card, panel or strip budgets. The existing `check.mjs` remains useful before rendering. The preview also prints checker diagnostics first. A fatal root returns 2 without starting Flutter; local errors can still render as placeholders.
 
-## 看哪些文件
+## Inspect the output
 
-- `light.png`、`dark.png`：所选主题的第一屏视口，PNG 像素和逻辑像素 1:1。
-- `light.json`、`dark.json`：App 解析问题、实际主题/字号、`remainingScrollExtent` 和原生根错误标记。剩余滚动距离大于零说明后面还有内容，不能凭第一屏说整份视图都已检查。
-- `sdk-diagnostics.json`：Node 检查器的诊断。
-- `request.json`：本次固定的视图和数据。它可能包含你提供的私有数据，请按原输入的用途保存和分享。
+- `light.png` and `dark.png`: the first viewport in each selected theme, with one image pixel per logical pixel.
+- `light.json` and `dark.json`: App parser issues, actual theme and text scale, a native fatal-root flag and `remainingScrollExtent`. A positive remaining extent means content continues beyond the screenshot.
+- `sdk-diagnostics.json`: the Node checker's report.
+- `request.json`: the exact view and data snapshot. It may contain the private data you supplied; store or share it accordingly.
 
-命令返回原检查器的 0/1/2 状态；Flutter 编译、布局、截图或文件写入失败返回 3，App 发现根错误至少返回 2。输出目录不会覆盖；失败后可能保留输入和部分图片，重跑要选新目录。
+The command retains the checker's 0/1/2 result. Flutter compilation, layout, capture or output failures return 3; a native fatal root returns at least 2. Existing output directories are not overwritten. Failed runs can leave partial output; use a new directory for the next run.
 
-## 预览边界
+## Scope
 
-图片只代表所选视口。面板按钮显示其正常外观，但没有主机处理函数；不要把图片当作动作、权限或后台流的测试。`asset:` 图片没有插件资产解析器，会显示既有占位；内联图片沿用 App 解码，异步图片的完整时序仍需专门测试。不会读取网页或执行 Markdown 中的插件代码。
+The image represents the selected viewport. Panel actions display their normal appearance but have no host handler; screenshots do not test actions, permissions or live feeds. No plugin asset resolver is installed, so `asset:` images use the App's placeholder. Inline images follow App decoding; asynchronous image timing needs separate tests. The tool does not load web pages or execute plugin code from Markdown.
 
-这是本地渲染结果，不会读取、写入或批准任何 golden 基准。最终视觉检查应使用完整产品字体和资产；真实设备的字体回退、GPU、系统字号策略及点击行为仍要单独检查。已在 Linux、Node 24、Flutter 3.47 上验证；其他系统请先确认本机能正常运行 Flutter 测试。
+These are local renderings. The command never reads, updates or approves golden baselines. Final visual checks require complete product fonts and assets, with separate device checks for font fallback, GPU behavior, system scaling and interaction. Verified on Linux with Node 24 and Flutter 3.47; on other platforms, first confirm that Flutter tests run locally.

@@ -104,14 +104,14 @@ await test('hosted links: wrong key, missing blob, network, bad magic', async ()
   await assert.rejects(V.decryptHosted(bad.buffer, b64url(raw)), /format/);
   await assert.rejects(V.openHosted('a1B2c3D4e5', b64url(raw), async () => new Response('', { status: 404 })), /gone/);
   await assert.rejects(V.openHosted('a1B2c3D4e5', b64url(raw), async () => { throw new TypeError('offline'); }), /network/);
-  assert.equal(V.errorText(new Error('gone')), '链接已过期或被删除');
-  assert.equal(V.errorText(new Error('key')), '链接不完整');
+  assert.equal(V.errorText(new Error('gone')), 'This link has expired or was deleted');
+  assert.equal(V.errorText(new Error('key')), 'This link is incomplete');
 });
 
 await test('newer files ask for an update', async () => {
   const body = { v: 2, kind: 'conversation', schema: 2, title: 'x', start: '2026-10-24T00:00:00Z', entries: [] };
   await assert.rejects(Promise.resolve().then(() => V.readConversation(body)), /newer/);
-  assert.equal(V.errorText(new Error('newer')), '需要更新 dsh-go 才能打开');
+  assert.equal(V.errorText(new Error('newer')), 'Update dsh-go to open this');
 });
 
 
@@ -150,7 +150,7 @@ await test('export filename keeps complete Unicode pairs after existing cleaning
   assert.equal(fileName('a'.repeat(38) + '😀x'), 'a'.repeat(38) + '😀.dshgo');
   assert.equal(fileName('a'.repeat(41)), 'a'.repeat(40) + '.dshgo');
   assert.equal(fileName(' / ' + 'a'.repeat(39) + '😀x'), 'a'.repeat(39) + '.dshgo');
-  assert.equal(fileName(' /:*?"<>| '), '对话.dshgo');
+  assert.equal(fileName(' /:*?"<>| '), 'Chat.dshgo');
   assert.ok(fileName('a'.repeat(39) + '😀x').isWellFormed());
 });
 

@@ -68,7 +68,7 @@ enum AskAiTopic {
     remote => appL10n.askAiQuestionRemote,
   };
 
-  /// The page of `docs/guide/<lang>/` that answers [question].
+  /// The page of `docs/guide/en/` that answers [question].
   String get guidePage => switch (this) {
     overview || fullAccess || phoneFiles => '10-settings',
     phoneControl || phoneAlways || appRules => '04-phone-control',
@@ -104,9 +104,8 @@ typedef GuidePageReader = Future<String> Function(String asset);
 final guidePageReaderProvider = Provider<GuidePageReader>((ref) => rootBundle.loadString);
 
 /// The asset of a guide [page] (`04-phone-control`): flat in the skill's
-/// asset folder, prefixed with the language (tool/guide_sync.py).
-String guidePageAsset(String page, {required bool english}) =>
-    'assets/skills/$guideSkillName/${english ? 'en' : 'zh'}-$page.md';
+/// asset folder (tool/guide_sync.py). The guide ships in English only.
+String guidePageAsset(String page) => 'assets/skills/$guideSkillName/en-$page.md';
 
 /// The attachment's name: `dsh-go-guide-phone-control.md`.
 String guideAttachmentName(String page) => '$guideSkillName-${page.replaceFirst(RegExp(r'^\d+-'), '')}.md';
@@ -121,8 +120,7 @@ Future<ComposeRequest> askAiRequest(
   AskAiTopic topic, {
   required GuideRoute route,
   required GuidePageReader read,
-  bool? english,
-}) => askAiQuestionRequest(topic.question, topic.guidePage, route: route, read: read, english: english);
+}) => askAiQuestionRequest(topic.question, topic.guidePage, route: route, read: read);
 
 /// [askAiRequest] for any [question], with [guidePage] the page that rides
 /// along where the host takes files.
@@ -131,7 +129,6 @@ Future<ComposeRequest> askAiQuestionRequest(
   String guidePage, {
   required GuideRoute route,
   required GuidePageReader read,
-  bool? english,
 }) async {
   final fallback = ComposeRequest(text: appL10n.askAiAboutApp(question), note: appL10n.askAiNoGuide);
   switch (route) {
@@ -142,7 +139,7 @@ Future<ComposeRequest> askAiQuestionRequest(
     case GuideRoute.attachment:
       final String page;
       try {
-        page = await read(guidePageAsset(guidePage, english: english ?? AppLocale.isEnglish));
+        page = await read(guidePageAsset(guidePage));
       } catch (_) {
         return fallback;
       }

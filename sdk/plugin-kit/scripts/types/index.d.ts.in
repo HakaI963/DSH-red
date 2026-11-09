@@ -233,7 +233,7 @@ export namespace effects {
   function patch(data: Record<string, unknown>, id?: string): InvokePatch
   function pickFile(action: string, options?: { maxFiles?: number }): InvokePickFile
   function pickImage(action: string, options?: { maxFiles?: number }): InvokePickImage
-  /** Wrap slow work as a deferred result: `effects.deferred(async (signal) => ({ insert }), { label: '正在翻译' })`. */
+  /** Wrap slow work as a deferred result: `effects.deferred(async (signal) => ({ insert }), { label: 'Translating' })`. */
   function deferred(work: Deferred['result'], options?: { label?: string; timeoutMs?: number }): Deferred
 }
 

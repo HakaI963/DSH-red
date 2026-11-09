@@ -1,70 +1,71 @@
-# 自查清单
+# Checklist
 
-发给别人用之前，逐条过一遍。`check` 能查的标了 ⚙️。
+Go through it before sharing a plugin. ⚙️ marks what `check` verifies.
 
-## 跑一遍
+## Run it
 
 ```sh
-node sdk/plugin-kit/bin/check.mjs 插件目录          # 清单 + 静态视图
-node sdk/plugin-kit/bin/check.mjs 插件目录 --load   # 再加载宿主半侧：注册了什么、视图函数画出来什么
+node sdk/plugin-kit/bin/check.mjs <plugin dir> --lang en          # manifest + static views
+node sdk/plugin-kit/bin/check.mjs <plugin dir> --load --lang en   # also loads the host half: registrations and the views it draws
 ```
 
-没有 `错误` 才算过。`--json` 给机器读。
+No `error` lines means done. `--json` for machines.
 
-## 清单
+## Manifest
 
-| | 项 | |
+| | Item | |
 |---|---|---|
-| ⬜ | `dshGo.v` 是 `1`；`contributes` 存在 | ⚙️ |
-| ⬜ | 所有 id 在本插件内唯一（跨插槽也算） | ⚙️ |
-| ⬜ | 胶囊 ≤ 10 字、菜单项 ≤ 12 字、状态条 ≤ 24 字、面板标题 ≤ 16 字、插件名 ≤ 24 字，**中英文都量** | ⚙️ |
-| ⬜ | 每插槽数量不超：胶囊 2、菜单 2、状态条 1、面板 4、加号工具 2、对话操作 2、回合尾注 1 | ⚙️ |
-| ⬜ | 加号工具 ≤ 8 字、对话操作 ≤ 12 字，中英文都量 | ⚙️ |
-| ⬜ | 用了较新的位置时，App 没有它也说得通（`hasSurface`） | |
-| ⬜ | `wants` 只要真用到的；`draft` / `clipboard` 只给胶囊和加号面板工具，`message` 只给消息菜单 | ⚙️ |
-| ⬜ | 静态 `effect` 只用 insert / command / open / link / toast / copy | ⚙️ |
-| ⬜ | 状态条的 `panel` 指向本插件的面板 | ⚙️ |
-| ⬜ | 静态视图文件在包目录内、≤ 32 KiB | ⚙️ |
-| ⬜ | `engines.dsh` 写了支持的 DSH 版本 | ⚙️ |
+| ⬜ | `dshGo.v` is `1`; `contributes` exists | ⚙️ |
+| ⬜ | Every id unique within the plugin (across slots too) | ⚙️ |
+| ⬜ | Capsules ≤ 10, menu items ≤ 12, strip ≤ 24, panel titles ≤ 16, plugin name ≤ 24 characters, **in Chinese and English** | ⚙️ |
+| ⬜ | Plus panel tools 2, chat actions 2, turn note 1 at most | ⚙️ |
+| ⬜ | Plus panel tools ≤ 8 characters and chat actions ≤ 12, in every language | ⚙️ |
+| ⬜ | If you use a newer place, it still makes sense when the app lacks it (`hasSurface`) | |
+| ⬜ | Per slot: capsules 2, menu 2, strip 1, panels 4 | ⚙️ |
+| ⬜ | `wants` only what you read; `draft` / `clipboard` for capsules and plus panel tools, `message` for menu items | ⚙️ |
+| ⬜ | Static `effect`s only insert / command / open / link / toast / copy | ⚙️ |
+| ⬜ | The strip's `panel` names one of your panels | ⚙️ |
+| ⬜ | Static view files inside the package, ≤ 32 KiB | ⚙️ |
+| ⬜ | `engines.dsh` declares the DSH versions you support | ⚙️ |
 
-## 宿主半侧
+## Host half
 
-| | 项 | |
+| | Item | |
 |---|---|---|
-| ⬜ | `ctx.inject(['dshGo'], …)`，不是 `'dshGo?'`；`dshGo` 不在顶层 `inject` | ⚙️ `--load` |
-| ⬜ | 每个没写静态 `effect` 的胶囊 / 菜单项都有 `on(id)` | ⚙️ `--load` |
-| ⬜ | 每个面板都有 `panel(id)` 或静态视图 | ⚙️ `--load` |
-| ⬜ | 没有注册清单里没有的 id | ⚙️ `--load` |
-| ⬜ | handler 3 秒内返回；调模型、联网用延后效果，并响应 `signal` | |
-| ⬜ | 数据函数返回取消函数，取消后不再 `emit` | |
-| ⬜ | `emit` 的是完整数据，≤ 32 KiB | |
-| ⬜ | 不在没有点按时做有副作用的事 | |
+| ⬜ | `ctx.inject(['dshGo'], …)`, not `'dshGo?'`; `dshGo` not in the top-level `inject` | ⚙️ `--load` |
+| ⬜ | Every capsule / menu item without a static `effect` has an `on(id)` | ⚙️ `--load` |
+| ⬜ | Every panel has a `panel(id)` or a static view | ⚙️ `--load` |
+| ⬜ | No registrations for ids the manifest does not declare | ⚙️ `--load` |
+| ⬜ | Handlers answer within 3 s; model calls and network use a deferred result and honour `signal` | |
+| ⬜ | Data functions return a cancel function and stop emitting after it | |
+| ⬜ | `emit` sends the whole data, ≤ 32 KiB | |
+| ⬜ | No side effects without a tap | |
 
-## 视图
+## Views
 
-| | 项 | |
+| | Item | |
 |---|---|---|
-| ⬜ | 按根节点视图版本选组件：省略 `v` / `v: 1` 用 v1；新增组件与有界样式显式写 `v: 2`，见[组件目录](components.md)和[样式](styles.md)。清单 `dshGo.v` 仍为 `1`；旧 App 按 `caps` / `adaptView` 降级 | ⚙️ |
-| ⬜ | 工具卡 ≤ 8 KiB、≤ 40 个组件、≤ 6 层；面板 ≤ 32 KiB、≤ 120 个、≤ 8 层 | ⚙️ |
-| ⬜ | 工具卡不用绑定（没有数据模型），不放按钮（第 0 期不能点） | ⚙️ |
-| ⬜ | `presentationMeta` 用 `toolCard()` 包住：不抛错、不返回 `undefined` / `NaN` | |
-| ⬜ | 图片只用 `assets` 目录或小 `data:` | ⚙️ |
-| ⬜ | 浅色、深色都看过；系统字号调大看过 | |
+| ⬜ | Match the view root version: omitted `v` / `v: 1` uses v1; set `v: 2` for the added [components](components.md) and bounded [styles](styles.md). Keep manifest `dshGo.v` at `1`; use `caps` / `adaptView` for older apps | ⚙️ |
+| ⬜ | Tool cards ≤ 8 KiB, ≤ 40 components, ≤ 6 levels; panels ≤ 32 KiB, ≤ 120, ≤ 8 | ⚙️ |
+| ⬜ | Tool cards without bindings (no data model) and without buttons (not tappable in phase 0) | ⚙️ |
+| ⬜ | `presentationMeta` wrapped in `toolCard()`: never throws, never returns `undefined` / `NaN` | |
+| ⬜ | Images only from `assets` or small `data:` | ⚙️ |
+| ⬜ | Looked at in light and dark, and with large system text | |
 
-## 隐私与安全
+## Privacy and safety
 
-| | 项 |
+| | Item |
 |---|---|
-| ⬜ | 不收集、不外传密钥、令牌、Cookie；视图里不显示它们 |
-| ⬜ | 读到的草稿、剪贴板、消息只用于这一次点按，不落盘（除非这正是功能，比如「存进笔记」） |
-| ⬜ | 联网时说明数据来源（卡片里注明，例如「数据：Open-Meteo」） |
-| ⬜ | `link` 只给 https，并且是用户预期的地址 |
-| ⬜ | 不用视图仿冒 App 的审批、登录、付款界面 |
+| ⬜ | No keys, tokens or cookies collected or sent; none shown in views |
+| ⬜ | Draft, clipboard and message text used for that one tap only, not stored (unless storing is the feature, like "Save note") |
+| ⬜ | Network data credited (e.g. "Data: Open-Meteo" on the card) |
+| ⬜ | `link` only https, and only where people expect to go |
+| ⬜ | No views imitating the app's approval, sign-in or payment UI |
 
-## 文案
+## Copy
 
-| | 项 |
+| | Item |
 |---|---|
-| ⬜ | 短、笃定、全角标点；没有「点击这里」「实验」「beta」 |
-| ⬜ | 报错像人话，不出现英文异常和类名 |
-| ⬜ | 中英文都有 |
+| ⬜ | Short and confident; no "click here", "experimental", "beta" |
+| ⬜ | Human error messages, no exceptions or class names |
+| ⬜ | Chinese and English both present |

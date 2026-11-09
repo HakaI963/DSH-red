@@ -1,18 +1,16 @@
-# 文案增量与人工修订保留
+# Incremental copy changes and preservation of human edits
 
-[English](i18n-incremental.en.md)
+`app/tool/l10n_catalog.py` is an offline maintenance tool. It produces source fingerprints and reviewable plans. It does not call a model, write ARBs or translations, select an App locale, or treat review declarations as authenticated approval. Existing output files are never overwritten.
 
-`app/tool/l10n_catalog.py` 是离线维护工具。它生成来源指纹和可审阅的工作计划；不调用模型、不写回 ARB 或译文、不设置应用语言、不把审核声明当作可信认证。现有输出文件一律拒绝覆盖。
+## Workflow
 
-## 使用流程
-
-在一次修改前保存来源目录快照：
+Save a source snapshot before changing copy:
 
 ```sh
 python3 app/tool/l10n_catalog.py snapshot --output catalog-v1.json
 ```
 
-修改文案后，用旧快照和对应语言的维护状态生成新计划：
+After source changes, prepare a new plan using the previous snapshot and the language's maintained state:
 
 ```sh
 python3 app/tool/l10n_catalog.py plan --locale ru \
@@ -21,23 +19,23 @@ python3 app/tool/l10n_catalog.py plan --locale ru \
 python3 app/tool/l10n_catalog.py snapshot --output catalog-v2.json
 ```
 
-开始一门尚无译文的语言时省略 `--translations`。`--repo PATH` 可读取另一份仓库工作副本；默认是脚本所在仓库。输出目录必须已存在。工具只读 `app/lib/l10n/parts/` 的中英来源，不访问聊天记录、账号、设备或凭据。
+Omit `--translations` when starting a language with no translations. `--repo PATH` reads another repository copy; the default is the script's repository. The output directory must exist. Only Chinese/English sources in `app/lib/l10n/parts/` are read; chats, accounts, devices, and credentials are not accessed.
 
-`sourceDiff` 给出 `new / changed / removed / unchanged` 四组键，比较的是旧来源快照与当前来源；`freshness` 比较的是每条译文所绑定的来源与当前来源。因此文案在这两份来源快照间未变，也可能有更早的译文仍然 stale。
+`sourceDiff` reports `new / changed / removed / unchanged` between the previous and current source snapshots. `freshness` compares each translation's recorded source hash with the current source. A translation may therefore still be stale even when those two source snapshots are unchanged.
 
-| 情况 | 保留内容 | 计划位置 |
+| Situation | Preserved data | Plan result |
 |---|---|---|
-| 没有译文 | 不生成目标文本 | `translationQueue`，reason 为 `missing` |
-| 来源变化，AI 草稿且未锁定 | 完整保留旧文本、旧来源 hash 和旧翻译 hash | `preservedTranslations` + `freshness: stale`，进入建议重译队列 |
-| 来源变化，声明人工审核或已锁定 | 同上，绝不自动替换 | `preservedTranslations` + `freshness: stale`，仅进入 `humanReviewQueue` |
-| 来源未变且译文绑定当前来源 | 保留文本与状态 | `freshness: current`，不进入重译队列 |
-| 来源键删除 | 保留旧文本、审核声明、锁定和原 hash | `retiredTranslations` + `freshness: removed` |
+| Missing translation | No target text is invented | `translationQueue`, reason `missing` |
+| Source changed; unlocked AI draft | Existing text and its original hashes | `preservedTranslations`, `freshness: stale`, suggested retranslation queue |
+| Source changed; declared human review or lock | Existing text and its original hashes, never replaced | `preservedTranslations`, `freshness: stale`, only `humanReviewQueue` |
+| Translation is bound to current source | Text and declarations | `freshness: current`, no retranslation request |
+| Source key removed | Old text, declarations, lock, and original hashes | `retiredTranslations`, `freshness: removed` |
 
-所有队列项的 `sourceHash` 对应**当前**准备项；保留和退休译文记录中的 `sourceHash` 仍是它们原来绑定的来源。队列只是建议清单，不触发模型请求或任何写回。即使条目进入建议重译队列，旧 AI 草稿也不会被丢弃。
+Queued `sourceHash` values always identify the current source request. Preserved/retired translation records keep their original source hash. Queues are suggestions only: no model call or writeback occurs. Even an unlocked AI draft queued for replacement is retained.
 
-## 数据契约 v1
+## Version 1 contract
 
-来源快照标识：`format: dsh-go-i18n-catalog`、`schemaVersion: 1`、`sourceHashAlgorithm: sha256-canonical-source-v1`。每条来源的 hash 计算对象严格为：
+Source snapshots use `format: dsh-go-i18n-catalog`, `schemaVersion: 1`, and `sourceHashAlgorithm: sha256-canonical-source-v1`. Each source hash is defined by:
 
 ```python
 payload = {"area": area, "zh": chinese_text,
@@ -47,11 +45,11 @@ source_hash = sha256(json.dumps(payload, ensure_ascii=False,
                                allow_nan=False).encode('utf-8')).hexdigest()
 ```
 
-这与当初四语草稿（没有入库）里的 `source-all-hashes.json` 是同一算法；在 `d38c1f0` 上，5477 个键逐条对比一致。`area` 纳入 hash，所以仅移动分片也会保守地要求重审。`metadata` 采用中文模板 `@key`，包含参数类型和已有说明；未提供时用 `{}`。英文 `@key` 不是模板类型来源，不纳入这个版本的 hash。
+This is the same algorithm as the four-language draft's `source-all-hashes.json` (not in the repo); on `d38c1f0` all 5477 hashes matched. Including `area` conservatively marks a fragment move for review. Metadata is the Chinese template's `@key` object, including declared types/context, or `{}` when absent. English `@key` metadata is not the template type source and is excluded from this hash version.
 
-独立术语表或风格指南的版本不包含在 v1 来源 hash 中。它们变化时，维护者需另列相关词条的人工重审任务，不能因为文案 hash 未变就跳过术语检查。
+A separate glossary/style-guide version is outside the v1 source hash. When those rules change, maintainers must prepare additional review work for affected terms; unchanged message hashes do not waive terminology review.
 
-翻译维护状态格式：
+A translation state looks like:
 
 ```json
 {
@@ -61,8 +59,8 @@ source_hash = sha256(json.dumps(payload, ensure_ascii=False,
   "entries": {
     "commonCancel": {
       "text": "Отмена",
-      "sourceHash": "<当前或历史来源的64位小写SHA-256>",
-      "translationHash": "<目标字符串的64位小写SHA-256>",
+      "sourceHash": "<64 lowercase hexadecimal SHA-256 characters>",
+      "translationHash": "<64 lowercase hexadecimal SHA-256 characters>",
       "review": "ai-draft",
       "locked": false
     }
@@ -70,21 +68,21 @@ source_hash = sha256(json.dumps(payload, ensure_ascii=False,
 }
 ```
 
-上面的尖括号是说明，不是可直接执行的数据。`translationHash` 使用同一 canonical JSON 算法，对象是目标**字符串本身**，不是 UTF-8 裸字符串。审核绑定应至少包含 locale、key、sourceHash、translationHash。修改目标文本却沿用旧 translationHash 会被拒绝；需要重新生成 hash 并重新决定审核状态。
+Angle-bracket values above are explanatory placeholders, not runnable data. `translationHash` applies the same canonical JSON hashing to the target string itself, not raw string bytes. Review records should bind locale, key, sourceHash, and translationHash. Changing target text while retaining its old translation hash fails; recompute the hash and reassess review status.
 
-`review` 只接受 `ai-draft` 或 `human-reviewed`，`locked` 必须是 JSON 布尔值。这些字段是本地维护者工作流声明，**没有签名、身份验证或语言质量保证**。外部导入包不得凭自称 `human-reviewed` 获得发布或应用内激活资格。锁定只表示保护该文本；不表示译文正确。对来源变更的人工译文，即使保留原审核声明，`freshness: stale` 也明确要求重新审核。
+`review` accepts only `ai-draft` or `human-reviewed`; `locked` must be a JSON boolean. These are local maintainer workflow declarations without signatures, identity verification, or language quality guarantees. An imported package must not gain release/activation rights by declaring itself human-reviewed. A lock protects text but does not certify it. Changed-source human translations retain their history while `freshness: stale` explicitly requires review again.
 
-快照/状态的未知结构字段、重复 JSON 键、非 JSON 常量、错误形状、hash 不匹配和两个来源目录中都不存在的译文键都会失败，不会静默忽略。合法删除条目保留到退休区，不直接删除。保留旧来源快照，才能区分真正删除的旧键与未知输入键。
+Unknown structural fields, duplicate JSON keys, non-JSON constants, malformed values, hash mismatches, and translation keys absent from both source snapshots fail instead of being silently ignored. Legitimately removed entries are archived rather than discarded. Retain the previous source snapshot to distinguish removed keys from unknown input.
 
-## 检查与费用计量
+## Validation and workload metrics
 
 ```sh
 python3 -m unittest discover -s app/tool -p test_l10n_catalog.py -v
 python3 app/tool/l10n_merge.py --check
 ```
 
-指纹工具不替代 ICU/占位符校验。计划完成后仍要通过文案结构检查、项目 Flutter 的 `gen-l10n`、目标语言母语复核和界面回归。它不自动导入 ARB，也不自动发布任何语言。
+Fingerprinting does not replace ICU or placeholder validation. Follow it with structural checks, the project's Flutter `gen-l10n`, native-speaker review, and UI regression checks. This tool neither imports ARBs nor publishes locales.
 
-`metrics` 记录键数、Python Unicode 字符数和英文按空白划分的词数，包含 ICU 语法、标记和占位符；**不是 token 数，也不是计费估算**。本次 `d38c1f0` 快照：5477 个键，中文 52337 字符，英文 144756 字符，英文空白分词 23245。计划还单独统计建议重译队列与人工复核队列的这些指标，方便按真实改动量准备批次。
+Metrics count keys, Python Unicode characters, and English whitespace-separated words, including ICU syntax, markup, and placeholders. They are not token counts or pricing estimates. The supplied `d38c1f0` snapshot has 5477 keys, 52337 Chinese characters, 144756 English characters, and 23245 English whitespace-separated words. Both suggested queues have separate metrics for preparing batches around actual changes.
 
-例如源文案变更 20 个键时，四种目标语言最多各需要查看这 20 个来源变化，外加各自缺失或已陈旧的条目；不能每次都把全量重译一遍。是否耗费模型费用、需要多少 token 或多久人工审完，要按实际模型、上下文、译文长度与审核方法另行测量。
+For example, a 20-key source change gives each of four target languages those 20 changes to assess, plus any separately missing or stale entries. It should not trigger a full retranslation on every update. Model charges, token counts, and human review time require measurement with the actual model, context, target text, and review method.

@@ -25,45 +25,45 @@ const ICONS = new Set(JSON.parse(readFileSync(new URL('../schema/view.schema.jso
 
 const WORDS = {
   zh: {
-    error: '错误', warn: '提示', note: '提示', fatal: '错误',
+    error: 'error', warn: 'note', note: 'note', fatal: 'error',
     plugin: (name, version) => `${name}${version ? ` ${version}` : ''}`,
-    noDshGo: '没有 dshGo 清单：只有工具卡（presentationMeta）这类零成本扩展',
-    manifest: { ok: '原生界面能显示', invalid: '清单无效，原生部分不显示', unsupported: '协议版本不被支持，原生部分不显示', 'needs-app': 'App 版本太低，原生部分不显示', degraded: '已降级' },
+    noDshGo: 'No dshGo manifest: only zero-cost extensions such as tool cards (presentationMeta)',
+    manifest: { ok: 'Native UI shows', invalid: 'Invalid manifest; the native part is not shown', unsupported: 'Protocol version not supported; the native part is not shown', 'needs-app': 'App too old; the native part is not shown', degraded: 'Degraded' },
     counts: (c) => [
-      c['composer.actions'] && `胶囊 ${c['composer.actions']}`,
-      c['message.actions'] && `菜单 ${c['message.actions']}`,
-      c['composer.strip'] && `状态条 ${c['composer.strip']}`,
-      c.panels && `面板 ${c.panels}`,
-      c['composer.tools'] && `加号工具 ${c['composer.tools']}`,
-      c['session.actions'] && `对话操作 ${c['session.actions']}`,
-      c['turn.note'] && `回合尾注 ${c['turn.note']}`,
+      c['composer.actions'] && `${c['composer.actions']} capsule(s)`,
+      c['message.actions'] && `${c['message.actions']} menu item(s)`,
+      c['composer.strip'] && `${c['composer.strip']} strip`,
+      c.panels && `${c.panels} panel(s)`,
+      c['composer.tools'] && `${c['composer.tools']} plus-panel tool(s)`,
+      c['session.actions'] && `${c['session.actions']} chat action(s)`,
+      c['turn.note'] && `${c['turn.note']} turn note`,
     ].filter(Boolean).join(' · '),
-    view: (where, budget) => `视图 ${where}（${{ toolCard: '工具卡', panel: '面板', strip: '状态条' }[budget]}）`,
-    viewOk: '能显示', viewFatal: '整块无法显示：', viewProblems: (n) => `，${n} 处问题`,
-    unknownIcon: '不认识的图标，已换成默认图标',
-    notBundle: '不是 DSH 组合包：package.json 缺 dsh.bundle.patch，DSH 装不上',
-    patchMissing: (p) => `找不到组合包补丁文件 ${p}`,
-    noEngines: '没写 engines.dsh：DSH 不检查版本，装到不兼容的 DSH 上会在运行时出错',
-    noName: '缺少 name',
-    cardBindings: '工具卡没有数据模型，绑定都会显示成「—」',
-    cardTaps: '工具卡（第 0 期）不能点：按钮、确认不显示，选项只读',
-    loadHint: '加 --load 再查处理函数和视图函数',
-    loaded: (n) => `已加载宿主半侧：${n} 项可用`,
-    loadedTools: '已加载',
-    loadFailed: (m) => `宿主半侧加载失败：${m}`,
-    optionalInject: "写成了 ctx.inject(['dshGo?'])：cordis 没有可选依赖语法，这个回调永远不执行，改成 ['dshGo']",
-    topInject: '插件顶层的 inject 里有 dshGo：没有桥接的主机上整个插件起不来，改用 ctx.inject([\'dshGo\'], …)',
-    viewFailed: (id, m) => `面板 ${id} 的视图函数出错：${m}`,
-    stripText: (id, n) => `状态条 ${id} 的文字超过 24 字（${n} 字），会被截断`,
-    stripEmit: (id, m) => `状态条 ${id}：${m}`,
-    tools: (names) => `注册了工具：${names}`,
-    missing: (p) => `找不到 ${p}`,
-    readFailed: (p, m) => `读不了 ${p}：${m}`,
-    notJson: (m) => `不是合法的 JSON（${m}）`,
-    packageObject: 'package.json 必须是 JSON 对象',
-    optionValue: (name) => `${name} 缺少值`,
-    unknownOption: (name) => `不认识的选项 ${name}；以 - 开头的文件名请放在 -- 后面`,
-    invalidOption: (name, values) => `${name} 必须是 ${values}`,
+    view: (where, budget) => `View ${where} (${{ toolCard: 'tool card', panel: 'panel', strip: 'strip' }[budget]})`,
+    viewOk: 'renders', viewFatal: 'does not render: ', viewProblems: (n) => `, ${n} problem(s)`,
+    unknownIcon: 'Unknown icon; drawn as the default icon',
+    notBundle: 'Not a DSH bundle: package.json lacks dsh.bundle.patch, DSH cannot install it',
+    patchMissing: (p) => `Bundle patch file ${p} not found`,
+    noEngines: 'No engines.dsh: DSH does not check versions and an incompatible DSH fails at run time',
+    noName: 'Missing name',
+    cardBindings: 'A tool card has no data model; every binding shows as "—"',
+    cardTaps: 'Tool cards (phase 0) are not tappable: buttons and confirms are hidden, options read-only',
+    loadHint: 'Add --load to check handlers and view functions too',
+    loaded: (n) => `Host half loaded: ${n} item(s) ready`,
+    loadedTools: 'Loaded',
+    loadFailed: (m) => `Host half failed to load: ${m}`,
+    optionalInject: "ctx.inject(['dshGo?']) never runs: cordis has no optional syntax; write ['dshGo']",
+    topInject: "dshGo is in the plugin's top-level inject: the plugin will not start on hosts without the bridge; use ctx.inject(['dshGo'], …)",
+    viewFailed: (id, m) => `View function of panel ${id} failed: ${m}`,
+    stripText: (id, n) => `Strip ${id} text is over 24 characters (${n}); it will be cut`,
+    stripEmit: (id, m) => `Strip ${id}: ${m}`,
+    tools: (names) => `Tools registered: ${names}`,
+    missing: (p) => `${p} not found`,
+    readFailed: (p, m) => `Cannot read ${p}: ${m}`,
+    notJson: (m) => `Not valid JSON (${m})`,
+    packageObject: 'package.json must be a JSON object',
+    optionValue: (name) => `${name} requires a value`,
+    unknownOption: (name) => `Unknown option ${name}; put filenames beginning with - after --`,
+    invalidOption: (name, values) => `${name} must be ${values}`,
   },
   en: {
     error: 'error', warn: 'note', note: 'note', fatal: 'error',
@@ -430,7 +430,7 @@ export function formatReport(report, lang) {
   const line = (i, indent = '  ') => {
     const sev = sevOf(i)
     const label = w[sev] ?? w.error
-    const colon = lang === 'en' ? ': ' : '：'
+    const colon = ': '
     if (i.code !== undefined) out.push(`${indent}${label} ${i.path ? `${i.path}${colon}` : ''}${i.message}`)
     else out.push(`${indent}${label} ${labeled(i, lang)}`)
   }
@@ -445,15 +445,15 @@ export function formatReport(report, lang) {
     else if (report.manifest) {
       const m = report.manifest
       const counts = w.counts(m.counts)
-      const tail = m.state === 'ok' && counts ? (lang === 'en' ? ` (${counts})` : `（${counts}）`) : ''
+      const tail = m.state === 'ok' && counts ? ` (${counts})` : ''
       out.push(`  ${w.manifest[m.state] ?? m.state}${tail}`)
       for (const i of m.issues) line(i, '    ')
     }
     if (report.load) {
       if (!report.load.ok) out.push(`  ${w.error} ${report.load.error}`)
       else {
-        const sep = lang === 'en' ? '; ' : '；'
-        const toolText = report.load.tools.length ? w.tools(report.load.tools.join(lang === 'en' ? ', ' : '、')) : ''
+        const sep = '; '
+        const toolText = report.load.tools.length ? w.tools(report.load.tools.join(', ')) : ''
         if (report.manifest) out.push(`  ${w.loaded(report.load.registered)}${toolText ? `${sep}${toolText}` : ''}`)
         else out.push(`  ${w.loadedTools}${toolText ? `${sep}${toolText}` : ''}`)
         for (const i of report.load.notes) line(i, '    ')
@@ -469,10 +469,10 @@ export function formatReport(report, lang) {
     }
     const head = w.view(v.where, v.budget)
     if (v.fatal) {
-      out.push(`  ${head}${lang === 'en' ? ': ' : '：'}${w.viewFatal}${labeled(v.issues.find((i) => i.kind === 'fatal'), lang)}`)
+      out.push(`  ${head}: ${w.viewFatal}${labeled(v.issues.find((i) => i.kind === 'fatal'), lang)}`)
       continue
     }
-    out.push(`  ${head}${lang === 'en' ? ': ' : '：'}${w.viewOk}${v.issues.length ? w.viewProblems(v.issues.length) : ''}`)
+    out.push(`  ${head}: ${w.viewOk}${v.issues.length ? w.viewProblems(v.issues.length) : ''}`)
     for (const i of v.issues) line(i, '    ')
   }
   return out.join('\n')

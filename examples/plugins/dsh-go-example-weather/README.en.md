@@ -49,7 +49,7 @@ output: {
 }
 ```
 
-`toolCard()` returns `{ "dsh-go/view": view }`. View format, components and limits: [`docs/plugins/`](../../../docs/plugins/en/README.md).
+`toolCard()` returns `{ "dsh-go/view": view }`. View format, components and limits: [`docs/plugins/`](../../../docs/plugins/README.md).
 
 ## Check
 

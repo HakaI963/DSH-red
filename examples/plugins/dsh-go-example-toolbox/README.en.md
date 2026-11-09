@@ -18,4 +18,4 @@ Install:
 dsh plugin --profile web add /absolute/path/dsh-go-example-toolbox
 ```
 
-See the [slot reference](../../../docs/plugins/en/slots.md#newer-places).
+See the [slot reference](../../../docs/plugins/slots.md#newer-places).

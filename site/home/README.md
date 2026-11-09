@@ -1,30 +1,30 @@
-# go.dshtui.com 首页
+# go.dshtui.com home page
 
-`https://go.dshtui.com/` 的展示网站。网页由社区开发者 **ClayGao233 / 采云师烧饼**（[GitHub](https://github.com/ClayGao233)、[B站](https://space.bilibili.com/28879571)）制作，作者交付用于 go.dshtui.com；交付包没有附许可证声明，所以这部分不在本仓库的 AGPL-3.0 授权范围内，见 [THIRD_PARTY_NOTICES.md](../../THIRD_PARTY_NOTICES.md)。页底的「网页开发」署名保留。
+The showcase site at `https://go.dshtui.com/`. The page was made by community developer **ClayGao233 / 采云师烧饼** ([GitHub](https://github.com/ClayGao233), [Bilibili](https://space.bilibili.com/28879571)) and handed over by its author for go.dshtui.com; the handoff came without a license statement, so this part is not covered by this repository's AGPL-3.0 license — see [THIRD_PARTY_NOTICES.md](../../THIRD_PARTY_NOTICES.md). The "Web development" credit in the footer stays.
 
-纯 HTML、CSS、JavaScript，没有第三方依赖，也不从别的网站加载任何东西。
+Pure HTML, CSS and JavaScript: no third-party dependencies, and nothing is loaded from other sites.
 
-## 怎么上线
+## How it goes live
 
-`services/share-worker/scripts/build-site.mjs` 把 `dist/` 拷进 Worker 静态资源 `public/` 的根下，`/` 返回 `index.html`（直接访问 `/index.html` 是 404），页面里的相对路径（`/app.js`、`/assets/…`）按原路径提供，都不经过 Worker；每个文件的安全头写在生成的 `public/_headers` 里。部署照旧：`CF_TOKEN_FILE=… services/share-worker/scripts/provision.sh deploy`。路由、安全头和缓存见 [share-links.md](../../docs/design/share-links.md) §2。
+`services/share-worker/scripts/build-site.mjs` copies `dist/` into the root of the Worker's static assets `public/`; `/` returns `index.html` (visiting `/index.html` directly is a 404), and the page's relative paths (`/app.js`, `/assets/…`) are served at their own paths, all without going through the Worker. The security headers for each file are written into the generated `public/_headers`. Deploy as usual: `CF_TOKEN_FILE=… services/share-worker/scripts/provision.sh deploy`. For routing, security headers and caching see [share-links.md](../../docs/design/share-links.md) §2.
 
-- **CSP**：写在 `dist/index.html` 的 `<meta>` 里，Worker 构建时取出来作为响应头（再加 `frame-ancestors 'none'`）。脚本只能是本站文件，没有内联脚本和事件属性；样式表只能是本站文件，允许内联 `style` 属性（开场动画用 `style="--order:…"` 这类 CSS 变量）；图片只能是本站的；`connect-src` 只有本站（Star 数）。所以头像、二维码要放在 `dist/assets/author/`，不能填外链。
-- **Star 数**：页面向本站的 `GET /api/github/stars` 要数（`services/share-worker/src/github.ts`），由 Worker 去问 GitHub、缓存 10 分钟，访客的浏览器不连 GitHub。拿不到数时气泡照常显示，只是没有数字。Worker 固定查 `ccch1mneyyy/dsh-go`。
-- **搜索引擎**：首页和它的文件可以被收录（`robots.txt` 只放行这些，其余页面仍是 `noindex`）。
-- **缓存**：HTML `no-cache`，其余文件一小时。换图请换文件名（例如 `download-qr-v3.png`），不要同名覆盖。
+- **CSP**: declared in the `<meta>` tag of `dist/index.html`; the Worker build extracts it as a response header (plus `frame-ancestors 'none'`). Scripts may only be same-site files — no inline scripts or event attributes; stylesheets may only be same-site files, while inline `style` attributes are allowed (the intro animation uses CSS variables like `style="--order:…"`); images may only come from this site; `connect-src` is this site only (the Star count). So the avatar and QR code must live in `dist/assets/author/` — external links won't work.
+- **Star count**: the page asks this site's own `GET /api/github/stars` (`services/share-worker/src/github.ts`); the Worker queries GitHub and caches for 10 minutes, so visitors' browsers never talk to GitHub. When no number is available the bubble still shows, just without a count. The Worker always queries `ccch1mneyyy/dsh-go`.
+- **Search engines**: the home page and its files may be indexed (`robots.txt` only allows these; every other page stays `noindex`).
+- **Caching**: HTML is `no-cache`, everything else one hour. To change an image, change its file name (e.g. `download-qr-v3.png`) instead of overwriting the same name.
 
-## 改内容
+## Editing content
 
-1. 所有可填项都在 `dist/site-config.js`：作者头像 / ID / 自述、下载入口（二维码、下载页、GitHub Releases）、平台说明、仓库、贡献者、分享元信息。
-2. 改了 `metadata` 后运行 `npm run prepare:publish`，把标题、描述、canonical、Open Graph 写进 `dist/index.html`。
-3. 运行 `npm run check`（语法）、`npm run check:content`（必填项、链接、本地图片）、`npm test`（发布工具的回归用例），再在 `services/share-worker` 跑 `npm test`。
+1. Everything fillable lives in `dist/site-config.js`: author avatar / ID / bio, download entries (QR code, download page, GitHub Releases), platform notes, repository, contributors, share metadata.
+2. After changing `metadata`, run `npm run prepare:publish` to write the title, description, canonical and Open Graph tags into `dist/index.html`.
+3. Run `npm run check` (syntax), `npm run check:content` (required fields, links, local images) and `npm test` (release-tool regression tests), then run `npm test` in `services/share-worker`.
 
-以上命令都只用 Node，不联网，不需要 `npm install`。`npm run dev` 在 http://127.0.0.1:4173/ 本地预览（没有 Star 数）。
+All of these commands use only Node, stay offline and need no `npm install`. `npm run dev` previews locally at http://127.0.0.1:4173/ (without the Star count).
 
-下载二维码 `dist/assets/author/download-qr-v2.png` 的内容和 `download.url` 相同，纠错级别 M、每格 10 像素、留白 4 格（`qrencode -t PNG -l M -s 10 -m 4` 或同等工具）。改了 `download.url` 就要重新生成并扫码核对。
+The download QR code `dist/assets/author/download-qr-v2.png` encodes the same content as `download.url`, with error-correction level M, 10 pixels per module and a 4-module margin (`qrencode -t PNG -l M -s 10 -m 4` or an equivalent tool). Whenever `download.url` changes, regenerate it and verify by scanning.
 
-分享封面 `dist/assets/author/share.png` 是 `docs/assets/social-preview.png` 的副本。
+The share cover `dist/assets/author/share.png` is a copy of `docs/assets/social-preview.png`.
 
-## 还要作者确认
+## Still to be confirmed by the author
 
-当前填的是暂定内容：作者 ID `ccch1mneyyy`、头像用品牌图标、分享封面用仓库的社交预览图。确认或替换后按上面的步骤重新检查。
+The currently filled-in content is provisional: author ID `ccch1mneyyy`, the brand icon as the avatar, and the repository's social preview image as the share cover. After confirming or replacing them, re-run the checks above.

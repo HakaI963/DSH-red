@@ -1,22 +1,22 @@
-# 本机插件改代码后怎样重载
+# Reloading local plugin code
 
-修改实际被 DSH 加载的代码后，打开「设置 › 插件 › 已安装 › 你的插件」，点「重启内核以重载」。确认框会说明：**本机内核会重启，正在运行的任务会中断**。它调用 App 已有的完整内核重启流程，不是只重新运行一个插件的 HMR。
+After editing the code DSH actually loads, open **Settings › Plugins › Installed › your plugin** and choose **Restart engine to reload**. The confirmation explains that **the local engine restarts and running tasks are interrupted**. This uses the app's existing full-engine restart, not HMR of an individual plugin.
 
-入口仅在本地主机、正常运行的内核、本地目录来源、已安装且已启用的第三方插件上出现。来源识别 `file:`、`link:`、绝对路径和 `./`、`../`、`~/` 形式的路径；压缩包不属于目录来源。安全模式、只读插件、远程主机和停止/启动中的内核不提供这个入口。
+The entry appears only on the local host, with a normally running engine and an installed, enabled third-party plugin from a local directory. Recognized sources are `file:`, `link:`, absolute paths and paths starting with `./`, `../` or `~/`; archives are not directory sources. Safe mode, read-only plugins, remote hosts and engines that are stopped, starting or stopping do not offer it.
 
-同一时刻只允许一次确认或重载。确认后 App 会重新核对主机、连接、本地目录来源、插件是否仍存在且启用，以及内核状态。确认期间换主机、卸载插件或关闭插件，都会取消这次执行并提示重新检查。
+Only one confirmation or reload may be pending at a time. After confirmation, the app checks the host, connection, local source, continued installation and enablement, and engine state again. Switching hosts, removing the plugin or disabling it during confirmation cancels the action and asks you to check again.
 
-## 哪些改动会生效
+## Which changes take effect
 
-- 重启会重新启动 DSH 进程并读取它实际加载的文件。若构建输出是 `lib/index.js`，先完成插件自己的构建。
-- 本地依赖是否直接链接源码，取决于安装方式。若包管理器复制了文件，编辑原目录并不等于编辑正在加载的副本；先更新实际加载的文件或重新安装，再重启。App 不会同步或覆盖插件目录。
-- “已请求重启内核”只确认重启调用已发出，不证明插件已成功生效。重连后查看插件详情的加载/解析诊断，必要时查看引擎日志。
-- 修改 `cordis.patch.yml` 是否能自动生效，取决于主机的 HMR 配置。这个入口不改该配置。
+- Restart starts a fresh DSH process reading the files it actually loads. If the entry point is built output such as `lib/index.js`, run your plugin's build first.
+- Whether a local dependency links directly to its source depends on installation. If the package manager copied files, editing the original directory does not edit the loaded copy; update that copy or reinstall before restarting. The app does not sync or overwrite plugin directories.
+- **Engine restart requested** confirms the restart call, not a successful plugin load. After reconnecting, inspect load/parse diagnostics in plugin details and engine logs when needed.
+- Whether changes to `cordis.patch.yml` apply automatically depends on the host's HMR configuration. This entry leaves that configuration alone.
 
-## 真正的插件级 HMR 还缺什么
+## What plugin-level HMR still needs
 
-当前 App 与桥接的可调用接口没有已核实的“使某个模块缓存失效并重新组合插件”能力。本补丁不新增 DSH 协议、不改 `hmr.config.root`，也不把停用再启用冒充源码重载。
+The current callable app and bridge interfaces contain no verified operation to invalidate one module's cache and recompose its plugin. This change adds no DSH protocol, does not edit `hmr.config.root`, and does not present disable/enable as a source reload.
 
-要提供不重启内核的重载，需要先在目标 DSH 版本验证受支持的 HMR 接口或配置：目录到实际模块的对应、源码缓存失效、旧 fiber/订阅/异步任务的撤销、重组完成与失败信号。App 还需要可识别主机的调用通道和可测试的失败恢复语义。直接照搬 issue 中对 `config.root: []` 的观察不足以证明每台主机都相同。
+A reload without restarting the engine first needs a supported HMR interface or configuration verified on the target DSH version: directory-to-module identity, source cache invalidation, cancellation of old fibers/subscriptions/async work, and explicit completion and failure signals. The app also needs a host-specific call path and testable failure recovery. An issue's observation of `config.root: []` is not proof that every host uses it.
 
-SSH / DSH Remote 上的本地路径属于那台主机。本入口不会重启远程 DSH；请沿用那台主机已有的开发/重启流程。
+A local path on SSH / DSH Remote belongs to that host. This entry does not restart remote DSH; use that host's existing development and restart workflow.

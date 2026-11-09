@@ -1,30 +1,28 @@
-# 声音与字幕（v1.2）
+# Sound and captions (v1.2)
 
-[English](en/voice.md)
+Four capabilities for a read-aloud kind of plugin: play a clip, stop the moment the person speaks, a caption updated ten times a second, and that caption floating over the app. All optional: without a declaration nothing happens, and older plugins and apps are unaffected. Full example: [`dsh-go-example-readaloud`](../../examples/plugins/dsh-go-example-readaloud/). Spec: [protocol §11](../design/native-plugins-protocol.md#11-optional-capabilities-v12).
 
-给朗读这类插件的四样能力：放一段声音，用户一开口就停，字幕每秒更新十次，字幕浮在界面上。全部可选：不声明就什么都不发生，老插件、老 App 都不受影响。完整示例：[`dsh-go-example-readaloud`](../../examples/plugins/dsh-go-example-readaloud/)。规格：[协议 §11](../design/native-plugins-protocol.md#11-可选能力v12)。
-
-| 能力 | 你得到 | 你做 | App 做 |
+| Capability | You get | You do | The app does |
 |---|---|---|---|
-| `audio` | 一段声音：播、暂停、继续、停，播完有事件 | 在主机上生成音频字节（比如问主机上的 TTS） | 从桥接取回、在手机上播 |
-| `voice` | 用户开口 / 说完的事件 | 什么都不用做 | 在手机上听；一开口**先自己停掉声音**，再告诉你 |
-| `micro` | 一条小数据通道，最快每秒 10 次 | 推 `{ text, progress }` | 画成一行字幕 |
-| `overlay` | 一行悬浮字幕 | 指定它跟哪条 `micro` 通道 | 浮在对话顶栏下，带关闭键 |
+| `audio` | A clip: play, pause, resume, stop, an event when it ends | Make the audio bytes on the Host (ask a TTS engine there, say) | Fetches them through the bridge, plays them on the phone |
+| `voice` | Events when the person starts / stops speaking | Nothing | Listens on the phone; on speech it **stops the clip itself first**, then tells you |
+| `micro` | A small data channel, up to 10 updates a second | Push `{ text, progress }` | Draws it as a caption line |
+| `overlay` | One floating caption line | Name the `micro` channel it follows | Floats it under the chat header, with a close key |
 
-## 一次朗读怎么走
+## One reading, step by step
 
 ```
-用户在回复上长按 → 朗读
- ├─ invoke on('read') ──▶ 你返回 [audio.play, voice.start, overlay.show]（同一个 instance）
- ├─ App GET 媒体路由 ──▶ 你的 media('speech') 生成整段音频
- ├─ App 播放，同时听麦克风，字幕订阅 micro('caption') ──▶ 你每 100 ms 推一次字幕
- ├─ 用户开口 → App 立刻停播 → cap.event voice.speechStart ──▶ 你的 onCapability
- └─ 声音结束（播完 / 停 / 开口）→ App 自动停止聆听、关字幕 → 终态事件 ──▶ onCapability
+Long-press a reply → Read aloud
+ ├─ invoke on('read') ──▶ you return [audio.play, voice.start, overlay.show] (one instance)
+ ├─ the app GETs the media route ──▶ your media('speech') makes the whole clip
+ ├─ the app plays it, listens, and subscribes to micro('caption') ──▶ you push a caption every 100 ms
+ ├─ the person speaks → the app stops the sound → cap.event voice.speechStart ──▶ your onCapability
+ └─ the clip is over (ended / stopped / interrupted) → the app stops listening, closes the caption → terminal events ──▶ onCapability
 ```
 
-手机从不直接访问你给的地址。主机上的 `127.0.0.1:8765` 由你在 `media` 里去取，App 只认桥接的同源媒体路由，所以本机引擎和远程主机一样能播。
+The phone never opens an address you give it. `127.0.0.1:8765` on the Host is yours to fetch inside `media`; the app only reads the bridge's own media route, so the local engine and a remote host work the same way.
 
-## 清单
+## Manifest
 
 ```jsonc
 "dshGo": {
@@ -41,15 +39,15 @@
 }
 ```
 
-| 字段 | 规则 |
+| Field | Rule |
 |---|---|
-| `capabilities` | 用到哪几样写哪几样 |
-| `requires` | 写在要用声音的按钮上：App 不支持时按钮不出现，而不是点了没反应 |
-| `media` / `micro` / `overlays` | 各最多 2 个，id 和其他贡献一起不重复 |
-| `overlays[].channel` / `text` | 字幕跟哪条 `micro`；`text` 是还没数据时的静态文字（≤ 240 字），二选一或都写 |
-| 面板 `micro` | 面板视图下多一行字幕，跟这条通道 |
+| `capabilities` | The ones you use |
+| `requires` | On the button that needs sound: an app without it doesn't show the button, rather than showing one that does nothing |
+| `media` / `micro` / `overlays` | Up to 2 each; ids unique with the other contributions |
+| `overlays[].channel` / `text` | The `micro` channel it follows; `text` is shown until there is data (≤ 240 characters). One or both |
+| A panel's `micro` | A caption line under the panel's view, from that channel |
 
-## 宿主半侧
+## Host half
 
 ```js
 ctx.inject(['dshGo'], (ctx) => {
@@ -59,67 +57,67 @@ ctx.inject(['dshGo'], (ctx) => {
     { type: 'overlay', op: 'show', instance: 'reading', id: 'subtitle' },
   ])
   ctx.dshGo.media('speech', async (scope, { key, signal }) => ({
-    body: await tts(textOf(key), { signal }),   // Buffer，≤ 16 MiB
+    body: await tts(textOf(key), { signal }),   // a Buffer, ≤ 16 MiB
     contentType: 'audio/mpeg',
   }))
-  ctx.dshGo.micro('caption', { data: (scope, emit) => follow(scope, emit) })   // 返回取消函数
+  ctx.dshGo.micro('caption', { data: (scope, emit) => follow(scope, emit) })   // returns its cancel
   ctx.dshGo.onCapability((scope, { event, reason }) => { if (event === 'voice.speechStart') stopFollowing(scope) })
 })
 ```
 
-- `on('read')` 要在 3 秒内返回：先把要读的文字存好、给一个 `key`，**慢的 TTS 放进 `media`**（它有 30 秒）。
-- `media` 只回完整的一段（`audio/mpeg` `audio/wav` `audio/ogg` `audio/mp4` `audio/aac`），不支持流式。`signal` 在停播、断线、超时时触发，记得传给 TTS 请求。
-- `micro` 的数据只能是 `{ text?, progress? }`：`text` ≤ 240 字，`progress` 0–1。推得再快，App 也最多每秒收 10 次（只要最新那份）；没人看时数据函数会被取消，别留定时器。
-- `onCapability` 的返回值不会执行；它的 `signal` 在会话结束后中止，要记的东西同步记。
+- `on('read')` has 3 seconds: store the text, hand out a `key`, and **do the slow TTS in `media`** (it has 30 s).
+- `media` returns one whole clip (`audio/mpeg`, `audio/wav`, `audio/ogg`, `audio/mp4`, `audio/aac`); no streaming. Its `signal` fires on stop, disconnect or timeout: pass it to the TTS request.
+- `micro` data is `{ text?, progress? }` only: `text` ≤ 240 characters, `progress` 0–1. However fast you push, the app gets at most 10 a second (the newest); with nobody watching your data function is cancelled — keep no timers.
+- `onCapability`'s return value never runs; its `signal` aborts when the session ends, so record what you need synchronously.
 
-## 效果
+## Effects
 
-| 效果 | 说明 |
+| Effect | Notes |
 |---|---|
-| `audio` `play` / `pause` / `resume` / `stop` | `play` 带 `src: "media:<id>"` 和可选 `key`；其余三个只带 `instance` |
-| `voice` `start` / `stop` | 只检测开口，App 不会把声音或文字给你 |
-| `overlay` `show` / `hide` | `id` 是你的 overlay |
+| `audio` `play` / `pause` / `resume` / `stop` | `play` takes `src: "media:<id>"` and an optional `key`; the others only `instance` |
+| `voice` `start` / `stop` | Speech activity only; the app never gives you sound or words |
+| `overlay` `show` / `hide` | `id` is your overlay |
 
-同一次返回里同一 `instance` 的效果属于一个会话。只有点按的直接返回能用这些效果（静态 `effect` 和延后结果都不行）。
+Effects with the same `instance` in one answer form one session. Only a tap's immediate answer may use them (not a static `effect`, not a deferred result).
 
-## 事件
+## Events
 
-| `event` | 什么时候 |
+| `event` | When |
 |---|---|
-| `audio.ended` / `audio.stopped` / `audio.error` | 播完 / 被停 / 出错 |
-| `voice.speechStart` | 用户开口；**声音已经停了**，不会再有 `audio.stopped` |
-| `voice.speechEnd` | 说完 |
-| `voice.stopped` / `voice.error` | 不再听 / 出错（`reason: "declined"` 用户不同意，`"permission"` 系统没给录音权限） |
-| `overlay.closed` | 字幕关了（`reason: "user"` 是用户点了 ×） |
+| `audio.ended` / `audio.stopped` / `audio.error` | Played to the end / stopped / failed |
+| `voice.speechStart` | The person spoke; **the sound has already stopped** — no `audio.stopped` follows |
+| `voice.speechEnd` | They finished |
+| `voice.stopped` / `voice.error` | No longer listening / failed (`reason: "declined"`: the person said no; `"permission"`: no microphone permission) |
+| `overlay.closed` | The caption closed (`reason: "user"`: the person tapped ×) |
 
-## App 替用户守着的
+## What the app guards for the person
 
-| 项 | 怎么做 |
+| Item | How |
 |---|---|
-| 麦克风 | 每个插件第一次要听时 App 问一次，记住答案；插件设置里有「听你开口」开关。之后才是系统录音权限。听的时候对话顶栏下有 App 的指示条（写着你的插件名），用户点「停止」就全停 |
-| 只在前台 | 退到后台、锁屏、换对话、换主机都立刻停，不会自动恢复 |
-| 一次一个 | 全 App 同时只有一个声音会话，新的点按换下旧的 |
-| 跟着声音走 | 声音结束后 App 自动停止聆听（等用户说完）、关掉字幕 |
-| 语音输入优先 | 用户按输入框的语音输入时，你的聆听和朗读先停 |
+| Microphone | The first time a plugin wants to listen the app asks once and remembers; the plugin's settings have a "Hear you speak" switch. The system's microphone permission comes after. While listening, the app's own indicator sits under the chat header, with your plugin's name; its Stop ends everything |
+| Foreground only | Leaving the app, locking the phone, another chat or host: stopped at once, never resumed by itself |
+| One at a time | One sound session in the whole app; a new tap replaces the old |
+| With the sound | When the clip is over the app stops listening (once the person has finished talking) and closes the caption |
+| Dictation first | When the person taps the composer's voice input, your listening and reading stop first |
 
-## 回声
+## Echo
 
-外放朗读时，麦克风会听到朗读声。App 用系统的通话录音通道和回声消除（设备有的话），朗读时把开口门槛调高、开头 0.4 秒不算。这只能降低误判：外放很响、设备没有回声消除时，朗读可能被自己的声音打断，小声说话也可能听不出来。戴耳机最稳。
+Reading out loud through the speaker, the microphone hears the reading. The app uses the system's voice-call capture path and echo canceller (where the phone has one), raises the bar for speech while it plays and ignores the first 0.4 s. That lowers false stops but doesn't rule them out: loud speaker playback on a phone without echo cancellation can interrupt itself, and quiet speech can be missed. Headphones are the most reliable.
 
-## 测
+## Testing
 
 ```js
 import { createTestHost } from '@dsh-go/plugin-kit/testing'
 const h = createTestHost({ dir, caps: { features: ['audio', 'voice', 'micro', 'overlay'] } })
 apply(h.ctx)
-const { effects } = await h.invoke('read', { context: { message: '你好。' }, scope: { sessionId: 's1' } })
+const { effects } = await h.invoke('read', { context: { message: 'Hello.' }, scope: { sessionId: 's1' } })
 const clip = await h.media('speech', { sessionId: 's1' }, { key: effects[0].key })
 const feed = h.subscribeMicro('caption', { sessionId: 's1' })     // feed.data / feed.history
 await h.capabilityEvent({ sessionId: 's1' }, { instance: 'reading', event: 'voice.speechStart', seq: 1 })
 ```
 
-测试宿主直接调你的回调，不模拟租约、鉴权和 10 Hz 节流；这些由桥接负责。`check --load` 按最新的 App（全部能力）检查。
+The test host calls your callbacks directly; leases, authentication and the 10 Hz pacing are the bridge's. `check --load` checks as the newest app (every capability on offer).
 
-## 在哪能用
+## Where it works
 
-本机引擎可用。SSH 主机要等桥接能装上（见[主机覆盖](hosts.md)）；中转主机没有这些能力，带 `requires` 的按钮不会出现。
+On the local engine. SSH hosts once the bridge can be installed there (see [hosts](hosts.md)); relay hosts have none of this, and buttons with `requires` don't show.

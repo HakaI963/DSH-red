@@ -36,4 +36,4 @@ On-device engine: put the folder into the device environment (e.g. `/root/.dsh/d
 
 Tests: `npm test` (the `@dsh-go/plugin-kit` test host). Check: `npm run check -- --load`.
 
-Protocol: [`docs/plugins/voice.md`](../../../docs/plugins/en/voice.md). MIT © DSH-TUI (ccch1mneyyy).
+Protocol: [`docs/plugins/voice.md`](../../../docs/plugins/voice.md). MIT © DSH-TUI (ccch1mneyyy).

@@ -12,7 +12,7 @@ const elevated = spec.backgrounds.elevated.map(numberColor)
 const ink = spec.ink.map(numberColor)
 const muted = spec.muted.map(numberColor)
 const defaultAccent = numberColor(spec.defaultAccent)
-// `accent: "app"`: the person's palette; offline checks assume the app's default (雾蓝).
+// `accent: "app"`: the person's palette; offline checks assume the app's default (mist blue).
 const appAccent = numberColor(spec.appAccent)
 const reserved = new Set(spec.reservedStyleKeys)
 const known = new Set(['size', 'weight', 'italic', 'underline', 'strike', 'align', 'maxLines', 'color',

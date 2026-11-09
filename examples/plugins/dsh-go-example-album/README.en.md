@@ -21,4 +21,4 @@ node --test examples/plugins/dsh-go-example-album/test/*.test.js
 node sdk/plugin-kit/bin/check.mjs examples/plugins/dsh-go-example-album --load
 ```
 
-Colour corrections in the diagnostics are expected notes. See [Components](../../../docs/plugins/en/components.md) for the components and [Web panels](../../../docs/plugins/en/web-panels.md) for the sheet.
+Colour corrections in the diagnostics are expected notes. See [Components](../../../docs/plugins/components.md) for the components and [Web panels](../../../docs/plugins/web-panels.md) for the sheet.

@@ -104,7 +104,7 @@ void main() {
         'a11y': {'enabled': true, 'serviceConnected': connected},
       });
       final markdown = diagnosticsMarkdown(snapshot);
-      expect(markdown, contains('无障碍开关：true · 服务已连接：$connected'));
+      expect(markdown, contains('Accessibility enabled: true · service connected: $connected'));
       final exported = readZip(DiagnosticsBundle.build(snapshot)).map((e) => utf8.decode(e.data)).join();
       expect('$exported\n$markdown', isNot(contains('PRIVATE_')));
       expect(calls, ['status']);
@@ -167,8 +167,8 @@ void main() {
       expect(summary(snapshot)['phone'], {'available': false});
       expect(summary(snapshot)['runtime'], isNotEmpty);
       final markdown = diagnosticsMarkdown(snapshot);
-      expect(markdown, contains('手机状态不可用'));
-      expect(markdown, isNot(contains('无障碍开关：false')));
+      expect(markdown, contains('Phone state unavailable'));
+      expect(markdown, isNot(contains('Accessibility enabled: false')));
       expect(markdown, isNot(contains('PRIVATE_NATIVE_DETAIL')));
     });
   }

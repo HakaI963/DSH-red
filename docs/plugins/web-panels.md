@@ -1,44 +1,44 @@
-# Web 插件面板入口
+# Opening web plugin panels
 
-注册 `sidebar.panellist` + `main` 的 Web 插件仍可从「全部功能 › 插件」进入。
+Web plugins that register `sidebar.panellist` + `main` remain available in **All features › Plugins**.
 
-对话详情页也提供入口：如果当前主机没有可见的对话专属插件页签（`sidebar.right.pane.tab`），「插件」页签会显示 `main` 面板。一项直接打开，多项先列出面板。已有对话专属页签时仍以它们为准，全局面板留在「全部功能」中。
+Chat details now provides another entry: when the current host has no visible conversation-specific plugin tabs (`sidebar.right.pane.tab`), its **Plugins** tab shows `main` panels. A single panel opens directly; several panels appear as a list first. Existing conversation-specific tabs retain priority, with global panels still available in All features.
 
-全局面板保持根作用域，不传当前 `sessionId`。同一槽内仍按原规则选择原生面板、Web 岛屿或「在网页版打开」；原生面板不会因为这个入口而多出 invoke 权限。没有可显示内容时不出现空页签。
+Global panels keep their root scope and receive no current `sessionId`. The existing planner still chooses a native panel, web island or **Open in web** entry within each slot. This entry grants native panels no additional invoke permissions. An empty plan produces no tab.
 
-面板名称优先取 `main` 条目的名字，再找同插件、同 cell 的 `sidebar.panellist` 名字，最后使用插件名。请为侧栏条目提供简短、明确、和别的面板不重名的名字：App 按名字在网页版侧栏里找它，同名时不猜，直接换成「在网页版打开」。插件设置分区（`settings.section`）同理。
+The panel name comes from its `main` label, then the same plugin and cell in `sidebar.panellist`, then the plugin name. Give sidebar entries short, clear names that no other panel uses: the app finds the panel by that name in DSH Web's sidebar, and when two go by it, it doesn't guess and offers **Open in DSH Web** instead. The same goes for a plugin's settings section (`settings.section`).
 
-## 对话视图
+## Conversation views
 
-在 DSH Web 里给对话注册了 View（`conversation.view`，和 Chat、Trajectory 并列的另一种看法）的插件，在 App 里出现在这个对话的对话详情 › 「插件」页签，和对话专属页签排在一起：先页签，后视图。一项直接打开，多项先列出。
+A plugin that registers a View of a conversation in DSH Web (`conversation.view`, another way to look at it beside Chat and Trajectory) shows in the app under that conversation's Chat details › **Plugins** tab, with the conversation's plugin tabs: tabs first, then views. A single one opens directly; several appear as a list first.
 
-- 名字取注册时的 `label`。App 按名字在网页版的 View 标签行（或「更多会话视图」菜单）里找到它，再按 View 的 id 确认打开的就是它，所以请给它一个简短、独一无二的名字：和别的 View 同名时，App 不猜，直接换成「在网页版打开」。
-- 整页岛，只在这台手机自己的引擎上、主机有桥接占用表、路由守卫生效、资源预算够时打开；打开时先显示加载骨架，12 秒内没显示出来就换成「在网页版打开」，打开的是这个对话。
-- App 只在岛里点选这个 View，不改用户在网页版里选的 View：岛显示后和离开时把原来的选择写回。
-- 官方的 Chat、Trajectory 不出现在这里。
+- Its name is the registered `label`. The app finds the view by that name in DSH Web's View tab row (or under **More conversation views**), then checks by the view's id that it opened that one, so give it a short name of its own: when another view goes by the same name, the app doesn't guess and offers **Open in DSH Web** instead.
+- A page island, only on this phone's own engine, with the bridge's occupancy table, the route guard on and room in the budget; it shows the loading skeleton first, and not on screen within 12 s, it becomes **Open in web**, into this conversation.
+- The app picks the View only inside the island and leaves the View the person chose in DSH Web as it was: the island writes their choice back once it shows, and again on the way out.
+- The official Chat and Trajectory do not show here.
 
-## 聊天页「插件」弹层
+## The chat page's Plugins sheet
 
-聊天页输入框上方胶囊行的最后一枚胶囊「插件」（拼图图标）打开这个对话的插件弹层。它只在弹层有内容时出现，不占胶囊 8 个的名额，生成回复时和整行一起让位。
+The last capsule above the chat page's composer, **Plugins** (a puzzle icon), opens the conversation's plugin sheet. It shows only while the sheet has something, outside the eight capsules, and steps aside with the row while a reply is generating.
 
-若要隐藏这个 App 绘制的入口，在 `$DSH_HOME/dsh-go/ui.json` 的现有 `hide` 数组中加上 `pluginCapsule`，例如 `{"version":1,"hide":["pluginCapsule"]}`。删除这一项或在界面配置页恢复默认即可重新显示。它不停用插件，不隐藏插件自己的快捷胶囊，也不移除「全部功能」或「对话详情」中的面板。`plugins.seats` 控制插件槽位；`chat.panel` 和 `dsh-go.panel` 都不是这枚 App 胶囊的名字。
+To hide this app-owned entry, add `pluginCapsule` to the existing `hide` array in `$DSH_HOME/dsh-go/ui.json`, for example `{"version":1,"hide":["pluginCapsule"]}`. Remove it, or restore that setting to its default in the app, to show the entry again. This does not disable plugins, hide their own composer actions, or remove panels from All features / Chat details. The `plugins.seats` map configures plugin slots; `chat.panel` and `dsh-go.panel` do not name this built-in capsule.
 
-弹层里先是原生面板（`placement: "chat.panel"`，按插件名排），再是网页插件放在聊天页的部件：这 7 个 slot 的第三方条目——`conversation.session.header.actions`、`conversation.session.header.utilities`、`conversation.input.dock`、`conversation.input.left`、`conversation.input.right`、`conversation.input.overlay`、`conversation.composer.dock`。它们装在**一个**面板岛里，按网页上的顺序竖排，官方条目已遮掉；岛上方一行写着是哪些插件的。
+The sheet holds the native panels first (`placement: "chat.panel"`, by plugin name), then the web plugins' chat-page parts: the third-party entries of these seven slots — `conversation.session.header.actions`, `conversation.session.header.utilities`, `conversation.input.dock`, `conversation.input.left`, `conversation.input.right`, `conversation.input.overlay`, `conversation.composer.dock`. They share **one** panel island, stacked in page order, with the official entries masked; a line above it says whose they are.
 
-- 岛在打开弹层时才建，关掉 30 秒后回收，不拖慢聊天页。
-- 只有每一项都能单独做成岛（本机引擎、桥接占用表、路由守卫）、没有被 `ui.json` 改成 `web` 或隐藏、预算够时才建；否则、或 8 秒内没显示出来、或网页说找不到，都换成一行「在网页版打开」。
-- 岛里的条目没有逐条标记，所以 App 不能只隐藏其中一个插件的；`ui.json` 改了其中一项，整块就走网页版。
+- The island is made when the sheet opens and goes 30 s after it closes, so the chat page stays light.
+- It is made only when every part could be an island on its own (this phone's engine, the bridge's occupancy, the route guard), none was set to `web` or hidden in `ui.json`, and the budget has room; otherwise, or when it is not on screen within 8 s, or the page cannot find the slots, it is one **Open in web** row.
+- Entries inside the island carry no marks of their own, so the app cannot hide one plugin's; a `ui.json` setting on any of them sends the whole part to the web.
 
-## 插件详情「网页版界面」
+## Plugin details: Web parts
 
-插件详情里列出这个插件的网页部分放在 App 没有座位的地方（输入框旁、消息里、全局浮层……），每行一个位置，点开去网页版。上面两节的对话视图和聊天页部件有了座位，不再列在这里。没有占用表的主机只显示一行，说这个插件有网页部分。
+A plugin's details list where its web part sits in places the app has no seat for (beside the composer, in messages, a global overlay…), one row per place, each opening DSH Web. Conversation views and chat-page parts have seats now (above) and are not listed. A host without the occupancy table shows one row saying the plugin has a web part.
 
-## 主机与降级
+## Hosts and fallback
 
-- 岛屿仍要求主机可提供 Web 页面，并通过现有路由门控和资源预算。
-- 岛屿无法打开时使用已有的 DSH Web 入口；它会打开侧栏，让用户选择面板。现有 Web 打开桥没有第三方面板的深链 id，因此不承诺直接定位任意插件 cell。
-- 没有 Web 页面的中转主机不显示仅 Web 面板。
+- Islands still require a host with web pages, the existing route gate and available resource budget.
+- If an island cannot open, the existing DSH Web entry opens the sidebar so the person can choose the panel. The web opening bridge has no third-party panel deep-link id, so it cannot promise to land on an arbitrary plugin cell.
+- Relay hosts without web pages do not show web-only panels.
 
-## 尚未开放
+## Not yet available
 
-此入口没有增加 `ui.json` 的 `plugin:` 页面引用、跨插件 `open` 别名或 `dsh-go://panel/…` 深链。原生 `open` 效果仍只能打开 App 支持的页面或本插件的 `panel:<id>`。这些能力需要另行定义可校验的目标、生命周期和权限边界。
+This entry adds no `plugin:` page references to `ui.json`, cross-plugin `open` aliases or `dsh-go://panel/…` deep links. Native `open` effects still target supported app pages or the calling plugin's `panel:<id>`. Additional targets need separately defined validation, lifecycle and permission boundaries.

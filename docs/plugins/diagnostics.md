@@ -1,19 +1,19 @@
-# 看加载状态与诊断
+# Load status and diagnostics
 
-「设置 › 插件 › 已安装 › 某插件」中的启用开关表示配置选择，不能证明组件已运行。主机清单报告组件失败、加载中、等待、没有运行实例或未返回条目时，详情页会增加「加载状态」。部分组件已经运行时显示「部分生效」及运行数量。
+The enabled switch in **Settings › Plugins › Installed › a plugin** records a configuration choice. It does not prove that a component is running. When the host inventory reports failure, loading, waiting, no running instance or a missing entry, the details sheet adds **Load status**. If some components are running, it shows **Partly active** and the running count.
 
-App 按 bundle row 的精确 `entryId` 对应 Loader 清单。不按包名或模块名猜测归属：两个插件可以导入同一模块。缺少 `entryId`、清单没有对应项或同一 id 出现多次，都显示「状态未报告」，不算成功，也不臆测失败原因。这里是全局 Loader 状态，预设内部的条件与运行状态仍在「插件清单」的预设分组中查看。
+The app joins each bundle row to the Loader inventory by its exact `entryId`. Package and module names are not used to guess ownership: two plugins can import the same module. Missing entry ids, absent inventory entries and duplicate ids remain **Not reported**, without claiming success or inventing a cause. This is the global Loader state; preset-specific conditions and runtime states remain in the preset groups of **Plugin inventory**.
 
-关闭的 bundle 不出现这个诊断区；组件明确关闭且无其他问题时也不会报警。所有组件正常运行且无元数据问题时，详情页保留原来的布局。清单正在读取、断线或读取失败时不据此认定插件失败；可去「插件清单」查看连接/读取错误并重试。
+A disabled bundle gets no extra diagnostics section. An explicitly disabled component with no other issue is not an error. When all components are running with clean metadata, the details layout stays unchanged. Loading, disconnection or failure of the inventory request does not establish that the plugin failed; use Plugin inventory to inspect that request's error and retry.
 
-## 三类证据各看什么
+## Three kinds of evidence
 
-| 证据 | 在哪看 | 能说明什么 |
+| Evidence | Where | What it establishes |
 |---|---|---|
-| Loader 状态 | 详情页「加载状态」 | 哪个全局组件运行、失败、等待或未报告 |
-| 元数据错误 | 组件下面的「元数据诊断」 | 主机实际返回的描述文件问题，不是运行时异常堆栈 |
-| 原生 UI 解析与运行问题 | 详情页「原生界面」 | 清单/视图/动作的问题及 JSON 路径，延用原有问题页 |
+| Loader state | Load status | Which global component is running, failed, waiting or unreported |
+| Metadata errors | Metadata diagnostics under a component | The host's actual metadata problem, not a runtime exception stack |
+| Native UI parse and runtime issues | Native UI | Manifest, view and action issues with their JSON paths, using the existing issues page |
 
-主机接口没有返回运行时异常详情时，App 明确显示这一点。本机可点「引擎日志」打开现有日志；SSH / DSH Remote 主机请在那台主机上查日志。App 不会展示本机日志来冒充远程错误，也不会从 `pending` 猜出缺少哪个依赖。
+If the host API did not return runtime error details, the app says so. For the local engine, **Engine logs** opens the existing log sheet. For SSH / DSH Remote, inspect logs on that host. Local logs never stand in for a remote error, and `pending` is not treated as evidence of a particular missing dependency.
 
-插件管理变化和主机就绪事件会使现有清单重新读取；诊断区的「刷新」也可手动重查。这里不新增定时轮询，也不承诺捕获没有对应通知的每一个瞬间阶段。
+Plugin management changes and host-ready events invalidate the existing inventory. **Refresh** in the diagnostics section also reads it again. This section adds no polling and cannot promise to observe every transient phase without a corresponding notification.

@@ -6,8 +6,8 @@ try {
   const report = await validateConfig(config);
   if (!report.errors.length) {
     const html = await readFile(resolve(projectRoot, 'dist/index.html'), 'utf8');
-    if (applyMetadata(html, config.metadata) !== html) report.warnings.push('metadata：静态 HTML 尚未同步配置，请在上传前执行 npm run prepare:publish。');
+    if (applyMetadata(html, config.metadata) !== html) report.warnings.push('metadata: the static HTML is not in sync with the config yet; run npm run prepare:publish before uploading.');
   }
   printReport(report);
   process.exitCode = report.errors.length ? 1 : 0;
-} catch (error) { console.error(`[错误] 无法检查配置：${error.message}`); process.exitCode = 1; }
+} catch (error) { console.error(`[error] cannot check config: ${error.message}`); process.exitCode = 1; }
