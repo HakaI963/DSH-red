@@ -314,12 +314,14 @@ void main() {
     expect(file.closed, isTrue);
   });
 
-  test('normal file named png retains the 200 MiB allowance and accepts its exact boundary', () async {
-    final file = _File('not-an-image.png', _megabytes(maxFileBytes ~/ _mib), reportedLength: maxFileBytes);
+  test('a normal file named png stays uncapped and streams whole', () async {
+    // Files have no size cap any more; the name alone must not invoke the
+    // 20 MiB image bound. 40 MiB of non-image content goes through as a file.
+    final file = _File('not-an-image.png', _megabytes(40), reportedLength: 40 * _mib);
     picker.selected = [file];
     final result = await device.pickFiles();
     expect(result.problem, isNull);
-    expect(result.attachments.single.size, maxFileBytes);
+    expect(result.attachments.single.size, 40 * _mib);
     expect(result.attachments.single.isImage, isFalse);
   });
 
