@@ -65,9 +65,7 @@ final Map<SettingsPageId, List<String Function(L10n)>> _unlisted = {
   SettingsPageId.pets: [(l) => l.botsPetShowNow, (l) => l.botsPetSwitchDisabled, (l) => l.botsPetHiddenToday],
   SettingsPageId.remote: [(l) => l.remoteWebConsole],
   SettingsPageId.executionMode: [
-    (l) => l.executionModeProot,
-    (l) => l.executionModeDirect,
-    (l) => l.executionModeShizuku,
+    (l) => l.executionModeChroot,
   ],
 };
 

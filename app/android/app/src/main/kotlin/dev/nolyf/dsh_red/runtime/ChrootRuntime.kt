@@ -97,21 +97,23 @@ object ChrootRuntime {
      * userspace (/data, /storage, /sdcard) and a couple of small tmpfs.
      * Everything that is already mounted is left alone, so a restart is cheap.
      */
-    fun mountScript(): String = buildString {
-        append("set -e\n")
-        append("R='$ROOT'\n")
-        append("mkdir -p $R/proc $R/sys $R/dev/shm $R/tmp $R/data $R/storage $R/sdcard $R/system $R/apex $R/mnt/user $R/root/.dsh/dsh-app\n")
-        append("mount -t proc proc $R/proc 2>/dev/null || true\n")
-        append("mount -t sysfs -o ro,nosuid,nodev sysfs $R/sys 2>/dev/null || true\n")
-        append("mount --bind /dev $R/dev 2>/dev/null || true\n")
-        append("mount -t tmpfs -o size=64m tmpfs $R/dev/shm 2>/dev/null || true\n")
-        append("mount -t tmpfs -o size=512m tmpfs $R/tmp 2>/dev/null || true\n")
-        append("mount --bind /data $R/data 2>/dev/null || true\n")
-        append("mount --bind /storage $R/storage 2>/dev/null || true\n")
-        append("mount --bind /sdcard $R/sdcard 2>/dev/null || true\n")
-        append("mount --bind /mnt/user $R/mnt/user 2>/dev/null || true\n")
-        append("mount --bind -o ro /system $R/system 2>/dev/null || true\n")
-        append("mount --bind -o ro /apex $R/apex 2>/dev/null || true\n")
+    fun mountScript(): String {
+        val r = ROOT
+        return listOf(
+            "set -e",
+            "mkdir -p $r/proc $r/sys $r/dev/shm $r/tmp $r/data $r/storage $r/sdcard $r/system $r/apex $r/mnt/user $r/root/.dsh/dsh-app",
+            "mount -t proc proc $r/proc 2>/dev/null || true",
+            "mount -t sysfs -o ro,nosuid,nodev sysfs $r/sys 2>/dev/null || true",
+            "mount --bind /dev $r/dev 2>/dev/null || true",
+            "mount -t tmpfs -o size=64m tmpfs $r/dev/shm 2>/dev/null || true",
+            "mount -t tmpfs -o size=512m tmpfs $r/tmp 2>/dev/null || true",
+            "mount --bind /data $r/data 2>/dev/null || true",
+            "mount --bind /storage $r/storage 2>/dev/null || true",
+            "mount --bind /sdcard $r/sdcard 2>/dev/null || true",
+            "mount --bind /mnt/user $r/mnt/user 2>/dev/null || true",
+            "mount --bind -o ro /system $r/system 2>/dev/null || true",
+            "mount --bind -o ro /apex $r/apex 2>/dev/null || true",
+        ).joinToString("\n") + "\n"
     }
 
     /** Sets the mounts up; every mount is best-effort (a missing one is logged). */

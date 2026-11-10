@@ -122,7 +122,7 @@ class RuntimeInstaller(
         }
         // Into the chroot the engine runs in (needs root on the phone).
         timed("chroot") {
-            ChrootRuntime.install(rootfs, android.os.Process.myUid(), android.os.Process.myGid(), onLog)
+            ChrootRuntime.install(rootfs, android.os.Process.myUid(), android.os.Process.myUid(), onLog)
             ChrootRuntime.writeVersion(manifest.runtimeVersion)
         }
     }
