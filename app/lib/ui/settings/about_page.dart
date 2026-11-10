@@ -1,4 +1,4 @@
-// About DSH Go: app information and the fork credits, then the brand mark,
+// About DSH red: app information and the fork credits, then the brand mark,
 // slogan and unofficial-app disclaimer.
 
 import 'dart:async';
