@@ -12410,6 +12410,18 @@ abstract class L10n {
   /// **'请先停止引擎'**
   String get executionModeStopFirst;
 
+  /// No description provided for @executionModeChroot.
+  ///
+  /// In zh, this message translates to:
+  /// **'Chroot（root）'**
+  String get executionModeChroot;
+
+  /// No description provided for @executionModeChrootNote.
+  ///
+  /// In zh, this message translates to:
+  /// **'引擎直接运行在本机文件系统的 chroot 里：内置 Linux 用户空间 + 挂载进来的手机存储 + root（Magisk）启动。不再有 PRoot，也没有转译层，快得多。'**
+  String get executionModeChrootNote;
+
   /// No description provided for @featuresCordisSubtitle.
   ///
   /// In zh, this message translates to:

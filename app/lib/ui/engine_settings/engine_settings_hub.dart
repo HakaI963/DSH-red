@@ -90,7 +90,7 @@ class EngineSettingsHubPage extends ConsumerWidget {
       (
         AppIcons.command,
         SettingsPageId.executionMode,
-        executionMode == null ? null : executionModeLabel(l10n, executionMode),
+        executionModeLabel(l10n, executionMode),
         const ExecutionModeSettingsPage(),
       ),
     ];

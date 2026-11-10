@@ -4067,6 +4067,8 @@
   "executionModeSaved": "执行模式已保存",
   "executionModeChangeFailed": "执行模式修改失败",
   "executionModeStopFirst": "请先停止引擎",
+  "executionModeChroot": "Chroot（root）",
+  "executionModeChrootNote": "引擎直接运行在本机文件系统的 chroot 里：内置 Linux 用户空间 + 挂载进来的手机存储 + root（Magisk）启动。不再有 PRoot，也没有转译层，快得多。",
   "featuresCordisSubtitle": "动态插件 · 引擎重启后清空",
   "featuresCordisUnavailable": "这个连接看不到 Cordis",
   "featuresCordisRemoteUnavailable": "经 DSH Remote 中转时不可用",

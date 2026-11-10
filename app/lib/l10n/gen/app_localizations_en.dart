@@ -7073,6 +7073,13 @@ class L10nEn extends L10n {
   String get executionModeStopFirst => 'Stop the engine first';
 
   @override
+  String get executionModeChroot => 'Chroot (root)';
+
+  @override
+  String get executionModeChrootNote =>
+      'The engine runs in a chroot on this phone’s own filesystem: the bundled Linux userland, your phone’s storage mounted into it, and root (Magisk) starting it. No PRoot, no translation layer — much faster.';
+
+  @override
   String get featuresCordisSubtitle => 'Dynamic plugins · Cleared when the engine restarts';
 
   @override

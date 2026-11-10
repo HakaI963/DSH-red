@@ -6706,6 +6706,13 @@ class L10nZh extends L10n {
   String get executionModeStopFirst => '请先停止引擎';
 
   @override
+  String get executionModeChroot => 'Chroot（root）';
+
+  @override
+  String get executionModeChrootNote =>
+      '引擎直接运行在本机文件系统的 chroot 里：内置 Linux 用户空间 + 挂载进来的手机存储 + root（Magisk）启动。不再有 PRoot，也没有转译层，快得多。';
+
+  @override
   String get featuresCordisSubtitle => '动态插件 · 引擎重启后清空';
 
   @override
