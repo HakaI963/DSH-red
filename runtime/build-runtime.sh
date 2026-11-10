@@ -377,6 +377,8 @@ build_abi() {
   # -- verification: every jniLib and every ELF in the rootfs must match the ABI --
   local f bad=0
   for f in "$jni"/*.so; do
+    # No native libraries any more (the engine runs in a chroot, not under PRoot).
+    [ -e "$f" ] || continue
     file -b "$f" | grep -q "$elf_name" || { log "ABI mismatch: $f: $(file -b "$f")"; bad=1; }
   done
   python3 -I - "$out/build-report.json" "$abi" <<'PYEOF' || bad=1
