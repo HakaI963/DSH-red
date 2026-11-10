@@ -334,7 +334,17 @@ void main() {
   group('引擎参数', () {
     Future<void> pumpEngine(WidgetTester tester, Widget page) async {
       final host = engine.FakeSettingsHost();
-      await engine.pumpPage(tester, page, overrides: engine.engineOverrides(DshClient.withCarrier(host)), height: 3200);
+      await engine.pumpPage(
+        tester,
+        page,
+        overrides: [
+          ...engine.engineOverrides(DshClient.withCarrier(host)),
+          // The execution-mode page reads the runtime status; without a mock
+          // the provider opens the platform event channel.
+          localRuntimeProvider.overrideWith(() => FakeRuntime(const LocalRuntimeState(loaded: true, status: runningStatus))),
+        ],
+        height: 3200,
+      );
     }
 
     testWidgets('引擎参数', (tester) async {

@@ -115,6 +115,7 @@ class _ExecutionModeSettingsPageState extends ConsumerState<ExecutionModeSetting
       subtitle: Text(l10n.executionModeNote),
       children: [
         SettingsSection(
+          footer: FeatureNote(hint),
           children: [
             for (final mode in executionModes)
               Semantics(
@@ -132,7 +133,6 @@ class _ExecutionModeSettingsPageState extends ConsumerState<ExecutionModeSetting
                 ),
               ),
           ],
-          footer: FeatureNote(hint),
         ),
       ],
     );

@@ -13,7 +13,7 @@ import 'support.dart';
 void main() {
   late FakeSettingsHost host;
 
-  Future<void> open(WidgetTester tester, {Map<String, Object?> values = const {}}) async {
+  Future<void> open(WidgetTester tester, {Map<String, Object> values = const {}}) async {
     SharedPreferences.setMockInitialValues(values);
     host = FakeSettingsHost();
     await pumpPage(
