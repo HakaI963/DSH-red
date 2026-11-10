@@ -30,7 +30,7 @@ object GuestSetup {
         """        |- Always answer in the language the user writes in; default to English.
         |- When you need a bash command, request it directly with `sandbox_permissions: "danger-full-access"` and state the reason in one sentence; do not try sandbox mode first.
         |- The default working directory is `/root/workspace`. {STORAGE_LINE}
-        |- Preinstalled: node / npm / pnpm, python3 / pip, git; npm and pnpm default to the China mirror registry.npmmirror.com. For any other missing tool run `apt-get update && apt-get install -y <package>` (needs network).
+        |- Preinstalled: node / npm / pnpm, python3 / pip, git; npm and pnpm default to registry.npmjs.org. For any other missing tool run `apt-get update && apt-get install -y <package>` (needs network).
         |- The phone screen is small: keep replies concise and don't make code blocks too wide.
         |
         |## Interface and skills

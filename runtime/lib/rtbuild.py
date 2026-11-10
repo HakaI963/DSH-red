@@ -863,7 +863,7 @@ def overlay_entries(runtime_info, with_python=False, with_pnpm=False, with_bridg
       "export TMPDIR=\"${TMPDIR:-/tmp}\"\n"
       "export DSH_HOME=\"${DSH_HOME:-/root/.dsh}\"\n"
       "export XDG_DATA_DIRS=\"${XDG_DATA_DIRS-/usr/local/share:/usr/share:/system}\"\n"
-      + ("export pnpm_config_registry=\"${pnpm_config_registry:-%s}\"\n" % NPMMIRROR if with_pnpm else ""))
+      + ("export pnpm_config_registry=\"${pnpm_config_registry:-%s}\"\n" % NPMJS if with_pnpm else ""))
     f("etc/apt/apt.conf.d/99dsh-app-proot",
       "// proot fakes root; apt's privilege drop to _apt only causes setgroups/permission noise.\n"
       "APT::Sandbox::User \"root\";\n"
@@ -873,7 +873,7 @@ def overlay_entries(runtime_info, with_python=False, with_pnpm=False, with_bridg
       "# pnpm 11 never reads this file: its registry comes from pnpm_config_registry, which the\n"
       "# launch environment and /etc/profile.d/dsh-app.sh set.\n"
       "prefix=/usr/local\n"
-      "registry=https://registry.npmmirror.com\n"
+      "registry=https://registry.npmjs.org\n"
       "update-notifier=false\nfund=false\naudit=false\n")
     s("usr/local/bin/node", "../../../opt/node/bin/node")
     s("usr/local/bin/npm", "../../../opt/node/bin/npm")
@@ -907,16 +907,17 @@ def overlay_entries(runtime_info, with_python=False, with_pnpm=False, with_bridg
         if with_pnpm:
             patch += ("#\n"
                       "# Plugin installs (pluginManager) ask pnpm's own registry first; the launch environment\n"
-                      "# points it at npmmirror (pnpm_config_registry). Listing npmmirror here keeps it in the\n"
-                      "# public set, so npm's own registry is asked next when the mirror is unreachable, times out\n"
-                      "# or has not synced a version yet. A private registry pnpm is pointed at is still asked\n"
-                      "# alone. This row replaces plugin-manager's whole config: a plugin-manager config in the\n"
-                      "# profile's cordis.patch.yml does not apply while DSH runs with this overlay.\n"
+                      "# points it at registry.npmjs.org (pnpm_config_registry) — DSH red ships for users outside\n"
+                      "# China, where the npmmirror mirror is slow or unreachable. Listing npmmirror here keeps it\n"
+                      "# in the public set as the fallback when npmjs itself is unreachable or has not synced a\n"
+                      "# version yet. A private registry pnpm is pointed at is still asked alone. This row\n"
+                      "# replaces plugin-manager's whole config: a plugin-manager config in the profile's\n"
+                      "# cordis.patch.yml does not apply while DSH runs with this overlay.\n"
                       "- id: plugin-manager\n"
                       "  config:\n"
                       "    fallbackRegistries:\n"
                       "      - %s\n"
-                      "      - %s\n" % (NPMMIRROR, NPMJS))
+                      "      - %s\n" % (NPMJS, NPMMIRROR))
         if with_bridge:
             patch += ("#\n"
                       "# dsh-go-bridge: plugin inventory for the app (GET /dsh-go/v1/inventory), loaded by path.\n"
@@ -1354,7 +1355,7 @@ def launch_template():
         # Linux font discovery appends /fonts; Android's fonts are in the bound /system.
         "XDG_DATA_DIRS=/usr/local/share:/usr/share:/system",
         # pnpm 11 reads its registry from here (not from any npmrc outside $HOME); see DSH_WEB_PATCH
-        "pnpm_config_registry=" + NPMMIRROR,
+        "pnpm_config_registry=" + NPMJS,
         "UV_USE_IO_URING=0",
         "NARB_DISABLE_NATIVE_CACHE=1",
         "NODE_OPTIONS=--dns-result-order=ipv4first",
@@ -1462,10 +1463,10 @@ def cmd_manifest(args):
         "dshGoBridge": {"version": v["dshGoBridge"], "path": DSH_GO_BRIDGE} if v.get("dshGoBridge") else None,
         "tallocVersion": v["tallocVersion"],
         "androidShmemVersion": v["androidShmemVersion"],
-        "npmRegistry": "https://registry.npmmirror.com",
-        "pnpmRegistry": NPMMIRROR,
+        "npmRegistry": "https://registry.npmjs.org",
+        "pnpmRegistry": NPMJS,
         "pluginRegistries": {
-            "order": [NPMMIRROR, NPMJS],
+            "order": [NPMJS, NPMMIRROR],
             "note": "pluginManager asks pnpm's own registry (pnpm_config_registry in launch.argv) and then "
                     "the fallbackRegistries set by " + DSH_WEB_PATCH + " (passed with --patch)",
         },
