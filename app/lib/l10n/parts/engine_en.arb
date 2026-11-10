@@ -377,6 +377,13 @@
   },
   "engineReconnectSaved": "Reconnect settings saved",
   "engineReconnectFailed": "Couldn’t apply: {error}",
+  "@engineReconnectFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
   "engineReconnectNoProvider": "No model provider with reconnect support on this host",
   "executionModeTitle": "Execution mode",
   "executionModeNote": "How the engine process runs on this phone. Changes apply after you stop and start the engine.",

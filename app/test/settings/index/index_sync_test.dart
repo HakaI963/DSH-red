@@ -12,7 +12,9 @@ import 'package:dsh_app/state/balance_state.dart';
 import 'package:dsh_app/state/connection_state.dart';
 import 'package:dsh_app/state/settings_state.dart';
 import 'package:dsh_app/ui/engine/engine_screen.dart';
+import 'package:dsh_app/ui/engine_settings/agent_reconnect_page.dart';
 import 'package:dsh_app/ui/engine_settings/engine_settings_hub.dart';
+import 'package:dsh_app/ui/engine_settings/execution_mode_page.dart';
 import 'package:dsh_app/ui/engine_settings/runtime_settings_pages.dart';
 import 'package:dsh_app/ui/engine_settings/subagent_settings_page.dart';
 import 'package:dsh_app/ui/engine_settings/web_search_page.dart';
@@ -62,6 +64,11 @@ final Map<SettingsPageId, List<String Function(L10n)>> _unlisted = {
   ],
   SettingsPageId.pets: [(l) => l.botsPetShowNow, (l) => l.botsPetSwitchDisabled, (l) => l.botsPetHiddenToday],
   SettingsPageId.remote: [(l) => l.remoteWebConsole],
+  SettingsPageId.executionMode: [
+    (l) => l.executionModeProot,
+    (l) => l.executionModeDirect,
+    (l) => l.executionModeShizuku,
+  ],
 };
 
 /// Entries whose row shows the thing itself rather than the page's name
@@ -341,6 +348,12 @@ void main() {
     });
     testWidgets('命令执行', (tester) async {
       await _check(tester, SettingsPageId.shell, () => pumpEngine(tester, const ShellSettingsPage()));
+    });
+    testWidgets('模型调用重连', (tester) async {
+      await _check(tester, SettingsPageId.agentReconnect, () => pumpEngine(tester, const AgentReconnectSettingsPage()));
+    });
+    testWidgets('执行模式', (tester) async {
+      await _check(tester, SettingsPageId.executionMode, () => pumpEngine(tester, const ExecutionModeSettingsPage()));
     });
     testWidgets('联网搜索', (tester) async {
       await _check(tester, SettingsPageId.webSearch, () => pumpEngine(tester, const WebSearchSettingsPage()));

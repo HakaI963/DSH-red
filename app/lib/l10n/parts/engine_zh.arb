@@ -722,6 +722,13 @@
   },
   "engineReconnectSaved": "重连设置已保存",
   "engineReconnectFailed": "应用失败：{error}",
+  "@engineReconnectFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
   "engineReconnectNoProvider": "这台主机上没有支持重连的模型提供方",
   "executionModeTitle": "执行模式",
   "executionModeNote": "引擎进程在本机上的运行方式。修改后需停止并重新启动引擎生效。",
