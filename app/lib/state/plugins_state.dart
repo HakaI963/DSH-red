@@ -155,16 +155,18 @@ class MarketEntry {
   /// The sidecar's title in [locale], else the index's. DSH red's own English
   /// copy wins for the engine's official plugins (their upstream metadata is
   /// Chinese-only in every locale).
-  String title([String locale = 'en']) =>
-      (locale.startsWith('en') ? dshRedOfficialCopy[name]?.$1 : null) ??
-      listing?.title?.resolve(locale) ??
-      plugin.displayTitle(locale);
+  String title([String? locale]) {
+    final l = locale ?? dshClientLocale;
+    return (l.startsWith('en') ? dshRedOfficialCopy[name]?.$1 : null) ?? listing?.title?.resolve(l) ?? plugin.displayTitle(l);
+  }
 
   /// The sidecar's summary in [locale], else the index's description.
-  String? summary([String locale = 'en']) =>
-      (locale.startsWith('en') ? dshRedOfficialCopy[name]?.$2 : null) ??
-      listing?.summary?.resolve(locale) ??
-      plugin.displayDescription(locale);
+  String? summary([String? locale]) {
+    final l = locale ?? dshClientLocale;
+    return (l.startsWith('en') ? dshRedOfficialCopy[name]?.$2 : null) ??
+        listing?.summary?.resolve(l) ??
+        plugin.displayDescription(l);
+  }
 
   static String _haystack(MarketPlugin p, DshGoListing? listing) => [
     p.name,

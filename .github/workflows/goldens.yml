@@ -79,6 +79,13 @@ jobs:
             test/settings/settings_pages_golden_test.dart \
             test/settings/wallpaper_section_test.dart \
             test/features/features_pages_test.dart \
+            test/access/access_golden_test.dart \
+            test/access/phone_mode_golden_test.dart \
+            test/onboarding/local_optional_golden_test.dart \
+            test/plugins/plugins_golden_test.dart \
+            test/plugins/native/chat_plugins_sheet_test.dart \
+            test/share_code/share_code_golden_test.dart \
+            test/phone/phone_floating_bar_test.dart \
             test/plugin_config/plugin_config_golden_test.dart \
             test/integration/wiring_test.dart
       - name: Package changed goldens

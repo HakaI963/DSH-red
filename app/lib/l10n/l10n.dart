@@ -9,6 +9,8 @@
 
 import 'package:flutter/widgets.dart';
 
+import 'package:dsh_client/dsh_client.dart' show dshClientLocale;
+
 import 'gen/app_localizations.dart';
 
 export 'gen/app_localizations.dart';
@@ -33,9 +35,11 @@ abstract final class AppLocale {
 
   static L10n get l10n => _l10n;
 
-  /// Switches [appL10n] to [locale] (zh_CN or en).
+  /// Switches [appL10n] to [locale] (zh_CN or en), and the dsh_client
+  /// package's display locale with it (plugin titles follow the app).
   static void use(Locale locale) {
     final next = locale.languageCode == 'en' ? en : zhCN;
+    dshClientLocale = next.languageCode;
     if (next == _locale) return;
     _locale = next;
     _l10n = lookupL10n(next);

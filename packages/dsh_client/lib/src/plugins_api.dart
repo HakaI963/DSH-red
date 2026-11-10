@@ -19,6 +19,11 @@ import 'session_api.dart';
 // Localized text
 // -----------------------------------------------------------------------------
 
+/// The language display text asks for when a call passes none. The app keeps
+/// it in step with its own locale (l10n `AppLocale.use`); Chinese-pinned
+/// tests and plain consumers stay on `zh`, the upstream default.
+String dshClientLocale = 'zh';
+
 /// A plain string or a map of language id to text (`{en, zh, ...}`).
 class LocalizedText {
   const LocalizedText(this.values);
@@ -55,9 +60,10 @@ class LocalizedText {
   /// Plain text is what `.description()` gave before `.i18n()` added
   /// languages (schemastery keeps it under `''`): a Chinese plugin that only
   /// translated into English must still read in Chinese for a Chinese UI.
-  String resolve([String locale = 'en']) {
+  String resolve([String? locale]) {
+    final wanted0 = locale ?? dshClientLocale;
     final tagged = {for (final MapEntry(:key, :value) in values.entries) _tag(key): value};
-    final wanted = _tag(locale);
+    final wanted = _tag(wanted0);
     final language = wanted.split('-').first;
     String? of(String language) =>
         tagged[language] ?? tagged.entries.where((e) => e.key.startsWith('$language-')).map((e) => e.value).firstOrNull;
@@ -265,13 +271,15 @@ class PluginBundle {
 
   bool get isOnDemand => official && !installed && availability == 'missing' && installTargetSpec != null;
 
-  String title([String locale = 'en']) =>
-      (locale.startsWith('en') ? dshRedOfficialCopy[name]?.$1 : null) ?? meta?.title?.resolve(locale) ?? name;
+  String title([String? locale]) {
+    final l = locale ?? dshClientLocale;
+    return (l.startsWith('en') ? dshRedOfficialCopy[name]?.$1 : null) ?? meta?.title?.resolve(l) ?? name;
+  }
 
-  String? summary([String locale = 'en']) =>
-      (locale.startsWith('en') ? dshRedOfficialCopy[name]?.$2 : null) ??
-      meta?.description?.resolve(locale) ??
-      description;
+  String? summary([String? locale]) {
+    final l = locale ?? dshClientLocale;
+    return (l.startsWith('en') ? dshRedOfficialCopy[name]?.$2 : null) ?? meta?.description?.resolve(l) ?? description;
+  }
 }
 
 /// DSH red's English names for the engine's official plugins: their manifests
@@ -882,9 +890,9 @@ class MarketPlugin {
 
   MarketVersion get latest => versions.first;
 
-  String displayTitle([String locale = 'en']) => title?.resolve(locale) ?? name;
+  String displayTitle([String? locale]) => title?.resolve(locale) ?? name;
 
-  String? displayDescription([String locale = 'en']) => description?.resolve(locale);
+  String? displayDescription([String? locale]) => description?.resolve(locale);
 }
 
 class MarketIndex {

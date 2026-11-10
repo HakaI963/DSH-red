@@ -305,9 +305,9 @@ void main() {
       expect(zh.starPromptTitle(0), '本鱼已经在 DSH Go 里陪你半个小时啦⁠~');
       expect(zh.starPromptTitle(1), '本鱼已经在 DSH Go 里陪你一个小时啦⁠~');
       expect(zh.starPromptTitle(5), '本鱼已经在 DSH Go 里陪你 5 个小时啦⁠~');
-      expect(en.starPromptTitle(0), 'I’ve kept you company in DSH Go for half an hour now~');
-      expect(en.starPromptTitle(1), 'I’ve kept you company in DSH Go for an hour now~');
-      expect(en.starPromptTitle(6), 'I’ve kept you company in DSH Go for 6 hours now~');
+      expect(en.starPromptTitle(0), 'I’ve kept you company in DSH red for half an hour now~');
+      expect(en.starPromptTitle(1), 'I’ve kept you company in DSH red for an hour now~');
+      expect(en.starPromptTitle(6), 'I’ve kept you company in DSH red for 6 hours now~');
     });
 
     test('keeps through JSON; the earlier prompt’s record keeps only whether it was finished', () {
@@ -804,7 +804,7 @@ void main() {
       await _pumpDialog(tester, width: 360, height: 780, scale: 1.3, locale: const Locale('en'), hours: 6);
       await tester.pumpAndSettle();
       fits(tester);
-      expect(find.text('I’ve kept you company in DSH Go for 6 hours now~'), findsOneWidget);
+      expect(find.text('I’ve kept you company in DSH red for 6 hours now~'), findsOneWidget);
     });
 
     testWidgets('animations on: the whale bobs in and comes to rest at full size', (tester) async {
