@@ -10,7 +10,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../l10n/l10n.dart';
-import '../../runtime/runtime_state.dart';
 import '../../state/agent_reconnect_state.dart';
 import '../../state/engine_settings_state.dart';
 import '../../state/plugin_config/plugin_config_state.dart';
@@ -56,8 +55,9 @@ class EngineSettingsHubPage extends ConsumerWidget {
     final reconnectNs = settings == null ? const <String>[] : llmRetryNamespaces(settings);
     final reconnect =
         reconnectNs.isEmpty ? null : agentReconnectFromPolicy(liveRetryPolicy(settings!));
-    final runtime = ref.watch(localRuntimeProvider);
-    final executionMode = runtime.loaded ? currentExecutionMode(status: runtime.status, loaded: true) : null;
+    // Prefs mirror, not the live status: watching the runtime here would open
+    // the platform event channel on a page whose tests never mock it.
+    final executionMode = ref.watch(executionModePrefProvider).value;
     // Every plugin with something to set, live fields or not.
     final config = settings == null ? null : ref.watch(pluginConfigProvider).value;
     final plugins = pluginConfigEntries(config);

@@ -5,6 +5,7 @@
 // The live values live in the engine: the `retryPolicy` field of every `llm-*`
 // namespace that serves one (see AgentReconnectPage).
 
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 /// `off`, or `<retries>:<first seconds>:<max seconds>`.
@@ -81,3 +82,10 @@ Future<void> saveAgentReconnectPref(
     ),
   );
 }
+
+/// The saved execution mode for the hub's row value: prefs only, so the hub
+/// never touches the runtime event channel (golden tests don't mock it).
+final executionModePrefProvider = FutureProvider<String?>((ref) async {
+  final prefs = await SharedPreferences.getInstance();
+  return prefs.getString(executionModePrefKey);
+});
