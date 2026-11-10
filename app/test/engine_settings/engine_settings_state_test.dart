@@ -287,7 +287,7 @@ void main() {
       final remote = items.global.firstWhere((i) => i.entryId == 'include:remote-access');
       expect(remote.system, isTrue, reason: 'no Chinese name in its package');
       expect(remote.title, 'api-remote-access');
-      expect(remote.description, isNull, reason: 'English one-liners are not shown');
+      expect(remote.description, isNotNull, reason: 'DSH red shows the English text'); // was hidden upstream
       expect(chineseText(LocalizedText.plain('远程访问')), '远程访问');
       expect(chineseText(LocalizedText.plain('Remote access')), isNull);
       expect(chineseText(const LocalizedText({'en': 'a', 'zh-cn': '甲'})), '甲');

@@ -408,7 +408,7 @@ void main() {
     expect(find.text('未启用'), findsNothing);
     await tester.enterText(find.byType(TextField), 'bash');
     await settle(tester);
-    expect(find.text('Bash 沙箱执行'), findsOneWidget);
+    expect(find.text('bash-sandbox'), findsOneWidget);
     expect(find.text('插件管理服务'), findsNothing);
     expect(find.text('@deepseek-ai/dsh-bash-sandbox'), findsNothing, reason: 'a Chinese one-liner instead');
     await tester.enterText(find.byType(TextField), '');
