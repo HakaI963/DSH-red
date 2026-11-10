@@ -133,9 +133,9 @@ class GuestSetupTest {
                 val path = if (direct) "${root.canonicalPath}/root/.dsh/dsh-app/diagnostics.md"
                     else "\$DSH_HOME/dsh-app/diagnostics.md"
                 assertTrue(text.contains("`$path`"))
-                assertTrue(text.contains("同目录的 `diagnostics-manual.md`"))
-                assertTrue(text.contains("后续自动快照不会覆盖它"))
-                assertTrue(text.contains("清除 App 内存证据不会撤回已发布文件"))
+                assertTrue(text.contains("`diagnostics-manual.md` in the same directory"))
+                assertTrue(text.contains("Later automatic snapshots don't overwrite it"))
+                assertTrue(text.contains("does not retract an already published file"))
             }
         } finally { root.deleteRecursively() }
     }

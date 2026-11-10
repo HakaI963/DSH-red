@@ -265,10 +265,40 @@ class PluginBundle {
 
   bool get isOnDemand => official && !installed && availability == 'missing' && installTargetSpec != null;
 
-  String title([String locale = 'zh']) => meta?.title?.resolve(locale) ?? name;
+  String title([String locale = 'en']) =>
+      (locale.startsWith('en') ? dshRedOfficialCopy[name]?.$1 : null) ?? meta?.title?.resolve(locale) ?? name;
 
-  String? summary([String locale = 'zh']) => meta?.description?.resolve(locale) ?? description;
+  String? summary([String locale = 'en']) =>
+      (locale.startsWith('en') ? dshRedOfficialCopy[name]?.$2 : null) ??
+      meta?.description?.resolve(locale) ??
+      description;
 }
+
+/// DSH red's English names for the engine's official plugins: their manifests
+/// ship Chinese-only titles, and the pinned engine package can't be rewritten
+/// here. Keyed by package; only consulted for English locales, so Chinese
+/// hosts and zh-pinned tests keep the upstream text.
+const dshRedOfficialCopy = <String, (String, String)>{
+  '@deepseek-ai/dsh-experimental-agent-team': ('Agent teams', 'Lets the agent you talk to split work among named teammates, with a durable mailbox and a shared task board.'),
+  '@deepseek-ai/dsh-experimental-agent-team-profile': ('Agent teams', 'Lets the agent you talk to split work among named teammates, with a durable mailbox and a shared task board.'),
+  '@deepseek-ai/dsh-experimental-client-ui-agent-team': ('Agent teams', 'The Agent teams screens in the app.'),
+  '@deepseek-ai/dsh-experimental-tool-agent-team': ('Agent teams tools', 'The tools the team members run on.'),
+  '@deepseek-ai/dsh-experimental-inspector': ('Developer tools', 'For troubleshooting: dig through the Session data diagnostics.'),
+  '@deepseek-ai/dsh-experimental-inspector-profile': ('Developer tools', 'For troubleshooting: dig through the Session data diagnostics.'),
+  '@deepseek-ai/dsh-experimental-session-inspector': ('Session data diagnostics', 'The session’s raw data, for looking problems up.'),
+  '@deepseek-ai/dsh-experimental-auto-review': ('Auto-approval review', 'Adds the Auto review mode: every tool call is checked by the model before it runs.'),
+  '@deepseek-ai/dsh-experimental-badge-skill-bundle': ('DSH badge skill', 'Lets the agent add the powered-by-DSH badge to docs, PRs and other outputs.'),
+  '@deepseek-ai/dsh-experimental-cot-translation-bundle': ('Thinking translation', 'Machine-translates the expanded thinking lines while the agent writes.'),
+  '@deepseek-ai/dsh-experimental-client-ui-cot-translation': ('Thinking translation', 'The Thinking translation screens in the app.'),
+  '@deepseek-ai/dsh-experimental-ralph-bundle': ('Ralph loop', 'When a Ralph loop is requested, the agent re-runs fresh passes until the goal is done.'),
+  '@deepseek-ai/dsh-experimental-session-titles-bundle': ('Auto session titles', 'Generates the session title from your messages and refreshes it as the conversation moves.'),
+  '@deepseek-ai/dsh-experimental-terminal-bundle': ('Persistent terminal', 'Gives the agent a terminal whose processes survive across tool calls.'),
+  '@deepseek-ai/dsh-experimental-voice-input-bundle': ('Voice input', 'Talk instead of typing; transcribes on-device with SenseVoice (its runtime downloads on first use).'),
+  '@deepseek-ai/dsh-experimental-client-ui-voice-input': ('Voice input', 'The Voice input screens in the app.'),
+  '@deepseek-ai/dsh-experimental-speech-to-text': ('Speech recognition', 'Transcribes recordings with a selectable provider.'),
+  '@deepseek-ai/dsh-experimental-speech-to-text-sensevoice': ('SenseVoice local recognition', 'On-device transcription with SenseVoice; downloads its runtime on first use.'),
+  '@deepseek-ai/dsh-experimental-api-speech-to-text': ('Speech transcription API', 'Transcription through an external API.'),
+};
 
 /// One `pluginManager/listPlugins` entry.
 class PluginEntry {

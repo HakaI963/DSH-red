@@ -40,7 +40,7 @@ class GuestAgentsModeTest {
             GuestSetup.writeAgentsMd(root, phoneStorage = true)
             val text = File(root, "root/.dsh/AGENTS.md").readText()
             // The folder FilesPlugin saves into and lists, with no space to quote in shell commands.
-            assertTrue(text.contains("给用户的产出文件放到 `/sdcard/Download/DSH-Go/`。"))
+            assertTrue(text.contains("put output files for the user in `/sdcard/Download/DSH-Go/`"))
             assertFalse(text.contains("/sdcard/Download/DSH/"))
         } finally { root.deleteRecursively() }
     }
@@ -51,7 +51,7 @@ class GuestAgentsModeTest {
             val file = File(root, "root/.dsh/AGENTS.md")
             GuestSetup.writeAgentsMd(root, phoneStorage = false)
             val proot = file.readText()
-            assertTrue(proot.contains("## 本机诊断"))
+            assertTrue(proot.contains("## Local diagnostics"))
             assertTrue(proot.contains("`\$DSH_HOME/dsh-app/diagnostics.md`"))
             assertTrue(proot.contains("dsh-go-support"))
             GuestSetup.writeAgentsMd(root, phoneStorage = false, directEngine = true)

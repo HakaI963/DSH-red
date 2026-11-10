@@ -45,10 +45,19 @@ object PhoneStorage {
         return listOf("${hostRoot()}:$GUEST_PATH", "/storage")
     }
 
-    /** The phone-storage link under /root (the folder itself is named in Chinese) → `/sdcard` inside the rootfs, present only while the mode is on. */
+    /** The phone-storage link under /root → `/sdcard` inside the rootfs, present only while the mode is on.
+     *  English-named in this fork; the old Chinese-named shortcut is removed once, so the engine's
+     *  file listings and the web picker show one clear name. */
     fun syncShortcut(rootfs: java.io.File, enabled: Boolean) {
         // l10n:keep guest filesystem path
-        val link = java.io.File(rootfs, "root/手机存储")
+        val legacy = java.io.File(rootfs, "root/手机存储")
+        runCatching {
+            val info = android.system.Os.lstat(legacy.path)
+            if (android.system.OsConstants.S_ISLNK(info.st_mode) && android.system.Os.readlink(legacy.path) == GUEST_PATH) {
+                legacy.delete()
+            }
+        }
+        val link = java.io.File(rootfs, "root/Phone storage")
         try {
             val info = android.system.Os.lstat(link.path)
             if (!enabled && android.system.OsConstants.S_ISLNK(info.st_mode) &&
