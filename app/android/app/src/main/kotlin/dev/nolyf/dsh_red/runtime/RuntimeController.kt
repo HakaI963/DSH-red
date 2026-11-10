@@ -526,7 +526,14 @@ class RuntimeController private constructor(private val app: Context) : DshProce
                 val direct = directEngine()
                 p.start(env, if (storage) PhoneStorage.binds() else emptyList(), safe, phone, direct.requested, direct.failed, searchOverlay, authOverlay, speechOverlay) { actualDirect ->
                     // SafeMode.prepare writes its own briefing; leave the original home untouched.
-                    if (!safe) GuestSetup.writeAgentsMd(installer.rootfs, storage, phone, pendingVisualReplies, actualDirect)
+                    if (!safe) {
+                        val prefs = app.getSharedPreferences("FlutterSharedPreferences", android.content.Context.MODE_PRIVATE)
+                        GuestSetup.writeAgentsMd(
+                            installer.rootfs, storage, phone, pendingVisualReplies, actualDirect,
+                            executionMode = prefs.getString("flutter.execution_mode", if (actualDirect) "direct" else "proot") ?: "proot",
+                            reconnect = prefs.getString("flutter.agent_reconnect", null),
+                        )
+                    }
                 }
                 if (phone) PhoneControl.get(app).launched(p.phoneMounted)
             } catch (e: Throwable) {

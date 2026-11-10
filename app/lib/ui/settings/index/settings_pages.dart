@@ -6,7 +6,9 @@ import 'package:flutter/material.dart';
 
 import '../../account/account_page.dart';
 import '../../engine/engine_screen.dart';
+import '../../engine_settings/agent_reconnect_page.dart';
 import '../../engine_settings/engine_settings_hub.dart';
+import '../../engine_settings/execution_mode_page.dart';
 import '../../engine_settings/runtime_settings_pages.dart';
 import '../../engine_settings/subagent_settings_page.dart';
 import '../../engine_settings/web_search_page.dart';
@@ -66,6 +68,8 @@ Widget settingsPage(SettingsPageId id, {String? sessionId}) => switch (id) {
   SettingsPageId.subagent => const SubagentSettingsPage(),
   SettingsPageId.agentLoop => const AgentLoopSettingsPage(),
   SettingsPageId.shell => const ShellSettingsPage(),
+  SettingsPageId.agentReconnect => const AgentReconnectSettingsPage(),
+  SettingsPageId.executionMode => const ExecutionModeSettingsPage(),
   SettingsPageId.webSearch => const WebSearchSettingsPage(),
   SettingsPageId.media => const MediaSettingsPage(),
   SettingsPageId.pluginInventory => const PluginInventoryPage(),

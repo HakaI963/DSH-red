@@ -1,0 +1,33 @@
+name: l10n gen
+# One-shot: regenerate app/lib/l10n/gen with the real flutter gen-l10n and
+# hand back the files (the dev machine has no Flutter). Apply the artifact and
+# commit; CI's "generated localization matches its source" then passes.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  gen:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    env:
+      FLUTTER_VERSION: 3.47.7
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - uses: subosito/flutter-action@1a449444c387b1966244ae4d4f8c696479add0b2 # v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: stable
+          cache: true
+      - working-directory: app
+        run: flutter pub get --enforce-lockfile
+      - run: python3 app/tool/l10n_merge.py
+      - run: tar -cf l10n-gen.tar app/lib/l10n/gen app/lib/l10n/app_en.arb app/lib/l10n/app_zh.arb
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: l10n-gen
+          path: l10n-gen.tar

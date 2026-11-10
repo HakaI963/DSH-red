@@ -1,7 +1,8 @@
 // "Engine parameters": the current host's engine parameters — subagents, the agent
-// loop, command execution — the plugin inventory, and the settings of every
-// plugin that brings a form of its own (named and marked read-only as in
-// plugin_config_entries.dart). Each row shows the value that matters most.
+// loop, command execution, model-call retries, the launch mode — the plugin
+// inventory, and the settings of every plugin that brings a form of its own
+// (named and marked read-only as in plugin_config_entries.dart). Each row shows
+// the value that matters most.
 // (Web search has its own row in Settings › Capabilities; the web app's preferences moved to
 // Settings › Interface and the log upload to Privacy & sharing.)
 
@@ -9,6 +10,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../l10n/l10n.dart';
+import '../../runtime/runtime_state.dart';
+import '../../state/agent_reconnect_state.dart';
 import '../../state/engine_settings_state.dart';
 import '../../state/plugin_config/plugin_config_state.dart';
 import '../../state/plugins_state.dart';
@@ -20,6 +23,8 @@ import '../settings/index/spots.dart';
 import '../settings/settings_widgets.dart' as sw show SettingsSection, SettingsTile;
 import '../shell/page_frame.dart';
 import '../theme/app_icons.dart';
+import 'agent_reconnect_page.dart';
+import 'execution_mode_page.dart';
 import 'namespace_copy.dart';
 import 'runtime_settings_pages.dart';
 import 'schema_fields.dart';
@@ -48,6 +53,11 @@ class EngineSettingsHubPage extends ConsumerWidget {
         ? 'pwsh-sandbox'
         : 'bash-sandbox';
     final depth = settings?.valueOf(const FieldRef('subagent', ['maxDepth']));
+    final reconnectNs = settings == null ? const <String>[] : llmRetryNamespaces(settings);
+    final reconnect =
+        reconnectNs.isEmpty ? null : agentReconnectFromPolicy(liveRetryPolicy(settings!));
+    final runtime = ref.watch(localRuntimeProvider);
+    final executionMode = runtime.loaded ? currentExecutionMode(status: runtime.status, loaded: true) : null;
     // Every plugin with something to set, live fields or not.
     final config = settings == null ? null : ref.watch(pluginConfigProvider).value;
     final plugins = pluginConfigEntries(config);
@@ -66,6 +76,22 @@ class EngineSettingsHubPage extends ConsumerWidget {
         const AgentLoopSettingsPage(),
       ),
       (AppIcons.commandTimeout, SettingsPageId.shell, number(shellNs, 'timeoutMs'), const ShellSettingsPage()),
+      (
+        AppIcons.retry,
+        SettingsPageId.agentReconnect,
+        reconnectNs.isEmpty
+            ? null
+            : reconnect == null
+            ? l10n.engineReconnectOff
+            : l10n.engineReconnectRetriesValue(reconnect.retries),
+        const AgentReconnectSettingsPage(),
+      ),
+      (
+        AppIcons.command,
+        SettingsPageId.executionMode,
+        executionMode == null ? null : executionModeLabel(l10n, executionMode),
+        const ExecutionModeSettingsPage(),
+      ),
     ];
     return AppPage.list(
       title: l10n.engineSettingsTitle,

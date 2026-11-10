@@ -108,6 +108,8 @@ object GuestSetup {
         phoneControl: Boolean = false,
         visualReplies: Boolean = true,
         directEngine: Boolean = false,
+        executionMode: String = "proot",
+        reconnect: String? = null,
     ) {
         try {
             val file = File(rootfs, "root/.dsh/AGENTS.md")
@@ -127,7 +129,17 @@ object GuestSetup {
                     // l10n:keep agent prompt
                     "The user's photos, downloads and other phone files are not part of this environment and can't be seen; if access is needed, ask the user to turn on \"Access phone files\" in the App settings."
                 },
-            ) + (if (visualReplies) DSH_UI_SECTION else "") +
+            ) + "\n- Engine execution mode: ${when (executionMode) {
+                    "shizuku" -> "shizuku (requested; running through the direct glibc path until the Shizuku shell is wired)"
+                    "direct" -> "direct glibc launch (no PRoot layer)"
+                    else -> "PRoot sandbox (non-root)"
+                }}.\n" +
+                (if (reconnect != null && reconnect != "off") {
+                    val parts = reconnect.split(":").mapNotNull { it.toIntOrNull() }
+                    if (parts.size >= 3) "- Model-call retries: the harness retries a failed model call up to ${parts[0]} times, backing off from ${parts[1]} s up to ${parts[2]} s; a turn only stops after those attempts.\n"
+                    else "- Model-call retries: enabled.\n"
+                } else "- Model-call retries: disabled; a failed model call stops the turn immediately.\n") +
+                (if (visualReplies) DSH_UI_SECTION else "") +
                 (if (phoneControl) PhoneGuest.AGENTS_SECTION else "") +
                 DIAGNOSTICS_SECTION.replace(
                     "{PATH}",

@@ -358,5 +358,33 @@
   "engineFieldEditOnWeb": "Edit this item on the web",
   "engineSettingsHostChanged": "The host changed. Reopen these settings to edit.",
   "engineSecretTargetChanged": "This field changed. Reopen it to edit.",
-  "engineSettingsGroupCount": "{count, plural, =1{1 setting} other{{count} settings}}"
+  "engineSettingsGroupCount": "{count, plural, =1{1 setting} other{{count} settings}}",
+
+  "engineReconnectTitle": "Agent reconnect",
+  "engineReconnectNote": "How the engine retries a model call that fails with a network, rate-limit or empty answer. When off, a failed call stops the turn immediately.",
+  "engineReconnectEnabled": "Retry failed model calls",
+  "engineReconnectRetries": "Retries",
+  "engineReconnectFirstDelay": "First retry after (s)",
+  "engineReconnectMaxDelay": "Max delay (s)",
+  "engineReconnectOff": "Off",
+  "engineReconnectRetriesValue": "{count} retries",
+  "@engineReconnectRetriesValue": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "engineReconnectSaved": "Reconnect settings saved",
+  "engineReconnectFailed": "Couldn’t apply: {error}",
+  "engineReconnectNoProvider": "No model provider with reconnect support on this host",
+  "executionModeTitle": "Execution mode",
+  "executionModeNote": "How the engine process runs on this phone. Changes apply after you stop and start the engine.",
+  "executionModeProot": "Non-root (PRoot)",
+  "executionModeDirect": "Root (Direct)",
+  "executionModeShizuku": "Shizuku",
+  "executionModeShizukuNote": "Shizuku pairing isn’t wired yet: the engine runs through the direct path until it is.",
+  "executionModeSaved": "Execution mode saved",
+  "executionModeChangeFailed": "Couldn’t change the execution mode",
+  "executionModeStopFirst": "Stop the engine first"
 }

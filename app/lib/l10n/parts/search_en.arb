@@ -117,5 +117,8 @@
   "searchKwWebBusySend": "send,queue,while AI works",
   "searchKwPluginsMarket": "plugin market,install plugins,marketplace",
   "searchKwUsageStats": "statistics,stats,usage data,analytics,telemetry,anonymous,privacy,data",
-  "searchKwQuickPanel": "swipe,left swipe,shortcuts,gesture,quick panel,quick access"
+  "searchKwQuickPanel": "swipe,left swipe,shortcuts,gesture,quick panel,quick access",
+
+  "searchKwAgentReconnect": "reconnect,retry,retries,backoff,model failure,rerun",
+  "searchKwExecutionMode": "execution mode,proot,direct,root,shizuku,launch,engine process"
 }
