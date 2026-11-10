@@ -1087,6 +1087,27 @@ class InventoryItem {
 
 final _cjk = RegExp(r'[\u3400-\u9fff]');
 
+/// A name or description a person can read: English first (DSH red), the
+/// package's Chinese text as the fallback. English tags that are just the
+/// npm package id (`@scope/name`) are not names — the caller shortens the
+/// module instead.
+String? humanText(LocalizedText? text) {
+  if (text == null) return null;
+  String? ok(String? v) => v != null && v.trim().isNotEmpty && !v.trim().startsWith('@') ? v.trim() : null;
+  for (final MapEntry(:key, :value) in text.values.entries) {
+    if (key == 'en' || key.startsWith('en-')) {
+      final p = ok(value);
+      if (p != null) return p;
+    }
+  }
+  final plain = text.values[''];
+  if (plain != null && !_cjk.hasMatch(plain)) {
+    final p = ok(plain);
+    if (p != null) return p;
+  }
+  return chineseText(text);
+}
+
 /// The Chinese variant of a package text (`zh`, `zh-CN`…, or plain text
 /// written in Chinese); null when the package has none — English is never
 /// shown in its place.
@@ -1135,7 +1156,7 @@ String? chineseText(LocalizedText? text) {
     return (source: name, bundle: owner.name, version: owner.version);
   }
 
-  String titleOf(PluginDisplayMeta? meta, String moduleName) => englishFirstText(meta?.title) ?? shortModuleName(moduleName);
+  String titleOf(PluginDisplayMeta? meta, String moduleName) => humanText(meta?.title) ?? shortModuleName(moduleName);
 
   final providedBy = <String, List<String>>{};
   for (final preset in inventory.presets) {
@@ -1154,8 +1175,8 @@ String? chineseText(LocalizedText? text) {
           entryId: e.entryId,
           moduleName: e.moduleName,
           title: titleOf(e.meta, e.moduleName),
-          description: englishFirstText(e.meta?.description),
-          system: chineseText(e.meta?.title) == null,
+          description: humanText(e.meta?.description),
+          system: humanText(e.meta?.title) == null,
           icon: e.meta?.icon,
           status: inventoryStatus(enabled: e.enabled, fiberPhase: e.fiberPhase),
           source: from.source,
@@ -1176,8 +1197,8 @@ String? chineseText(LocalizedText? text) {
               entryId: row.entryId ?? row.moduleName,
               moduleName: row.moduleName,
               title: titleOf(row.meta, row.moduleName),
-              description: englishFirstText(row.meta?.description),
-              system: chineseText(row.meta?.title) == null,
+              description: humanText(row.meta?.description),
+              system: humanText(row.meta?.title) == null,
               icon: row.meta?.icon,
               status: inventoryStatus(enabled: row.enabled, fiberPhase: row.fiberPhase, conditional: row.conditional),
               source: from.source,

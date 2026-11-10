@@ -413,8 +413,9 @@ void main() {
     expect(find.text('@deepseek-ai/dsh-bash-sandbox'), findsNothing, reason: 'a Chinese one-liner instead');
     await tester.enterText(find.byType(TextField), '');
     await settle(tester);
-    // No English on the page: components without Chinese copy fold into
-    // 「系统组件」 and read by package id.
+    // Components with no readable name in any language fold into 「系统组件」
+    // and read by shortened package id; their English text is hidden while
+    // the group is closed.
     expect(find.textContaining('Method-level'), findsNothing);
     await tester.scrollUntilVisible(find.text('系统组件'), 300, scrollable: find.byType(Scrollable).first);
     await settle(tester);
@@ -429,7 +430,7 @@ void main() {
       reason: 'descriptionless rows are single-line',
     );
     expect(find.text('api-remote-access'), findsOneWidget);
-    expect(find.textContaining('Method-level'), findsNothing);
+    expect(find.textContaining('Method-level'), findsOneWidget, reason: 'DSH red shows the English description');
     await tester.scrollUntilVisible(find.byType(TextField), -300, scrollable: find.byType(Scrollable).first);
     await tester.enterText(find.byType(TextField), 'zzzz');
     await settle(tester);
