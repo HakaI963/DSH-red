@@ -444,7 +444,7 @@ void main() {
     await settle(tester);
     await tester.enterText(find.byType(TextField), '运行循环');
     await settle(tester);
-    await tester.tap(find.text('智能体运行循环'));
+    await tester.tap(find.text('agent-loop'));
     await flush(tester);
     expect(find.text('@deepseek-ai/dsh-agent-loop'), findsOneWidget);
     await tester.tap(find.text('设置'));

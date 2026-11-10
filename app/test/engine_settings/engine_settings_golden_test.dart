@@ -115,7 +115,7 @@ void main() {
     before: (tester) async {
       await tester.enterText(find.byType(TextField), '循环');
       await settle(tester);
-      await tester.tap(find.text('智能体运行循环'));
+      await tester.tap(find.text('agent-loop'));
       await settle(tester);
     },
   );
