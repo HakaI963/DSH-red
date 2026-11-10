@@ -12290,6 +12290,126 @@ abstract class L10n {
   /// **'{count} 项'**
   String engineSettingsGroupCount(int count);
 
+  /// No description provided for @engineReconnectTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'智能体重连'**
+  String get engineReconnectTitle;
+
+  /// No description provided for @engineReconnectNote.
+  ///
+  /// In zh, this message translates to:
+  /// **'模型调用遇到网络、限流或空回复时，引擎如何自动重试。关闭时，一次失败会直接停止本轮。'**
+  String get engineReconnectNote;
+
+  /// No description provided for @engineReconnectEnabled.
+  ///
+  /// In zh, this message translates to:
+  /// **'失败模型调用自动重试'**
+  String get engineReconnectEnabled;
+
+  /// No description provided for @engineReconnectRetries.
+  ///
+  /// In zh, this message translates to:
+  /// **'重试次数'**
+  String get engineReconnectRetries;
+
+  /// No description provided for @engineReconnectFirstDelay.
+  ///
+  /// In zh, this message translates to:
+  /// **'首次重试等待（秒）'**
+  String get engineReconnectFirstDelay;
+
+  /// No description provided for @engineReconnectMaxDelay.
+  ///
+  /// In zh, this message translates to:
+  /// **'最大间隔（秒）'**
+  String get engineReconnectMaxDelay;
+
+  /// No description provided for @engineReconnectOff.
+  ///
+  /// In zh, this message translates to:
+  /// **'关闭'**
+  String get engineReconnectOff;
+
+  /// No description provided for @engineReconnectRetriesValue.
+  ///
+  /// In zh, this message translates to:
+  /// **'{count} 次重试'**
+  String engineReconnectRetriesValue(int count);
+
+  /// No description provided for @engineReconnectSaved.
+  ///
+  /// In zh, this message translates to:
+  /// **'重连设置已保存'**
+  String get engineReconnectSaved;
+
+  /// No description provided for @engineReconnectFailed.
+  ///
+  /// In zh, this message translates to:
+  /// **'应用失败：{error}'**
+  String get engineReconnectFailed;
+
+  /// No description provided for @engineReconnectNoProvider.
+  ///
+  /// In zh, this message translates to:
+  /// **'这台主机上没有支持重连的模型提供方'**
+  String get engineReconnectNoProvider;
+
+  /// No description provided for @executionModeTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'执行模式'**
+  String get executionModeTitle;
+
+  /// No description provided for @executionModeNote.
+  ///
+  /// In zh, this message translates to:
+  /// **'引擎进程在本机上的运行方式。修改后需停止并重新启动引擎生效。'**
+  String get executionModeNote;
+
+  /// No description provided for @executionModeProot.
+  ///
+  /// In zh, this message translates to:
+  /// **'免 Root（PRoot）'**
+  String get executionModeProot;
+
+  /// No description provided for @executionModeDirect.
+  ///
+  /// In zh, this message translates to:
+  /// **'Root（直接启动）'**
+  String get executionModeDirect;
+
+  /// No description provided for @executionModeShizuku.
+  ///
+  /// In zh, this message translates to:
+  /// **'Shizuku'**
+  String get executionModeShizuku;
+
+  /// No description provided for @executionModeShizukuNote.
+  ///
+  /// In zh, this message translates to:
+  /// **'Shizuku 配对尚未接入：在此之前引擎按直接启动方式运行。'**
+  String get executionModeShizukuNote;
+
+  /// No description provided for @executionModeSaved.
+  ///
+  /// In zh, this message translates to:
+  /// **'执行模式已保存'**
+  String get executionModeSaved;
+
+  /// No description provided for @executionModeChangeFailed.
+  ///
+  /// In zh, this message translates to:
+  /// **'执行模式修改失败'**
+  String get executionModeChangeFailed;
+
+  /// No description provided for @executionModeStopFirst.
+  ///
+  /// In zh, this message translates to:
+  /// **'请先停止引擎'**
+  String get executionModeStopFirst;
+
   /// No description provided for @featuresCordisSubtitle.
   ///
   /// In zh, this message translates to:
@@ -28873,6 +28993,18 @@ abstract class L10n {
   /// In zh, this message translates to:
   /// **'左滑,快捷入口,手势,滑动,目录,自定义目录,快捷,常用入口'**
   String get searchKwQuickPanel;
+
+  /// No description provided for @searchKwAgentReconnect.
+  ///
+  /// In zh, this message translates to:
+  /// **'重连,重试,退避,模型失败,断线'**
+  String get searchKwAgentReconnect;
+
+  /// No description provided for @searchKwExecutionMode.
+  ///
+  /// In zh, this message translates to:
+  /// **'执行模式,proot,直接启动,root,shizuku,引擎进程'**
+  String get searchKwExecutionMode;
 
   /// No description provided for @shellDeletePermanently.
   ///

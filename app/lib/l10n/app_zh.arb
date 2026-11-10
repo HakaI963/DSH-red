@@ -4033,6 +4033,33 @@
       }
     }
   },
+  "engineReconnectTitle": "智能体重连",
+  "engineReconnectNote": "模型调用遇到网络、限流或空回复时，引擎如何自动重试。关闭时，一次失败会直接停止本轮。",
+  "engineReconnectEnabled": "失败模型调用自动重试",
+  "engineReconnectRetries": "重试次数",
+  "engineReconnectFirstDelay": "首次重试等待（秒）",
+  "engineReconnectMaxDelay": "最大间隔（秒）",
+  "engineReconnectOff": "关闭",
+  "engineReconnectRetriesValue": "{count} 次重试",
+  "@engineReconnectRetriesValue": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "engineReconnectSaved": "重连设置已保存",
+  "engineReconnectFailed": "应用失败：{error}",
+  "engineReconnectNoProvider": "这台主机上没有支持重连的模型提供方",
+  "executionModeTitle": "执行模式",
+  "executionModeNote": "引擎进程在本机上的运行方式。修改后需停止并重新启动引擎生效。",
+  "executionModeProot": "免 Root（PRoot）",
+  "executionModeDirect": "Root（直接启动）",
+  "executionModeShizuku": "Shizuku",
+  "executionModeShizukuNote": "Shizuku 配对尚未接入：在此之前引擎按直接启动方式运行。",
+  "executionModeSaved": "执行模式已保存",
+  "executionModeChangeFailed": "执行模式修改失败",
+  "executionModeStopFirst": "请先停止引擎",
   "featuresCordisSubtitle": "动态插件 · 引擎重启后清空",
   "featuresCordisUnavailable": "这个连接看不到 Cordis",
   "featuresCordisRemoteUnavailable": "经 DSH Remote 中转时不可用",
@@ -9689,6 +9716,8 @@
   "searchKwPluginsMarket": "插件市场,安装插件,市场,获取插件",
   "searchKwUsageStats": "统计,使用统计,匿名,隐私,数据,改进,遥测,分析",
   "searchKwQuickPanel": "左滑,快捷入口,手势,滑动,目录,自定义目录,快捷,常用入口",
+  "searchKwAgentReconnect": "重连,重试,退避,模型失败,断线",
+  "searchKwExecutionMode": "执行模式,proot,直接启动,root,shizuku,引擎进程",
   "shellDeletePermanently": "永久删除",
   "shellDeleteNoUndo": "无法撤销，与归档不同",
   "shellDeleteChecking": "正在检查此主机是否支持永久删除…",

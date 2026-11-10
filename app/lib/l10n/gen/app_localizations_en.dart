@@ -7006,6 +7006,71 @@ class L10nEn extends L10n {
   }
 
   @override
+  String get engineReconnectTitle => 'Agent reconnect';
+
+  @override
+  String get engineReconnectNote =>
+      'How the engine retries a model call that fails with a network, rate-limit or empty answer. When off, a failed call stops the turn immediately.';
+
+  @override
+  String get engineReconnectEnabled => 'Retry failed model calls';
+
+  @override
+  String get engineReconnectRetries => 'Retries';
+
+  @override
+  String get engineReconnectFirstDelay => 'First retry after (s)';
+
+  @override
+  String get engineReconnectMaxDelay => 'Max delay (s)';
+
+  @override
+  String get engineReconnectOff => 'Off';
+
+  @override
+  String engineReconnectRetriesValue(int count) {
+    return '$count retries';
+  }
+
+  @override
+  String get engineReconnectSaved => 'Reconnect settings saved';
+
+  @override
+  String get engineReconnectFailed => 'Couldn’t apply: {error}';
+
+  @override
+  String get engineReconnectNoProvider => 'No model provider with reconnect support on this host';
+
+  @override
+  String get executionModeTitle => 'Execution mode';
+
+  @override
+  String get executionModeNote =>
+      'How the engine process runs on this phone. Changes apply after you stop and start the engine.';
+
+  @override
+  String get executionModeProot => 'Non-root (PRoot)';
+
+  @override
+  String get executionModeDirect => 'Root (Direct)';
+
+  @override
+  String get executionModeShizuku => 'Shizuku';
+
+  @override
+  String get executionModeShizukuNote =>
+      'Shizuku pairing isn’t wired yet: the engine runs through the direct path until it is.';
+
+  @override
+  String get executionModeSaved => 'Execution mode saved';
+
+  @override
+  String get executionModeChangeFailed => 'Couldn’t change the execution mode';
+
+  @override
+  String get executionModeStopFirst => 'Stop the engine first';
+
+  @override
   String get featuresCordisSubtitle => 'Dynamic plugins · Cleared when the engine restarts';
 
   @override
@@ -16607,6 +16672,12 @@ class L10nEn extends L10n {
 
   @override
   String get searchKwQuickPanel => 'swipe,left swipe,shortcuts,gesture,quick panel,quick access';
+
+  @override
+  String get searchKwAgentReconnect => 'reconnect,retry,retries,backoff,model failure,rerun';
+
+  @override
+  String get searchKwExecutionMode => 'execution mode,proot,direct,root,shizuku,launch,engine process';
 
   @override
   String get shellDeletePermanently => 'Delete permanently';

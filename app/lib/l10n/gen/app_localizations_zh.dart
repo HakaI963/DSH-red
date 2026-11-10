@@ -6642,6 +6642,68 @@ class L10nZh extends L10n {
   }
 
   @override
+  String get engineReconnectTitle => '智能体重连';
+
+  @override
+  String get engineReconnectNote => '模型调用遇到网络、限流或空回复时，引擎如何自动重试。关闭时，一次失败会直接停止本轮。';
+
+  @override
+  String get engineReconnectEnabled => '失败模型调用自动重试';
+
+  @override
+  String get engineReconnectRetries => '重试次数';
+
+  @override
+  String get engineReconnectFirstDelay => '首次重试等待（秒）';
+
+  @override
+  String get engineReconnectMaxDelay => '最大间隔（秒）';
+
+  @override
+  String get engineReconnectOff => '关闭';
+
+  @override
+  String engineReconnectRetriesValue(int count) {
+    return '$count 次重试';
+  }
+
+  @override
+  String get engineReconnectSaved => '重连设置已保存';
+
+  @override
+  String get engineReconnectFailed => '应用失败：{error}';
+
+  @override
+  String get engineReconnectNoProvider => '这台主机上没有支持重连的模型提供方';
+
+  @override
+  String get executionModeTitle => '执行模式';
+
+  @override
+  String get executionModeNote => '引擎进程在本机上的运行方式。修改后需停止并重新启动引擎生效。';
+
+  @override
+  String get executionModeProot => '免 Root（PRoot）';
+
+  @override
+  String get executionModeDirect => 'Root（直接启动）';
+
+  @override
+  String get executionModeShizuku => 'Shizuku';
+
+  @override
+  String get executionModeShizukuNote => 'Shizuku 配对尚未接入：在此之前引擎按直接启动方式运行。';
+
+  @override
+  String get executionModeSaved => '执行模式已保存';
+
+  @override
+  String get executionModeChangeFailed => '执行模式修改失败';
+
+  @override
+  String get executionModeStopFirst => '请先停止引擎';
+
+  @override
   String get featuresCordisSubtitle => '动态插件 · 引擎重启后清空';
 
   @override
@@ -15797,6 +15859,12 @@ class L10nZh extends L10n {
 
   @override
   String get searchKwQuickPanel => '左滑,快捷入口,手势,滑动,目录,自定义目录,快捷,常用入口';
+
+  @override
+  String get searchKwAgentReconnect => '重连,重试,退避,模型失败,断线';
+
+  @override
+  String get searchKwExecutionMode => '执行模式,proot,直接启动,root,shizuku,引擎进程';
 
   @override
   String get shellDeletePermanently => '永久删除';
