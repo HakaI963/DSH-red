@@ -1346,7 +1346,14 @@ def cmd_assemble(args):
 # manifest
 # ---------------------------------------------------------------------------
 def launch_template():
-    """The proot invocation the app runs (placeholders expanded by DshProcess.kt)."""
+    """The chroot invocation the app runs (placeholders expanded by DshProcess.kt).
+
+    DSH red runs the engine in a real chroot on the phone's own filesystem
+    (/data/local/DSH-red/chroot): no PRoot, no ptrace, no ELF translation — a
+    plain Linux userland (Ubuntu base + node/python/pnpm + the patched DSH),
+    entered with `chroot` as root. The app sets up the mounts below and then
+    runs the guest command.
+    """
     guest_env = [
         "HOME=/root", "USER=root", "LOGNAME=root", "SHELL=/bin/bash",
         "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
@@ -1361,21 +1368,6 @@ def launch_template():
         "NODE_OPTIONS=--dns-result-order=ipv4first",
     ]
     argv = [
-        "{NATIVE_LIB_DIR}/libproot.so",
-        "--kill-on-exit", "--link2symlink", "--sysvipc", "-L", "-0",
-        "--rootfs={ROOTFS}", "--cwd=/root",
-        "-b", "/dev",
-        "-b", "/dev/urandom:/dev/random",
-        "-b", "/proc",
-        "-b", "/proc/self/fd:/dev/fd",
-        "-b", "/proc/self/fd/0:/dev/stdin",
-        "-b", "/proc/self/fd/1:/dev/stdout",
-        "-b", "/proc/self/fd/2:/dev/stderr",
-        "-b", "/sys",
-        "-b", "{ROOTFS}/var/lib/dsh-app/empty:/sys/fs/selinux",
-        "-b", "{ROOTFS}/var/lib/dsh-app/shm:/dev/shm",
-        "-b", "/system",
-        "-b", "/apex",
         "/usr/bin/env", "-i",
     ] + guest_env + [
         "{GUEST_ENV}",
@@ -1383,19 +1375,28 @@ def launch_template():
         "echo $$ > /tmp/dsh-web.pid; exec /usr/local/bin/dsh web --patch " + DSH_WEB_PATCH
         + " --host 127.0.0.1 --port {PORT} --no-open",
     ]
-    env = {
-        "PROOT_LOADER": "{NATIVE_LIB_DIR}/libproot-loader.so",
-        "PROOT_TMP_DIR": "{TMP}",
-        "PROOT_L2S_DIR": "{ROOTFS}/root/.l2s",
-        "LD_LIBRARY_PATH": "{NATIVE_LIB_DIR}",
-    }
+    # Mounts the app sets up inside the chroot before the engine starts. Host
+    # paths are Android's; the targets are the same paths inside the chroot, so
+    # the guest sees the phone's userspace at the usual places.
+    mounts = [
+        {"kind": "proc", "source": "proc", "target": "/proc", "options": ""},
+        {"kind": "sysfs", "source": "sysfs", "target": "/sys", "options": "ro,nosuid,nodev"},
+        {"kind": "bind", "source": "/dev", "target": "/dev", "options": ""},
+        {"kind": "tmpfs", "source": "tmpfs", "target": "/dev/shm", "options": "size=64m"},
+        {"kind": "tmpfs", "source": "tmpfs", "target": "/tmp", "options": "size=512m"},
+        {"kind": "bind", "source": "/data", "target": "/data", "options": ""},
+        {"kind": "bind", "source": "/storage", "target": "/storage", "options": ""},
+        {"kind": "bind", "source": "/sdcard", "target": "/sdcard", "options": ""},
+        {"kind": "bind", "source": "/system", "target": "/system", "options": "ro"},
+        {"kind": "bind", "source": "/apex", "target": "/apex", "options": "ro"},
+    ]
     return {
         "argv": argv,
-        "env": env,
+        "env": {},
+        "mounts": mounts,
+        "chroot": "/data/local/DSH-red/chroot",
         "placeholders": {
-            "{NATIVE_LIB_DIR}": "applicationInfo.nativeLibraryDir (libs must be extracted: useLegacyPackaging=true)",
-            "{ROOTFS}": "filesDir/runtime/rootfs",
-            "{TMP}": "app-private writable dir for PROOT_TMP_DIR (e.g. cacheDir/proot-tmp)",
+            "{CHROOT}": "the chroot root on the phone (/data/local/DSH-red/chroot)",
             "{FILES_DIR}": "context.filesDir (unused by this template)",
             "{PORT}": "loopback port chosen by the app",
             "{GUEST_ENV}": "standalone element -> zero or more KEY=VALUE from the app "
@@ -1418,17 +1419,16 @@ def launch_template():
             "http": "GET / without cookie -> 401 (server up, unauthenticated); with the dsh-auth cookie -> 200",
         },
         "stop": {
-            "pidFile": "{ROOTFS}/tmp/dsh-web.pid",
-            "graceful": "Os.kill(pid from pidFile, SIGTERM): dsh disposes plugins and exits 0; "
-                        "--kill-on-exit then reaps the rest and proot exits",
-            "fallback": "Os.kill(prootPid, SIGQUIT) kills every tracee; proot IGNORES SIGTERM/SIGINT/SIGHUP, "
-                        "so Process.destroy() alone does nothing and destroyForcibly() orphans node",
+            "pidFile": "{CHROOT}/tmp/dsh-web.pid",
+            "graceful": "Os.kill(pid from pidFile, SIGTERM): dsh disposes plugins and exits 0",
+            "fallback": "the engine is a direct child of `su`; killing that process group "
+                        "ends the chrooted engine with it",
         },
         "files": {
-            "resolvConf": "{ROOTFS}/etc/resolv.conf",
-            "dshHome": "{ROOTFS}/root/.dsh",
-            "credentials": "{ROOTFS}/root/.dsh/.credentials.yaml (mode 0600; 'version: 1' + 'refs: {DEEPSEEK_API_KEY: ...}')",
-            "l2sDir": "{ROOTFS}/root/.l2s (must exist; created by the archive)",
+            "resolvConf": "{CHROOT}/etc/resolv.conf",
+            "dshHome": "{CHROOT}/root/.dsh",
+            "credentials": "{CHROOT}/root/.dsh/.credentials.yaml (mode 0600; 'version: 1' + 'refs: {DEEPSEEK_API_KEY: ...}')",
+            "l2sDir": "{CHROOT}/root/.l2s (must exist; created by the archive)",
         },
     }
 

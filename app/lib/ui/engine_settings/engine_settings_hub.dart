@@ -55,9 +55,10 @@ class EngineSettingsHubPage extends ConsumerWidget {
     final reconnectNs = settings == null ? const <String>[] : llmRetryNamespaces(settings);
     final reconnect =
         reconnectNs.isEmpty ? null : agentReconnectFromPolicy(liveRetryPolicy(settings!));
-    // Prefs mirror, not the live status: watching the runtime here would open
-    // the platform event channel on a page whose tests never mock it.
-    final executionMode = ref.watch(executionModePrefProvider).value;
+    // The engine always runs in the chroot now; the runtime status is not read
+    // here (it would open the platform event channel on a page whose tests
+    // never mock it).
+    const executionMode = 'chroot';
     // Every plugin with something to set, live fields or not.
     final config = settings == null ? null : ref.watch(pluginConfigProvider).value;
     final plugins = pluginConfigEntries(config);

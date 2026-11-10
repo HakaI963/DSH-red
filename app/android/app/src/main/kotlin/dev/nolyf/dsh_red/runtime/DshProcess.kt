@@ -80,28 +80,20 @@ class DshProcess(
      */
     fun start(guestEnv: Map<String, String>, binds: List<String> = emptyList(), safe: Boolean = false, phone: Boolean = false, directEngine: Boolean = false, directFailed: Boolean = false, searchOverlay: Boolean = false, authOverlay: Boolean = false, speechOverlay: Boolean = false, onLaunchMethod: ((Boolean) -> Unit)? = null) {
         check(process == null) { "already started" }
-        var selection = DirectLaunch.select(rootfs, directEngine, safe, directFailed)
-        // Only PRoot's fake hard links stand in Direct's way: tidy them once no runtime process is left.
-        val tidy = selection.fallbackReason == DirectLaunch.INCOMPATIBLE
-        val cleanup = reapStrays(allowObservationGap = !selection.direct && !tidy)
-        if (tidy && cleanup.complete) selection = tidyLinks(binds)
-        directFallbackReason = selection.fallbackReason ?: if (directEngine && safe) "safeRecovery" else null
-        launchDiagnostics.selected(selection.direct, directFallbackReason)
-        direct = selection.direct
-        check(cleanup.complete || (!direct && !cleanup.ownedRemaining)) { "runtime cleanup incomplete; stop the engine and retry" }
-        if (!cleanup.complete) listener.onLog("[dsh-app] starting proot with incomplete process observation; no captured runtime identities remain", "system")
+        // The engine runs in a real chroot: no PRoot, no ptrace.
+        val cleanup = reapStrays(allowObservationGap = true)
+        directFallbackReason = null
+        launchDiagnostics.selected(false, null)
+        direct = false
+        check(cleanup.complete || !cleanup.ownedRemaining) { "runtime cleanup incomplete; stop the engine and retry" }
+        if (!cleanup.complete) listener.onLog("[dsh-app] starting the engine with incomplete process observation", "system")
         val pidFile = File(rootfs, "tmp/dsh-web.pid")
         pidFile.delete() // also removes a stale/dangling symlink; never reuse a previous run's PID
         check(!java.nio.file.Files.exists(pidFile.toPath(), java.nio.file.LinkOption.NOFOLLOW_LINKS)) { "cannot remove stale runtime pid file" }
         port = pickPort()
-        val tmp = File(context.cacheDir, "proot-tmp").apply { mkdirs() }
-        if (cleanup.canPruneTemp) {
-            val reclaimed = ProotTempFiles.prune(tmp) { pid -> processReader.uid(pid) == null }
-            if (reclaimed.removed > 0) listener.onLog("[dsh-app] reclaimed ${reclaimed.removed} stale proot temporary directories", "system")
-            if (reclaimed.incomplete) listener.onLog("[dsh-app] proot temporary cleanup incomplete; retained entries for a later start", "system")
-        }
+        val tmp = File(context.cacheDir, "chroot-tmp").apply { mkdirs() }
         val vars = mapOf(
-            "{NATIVE_LIB_DIR}" to context.applicationInfo.nativeLibraryDir,
+            "{CHROOT}" to rootfs.canonicalPath,
             "{ROOTFS}" to rootfs.canonicalPath,
             "{TMP}" to tmp.absolutePath,
             "{FILES_DIR}" to context.filesDir.absolutePath,
@@ -110,15 +102,10 @@ class DshProcess(
         fun expand(s: String) = vars.entries.fold(s) { acc, (k, v) -> acc.replace(k, v) }
 
         val argv = ArrayList<String>()
-        val sameBind = DirectLaunch.samePathBind(rootfs)
-        val launchArgv = DirectLaunch.prootArguments(rootfs, manifest.launchArgv, direct)
-        val allBinds = binds.filterNot { expand(it) == sameBind }.distinct()
-        // PRoot's Node resolves through glibc, which fails A with a refused AAAA (#152): add Direct's resolver.
-        val effectiveGuestEnv = guestEnv + ("DSH_GO_RUNTIME_ROOT" to rootfs.canonicalPath) +
-            listOfNotNull(if (direct) null else "NODE_OPTIONS" to DirectLaunch.prootNodeOptions(guestEnv["NODE_OPTIONS"]))
+        val launchArgv = manifest.launchArgv
+        val effectiveGuestEnv = guestEnv + ("DSH_GO_RUNTIME_ROOT" to rootfs.canonicalPath)
         var guestEnvPlaced = false
         check(manifest.launchArgv.isNotEmpty()) { "runtime manifest has no launch.argv" }
-        var bindsPlaced = false
         var profileSelected = false
         // Only overlays successfully prepared for this launch; cleanup may leave an old file behind.
         // Also require the file in place (a missing --patch file stops DSH).
@@ -128,10 +115,6 @@ class DshProcess(
         // On-device voice input: the recognizer's phone settings, same rule.
         var speechPending = !safe && speechOverlay && SpeechGuest.file(rootfs).isFile
         for (arg in launchArgv) {
-            if (!bindsPlaced && arg == "/usr/bin/env") {
-                allBinds.forEach { argv += "-b"; argv += it }
-                bindsPlaced = true
-            }
             if (arg == GUEST_ENV) {
                 effectiveGuestEnv.forEach { (k, v) -> argv += "$k=$v" }
                 guestEnvPlaced = true
@@ -152,7 +135,19 @@ class DshProcess(
         }
         check(!safe || profileSelected) { "safe mode: this runtime's launch command has no `dsh web` to replace" }
 
-        val builder = ProcessBuilder(argv).directory(context.filesDir)
+        if (!guestEnvPlaced) {
+            // No {GUEST_ENV} slot in the template: the whole environment is ours.
+            argv += effectiveGuestEnv.entries.map { (k, v) -> "$k=$v" }
+        }
+        // The guest command runs from a script inside the chroot: no quoting
+        // problems with the engine's own arguments.
+        val script = ChrootRuntime.launchScript(argv.map { expand(it) }, emptyMap(), port)
+        val scriptFile = File(rootfs, ChrootRuntime.LAUNCH_SCRIPT.removePrefix("/"))
+        scriptFile.parentFile?.mkdirs()
+        scriptFile.writeText(script)
+        scriptFile.setExecutable(true)
+
+        val builder = ProcessBuilder(ChrootRuntime.launchCommand()).directory(context.filesDir)
         val env = builder.environment()
         env.clear()
         env["PATH"] = "/system/bin:/system/xbin"
@@ -160,20 +155,9 @@ class DshProcess(
         env["TMPDIR"] = tmp.absolutePath
         env["ANDROID_ROOT"] = System.getenv("ANDROID_ROOT") ?: "/system"
         env["ANDROID_DATA"] = System.getenv("ANDROID_DATA") ?: "/data"
-        env["PROOT_TMP_DIR"] = tmp.absolutePath
-        manifest.launchEnv.forEach { (k, v) -> env[k] = expand(v) }
-        if (!guestEnvPlaced) env.putAll(effectiveGuestEnv)
-        if (direct) {
-            val plan = DirectLaunch.prepare(rootfs, manifest.abi, argv, env.toMap())
-            builder.command(plan.argv).directory(plan.cwd)
-            env.clear()
-            env.putAll(plan.environment)
-        }
 
         readyReported = false
-        if (directFallbackReason == DirectLaunch.INCOMPATIBLE) listener.onLog("[dsh-app] direct fallback: proot hard-link backing files need compatible launch; user preference and data retained", "system")
-        if (directFallbackReason == DirectLaunch.FAILED) listener.onLog("[dsh-app] direct fallback: direct launch failed before with this runtime; turn Direct on again to retry", "system")
-        listener.onLog("[dsh-app] launch method: ${if (direct) "direct-glibc" else "proot"}${if (directEngine && safe) " (safe recovery)" else ""}", "system")
+        listener.onLog("[dsh-app] launch method: chroot (${ChrootRuntime.ROOT})", "system")
         listener.onLog("[dsh-app] launching ${builder.command().joinToString(" ") { redact(it) }}", "system")
         // stop() came in while this was being prepared: don't launch at all.
         if (stopping) {
@@ -220,11 +204,6 @@ class DshProcess(
         if (stopping) stop()
     }
 
-    /**
-     * Direct was asked for and PRoot's fake hard links are the only obstacle: make
-     * them real files ([L2sMigration]). Short of room or on an error this start stays
-     * on PRoot with every name intact, and the next start carries on from there.
-     */
     private fun tidyLinks(binds: List<String>): DirectLaunch.Selection {
         val started = System.nanoTime()
         // Every bind a PRoot launch may have used: this one's, plus the rootfs alias of earlier ones.

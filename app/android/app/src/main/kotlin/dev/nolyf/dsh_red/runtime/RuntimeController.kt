@@ -220,8 +220,8 @@ class RuntimeController private constructor(private val app: Context) : DshProce
             try {
                 log("[dsh-app] unpacking runtime ${manifest.runtimeVersion} (${manifest.abi})", "system")
                 val started = System.currentTimeMillis()
-                if (installer.rootfs.exists() &&
-                    !DshProcess(app, manifest, installer.rootfs, this).killStrays()) {
+                if (installer.chrootRoot.exists() &&
+                    !DshProcess(app, manifest, installer.chrootRoot, this).killStrays()) {
                     throw RuntimeUpgradeBlocked("running")
                 }
                 if (dropKept) log("[dsh-app] installing without what could not be kept", "system")
@@ -276,7 +276,7 @@ class RuntimeController private constructor(private val app: Context) : DshProce
     fun publishDiagnostics(markdown: String, manual: Boolean = false): Map<String, Any?>? = try {
         if (!installer.isCurrent()) null
         else {
-            val file = GuestSetup.writeDiagnostics(installer.rootfs, markdown, safe = currentModeSafe(), manual = manual)
+            val file = GuestSetup.writeDiagnostics(installer.chrootRoot, markdown, safe = currentModeSafe(), manual = manual)
             mapOf("path" to file.absolutePath, "bytes" to file.length())
         }
     } catch (_: Exception) {
@@ -298,7 +298,7 @@ class RuntimeController private constructor(private val app: Context) : DshProce
             onDone(mapOf("result" to null, "current" to false, "reason" to if (request == null) "invalid" else "stale"))
             return
         }
-        managedSkills.submit(owner, request, installer.rootfs, current = {
+        managedSkills.submit(owner, request, installer.chrootRoot, current = {
             managedSkillGate.current(run) && phase == Phase.RUNNING && runGen == run.runtimeGeneration &&
                 stopGen < run.runtimeGeneration && !resetting && token == run.token
         }, onDone = onDone)
@@ -318,7 +318,7 @@ class RuntimeController private constructor(private val app: Context) : DshProce
 
     @Synchronized internal fun capturePhoneSkillOrigin(): PhoneSkillOrigin? =
         if (phase == Phase.RUNNING && !runSafe && !resetting && stopGen < runGen &&
-            phoneSkillStoppedGeneration < runGen) PhoneSkillOrigin(this, runGen, installer.rootfs) else null
+            phoneSkillStoppedGeneration < runGen) PhoneSkillOrigin(this, runGen, installer.chrootRoot) else null
 
     // Read-only generation fence for physical action gates; never acquires the Runtime monitor.
     // The final generation read rejects mixed fields across an unexpected-exit/restart.
@@ -458,20 +458,27 @@ class RuntimeController private constructor(private val app: Context) : DshProce
         worker.execute {
             var launched: DshProcess? = null
             try {
-                noteDns(GuestSetup.writeResolvConf(app, installer.rootfs), DnsConfigSource.START)
+                // The chroot needs root and its mounts before anything runs in it.
+                if (!ChrootRuntime.rootAvailable()) {
+                    throw IllegalStateException(
+                        "this phone has no root: the engine runs in a chroot and needs Magisk (or a rooted ROM)"
+                    )
+                }
+                ChrootRuntime.mount { line -> log(line, "system") }
+                noteDns(GuestSetup.writeResolvConf(app, installer.chrootRoot), DnsConfigSource.START)
                 val storage = pendingPhoneStorage && PhoneStorage.isGranted(app) && PhoneStorage.binds().isNotEmpty()
-                PhoneStorage.syncShortcut(installer.rootfs, storage)
+                PhoneStorage.syncShortcut(installer.chrootRoot, storage)
                 // Phone control: bridge up and guest files written before DSH starts; off in safe mode.
-                val phone = PhoneControl.get(app).prepareLaunch(installer.rootfs, safe) { log(it, "system") }
-                val searchOverlay = !safe && SessionSearchGuest.writeFiles(installer.rootfs)
+                val phone = PhoneControl.get(app).prepareLaunch(installer.chrootRoot, safe) { log(it, "system") }
+                val searchOverlay = !safe && SessionSearchGuest.writeFiles(installer.chrootRoot)
                 if (!safe && !searchOverlay) {
                     log("[dsh-app] message search overlay not written; searching matches titles only", "system")
                 }
-                val authOverlay = !safe && AppAuthGuest.writeFiles(app, installer.rootfs)
+                val authOverlay = !safe && AppAuthGuest.writeFiles(app, installer.chrootRoot)
                 if (!safe && !authOverlay) {
                     log("[dsh-app] subscription sign-in overlay not written; ChatGPT / Claude sign-in is unavailable", "system")
                 }
-                val speechOverlay = !safe && SpeechGuest.writeFiles(installer.rootfs)
+                val speechOverlay = !safe && SpeechGuest.writeFiles(installer.chrootRoot)
                 if (!safe && !speechOverlay) {
                     log("[dsh-app] voice input overlay not written; the voice model keeps DSH's defaults", "system")
                 }
@@ -482,13 +489,13 @@ class RuntimeController private constructor(private val app: Context) : DshProce
                 workspaceRecovery.applyEnvironment(env)
                 PerformancePolicy.applyEngineEnvironment(app, env, manifest.launchArgv, manifest.launchEnv)
                 if (safe) {
-                    SafeMode.prepare(installer.rootfs, briefing())
+                    SafeMode.prepare(installer.chrootRoot, briefing())
                     env.putAll(SafeMode.GUEST_ENV)
                     bootProfile = null
                     log("[dsh-app] safe mode: booting profile ${SafeMode.PROFILE} rebuilt from the web template, plugins off", "system")
                 } else {
                     bootProfile = try {
-                        LastKnownGood.read(installer.rootfs)
+                        LastKnownGood.read(installer.chrootRoot)
                     } catch (_: Exception) {
                         null
                     }
@@ -499,7 +506,7 @@ class RuntimeController private constructor(private val app: Context) : DshProce
                 val p = synchronized(this@RuntimeController) {
                     if (stopGen >= gen || gen != runGen) null
                     else DshProcess(
-                        app, manifest, installer.rootfs,
+                        app, manifest, installer.chrootRoot,
                         object : DshProcess.Listener by this@RuntimeController {
                             override fun onLog(line: String, stream: String) {
                                 if (stream != "system") {
@@ -529,8 +536,8 @@ class RuntimeController private constructor(private val app: Context) : DshProce
                     if (!safe) {
                         val prefs = app.getSharedPreferences("FlutterSharedPreferences", android.content.Context.MODE_PRIVATE)
                         GuestSetup.writeAgentsMd(
-                            installer.rootfs, storage, phone, pendingVisualReplies, actualDirect,
-                            executionMode = prefs.getString("flutter.execution_mode", if (actualDirect) "direct" else "proot") ?: "proot",
+                            installer.chrootRoot, storage, phone, pendingVisualReplies, actualDirect,
+                            executionMode = prefs.getString("flutter.execution_mode", "chroot") ?: "chroot",
                             reconnect = prefs.getString("flutter.agent_reconnect", null),
                         )
                     }
@@ -594,7 +601,7 @@ class RuntimeController private constructor(private val app: Context) : DshProce
                 // Check ownership where this queued write executes, not only in the callback.
                 // If a stop/start follows this check, its startup DNS write is later on this worker.
                 if (gen != runGen || stopGen >= gen || !networkAccess.isCurrent(watch)) return@execute
-                noteDns(GuestSetup.writeResolvConf(installer.rootfs, servers), DnsConfigSource.NETWORK)
+                noteDns(GuestSetup.writeResolvConf(installer.chrootRoot, servers), DnsConfigSource.NETWORK)
             }
         }
     }
@@ -634,7 +641,7 @@ class RuntimeController private constructor(private val app: Context) : DshProce
                 }
                 // A finished waiter may have reported incomplete cleanup. Captured identities
                 // outlive its launcher; do not retire their rootfs while any still remain.
-                val cleanup = DshProcess(app, manifest, installer.rootfs, this).reapStrays()
+                val cleanup = DshProcess(app, manifest, installer.chrootRoot, this).reapStrays()
                 check(cleanup.complete) { "runtime stop incomplete; retry reset after cleanup" }
                 lastLaunch = null
                 try {
@@ -725,7 +732,7 @@ class RuntimeController private constructor(private val app: Context) : DshProce
         worker.execute {
             val result: Map<String, Any?> = try {
                 val lkg = LastKnownGood.load(lkgFile)
-                val current = LastKnownGood.read(installer.rootfs)
+                val current = LastKnownGood.read(installer.chrootRoot)
                 if (lkg == null || current == null) {
                     mapOf("available" to false, "at" to lkg?.at)
                 } else {
@@ -744,7 +751,7 @@ class RuntimeController private constructor(private val app: Context) : DshProce
             try {
                 checkRecoveryWrite(mainProfileOnly = true)
                 val lkg = LastKnownGood.load(lkgFile) ?: throw IllegalStateException(AppStrings.get(app, R.string.safe_no_good_config))
-                val plan = LastKnownGood.restore(installer.rootfs, lkg.snapshot, SafeMode.stamp(),
+                val plan = LastKnownGood.restore(installer.chrootRoot, lkg.snapshot, SafeMode.stamp(),
                     AppStrings.get(app, R.string.safe_config_missing), AppStrings.get(app, R.string.safe_config_busy))
                 log(
                     "[dsh-app] restored the last good plugin set from ${SafeMode.formatTime(lkg.at)}: " +
@@ -763,7 +770,7 @@ class RuntimeController private constructor(private val app: Context) : DshProce
     fun safePreflight(onDone: (List<Map<String, Any?>>) -> Unit) {
         worker.execute {
             val hazards = try {
-                SafeMode.preflight(installer.rootfs, AppStrings.get(app, R.string.safe_patch_hazard)) { names ->
+                SafeMode.preflight(installer.chrootRoot, AppStrings.get(app, R.string.safe_patch_hazard)) { names ->
                     AppStrings.get(app, R.string.safe_env_hazard, names.joinToString(if (AppStrings.isEnglish(app)) ", " else "、"))
                 }.map { it.toMap() }
             } catch (_: Exception) {
@@ -778,7 +785,7 @@ class RuntimeController private constructor(private val app: Context) : DshProce
         worker.execute {
             try {
                 checkRecoveryWrite(mainProfileOnly = false)
-                val outcome = SafeMode.moveAside(installer.rootfs, paths, SafeMode.stamp())
+                val outcome = SafeMode.moveAside(installer.chrootRoot, paths, SafeMode.stamp())
                 val moved = outcome.moved
                 if (moved.isNotEmpty()) {
                     val record = JSONArray(movedAside() + moved.map { (from, to) -> "$from → $to" })
@@ -800,7 +807,7 @@ class RuntimeController private constructor(private val app: Context) : DshProce
         }
         RuntimeRecoveryGate.check(state, mainProfileOnly) {
             // onExit can follow an incomplete sweep; inspect the shared captured identities again.
-            DshProcess(app, manifest, installer.rootfs, this).killStrays()
+            DshProcess(app, manifest, installer.chrootRoot, this).killStrays()
         }
     }
 
@@ -865,7 +872,7 @@ class RuntimeController private constructor(private val app: Context) : DshProce
     /** Bundles enabled or upgraded since the last good run: the first suspects of a new failure. */
     private fun recentChanges(): List<String> = try {
         val lkg = LastKnownGood.load(lkgFile)
-        val current = bootProfile ?: LastKnownGood.read(installer.rootfs)
+        val current = bootProfile ?: LastKnownGood.read(installer.chrootRoot)
         if (lkg == null || current == null) {
             emptyList()
         } else {
@@ -979,7 +986,7 @@ class RuntimeController private constructor(private val app: Context) : DshProce
         if (!runSafe) {
             // First boot creates the profile after startProcess reads it. Capture it before
             // RUNNING lets the app change it; a later disk read would not describe this boot.
-            bootProfile = LastKnownGood.bootedAtReady(bootProfile) { LastKnownGood.read(installer.rootfs) }
+            bootProfile = LastKnownGood.bootedAtReady(bootProfile) { LastKnownGood.read(installer.chrootRoot) }
         }
         if (!runSafe) healthyAt = System.currentTimeMillis() + SafePolicy.HEALTHY_MS
         log("[dsh-app] DSH is listening at $baseUrl${if (runSafe) " (safe mode)" else ""}", "system")

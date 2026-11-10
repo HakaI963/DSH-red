@@ -317,71 +317,17 @@ build_abi() {
   mkdir -p "$work"
   rm -rf "$out"; mkdir -p "$assets/licenses" "$jni"
 
-  local base node proot_deb talloc_deb shmem_deb proot_src
+  local base node
   base="$(ubuntu_base "$ubuntu_arch")"
   node="$(node_dist "$node_arch")"
   ubuntu_extra_debs "$ubuntu_arch" "$base" > "$work/extra-debs.txt"   # set -e aborts on any failure inside
   local -a extra_debs=(); mapfile -t extra_debs < "$work/extra-debs.txt"
   [[ ${#extra_debs[@]} -gt 0 ]] || die "Ubuntu package resolution produced nothing"
   local python; python="$(python_dist "$termux_arch")"
-  proot_deb="$(termux_deb proot "$PROOT_VERSION" "$termux_arch")"
-  talloc_deb="$(termux_deb libtalloc "$TALLOC_VERSION" "$termux_arch")"
-  shmem_deb="$(termux_deb libandroid-shmem "$SHMEM_VERSION" "$termux_arch")"
-  proot_src="$CACHE/termux/proot-v$PROOT_VERSION.zip"
-  fetch "https://github.com/termux/proot/archive/v$PROOT_VERSION.zip" "$proot_src" "$(pin_of "proot-v$PROOT_VERSION.zip")"
 
-  # -- jniLibs: Termux binaries, renamed lib*.so so the package manager extracts them --
-  local debx="$work/debs"; rm -rf "$debx"
-  local d
-  for d in "$proot_deb" "$talloc_deb" "$shmem_deb"; do "${PY[@]}" deb-extract "$d" "$debx"; done
-  local tprefix="$debx/data/data/com.termux/files/usr"
-  cp "$tprefix/bin/proot"                  "$jni/libproot.so"
-  cp "$tprefix/libexec/proot/loader"       "$jni/libproot-loader.so"
-  cp "$tprefix/lib/libtalloc.so.$TALLOC_VERSION" "$jni/libtalloc.so"
-  cp "$tprefix/lib/libandroid-shmem.so"    "$jni/libandroid-shmem.so"
-  local orig_proot orig_talloc
-  orig_proot="$(sha256 "$jni/libproot.so")"; orig_talloc="$(sha256 "$jni/libtalloc.so")"
-  # APKs can only carry lib*.so, so the DT_NEEDED/SONAME "libtalloc.so.2" becomes "libtalloc.so".
-  "${PY[@]}" patch-dynstr "$jni/libproot.so" libtalloc.so.2 libtalloc.so >&2
-  "${PY[@]}" patch-dynstr "$jni/libtalloc.so" libtalloc.so.2 libtalloc.so >&2
-  chmod 0755 "$jni"/*.so
-  "${PY[@]}" elf-info "$jni"/*.so > "$work/jni-elf.json"
-
-  python3 -I - "$jni" "$work/jni-elf.json" "$work/jnilibs.json" <<PYEOF
-import hashlib, json, os, sys
-jni, elf, out = sys.argv[1:4]
-info = json.load(open(elf))
-src = {
-  "libproot.so": ("proot", "$PROOT_VERSION", "$(basename "$proot_deb")", "usr/bin/proot",
-                  "DT_NEEDED libtalloc.so.2 -> libtalloc.so", "$orig_proot"),
-  "libproot-loader.so": ("proot", "$PROOT_VERSION", "$(basename "$proot_deb")", "usr/libexec/proot/loader", None, None),
-  "libtalloc.so": ("libtalloc", "$TALLOC_VERSION", "$(basename "$talloc_deb")", "usr/lib/libtalloc.so.$TALLOC_VERSION",
-                   "DT_SONAME libtalloc.so.2 -> libtalloc.so", "$orig_talloc"),
-  "libandroid-shmem.so": ("libandroid-shmem", "$SHMEM_VERSION", "$(basename "$shmem_deb")", "usr/lib/libandroid-shmem.so", None, None),
-}
-res = {}
-for name, (pkg, ver, deb, inner, patch, orig) in src.items():
-    path = os.path.join(jni, name)
-    e = info[path]
-    res[name] = {
-        "sha256": hashlib.sha256(open(path, "rb").read()).hexdigest(),
-        "bytes": os.path.getsize(path),
-        "source": "termux-main %s %s (%s:/data/data/com.termux/files/%s)" % (pkg, ver, deb, inner),
-        "patch": patch, "originalSha256": orig,
-        "machine": e["machine"], "type": e["type"], "needed": e.get("needed"),
-        "soname": e.get("soname"), "minLoadAlign": e["minLoadAlign"],
-    }
-json.dump(res, open(out, "w"), indent=2)
-PYEOF
-  # licenses for the native bits
-  python3 -I - "$proot_src" "$assets/licenses/proot-COPYING.txt" <<'PYEOF'
-import sys, zipfile
-z = zipfile.ZipFile(sys.argv[1])
-name = next(n for n in z.namelist() if n.endswith("/COPYING") and n.count("/") == 1)
-open(sys.argv[2], "wb").write(z.read(name))
-PYEOF
-  cp "$debx/data/data/com.termux/files/usr/share/doc/libandroid-shmem/copyright" "$assets/licenses/libandroid-shmem-copyright.txt"
-  sed -n '1,/\*\//p' "$tprefix/include/talloc.h" > "$assets/licenses/libtalloc-notice.txt"
+  # -- no native libraries: DSH red runs the engine in a chroot, not under PRoot --
+  mkdir -p "$jni"
+  printf '{}\n' > "$work/jnilibs.json"
 
   # -- DSH --
   local prefix="$work/dsh-prefix"
@@ -402,7 +348,6 @@ PYEOF
   inputs_sha="$( {
       echo "$RUNTIME_REVISION $abi $DSH_VERSION $NODE_VERSION $PNPM_VERSION $UBUNTU_VERSION $COMPRESS $XZ_PRESET $PRUNE_DEV_METADATA $SOURCE_DATE_EPOCH"
       sha256 "$base"; sha256 "$node"; sha256 "$python"; sha256sum "${extra_debs[@]}" | cut -d' ' -f1
-      sha256 "$proot_deb"; sha256 "$talloc_deb"; sha256 "$shmem_deb"
       sha256 "$lockfile"; sha256 "$pnpm_lockfile"; sha256 "$HERE/build-runtime.sh"; sha256 "$HERE/lib/rtbuild.py"
       (cd "$HERE" && find patches bridge boot direct -type f -print0 | LC_ALL=C sort -z | xargs -0 sha256sum)
     } | sha256sum | cut -c1-12 )"

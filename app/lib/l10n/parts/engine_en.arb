@@ -393,5 +393,7 @@
   "executionModeShizukuNote": "Shizuku pairing isn’t wired yet: the engine runs through the direct path until it is.",
   "executionModeSaved": "Execution mode saved",
   "executionModeChangeFailed": "Couldn’t change the execution mode",
-  "executionModeStopFirst": "Stop the engine first"
+  "executionModeStopFirst": "Stop the engine first",
+  "executionModeChroot": "Chroot (root)",
+  "executionModeChrootNote": "The engine runs in a chroot on this phone’s own filesystem: the bundled Linux userland, your phone’s storage mounted into it, and root (Magisk) starting it. No PRoot, no translation layer — much faster."
 }

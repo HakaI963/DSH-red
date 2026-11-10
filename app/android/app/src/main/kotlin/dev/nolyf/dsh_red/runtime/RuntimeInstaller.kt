@@ -36,6 +36,9 @@ class RuntimeInstaller(
 ) {
     val baseDir = File(context.filesDir, "runtime")
     val rootfs = File(baseDir, "rootfs")
+
+    /** The live tree: the chroot the engine actually runs in. */
+    val chrootRoot = File(ChrootRuntime.ROOT)
     private val versionFile = File(baseDir, "rootfs.version")
     private val staging = File(baseDir, "staging")
     private val retiredDir = File(context.filesDir, "runtime.reset")
@@ -43,8 +46,13 @@ class RuntimeInstaller(
 
     private val engineUpgrade = EngineUpgrade(baseDir, sync)
 
-    fun installedVersion(): String? =
-        if (!engineUpgrade.isPending() && rootfs.isDirectory && versionFile.isFile) versionFile.readText().trim().ifEmpty { null } else null
+    fun installedVersion(): String? {
+        // The chroot is what runs: when it is gone, the runtime is gone.
+        val chrootVersion = ChrootRuntime.installedVersion()
+        if (chrootVersion != null) return chrootVersion
+        if (!engineUpgrade.isPending() && rootfs.isDirectory && versionFile.isFile) return versionFile.readText().trim().ifEmpty { null }
+        return null
+    }
 
     fun isCurrent(): Boolean = installedVersion() == manifest.runtimeVersion
 
@@ -112,6 +120,11 @@ class RuntimeInstaller(
             activateRuntimeUpdate(baseDir, manifest.runtimeVersion, manifest.abi, manifest.raw,
                 keepDir, dropKept, sync = { timed("sync") { sync() } }, onLog = onLog)
         }
+        // Into the chroot the engine runs in (needs root on the phone).
+        timed("chroot") {
+            ChrootRuntime.install(rootfs, android.os.Process.myUid(), android.os.Process.myGid(), onLog)
+            ChrootRuntime.writeVersion(manifest.runtimeVersion)
+        }
     }
 
     private inline fun <T> timed(phase: String, block: () -> T): T {
@@ -135,6 +148,8 @@ class RuntimeInstaller(
     /** Deletes the runtime; [keep] (paths under the rootfs) waits in runtime-keep for the next install. */
     fun reset(keep: List<String>) {
         retireRuntime(baseDir, retiredDir, keepDir, keep)
+        // The chroot is the live tree: it goes with it.
+        runCatching { ChrootRuntime.root("rm -rf '${ChrootRuntime.ROOT}'") }.onFailure { onLog("[dsh-app] chroot reset: ${it.message}") }
     }
 
     private fun assetLength(path: String): Long = try {

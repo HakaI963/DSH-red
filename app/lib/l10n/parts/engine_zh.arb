@@ -738,5 +738,7 @@
   "executionModeShizukuNote": "Shizuku 配对尚未接入：在此之前引擎按直接启动方式运行。",
   "executionModeSaved": "执行模式已保存",
   "executionModeChangeFailed": "执行模式修改失败",
-  "executionModeStopFirst": "请先停止引擎"
+  "executionModeStopFirst": "请先停止引擎",
+  "executionModeChroot": "Chroot（root）",
+  "executionModeChrootNote": "引擎直接运行在本机文件系统的 chroot 里：内置 Linux 用户空间 + 挂载进来的手机存储 + root（Magisk）启动。不再有 PRoot，也没有转译层，快得多。"
 }
