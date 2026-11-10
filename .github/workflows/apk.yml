@@ -45,6 +45,22 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
           persist-credentials: false
+      # One stable key for every build: Android refuses direct updates when the
+      # signing certificate changes (the auto-generated debug key did, each run).
+      - name: Restore the release signing key
+        env:
+          KS_B64: ${{ secrets.DSH_KEYSTORE_B64 }}
+          KS_PASS: ${{ secrets.DSH_KEYSTORE_PASSWORD }}
+          KS_ALIAS: ${{ secrets.DSH_KEYSTORE_ALIAS }}
+        run: |
+          if [ -n "$KS_B64" ]; then
+            printf '%s' "$KS_B64" | base64 -d > "$RUNNER_TEMP/dsh-red-release.jks"
+            printf 'storeFile=%s\nstorePassword=%s\nkeyAlias=%s\nkeyPassword=%s\n' \
+              "$RUNNER_TEMP/dsh-red-release.jks" "$KS_PASS" "$KS_ALIAS" "$KS_PASS" > app/android/key.properties
+            echo "release signing restored"
+          else
+            echo "::warning::no DSH_KEYSTORE_B64 secret: this build is debug-signed and cannot update earlier installs"
+          fi
       - uses: actions/setup-java@b843ebf9b913146b38da2eaa7aeddf76074ae1ad # v6.1.0
         with:
           distribution: temurin
@@ -121,5 +137,5 @@ jobs:
           cd -
           gh release create "${GITHUB_REF_NAME}" \
             --title "DSH-red ${GITHUB_REF_NAME}" \
-            --notes "English build of DSH Go (DeepSeek Harness for Android). Release APK built by GitHub Actions; debug-signed (add signing secrets to the repo for store-ready builds). Install over any earlier build of the same version." \
+            --notes "English build of DSH Go (DeepSeek Harness for Android). Release APK built by GitHub Actions; signed with the stable fork release key, so direct updates work between versions." \
             app/build/app/outputs/flutter-apk/*.apk
