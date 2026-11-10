@@ -47,24 +47,12 @@ object ChrootRuntime {
     }
 
     /** Runs [command] as root and returns its combined output. */
-    fun runRoot(su: String, command: String, timeoutMs: Long = 600_000): String {
-        val process = ProcessBuilder(su, "-c", command).redirectErrorStream(true).start()
-        process.outputStream.close()
-        val out = process.inputStream.bufferedReader().readText()
-        if (!process.waitFor(timeoutMs, java.util.concurrent.TimeUnit.MILLISECONDS)) {
-            process.destroyForcibly()
-            throw IllegalStateException("root command timed out: ${command.take(80)}")
-        }
-        if (process.exitValue() != 0) {
-            throw IllegalStateException("root command failed (${process.exitValue()}): ${command.take(120)}\n$out")
-        }
-        return out
-    }
+    fun runRoot(su: String, command: String, timeoutMs: Long = 600_000): String = runRootCommand(su, command, timeoutMs)
 
     /** Runs [command] as root, or throws a message the app can show. */
     fun root(command: String, timeoutMs: Long = 600_000): String {
         val su = suBinary() ?: throw IllegalStateException("no root on this phone: the engine needs a rooted device (Magisk) to run in a chroot")
-        return runRoot(su, command, timeoutMs)
+        return runRootCommand(su, command, timeoutMs)
     }
 
     /**

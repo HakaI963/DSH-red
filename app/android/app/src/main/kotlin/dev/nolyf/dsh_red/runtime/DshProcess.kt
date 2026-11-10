@@ -22,6 +22,26 @@ import kotlin.concurrent.thread
  * Runs `dsh web` through proot or the optional direct glibc planner, using the
  * same composed manifest configuration. Reports ready after the token and socket.
  */
+/**
+ * Runs [command] as root (Magisk's `su`) and returns its combined output.
+ *
+ * The launch happens here, in the reviewed owner: a native child started
+ * anywhere else would inherit the app's configuration file descriptors.
+ */
+internal fun runRootCommand(su: String, command: String, timeoutMs: Long = 600_000): String {
+    val process = ProcessBuilder(su, "-c", command).redirectErrorStream(true).start()
+    process.outputStream.close()
+    val out = process.inputStream.bufferedReader().readText()
+    if (!process.waitFor(timeoutMs, java.util.concurrent.TimeUnit.MILLISECONDS)) {
+        process.destroyForcibly()
+        throw IllegalStateException("root command timed out: ${command.take(80)}")
+    }
+    if (process.exitValue() != 0) {
+        throw IllegalStateException("root command failed (${process.exitValue()}): ${command.take(120)}\n$out")
+    }
+    return out
+}
+
 class DshProcess(
     private val context: Context,
     private val manifest: RuntimeManifest,
