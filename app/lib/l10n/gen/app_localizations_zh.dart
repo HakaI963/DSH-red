@@ -6671,7 +6671,9 @@ class L10nZh extends L10n {
   String get engineReconnectSaved => '重连设置已保存';
 
   @override
-  String get engineReconnectFailed => '应用失败：{error}';
+  String engineReconnectFailed(String error) {
+    return '应用失败：$error';
+  }
 
   @override
   String get engineReconnectNoProvider => '这台主机上没有支持重连的模型提供方';

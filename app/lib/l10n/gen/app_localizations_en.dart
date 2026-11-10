@@ -7036,7 +7036,9 @@ class L10nEn extends L10n {
   String get engineReconnectSaved => 'Reconnect settings saved';
 
   @override
-  String get engineReconnectFailed => 'Couldn’t apply: {error}';
+  String engineReconnectFailed(String error) {
+    return 'Couldn’t apply: $error';
+  }
 
   @override
   String get engineReconnectNoProvider => 'No model provider with reconnect support on this host';

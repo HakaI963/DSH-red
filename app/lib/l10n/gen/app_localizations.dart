@@ -12348,7 +12348,7 @@ abstract class L10n {
   ///
   /// In zh, this message translates to:
   /// **'应用失败：{error}'**
-  String get engineReconnectFailed;
+  String engineReconnectFailed(String error);
 
   /// No description provided for @engineReconnectNoProvider.
   ///
