@@ -475,7 +475,7 @@ extension ClientInventoryApi on DshClient {
   /// when the page has no boot graph. Throws `client-inventory/unsupported`
   /// on a carrier without pages and `client-inventory/http-<status>` when the
   /// Host refuses.
-  Future<WebBootGraph?> readWebBoot({Duration timeout = const Duration(seconds: 15)}) async {
+  Future<WebBootGraph?> readWebBoot({Duration timeout = const Duration(seconds: 60)}) async {
     final response = await _get('/', timeout);
     if (response.statusCode != 200) throw _httpError('/', response.statusCode);
     return parseWebBootGraph(response.text);
@@ -484,7 +484,7 @@ extension ClientInventoryApi on DshClient {
   /// Tier B: `GET /dsh-go/v1/inventory`. Null when the bridge is not installed
   /// (404). Throws like [readWebBoot], and [DshProtocolException] when the
   /// body is not an inventory.
-  Future<BridgeInventory?> readBridgeInventory({Duration timeout = const Duration(seconds: 10)}) async {
+  Future<BridgeInventory?> readBridgeInventory({Duration timeout = const Duration(seconds: 45)}) async {
     final response = await _get(bridgeInventoryPath, timeout);
     if (response.statusCode == 404) return null;
     if (response.statusCode != 200) throw _httpError(bridgeInventoryPath, response.statusCode);
