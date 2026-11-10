@@ -40,7 +40,7 @@ void main() {
       for (final m in host.mutates())
         m['ns']! as String: (m['ops']! as List).single! as Map<String, Object?>,
     };
-    expect(ops.keys.toSet(), {'llm-deepseek', 'llm-deepseek-account', 'llm-pi-ai'});
+    expect(ops.keys.toSet(), {'llm-deepseek', 'llm-deepseek-account'});
     for (final op in ops.values) {
       expect(op['op'], 'set');
       expect(op['path'], ['retryPolicy']);
