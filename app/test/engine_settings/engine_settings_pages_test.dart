@@ -443,7 +443,7 @@ void main() {
     expect(find.text('条件启用'), findsNothing);
     await tester.tap(find.text('全局插件'));
     await settle(tester);
-    await tester.enterText(find.byType(TextField), 'agent-loop');
+    await tester.enterText(find.byType(TextField), 'dsh-agent-loop');
     await settle(tester);
     await tester.tap(find.text('agent-loop'));
     await flush(tester);
