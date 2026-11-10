@@ -160,12 +160,12 @@ void main() {
 
     testWidgets('the kit\'s sheet: each row by its own title, the page under it', (tester) async {
       await _openSheet(tester, PluginBundle.fromJson(_kitBundles().first), configOverrides(_kit(), host: _kitHost()));
-      expect(_sheetRows(tester), ['Speech recognition', 'SenseVoice 本地识别', 'Speech transcription API']);
+      expect(_sheetRows(tester), ['语音识别', 'SenseVoice 本地识别', '语音转写接口']);
       expect(find.text('由配置文件固定'), findsNothing);
-      await tester.tap(_row('Speech transcription API'));
+      await tester.tap(_row('语音转写接口'));
       await flush(tester);
       expect(find.byType(PluginConfigPage), findsOneWidget);
-      expect(find.text('Speech transcription API'), findsWidgets);
+      expect(find.text('语音转写接口'), findsWidgets);
     });
 
     testWidgets('a page opened on its own: the row\'s title', (tester) async {
