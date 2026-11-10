@@ -113,7 +113,7 @@ void main() {
       ..inventory = recordedInventory()
       ..bundles = sampleBundles(),
     before: (tester) async {
-      await tester.enterText(find.byType(TextField), '循环');
+      await tester.enterText(find.byType(TextField), 'loop');
       await settle(tester);
       await tester.tap(find.text('agent-loop'));
       await settle(tester);
