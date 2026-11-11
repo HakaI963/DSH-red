@@ -144,7 +144,9 @@ class PhoneBridge(
             } catch (_: Exception) {
                 -1
             }
-            if (uid != Process.myUid()) {
+            // The engine runs as root inside the chroot (uid 0); the app itself
+            // is the only other peer allowed.
+            if (uid != Process.myUid() && uid != 0) {
                 log("[dsh-app] phone bridge: refused a connection from uid $uid")
                 runCatching { sock.close() }
                 continue
@@ -166,7 +168,7 @@ class PhoneBridge(
                 return
             }
             val uid = loopbackPeerUid(sock.port, s.localPort)
-            if (uid != null && uid != Process.myUid()) {
+            if (uid != null && uid != Process.myUid() && uid != 0) {
                 log("[dsh-app] phone bridge: refused a tcp connection from uid $uid")
                 runCatching { sock.close() }
                 continue

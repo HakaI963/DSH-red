@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import '../../account/account_page.dart';
 import '../../engine/engine_screen.dart';
 import '../../engine_settings/agent_reconnect_page.dart';
+import '../../engine_settings/chroot_mounts_page.dart';
 import '../../engine_settings/engine_settings_hub.dart';
 import '../../engine_settings/execution_mode_page.dart';
 import '../../engine_settings/runtime_settings_pages.dart';
@@ -69,6 +70,7 @@ Widget settingsPage(SettingsPageId id, {String? sessionId}) => switch (id) {
   SettingsPageId.agentLoop => const AgentLoopSettingsPage(),
   SettingsPageId.shell => const ShellSettingsPage(),
   SettingsPageId.agentReconnect => const AgentReconnectSettingsPage(),
+  SettingsPageId.mounts => const ChrootMountsPage(),
   SettingsPageId.executionMode => const ExecutionModeSettingsPage(),
   SettingsPageId.webSearch => const WebSearchSettingsPage(),
   SettingsPageId.media => const MediaSettingsPage(),

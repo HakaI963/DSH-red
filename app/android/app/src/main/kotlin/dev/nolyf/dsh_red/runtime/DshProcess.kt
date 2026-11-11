@@ -167,7 +167,7 @@ class DshProcess(
         scriptFile.writeText(script)
         scriptFile.setExecutable(true)
 
-        val builder = ProcessBuilder(ChrootRuntime.launchCommand()).directory(context.filesDir)
+        val builder = ProcessBuilder(ChrootRuntime.launchCommand(context)).directory(context.filesDir)
         val env = builder.environment()
         env.clear()
         env["PATH"] = "/system/bin:/system/xbin"

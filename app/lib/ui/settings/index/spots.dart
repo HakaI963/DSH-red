@@ -89,6 +89,7 @@ enum SettingsPageId {
   agentReconnect,
   executionMode,
   pluginInventory,
+  mounts,
   allFeatures,
   diagnostics,
   about,
@@ -534,6 +535,13 @@ final _pages = <SettingsPageMeta>[
     parent: SettingsPageId.engineParams,
     keywords: (l) => l.searchKwPluginInventory,
     links: const ['plugin-inventory'],
+  ),
+  SettingsPageMeta(
+    SettingsPageId.mounts,
+    title: (l) => l.chrootMountsTitle,
+    parent: SettingsPageId.engine,
+    keywords: (l) => l.chrootMountsHint,
+    links: const ['mounts'],
   ),
   SettingsPageMeta(
     SettingsPageId.allFeatures,

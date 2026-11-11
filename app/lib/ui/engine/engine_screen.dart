@@ -163,6 +163,11 @@ class EngineScreen extends ConsumerWidget {
                   subtitle: l10n.phoneEngineDiagnosticsHint,
                   onTap: () => _push(context, const DiagnosticsPage()),
                 ),
+                SettingsTile(
+                  spot: SettingsIndex.entry(SettingsPageId.mounts),
+                  subtitle: l10n.chrootMountsHint,
+                  onTap: () => _push(context, const ChrootMountsPage()),
+                ),
               ],
             ),
             SettingsSection(
