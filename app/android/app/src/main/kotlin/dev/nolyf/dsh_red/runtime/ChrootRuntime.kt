@@ -118,7 +118,7 @@ object ChrootRuntime {
     }
 
     /** One mount from the prefs JSON. */
-    private data class Mount(val source: String, val target: String, val enabled: Boolean, val access: String)
+    data class Mount(val source: String, val target: String, val enabled: Boolean, val access: String)
 
     /** Reads the person's mount list; the built-in default when there is none. */
     fun parseMounts(raw: String?): List<Mount> {
@@ -156,14 +156,6 @@ object ChrootRuntime {
         Mount("tmpfs", "/dev/shm", true, "readWrite"),
     )
 
-    /** Sets the mounts up; every mount is best-effort (a missing one is logged). */
-    fun mount(onLog: (String) -> Unit) {
-        val out = runCatching { root(mountScript(), 120_000) }.getOrElse {
-            onLog("[dsh-app] chroot: mounts failed: ${it.message}")
-            throw it
-        }
-        if (out.isNotBlank()) onLog("[dsh-app] chroot: $out")
-    }
 
     /**
      * The command that starts the engine inside the chroot. The mounts are
