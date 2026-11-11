@@ -75,11 +75,16 @@ class ChrootMountsPage extends ConsumerWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             for (final mode in MountAccess.values)
-              RadioListTile<MountAccess>(
-                value: mode,
-                groupValue: mount.access,
+              ListTile(
                 title: Text(_mode(l10n, mode)),
-                onChanged: (v) => Navigator.of(dialog).pop(v),
+                trailing: Icon(
+                  mount.access == mode ? AppIcons.radioOn : AppIcons.radioOff,
+                  size: 20,
+                  color: mount.access == mode
+                      ? Theme.of(dialog).colorScheme.primary
+                      : Theme.of(dialog).colorScheme.onSurfaceVariant,
+                ),
+                onTap: () => Navigator.of(dialog).pop(mode),
               ),
             if (!mount.builtin)
               TextButton(

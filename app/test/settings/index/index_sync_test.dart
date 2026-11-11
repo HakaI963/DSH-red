@@ -66,6 +66,7 @@ final Map<SettingsPageId, List<String Function(L10n)>> _unlisted = {
   SettingsPageId.remote: [(l) => l.remoteWebConsole],
   SettingsPageId.executionMode: [
     (l) => l.executionModeChroot,
+    (l) => l.executionModeShizuku,
   ],
 };
 

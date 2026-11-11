@@ -154,7 +154,8 @@ void main() {
       findsOneWidget,
       reason: 'installed local runtime must expose index rescue without DSH RPC',
     );
-    await tester.ensureVisible(find.byKey(_tile));
+    await tester.scrollUntilVisible(find.byKey(_tile), 200, scrollable: find.byType(Scrollable).first);
+    await tester.pumpAndSettle();
     await tester.tap(find.byKey(_tile));
     await tester.pumpAndSettle();
     expect(find.byType(AlertDialog), findsOneWidget);
@@ -314,7 +315,8 @@ void main() {
     await open(tester);
     await confirm(tester);
     expect(f.native, hasLength(1));
-    await tester.ensureVisible(find.byKey(_tile));
+    await tester.scrollUntilVisible(find.byKey(_tile), 200, scrollable: find.byType(Scrollable).first);
+    await tester.pumpAndSettle();
     await tester.tap(find.byKey(_tile));
     await tester.pump();
     expect(find.byType(AlertDialog), findsNothing);
