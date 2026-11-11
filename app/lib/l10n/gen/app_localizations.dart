@@ -12389,7 +12389,7 @@ abstract class L10n {
   /// No description provided for @executionModeShizukuNote.
   ///
   /// In zh, this message translates to:
-  /// **'Shizuku 配对尚未接入：在此之前引擎按直接启动方式运行。'**
+  /// **'Shizuku 是计划中的第二种方式（通过 Shizuku 服务获得 shell，无需 root）。这里会记住你的选择，但在它落地之前引擎仍运行在 chroot 里。'**
   String get executionModeShizukuNote;
 
   /// No description provided for @executionModeSaved.
@@ -12421,6 +12421,78 @@ abstract class L10n {
   /// In zh, this message translates to:
   /// **'引擎直接运行在本机文件系统的 chroot 里：内置 Linux 用户空间 + 挂载进来的手机存储 + root（Magisk）启动。不再有 PRoot，也没有转译层，快得多。'**
   String get executionModeChrootNote;
+
+  /// No description provided for @chrootMountsTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'挂载'**
+  String get chrootMountsTitle;
+
+  /// No description provided for @chrootMountsHint.
+  ///
+  /// In zh, this message translates to:
+  /// **'引擎能看到手机的哪些内容，下次启动引擎时生效。'**
+  String get chrootMountsHint;
+
+  /// No description provided for @chrootMountsAdd.
+  ///
+  /// In zh, this message translates to:
+  /// **'添加挂载'**
+  String get chrootMountsAdd;
+
+  /// No description provided for @chrootMountsReadOnly.
+  ///
+  /// In zh, this message translates to:
+  /// **'只读'**
+  String get chrootMountsReadOnly;
+
+  /// No description provided for @chrootMountsReadWrite.
+  ///
+  /// In zh, this message translates to:
+  /// **'读写'**
+  String get chrootMountsReadWrite;
+
+  /// No description provided for @chrootMountsAsk.
+  ///
+  /// In zh, this message translates to:
+  /// **'每次询问'**
+  String get chrootMountsAsk;
+
+  /// No description provided for @chrootMountsName.
+  ///
+  /// In zh, this message translates to:
+  /// **'名称'**
+  String get chrootMountsName;
+
+  /// No description provided for @chrootMountsSource.
+  ///
+  /// In zh, this message translates to:
+  /// **'手机上的路径'**
+  String get chrootMountsSource;
+
+  /// No description provided for @chrootMountsTarget.
+  ///
+  /// In zh, this message translates to:
+  /// **'引擎内的路径'**
+  String get chrootMountsTarget;
+
+  /// No description provided for @chrootMountsRemove.
+  ///
+  /// In zh, this message translates to:
+  /// **'移除'**
+  String get chrootMountsRemove;
+
+  /// No description provided for @chrootMountsSaved.
+  ///
+  /// In zh, this message translates to:
+  /// **'挂载设置已保存'**
+  String get chrootMountsSaved;
+
+  /// No description provided for @chrootMountsAskTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'本次启动允许挂载 {name} 吗？'**
+  String get chrootMountsAskTitle;
 
   /// No description provided for @featuresCordisSubtitle.
   ///

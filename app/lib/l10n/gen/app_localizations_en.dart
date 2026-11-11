@@ -7061,7 +7061,7 @@ class L10nEn extends L10n {
 
   @override
   String get executionModeShizukuNote =>
-      'Shizuku pairing isn’t wired yet: the engine runs through the direct path until it is.';
+      'Shizuku is the planned second way in (a shell through the Shizuku service, no root). It is remembered here, but the engine still runs in the chroot until that lands.';
 
   @override
   String get executionModeSaved => 'Execution mode saved';
@@ -7078,6 +7078,42 @@ class L10nEn extends L10n {
   @override
   String get executionModeChrootNote =>
       'The engine runs in a chroot on this phone’s own filesystem: the bundled Linux userland, your phone’s storage mounted into it, and root (Magisk) starting it. No PRoot, no translation layer — much faster.';
+
+  @override
+  String get chrootMountsTitle => 'Mounts';
+
+  @override
+  String get chrootMountsHint => 'What the engine sees of your phone. Changes apply when the engine starts next.';
+
+  @override
+  String get chrootMountsAdd => 'Add a mount';
+
+  @override
+  String get chrootMountsReadOnly => 'Read-only';
+
+  @override
+  String get chrootMountsReadWrite => 'Read & write';
+
+  @override
+  String get chrootMountsAsk => 'Ask each time';
+
+  @override
+  String get chrootMountsName => 'Name';
+
+  @override
+  String get chrootMountsSource => 'Path on the phone';
+
+  @override
+  String get chrootMountsTarget => 'Path inside the engine';
+
+  @override
+  String get chrootMountsRemove => 'Remove';
+
+  @override
+  String get chrootMountsSaved => 'Mounts saved';
+
+  @override
+  String get chrootMountsAskTitle => 'Allow {name} for this start?';
 
   @override
   String get featuresCordisSubtitle => 'Dynamic plugins · Cleared when the engine restarts';

@@ -6694,7 +6694,8 @@ class L10nZh extends L10n {
   String get executionModeShizuku => 'Shizuku';
 
   @override
-  String get executionModeShizukuNote => 'Shizuku 配对尚未接入：在此之前引擎按直接启动方式运行。';
+  String get executionModeShizukuNote =>
+      'Shizuku 是计划中的第二种方式（通过 Shizuku 服务获得 shell，无需 root）。这里会记住你的选择，但在它落地之前引擎仍运行在 chroot 里。';
 
   @override
   String get executionModeSaved => '执行模式已保存';
@@ -6711,6 +6712,42 @@ class L10nZh extends L10n {
   @override
   String get executionModeChrootNote =>
       '引擎直接运行在本机文件系统的 chroot 里：内置 Linux 用户空间 + 挂载进来的手机存储 + root（Magisk）启动。不再有 PRoot，也没有转译层，快得多。';
+
+  @override
+  String get chrootMountsTitle => '挂载';
+
+  @override
+  String get chrootMountsHint => '引擎能看到手机的哪些内容，下次启动引擎时生效。';
+
+  @override
+  String get chrootMountsAdd => '添加挂载';
+
+  @override
+  String get chrootMountsReadOnly => '只读';
+
+  @override
+  String get chrootMountsReadWrite => '读写';
+
+  @override
+  String get chrootMountsAsk => '每次询问';
+
+  @override
+  String get chrootMountsName => '名称';
+
+  @override
+  String get chrootMountsSource => '手机上的路径';
+
+  @override
+  String get chrootMountsTarget => '引擎内的路径';
+
+  @override
+  String get chrootMountsRemove => '移除';
+
+  @override
+  String get chrootMountsSaved => '挂载设置已保存';
+
+  @override
+  String get chrootMountsAskTitle => '本次启动允许挂载 {name} 吗？';
 
   @override
   String get featuresCordisSubtitle => '动态插件 · 引擎重启后清空';
