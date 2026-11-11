@@ -64,14 +64,12 @@ Map<String, Object?> notice(int seq, String kind, String text, {String? roomId})
   'roomId': ?roomId,
   'title': roomId == null ? null : '发布会',
   'text': text,
-  // Today at a fixed clock time, so the row's time reads the same on every run.
-  'time': _today(9, 40 + seq).millisecondsSinceEpoch,
+  // A fixed date and clock time: "today" made the row flip to 「刚刚」
+  // whenever the CI clock was within a minute of it.
+  'time': _fixed(9, 40 + seq).millisecondsSinceEpoch,
 };
 
-DateTime _today(int hour, int minute) {
-  final now = DateTime.now();
-  return DateTime(now.year, now.month, now.day, hour, minute);
-}
+DateTime _fixed(int hour, int minute) => DateTime(2026, 10, 24, hour, minute);
 
 void main() {
   goldenBots(
