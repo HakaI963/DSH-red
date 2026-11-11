@@ -5,7 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../l10n/l10n.dart';
 import '../performance/performance_state.dart';
-import '../runtime/runtime_bridge.dart';
+import '../runtime/runtime_state.dart';
 import 'chroot_mounts.dart';
 import 'provider_keys.dart';
 import 'read_list_epoch.dart';
