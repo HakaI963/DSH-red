@@ -96,12 +96,19 @@ object ChrootRuntime {
         val raw = prefs.getString("flutter.chroot_mounts", null)
         // Without a saved list the phone's storage is mounted only when the
         // person granted access to it (as before, under PRoot).
-        val mounts = if (raw.isNullOrEmpty()) defaultMounts(phoneStorage) else parseMounts(raw)
+        // The person's list wins, but the phone's storage follows the grant:
+        // a list saved before the grant existed must not hide it.
+        val mounts = if (raw.isNullOrEmpty()) defaultMounts(phoneStorage) else parseMounts(raw).let { saved ->
+            if (!phoneStorage) saved
+            else saved.map { if (it.target == "/sdcard" || it.target == "/storage") it.copy(enabled = true) else it }
+        }
         val lines = mutableListOf("set -e")
         for (mount in mounts) {
             if (!mount.enabled) continue
             val target = "${ROOT}${mount.target}"
             val readOnly = mount.access != "readWrite"
+            // The mount point must exist: the rootfs has no /sdcard or /storage.
+            lines += "mkdir -p $target 2>/dev/null || true"
             lines += when (mount.source) {
                 "proc" -> "mount -t proc proc $target 2>/dev/null || true"
                 "sysfs" -> "mount -t sysfs -o ro,nosuid,nodev sysfs $target 2>/dev/null || true"
@@ -120,7 +127,9 @@ object ChrootRuntime {
     }
 
     /** One mount from the prefs JSON. */
-    data class Mount(val source: String, val target: String, val enabled: Boolean, val access: String)
+    data class Mount(val source: String, val target: String, val enabled: Boolean, val access: String) {
+        fun copy(enabled: Boolean = this.enabled) = Mount(source, target, enabled, access)
+    }
 
     /** Reads the person's mount list; the built-in default when there is none. */
     fun parseMounts(raw: String?): List<Mount> {
@@ -176,7 +185,7 @@ object ChrootRuntime {
     fun setPhoneStorageMounted(enabled: Boolean): Boolean {
         val su = suBinary() ?: return false
         val command = if (enabled) {
-            "mkdir -p '$ROOT/sdcard' '$ROOT/storage'; " +
+            "mkdir -p '$ROOT/sdcard' '$ROOT/storage' 2>/dev/null || true; " +
                 "mount --bind /sdcard '$ROOT/sdcard' 2>/dev/null || true; " +
                 "mount --bind /storage '$ROOT/storage' 2>/dev/null || true; true"
         } else {
