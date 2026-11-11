@@ -167,7 +167,8 @@ class DshProcess(
         scriptFile.writeText(script)
         scriptFile.setExecutable(true)
 
-        val builder = ProcessBuilder(ChrootRuntime.launchCommand(context)).directory(context.filesDir)
+        val phoneStorageMount = binds.any { it == "/storage" || it.endsWith(":/sdcard") }
+        val builder = ProcessBuilder(ChrootRuntime.launchCommand(context, phoneStorageMount)).directory(context.filesDir)
         val env = builder.environment()
         env.clear()
         env["PATH"] = "/system/bin:/system/xbin"

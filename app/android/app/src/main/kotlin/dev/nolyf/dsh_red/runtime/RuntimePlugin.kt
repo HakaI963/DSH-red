@@ -183,6 +183,10 @@ class RuntimePlugin :
             }
             "storageStatus" -> result.success(PhoneStorage.status(appContext))
             "requestStorage" -> requestStorage(result)
+            "mountPhoneStorage" -> {
+                val enabled = call.argument<Boolean>("enabled") ?: false
+                result.success(ChrootRuntime.setPhoneStorageMounted(enabled))
+            }
             "openAllFilesAccess" -> {
                 val intent = PhoneStorage.allFilesAccessIntent(appContext)
                 if (intent != null) runCatching { appContext.startActivity(intent) }

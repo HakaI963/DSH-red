@@ -397,7 +397,7 @@
   "executionModeChroot": "Chroot (root)",
   "executionModeChrootNote": "The engine runs in a chroot on this phone’s own filesystem: the bundled Linux userland, your phone’s storage mounted into it, and root (Magisk) starting it. No PRoot, no translation layer — much faster.",
   "chrootMountsTitle": "Mounts",
-  "chrootMountsHint": "What the engine sees of your phone. Changes apply when the engine starts next.",
+  "chrootMountsHint": "What the engine sees of your phone. Changes apply when the engine starts next. \"Ask each time\" mounts it read-only until you allow it.",
   "chrootMountsAdd": "Add a mount",
   "chrootMountsReadOnly": "Read-only",
   "chrootMountsReadWrite": "Read & write",

@@ -5,6 +5,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../l10n/l10n.dart';
 import '../performance/performance_state.dart';
+import '../runtime/runtime_bridge.dart';
+import 'chroot_mounts.dart';
 import 'provider_keys.dart';
 import 'read_list_epoch.dart';
 
@@ -217,6 +219,10 @@ class SettingsController extends Notifier<AppSettings> {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool(_phoneStorageKey, value);
     state = state.copyWith(phoneStorage: value);
+    // The engine runs in a chroot: its mounts are fixed at launch, so the
+    // phone's storage is mounted (or taken away) while it runs.
+    await ref.read(runtimeBridgeProvider).mountPhoneStorage(value);
+    await ref.read(chrootMountsProvider.notifier).setStorageEnabled(value);
   }
 
   static double _knownScale(double? v) => chatTextScales.any((s) => s.$1 == v) ? v! : 1.0;

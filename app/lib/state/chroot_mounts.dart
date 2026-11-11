@@ -88,8 +88,22 @@ const chrootMountsPrefKey = 'chroot_mounts';
 
 /// The mounts the chroot starts with.
 List<ChrootMount> defaultChrootMounts() => const [
-  ChrootMount(id: 'sdcard', label: 'Phone storage', source: '/sdcard', target: '/sdcard'),
-  ChrootMount(id: 'storage', label: 'Shared storage', source: '/storage', target: '/storage'),
+  // The phone's storage is mounted when the person grants access to it
+  // (Settings › Capabilities › Phone files), not by default.
+  ChrootMount(
+    id: 'sdcard',
+    label: 'Phone storage',
+    source: '/sdcard',
+    target: '/sdcard',
+    enabled: false,
+  ),
+  ChrootMount(
+    id: 'storage',
+    label: 'Shared storage',
+    source: '/storage',
+    target: '/storage',
+    enabled: false,
+  ),
   ChrootMount(id: 'data', label: 'App and system data', source: '/data', target: '/data', access: MountAccess.readWrite),
   ChrootMount(id: 'system', label: 'Android system', source: '/system', target: '/system'),
   ChrootMount(id: 'apex', label: 'Android apex', source: '/apex', target: '/apex'),
@@ -131,6 +145,15 @@ class ChrootMountsController extends Notifier<List<ChrootMount>> {
   Future<void> addCustom({required String label, required String source, required String target}) async {
     final id = 'custom-${DateTime.now().microsecondsSinceEpoch}';
     await _save([...state, ChrootMount(id: id, label: label, source: source, target: target)]);
+  }
+
+  /// The phone's storage follows the person's grant.
+  Future<void> setStorageEnabled(bool enabled) async {
+    final next = [
+      for (final m in state)
+        if (m.id == 'sdcard' || m.id == 'storage') m.copyWith(enabled: enabled) else m,
+    ];
+    await _save(next);
   }
 
   Future<void> remove(String id) async {

@@ -91,10 +91,12 @@ object ChrootRuntime {
      * whatever they added. Off mounts are left out; "ask each time" mounts go
      * in read-only until the person allows them.
      */
-    fun mountScript(context: android.content.Context): String {
+    fun mountScript(context: android.content.Context, phoneStorage: Boolean): String {
         val prefs = context.getSharedPreferences("FlutterSharedPreferences", android.content.Context.MODE_PRIVATE)
         val raw = prefs.getString("flutter.chroot_mounts", null)
-        val mounts = parseMounts(raw)
+        // Without a saved list the phone's storage is mounted only when the
+        // person granted access to it (as before, under PRoot).
+        val mounts = if (raw.isNullOrEmpty()) defaultMounts(phoneStorage) else parseMounts(raw)
         val lines = mutableListOf("set -e")
         for (mount in mounts) {
             if (!mount.enabled) continue
@@ -122,7 +124,7 @@ object ChrootRuntime {
 
     /** Reads the person's mount list; the built-in default when there is none. */
     fun parseMounts(raw: String?): List<Mount> {
-        if (raw.isNullOrEmpty()) return defaultMounts()
+        if (raw.isNullOrEmpty()) return defaultMounts(false)
         return try {
             val array = org.json.JSONArray(raw)
             val out = mutableListOf<Mount>()
@@ -135,16 +137,16 @@ object ChrootRuntime {
                     access = item.optString("access", "readOnly"),
                 )
             }
-            if (out.isEmpty()) defaultMounts() else out
+            if (out.isEmpty()) defaultMounts(false) else out
         } catch (_: Exception) {
-            defaultMounts()
+            defaultMounts(false)
         }
     }
 
     /** The mounts the chroot starts with (the Dart side's defaults). */
-    fun defaultMounts(): List<Mount> = listOf(
-        Mount("/sdcard", "/sdcard", true, "readOnly"),
-        Mount("/storage", "/storage", true, "readOnly"),
+    fun defaultMounts(phoneStorage: Boolean): List<Mount> = listOf(
+        Mount("/sdcard", "/sdcard", phoneStorage, "readOnly"),
+        Mount("/storage", "/storage", phoneStorage, "readOnly"),
         Mount("/data", "/data", true, "readWrite"),
         Mount("/system", "/system", true, "readOnly"),
         Mount("/apex", "/apex", true, "readOnly"),
@@ -161,10 +163,26 @@ object ChrootRuntime {
      * The command that starts the engine inside the chroot. The mounts are
      * part of it, so the phone is asked for root once per start.
      */
-    fun launchCommand(context: android.content.Context): List<String> {
+    fun launchCommand(context: android.content.Context, phoneStorage: Boolean): List<String> {
         val su = suBinary() ?: throw IllegalStateException("no root on this phone: the engine needs a rooted device (Magisk) to run in a chroot")
         val script = "exec chroot '$ROOT' /bin/sh '$LAUNCH_SCRIPT'"
-        return listOf(su, "-c", mountScript(context) + script)
+        return listOf(su, "-c", mountScript(context, phoneStorage) + script)
+    }
+
+    /**
+     * Mounts or unmounts the phone's shared storage in the running chroot: the
+     * engine asks for it while it runs, and the mount list is fixed at launch.
+     */
+    fun setPhoneStorageMounted(enabled: Boolean): Boolean {
+        val su = suBinary() ?: return false
+        val command = if (enabled) {
+            "mkdir -p '$ROOT/sdcard' '$ROOT/storage'; " +
+                "mount --bind /sdcard '$ROOT/sdcard' 2>/dev/null || true; " +
+                "mount --bind /storage '$ROOT/storage' 2>/dev/null || true; true"
+        } else {
+            "umount '$ROOT/sdcard' 2>/dev/null || true; umount '$ROOT/storage' 2>/dev/null || true; true"
+        }
+        return runCatching { runRootCommand(su, command, 60_000) }.isSuccess
     }
 
     /** Single-quotes [value] for the shell. */

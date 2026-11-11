@@ -627,6 +627,11 @@ class RuntimeBridge {
       StorageAccess.fromMap(await _methods.invokeMapMethod<Object?, Object?>('storageStatus') ?? const {});
 
   /// Shows the system storage permission prompt; resolves with the resulting access.
+  /// Mounts or unmounts the phone's shared storage in the running chroot: the
+  /// engine asks for it while it runs (the mount list is fixed at launch).
+  Future<bool> mountPhoneStorage(bool enabled) async =>
+      await _methods.invokeMethod<bool>('mountPhoneStorage', {'enabled': enabled}) ?? false;
+
   Future<StorageAccess> requestStorage() async =>
       StorageAccess.fromMap(await _methods.invokeMapMethod<Object?, Object?>('requestStorage') ?? const {});
 
