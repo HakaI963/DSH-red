@@ -464,7 +464,6 @@ class RuntimeController private constructor(private val app: Context) : DshProce
                         "this phone has no root: the engine runs in a chroot and needs Magisk (or a rooted ROM)"
                     )
                 }
-                ChrootRuntime.mount { line -> log(line, "system") }
                 noteDns(GuestSetup.writeResolvConf(app, installer.chrootRoot), DnsConfigSource.START)
                 val storage = pendingPhoneStorage && PhoneStorage.isGranted(app) && PhoneStorage.binds().isNotEmpty()
                 PhoneStorage.syncShortcut(installer.chrootRoot, storage)

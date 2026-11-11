@@ -284,10 +284,15 @@ class DshProcess(
         stopper = thread(name = "dsh-stop", isDaemon = true) {
             try {
                 val node = if (p.isAlive) guestRecord() else null
-                val proot = if (direct) null else node?.let { child -> processSnapshot().records.firstOrNull { it.pid == child.parent && it.proot } }
-                if (node != null) signalOwned(node, OsConstants.SIGTERM)
-                else if (direct && p.isAlive) p.destroy() // loader/preload may fail before writing its pid file
-                if (!waitExit(p, 5000) && proot != null) signalOwned(proot, OsConstants.SIGQUIT)
+                val pid = guestPid()
+                if (pid != null) signalEngine(pid, OsConstants.SIGTERM)
+                else if (node != null) signalOwned(node, OsConstants.SIGTERM)
+                else if (p.isAlive) p.destroy() // the engine may fail before writing its pid file
+                if (!waitExit(p, 5000)) {
+                    // Still running: end it as root (the engine runs as root in the chroot).
+                    guestPid()?.let { signalEngine(it, OsConstants.SIGKILL) }
+                    p.destroyForcibly()
+                }
                 waitExit(p, 2000)
             } finally {
                 try {
@@ -300,6 +305,29 @@ class DshProcess(
                 }
             }
         }
+    }
+
+
+    /** The engine's pid, from the chroot's own pid file (always visible). */
+    private fun guestPid(): Int? =
+        (File(rootfs, "root/.dsh/dsh-app/dsh-web.pid").takeIf { it.isFile }?.readText()
+            ?: File(rootfs, "tmp/dsh-web.pid").takeIf { it.isFile }?.readText())
+            ?.trim()?.toIntOrNull()
+
+    /**
+     * Signals the engine. It runs as root inside the chroot, so the app cannot
+     * signal it directly: the signal goes through root when the direct one is
+     * refused.
+     */
+    private fun signalEngine(pid: Int, signal: Int) {
+        if (runCatching { Os.kill(pid, signal) }.isSuccess) return
+        val su = ChrootRuntime.suBinary() ?: return
+        val name = when (signal) {
+            OsConstants.SIGKILL -> "KILL"
+            OsConstants.SIGQUIT -> "QUIT"
+            else -> "TERM"
+        }
+        runCatching { runRootCommand(su, "kill -$name $pid 2>/dev/null || true", 20_000) }
     }
 
     private fun waitExit(p: Process, millis: Long): Boolean {

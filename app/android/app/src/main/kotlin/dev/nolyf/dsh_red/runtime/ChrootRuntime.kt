@@ -113,10 +113,14 @@ object ChrootRuntime {
         if (out.isNotBlank()) onLog("[dsh-app] chroot: $out")
     }
 
-    /** The command that starts the engine inside the chroot. */
+    /**
+     * The command that starts the engine inside the chroot. The mounts are
+     * part of it, so the phone is asked for root once per start.
+     */
     fun launchCommand(): List<String> {
         val su = suBinary() ?: throw IllegalStateException("no root on this phone: the engine needs a rooted device (Magisk) to run in a chroot")
-        return listOf(su, "-c", "exec chroot '$ROOT' /bin/sh '$LAUNCH_SCRIPT'")
+        val script = "exec chroot '$ROOT' /bin/sh '$LAUNCH_SCRIPT'"
+        return listOf(su, "-c", mountScript() + script)
     }
 
     /** Single-quotes [value] for the shell. */
@@ -149,6 +153,8 @@ object ChrootRuntime {
                 }
             }
         }
-        return "#!/bin/sh\nexec " + parts.joinToString(" ") + "\n"
+        // The pid file in the chroot's own home is always visible to the app;
+        // /tmp may be a tmpfs the app cannot see.
+        return "#!/bin/sh\necho \$\$ > /root/.dsh/dsh-app/dsh-web.pid\nexec " + parts.joinToString(" ") + "\n"
     }
 }
