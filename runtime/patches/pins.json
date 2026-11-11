@@ -170,6 +170,18 @@
         }
       }
     },
+    "web-portrait-layout.diff": {
+      "0.2.2-rc.1": {
+        "node_modules/@deepseek-ai/dsh-client-ui-chat/lib/client.js": {
+          "after": "08d127c8fbbf04f5139e27714893f5e047f81b335f8520ffb9d909af86e68bb8",
+          "before": "b7e645f2461231e8ece31381f026db2df72d058e425eaef19265f215c823d84e"
+        },
+        "node_modules/@deepseek-ai/dsh-client-ui-directory-picker-browse/lib/client.js": {
+          "after": "1ba5d2e248e69cd4bb907b55ea2aa0b4738f8f3012a8afe857492de8b61f6214",
+          "before": "dbb02027bc8d836cd1a88dbb90d0b7a53124423142c1b7de28866ab2d08dc2fe"
+        }
+      }
+    },
     "z-plugin-install-log-utf8.diff": {
       "0.2.1-rc.4": {
         "node_modules/@deepseek-ai/dsh-plugin-manager/lib/index.js": {
