@@ -11,6 +11,7 @@ import '../../state/engine_control.dart';
 import '../../state/safe_mode_state.dart';
 import '../../state/settings_state.dart';
 import '../common/app_dialog.dart';
+import '../engine_settings/chroot_mounts_page.dart';
 import '../common/page_hero.dart';
 import '../onboarding/local_install.dart';
 import '../safe_mode/engine_failure_card.dart';
