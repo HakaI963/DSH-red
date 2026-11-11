@@ -145,8 +145,8 @@ object ChrootRuntime {
 
     /** The mounts the chroot starts with (the Dart side's defaults). */
     fun defaultMounts(phoneStorage: Boolean): List<Mount> = listOf(
-        Mount("/sdcard", "/sdcard", phoneStorage, "readOnly"),
-        Mount("/storage", "/storage", phoneStorage, "readOnly"),
+        Mount("/sdcard", "/sdcard", phoneStorage, "readWrite"),
+        Mount("/storage", "/storage", phoneStorage, "readWrite"),
         Mount("/data", "/data", true, "readWrite"),
         Mount("/system", "/system", true, "readOnly"),
         Mount("/apex", "/apex", true, "readOnly"),

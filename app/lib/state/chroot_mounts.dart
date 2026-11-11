@@ -96,6 +96,7 @@ List<ChrootMount> defaultChrootMounts() => const [
     source: '/sdcard',
     target: '/sdcard',
     enabled: false,
+    access: MountAccess.readWrite,
   ),
   ChrootMount(
     id: 'storage',
@@ -103,6 +104,7 @@ List<ChrootMount> defaultChrootMounts() => const [
     source: '/storage',
     target: '/storage',
     enabled: false,
+    access: MountAccess.readWrite,
   ),
   ChrootMount(id: 'data', label: 'App and system data', source: '/data', target: '/data', access: MountAccess.readWrite),
   ChrootMount(id: 'system', label: 'Android system', source: '/system', target: '/system'),

@@ -217,6 +217,17 @@ class SettingsController extends Notifier<AppSettings> {
 
   Future<void> setPhoneStorage(bool value) async {
     final prefs = await SharedPreferences.getInstance();
+    if (value) {
+      // The engine sees the phone's storage only with Android's grant: ask for
+      // it now (the toggle can be on while the grant is missing — after an
+      // update, for instance).
+      final bridge = ref.read(runtimeBridgeProvider);
+      final access = await bridge.requestStorage();
+      if (!access.granted && access.permission && !access.legacy) {
+        await bridge.openAllFilesAccess();
+        return;
+      }
+    }
     await prefs.setBool(_phoneStorageKey, value);
     state = state.copyWith(phoneStorage: value);
     // The engine runs in a chroot: its mounts are fixed at launch, so the

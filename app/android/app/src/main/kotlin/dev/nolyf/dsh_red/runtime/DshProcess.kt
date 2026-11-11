@@ -107,7 +107,9 @@ class DshProcess(
         direct = false
         check(cleanup.complete || !cleanup.ownedRemaining) { "runtime cleanup incomplete; stop the engine and retry" }
         if (!cleanup.complete) listener.onLog("[dsh-app] starting the engine with incomplete process observation", "system")
-        val pidFile = File(rootfs, "tmp/dsh-web.pid")
+        // In the chroot the pid file lives in the tree the app owns: /tmp is a
+        // root-owned tmpfs, and the app cannot delete a file it does not own.
+        val pidFile = File(rootfs, "root/.dsh/dsh-app/dsh-web.pid")
         pidFile.delete() // also removes a stale/dangling symlink; never reuse a previous run's PID
         check(!java.nio.file.Files.exists(pidFile.toPath(), java.nio.file.LinkOption.NOFOLLOW_LINKS)) { "cannot remove stale runtime pid file" }
         port = pickPort()
@@ -344,7 +346,9 @@ class DshProcess(
 
     private fun captureGuestRecord(): RuntimeProcessRecord? {
         return try {
-            val pid = File(rootfs, "tmp/dsh-web.pid").takeIf { it.isFile }?.readText()?.trim()?.toIntOrNull() ?: return null
+            val pid = (File(rootfs, "root/.dsh/dsh-app/dsh-web.pid").takeIf { it.isFile }?.readText()
+                ?: File(rootfs, "tmp/dsh-web.pid").takeIf { it.isFile }?.readText())
+                ?.trim()?.toIntOrNull() ?: return null
             val records = processSnapshot().records
             val owned = RuntimeProcessOwnership.owned(records, setOf(rootfs.absolutePath, rootfs.canonicalPath), AndroidProcess.myPid())
             owned.forEach { cleanupKnown[it.pid] = it.started }
