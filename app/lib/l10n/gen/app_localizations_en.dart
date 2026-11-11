@@ -7083,7 +7083,8 @@ class L10nEn extends L10n {
   String get chrootMountsTitle => 'Mounts';
 
   @override
-  String get chrootMountsHint => 'What the engine sees of your phone. Changes apply when the engine starts next.';
+  String get chrootMountsHint =>
+      'What the engine sees of your phone. Changes apply when the engine starts next. \"Ask each time\" mounts it read-only until you allow it.';
 
   @override
   String get chrootMountsAdd => 'Add a mount';

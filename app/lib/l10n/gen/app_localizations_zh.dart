@@ -6717,7 +6717,7 @@ class L10nZh extends L10n {
   String get chrootMountsTitle => '挂载';
 
   @override
-  String get chrootMountsHint => '引擎能看到手机的哪些内容，下次启动引擎时生效。';
+  String get chrootMountsHint => '引擎能看到手机的哪些内容，下次启动引擎时生效。\"每次询问\"会先以只读挂载，得到允许后才可写。';
 
   @override
   String get chrootMountsAdd => '添加挂载';

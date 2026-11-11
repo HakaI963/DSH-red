@@ -12431,7 +12431,7 @@ abstract class L10n {
   /// No description provided for @chrootMountsHint.
   ///
   /// In zh, this message translates to:
-  /// **'引擎能看到手机的哪些内容，下次启动引擎时生效。'**
+  /// **'引擎能看到手机的哪些内容，下次启动引擎时生效。\"每次询问\"会先以只读挂载，得到允许后才可写。'**
   String get chrootMountsHint;
 
   /// No description provided for @chrootMountsAdd.
