@@ -107,6 +107,15 @@ class DshProcess(
         direct = false
         check(cleanup.complete || !cleanup.ownedRemaining) { "runtime cleanup incomplete; stop the engine and retry" }
         if (!cleanup.complete) listener.onLog("[dsh-app] starting the engine with incomplete process observation", "system")
+        // An engine from an earlier run is still there when the app was killed
+        // or the phone rebooted the service. It runs as root, so the app can
+        // neither see nor stop it, and it keeps the write lock of every chat
+        // it had open: a second engine then finds those chats "in use
+        // elsewhere". Root ends it before this launch.
+        val leftovers = ChrootRuntime.killLeftoverEngines()
+        if (leftovers > 0) {
+            listener.onLog("[dsh-app] stopped $leftovers engine process(es) left over from an earlier run", "system")
+        }
         // In the chroot the pid file lives in the tree the app owns: /tmp is a
         // root-owned tmpfs, and the app cannot delete a file it does not own.
         val pidFile = File(rootfs, "root/.dsh/dsh-app/dsh-web.pid")
@@ -362,11 +371,13 @@ class DshProcess(
         }
     }
 
-    private fun signalOwned(record: RuntimeProcessRecord, value: Int) = runCatching {
+    private fun signalOwned(record: RuntimeProcessRecord, value: Int) {
         val current = RuntimeProcessOwnership.stat(File("/proc/${record.pid}/stat").readText())
-        if (current?.second == record.started && Os.stat("/proc/${record.pid}").st_uid == AndroidProcess.myUid()) {
-            Os.kill(record.pid, value)
-        }
+        // The pid was reused by another process: never signal it.
+        if (current?.second != record.started) return
+        // The engine runs as root inside the chroot, so the app cannot signal
+        // it directly; the signal goes through root instead.
+        signalEngine(record.pid, value)
     }
 
 

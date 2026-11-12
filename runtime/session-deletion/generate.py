@@ -73,10 +73,10 @@ def transforms():
 \t\tif (this.dshGoDeleting) throw new Error("session is being deleted");
 \t\tthis.loopCtx.get("sessionPersistence")?.dshGoDeletion?.assertAdmit(this.id);''')
     add('dsh-agent-loop', '\tasync initializeAgent(ownerCtx, options) {', '''\tdshGoDeletionVersion = 1;
-\tasync dshGoDisposeForDeletion(id) {
+\tasync dshGoDisposeForDeletion(id, options) {
 \t\tconst agent = this.runtime.ctx.agents.get(id);
 \t\tif (agent === void 0) return;
-\t\tif (agent.session.header.origin === "subagent" || (agent.session.header.delegationDepth ?? 0) > 0)
+\t\tif (options?.allowSubagent !== true && (agent.session.header.origin === "subagent" || (agent.session.header.delegationDepth ?? 0) > 0))
 \t\t\tthrow Object.assign(new Error("related agent"), { code: "session-related" });
 \t\tif (agent.phase?.kind !== "idle")
 \t\t\tthrow Object.assign(new Error("active agent"), { code: "session-active" });

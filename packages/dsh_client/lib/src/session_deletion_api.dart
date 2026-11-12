@@ -34,7 +34,15 @@ extension SessionDeletionApi on DshClient {
   /// Deletes exactly one confirmed session. Never retries or follows redirects:
   /// after a lost response the outcome is unknown, not safe to replay blindly.
   /// The caller must separately hold and recheck its Host/generation authority.
-  Future<void> deleteSessionPermanently(String sessionId, {Duration timeout = const Duration(seconds: 30)}) async {
+  ///
+  /// With [cascade] the Host removes the chat together with the subagent work
+  /// it spawned. It is the person's explicit answer to a refusal, never a
+  /// default.
+  Future<void> deleteSessionPermanently(
+    String sessionId, {
+    bool cascade = false,
+    Duration timeout = const Duration(seconds: 30),
+  }) async {
     if (sessionId.isEmpty || sessionId.length > 256 || sessionId.contains(RegExp(r'[\x00-\x1f\x7f]'))) {
       throw ArgumentError.value(sessionId, 'sessionId');
     }
@@ -44,7 +52,7 @@ extension SessionDeletionApi on DshClient {
     }
     final response = await transport.connection.postBytes(
       sessionDeletionPath,
-      utf8.encode(jsonEncode({'sessionId': sessionId})),
+      utf8.encode(jsonEncode({'sessionId': sessionId, if (cascade) 'cascade': true})),
       contentType: 'application/json',
       followRedirects: false,
       maxResponseBytes: _maxReplyBytes,

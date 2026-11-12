@@ -131,6 +131,11 @@ export function createDeletionSeam(storage, { acquire, parseGeneration, notFound
       return mutation(async () => { assertPersist(header.id, header); assertParent(header); return operation(); });
     },
     async delete(id, hooks) {
+      // A cascade delete removes a chat together with the subagent work it
+      // spawned. The tree members are known to the caller, so the related-work
+      // guard does not apply to them.
+      const cascade = hooks.cascade ?? null;
+      const inCascade = cascade !== null && cascade.has(id);
       if (pending.has(id)) throw failure('writer-held');
       pending.add(id); // Synchronous fence precedes the first await and every prompt admission.
       const writer = storage.tracker.writers.get(id);
@@ -145,7 +150,7 @@ export function createDeletionSeam(storage, { acquire, parseGeneration, notFound
           if (!retry) {
             const live = storage.ctx.get('sessions')?.list() ?? [];
             const corpus = [...await storage.list(), ...live.map((session) => ({ header: session.header }))];
-            if (corpus.some(({ header }) => header.id === id && (header.origin === 'subagent' || (header.delegationDepth ?? 0) > 0)
+            if (!inCascade && corpus.some(({ header }) => header.id === id && (header.origin === 'subagent' || (header.delegationDepth ?? 0) > 0)
               || header.origin === 'subagent' && header.parentSession === id)) throw failure('session-related');
             await hooks.prepare();
           }
@@ -169,12 +174,12 @@ export function createDeletionSeam(storage, { acquire, parseGeneration, notFound
             // observation-only; no old generation is ever resumed or published by delete.
             const metadata = await storage.readGenerationHeader(await storage.findLog(id), id);
             if (metadata === undefined) throw failure('failed');
-            if (metadata.header.origin === 'subagent' || (metadata.header.delegationDepth ?? 0) > 0) throw failure('session-related');
+            if (!inCascade && (metadata.header.origin === 'subagent' || (metadata.header.delegationDepth ?? 0) > 0)) throw failure('session-related');
             const corpus = await storage.list();
-            if (corpus.some(({ header }) => header.origin === 'subagent' && header.parentSession === id)) throw failure('session-related');
+            if (!inCascade && corpus.some(({ header }) => header.origin === 'subagent' && header.parentSession === id)) throw failure('session-related');
             if (await hooks.inspectTasks()) throw failure('session-related');
             const stored = await storage.requireStoredLog(id);
-            if (stored.events.some((event) => event.type === 'team/task' || event.type === 'subagent/catalog')) throw failure('session-related');
+            if (!inCascade && stored.events.some((event) => event.type === 'team/task' || event.type === 'subagent/catalog')) throw failure('session-related');
             const goal = stored.events.filter((event) => event.type === 'goal/change').at(-1)?.data?.goal;
             if (goal?.phase === 'active') throw failure('session-active');
           }
@@ -196,6 +201,46 @@ export function createDeletionSeam(storage, { acquire, parseGeneration, notFound
           finally { if (claimed) storage.tracker.releaseClaim(id); pending.delete(id); }
         }
       }
+    },
+    /**
+     * Removes a chat together with the subagent sessions it spawned.
+     *
+     * The related-work guard protects a child session from a deletion that
+     * only names its parent. The person asked for the whole chat, so the tree
+     * goes with it: the children are removed first, the parent last. A child
+     * that cannot be removed stops the whole tree, and nothing is reported as
+     * deleted that was not.
+     */
+    async deleteTree(id, hooks) {
+      const live = storage.ctx.get('sessions')?.list() ?? [];
+      const corpus = [...await storage.list(), ...live.map((session) => ({ header: session.header }))];
+      const children = new Map();
+      for (const { header } of corpus) {
+        const parent = header.parentSession;
+        if (header.origin !== 'subagent' || typeof parent !== 'string' || parent.length === 0) continue;
+        const list = children.get(parent) ?? [];
+        list.push(header.id);
+        children.set(parent, list);
+      }
+      const depth = new Map([[id, 0]]);
+      const queue = [id];
+      while (queue.length > 0) {
+        const current = queue.shift();
+        for (const child of children.get(current) ?? []) {
+          if (depth.has(child)) continue;
+          depth.set(child, depth.get(current) + 1);
+          queue.push(child);
+        }
+      }
+      const tree = new Set(depth.keys());
+      // Deepest first: a parent is only removed once its children are gone.
+      const order = [...depth.entries()].sort((a, b) => b[1] - a[1]).map(([sessionId]) => sessionId);
+      const deleted = [];
+      for (const target of order) {
+        await this.delete(target, { ...hooks, cascade: tree });
+        deleted.push(target);
+      }
+      return { deleted };
     },
   };
 }

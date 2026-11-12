@@ -119,7 +119,15 @@ object GuestSetup {
                 AGENTS_MD.replace("Ubuntu 24.04 environment on an Android phone (proot, no Root needed)", "Ubuntu 24.04 environment started directly by the engine (bash/git/python/apt tools still run through proot)")
                     .replace("`/root/workspace`", "`${rootfs.canonicalPath}/root/workspace`") +
                     "\n- File tools, the session directory, @ references, AGENTS and skills all use the same full absolute path; that path is visible under the same name inside the shell too. The old `/root` paths still work for file tools. Shell output is not rewritten; do not strip a path's prefix.\n"
-            } else AGENTS_MD
+            } else {
+                // l10n:keep agent prompt
+                AGENTS_MD.replace(
+                    "Ubuntu 24.04 environment on an Android phone (proot, no Root needed)",
+                    "Ubuntu 24.04 environment on an Android phone: a real chroot on the phone's own filesystem, started as root (no PRoot, no ptrace)"
+                ) +
+                    // l10n:keep agent prompt
+                    "\n- Your temporary files belong in `/tmp` (a writable tmpfs inside the chroot); put anything the user should keep in `/root/workspace`.\n"
+            }
             val text = environment.replace(
                 "{STORAGE_LINE}",
                 if (phoneStorage) {

@@ -23,6 +23,13 @@ object ChrootRuntime {
     /** Where the app's own copy of the rootfs waits until it is copied into place. */
     const val STAGING = "/data/local/DSH-red/staging"
 
+    /**
+     * A tmpfs is created with mode 0755, so every process that is not root
+     * was denied its own temp folder inside the chroot (the tools and the
+     * spill files live there). A normal Linux /tmp is 1777.
+     */
+    private const val TMPFS_MODE = "mode=1777"
+
     private val suCandidates = listOf(
         "/system/xbin/su",
         "/system/bin/su",
@@ -81,11 +88,6 @@ object ChrootRuntime {
     }
 
     /**
-     * The mounts the chroot needs: the phone's own kernels interfaces, its
-     * userspace (/data, /storage, /sdcard) and a couple of small tmpfs.
-     * Everything that is already mounted is left alone, so a restart is cheap.
-     */
-    /**
      * The mounts the chroot needs, from the person's list (prefs): the phone's
      * own kernels interfaces, its userspace (/data, /storage, /sdcard) and
      * whatever they added. Off mounts are left out; "ask each time" mounts go
@@ -114,7 +116,7 @@ object ChrootRuntime {
                 "sysfs" -> "mount -t sysfs -o ro,nosuid,nodev sysfs $target 2>/dev/null || true"
                 "tmpfs" -> {
                     val size = if (mount.target.endsWith("shm")) "64m" else "512m"
-                    "mount -t tmpfs -o size=$size tmpfs $target 2>/dev/null || true"
+                    "mount -t tmpfs -o size=$size,$TMPFS_MODE tmpfs $target 2>/dev/null || true"
                 }
                 else -> {
                     val ro = if (readOnly) "-o ro" else ""
@@ -126,6 +128,10 @@ object ChrootRuntime {
             }
         }
         lines += "mkdir -p ${ROOT}/root/.dsh/dsh-app 2>/dev/null || true"
+        // The engine runs as root, so the files it leaves in the app's own
+        // folder (the log, the pid file) belong to root and the app could not
+        // replace them. The app owns this folder.
+        lines += "chown -R ${android.os.Process.myUid()}:${android.os.Process.myUid()} ${ROOT}/root/.dsh/dsh-app 2>/dev/null || true"
         return lines.joinToString("\n") + "\n"
     }
 
@@ -201,6 +207,42 @@ object ChrootRuntime {
 
     /** Single-quotes [value] for the shell. */
     fun shellQuote(value: String): String = "'" + value.replace("'", "'\\''") + "'"
+
+    /**
+     * Ends every engine left over from an earlier run.
+     *
+     * In the chroot the engine runs as root: the app cannot signal it and
+     * cannot even read its /proc entries, so a leftover survives every cleanup
+     * the app can do on its own. It keeps the write lock of the chats it had
+     * open ("this chat is in use elsewhere"), and a second engine starts next
+     * to it. Only a process that runs from this chroot is touched.
+     *
+     * @return how many processes were asked to stop.
+     */
+    fun killLeftoverEngines(): Int {
+        val su = suBinary() ?: return 0
+        val script = """
+            ended=0
+            for p in /proc/[0-9]*; do
+              pid=${'$'}{p#/proc/}
+              exe=`readlink "${'$'}p/exe" 2>/dev/null` || continue
+              case "${'$'}exe" in
+                "$ROOT"/*) kill -TERM "${'$'}pid" 2>/dev/null && ended=${'$'}((ended+1)) ;;
+              esac
+            done
+            sleep 1
+            for p in /proc/[0-9]*; do
+              pid=${'$'}{p#/proc/}
+              exe=`readlink "${'$'}p/exe" 2>/dev/null` || continue
+              case "${'$'}exe" in
+                "$ROOT"/*) kill -KILL "${'$'}pid" 2>/dev/null ;;
+              esac
+            done
+            echo "ended ${'$'}ended"
+        """.trimIndent()
+        val out = runCatching { runRootCommand(su, script, 60_000) }.getOrDefault("")
+        return Regex("ended (\\d+)").find(out)?.groupValues?.get(1)?.toIntOrNull() ?: 0
+    }
 
     /**
      * The launch script: the guest command from the runtime manifest with the

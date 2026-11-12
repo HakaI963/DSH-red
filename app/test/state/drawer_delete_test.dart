@@ -40,7 +40,7 @@ class _DeletionBackend implements SessionDeletionBackend {
   }
 
   @override
-  Future<void> delete(DshClient client, String sessionId) async {
+  Future<void> delete(DshClient client, String sessionId, {bool cascade = false}) async {
     calls.add((client: client, id: sessionId));
     if (calls.length == 1 && firstDeleteReply != null) await firstDeleteReply!.future;
     final code = failures[sessionId];

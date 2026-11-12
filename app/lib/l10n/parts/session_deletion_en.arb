@@ -20,5 +20,8 @@
   "shellDeleteInventoryChanged": "The chat list changed. Refresh and select the chats again.",
   "shellDeleteProtocolError": "The deletion result is unconfirmed. Refresh the chat list before taking further action.",
   "shellDeleteNotAttempted": "Not attempted. Check the chat list before trying again.",
-  "shellDeleteFailed": "The host could not confirm deletion. Refresh before retrying."
+  "shellDeleteFailed": "The host could not confirm deletion. Refresh before retrying.",
+  "shellDeleteRelatedTitle": "This chat has subagent work",
+  "shellDeleteRelatedAction": "Delete the chat and its subagent chats",
+  "shellDeleteRelatedExplanation": "The chats this one started are removed with it. Nothing else is touched."
 }

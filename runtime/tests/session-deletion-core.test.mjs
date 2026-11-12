@@ -129,6 +129,33 @@ test('a live agent, a related subagent and reminder rows are refused', async () 
   assert.equal(cleanups, 0);
 });
 
+test('a cascade delete removes the subagent tree with it, children first', async () => {
+  corpus = [{ id: 's1' }, { id: 'kid', origin: 'subagent', parentSession: 's1' }];
+  await mkdir(join(root, 'aa', 'kid'), { recursive: true });
+  await writeFile(join(root, 'aa', 'kid', 'session.jsonl'), '{}\n');
+  files.kid = ['session.jsonl'];
+  // Without the cascade the host protects the child.
+  await assert.rejects(seam.delete('s1', hooks()), (e) => e.code === 'session-related');
+  assert.equal(seam.deleted('s1'), false);
+  const result = await seam.deleteTree('s1', hooks());
+  assert.deepEqual(result.deleted, ['kid', 's1']);
+  assert.equal(seam.deleted('kid'), true);
+  assert.equal(seam.deleted('s1'), true);
+  assert.equal(cleanups, 2);
+});
+
+test('a cascade that cannot remove one child removes nothing', async () => {
+  corpus = [{ id: 's1' }, { id: 'kid', origin: 'subagent', parentSession: 's1' }];
+  await mkdir(join(root, 'aa', 'kid'), { recursive: true });
+  await writeFile(join(root, 'aa', 'kid', 'session.jsonl'), '{}\n');
+  files.kid = ['session.jsonl'];
+  taskRows = true;
+  await assert.rejects(seam.deleteTree('s1', hooks()), (e) => e.code === 'session-related');
+  assert.equal(seam.deleted('s1'), false);
+  assert.equal(seam.deleted('kid'), false);
+  assert.equal(cleanups, 0);
+});
+
 test('a symlinked session directory is refused instead of deleting elsewhere', async () => {
   const outside = await mkdtemp(join(tmpdir(), 'dsh-outside-'));
   try {

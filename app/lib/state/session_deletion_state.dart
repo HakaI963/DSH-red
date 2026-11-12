@@ -16,7 +16,7 @@ import 'sessions_state.dart';
 /// direct phone filesystem access or archive as a substitute for deletion.
 abstract interface class SessionDeletionBackend {
   Future<bool> supported(DshClient client);
-  Future<void> delete(DshClient client, String sessionId);
+  Future<void> delete(DshClient client, String sessionId, {bool cascade});
 }
 
 class _HostSessionDeletion implements SessionDeletionBackend {
@@ -24,7 +24,8 @@ class _HostSessionDeletion implements SessionDeletionBackend {
   @override
   Future<bool> supported(DshClient client) => client.supportsSessionDeletion();
   @override
-  Future<void> delete(DshClient client, String sessionId) => client.deleteSessionPermanently(sessionId);
+  Future<void> delete(DshClient client, String sessionId, {bool cascade = false}) =>
+      client.deleteSessionPermanently(sessionId, cascade: cascade);
 }
 
 final sessionDeletionBackendProvider = Provider<SessionDeletionBackend>((ref) => const _HostSessionDeletion());
@@ -125,7 +126,11 @@ class SessionDeletionController extends Notifier<bool> {
   @override
   bool build() => false;
 
-  Future<SessionDeletionResult> delete(List<String> sessionIds, {required SessionDeletionOwner owner}) async {
+  Future<SessionDeletionResult> delete(
+    List<String> sessionIds, {
+    required SessionDeletionOwner owner,
+    bool cascade = false,
+  }) async {
     final ids = sessionIds.toSet().toList();
     bool owned() => ref.mounted && identical(ref.container, owner.container) && owner.current;
     if (!owned()) return const SessionDeletionResult(retired: true);
@@ -152,7 +157,7 @@ class SessionDeletionController extends Notifier<bool> {
         }
         try {
           if (!owned()) break;
-          await backend.delete(client, id);
+          await backend.delete(client, id, cascade: cascade);
           // A late response belongs to its old Host, never to a new screen.
           if (!owned()) break;
           deleted.add(id);
