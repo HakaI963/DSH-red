@@ -116,6 +116,12 @@ class DshProcess(
         if (leftovers > 0) {
             listener.onLog("[dsh-app] stopped $leftovers engine process(es) left over from an earlier run", "system")
         }
+        // The tree belongs to this app's uid. A reinstall gives the app a new
+        // one, and until the tree is handed over the app cannot write its own
+        // launch script into it.
+        if (ChrootRuntime.ensureTreeOwnership()) {
+            listener.onLog("[dsh-app] the runtime tree belonged to an earlier install; it is this app's again", "system")
+        }
         // In the chroot the pid file lives in the tree the app owns: /tmp is a
         // root-owned tmpfs, and the app cannot delete a file it does not own.
         val pidFile = File(rootfs, "root/.dsh/dsh-app/dsh-web.pid")

@@ -62,6 +62,10 @@ class RuntimeInstaller(
      * whatever cannot and installs anyway.
      */
     fun install(dropKept: Boolean = false, onProgress: (Long, Long) -> Unit) {
+        // A reinstall gives the app a new uid while the tree under
+        // /data/local still belongs to the old one: nothing could be written
+        // into it. Root hands the tree over before the install touches it.
+        ChrootRuntime.ensureTreeOwnership()
         // A reset killed halfway finishes first, so what it keeps is in runtime-keep for the restore.
         settleReset(retiredDir, keepDir, dropKept)
         baseDir.mkdirs()

@@ -23,12 +23,42 @@ object ChrootRuntime {
     /** Where the app's own copy of the rootfs waits until it is copied into place. */
     const val STAGING = "/data/local/DSH-red/staging"
 
+    /** The tree this app owns, with the chroot inside it. */
+    private const val TREE = "/data/local/DSH-red"
+
     /**
      * A tmpfs is created with mode 0755, so every process that is not root
      * was denied its own temp folder inside the chroot (the tools and the
      * spill files live there). A normal Linux /tmp is 1777.
      */
     private const val TMPFS_MODE = "mode=1777"
+
+    /**
+     * Hands the tree to this app's uid when the last install had another one.
+     *
+     * Android gives an app a new uid when it is uninstalled and installed
+     * again. The tree under /data/local keeps the old owner, and the app can
+     * then write nothing into it any more — not even its own launch script.
+     * Root repairs the ownership once per uid change; the marker says which
+     * uid owns the tree now.
+     *
+     * @return true when the tree had to be handed over.
+     */
+    fun ensureTreeOwnership(): Boolean {
+        val su = suBinary() ?: return false
+        val uid = android.os.Process.myUid()
+        val script = """
+            marker='$ROOT/root/.dsh/dsh-app/owner'
+            current=`cat "$marker" 2>/dev/null`
+            if [ "${'$'}current" = "$uid" ]; then echo owned; exit 0; fi
+            chown -R $uid:$uid '$TREE' 2>/dev/null
+            mkdir -p '$ROOT/root/.dsh/dsh-app' 2>/dev/null || true
+            echo "$uid" > "$marker" 2>/dev/null || true
+            echo reowned
+        """.trimIndent()
+        val out = runCatching { runRootCommand(su, script, 600_000) }.getOrDefault("")
+        return out.contains("reowned")
+    }
 
     private val suCandidates = listOf(
         "/system/xbin/su",
