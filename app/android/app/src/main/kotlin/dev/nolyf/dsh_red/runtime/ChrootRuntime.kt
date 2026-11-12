@@ -60,6 +60,19 @@ object ChrootRuntime {
         return out.contains("reowned")
     }
 
+    /**
+     * Hands one path of the tree to this app's uid.
+     *
+     * The fallback for a write that was refused: the folder still belongs to
+     * an earlier install of this app.
+     */
+    fun chownToApp(path: File): Boolean {
+        val su = suBinary() ?: return false
+        val uid = android.os.Process.myUid()
+        val script = "chown -R $uid:$uid '${path.absolutePath}' 2>/dev/null; echo done"
+        return runCatching { runRootCommand(su, script, 120_000) }.isSuccess
+    }
+
     private val suCandidates = listOf(
         "/system/xbin/su",
         "/system/bin/su",

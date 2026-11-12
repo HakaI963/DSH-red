@@ -181,7 +181,14 @@ class DshProcess(
         val script = ChrootRuntime.launchScript(argv.map { expand(it) }, emptyMap(), port)
         val scriptFile = File(rootfs, ChrootRuntime.LAUNCH_SCRIPT.removePrefix("/"))
         scriptFile.parentFile?.mkdirs()
-        scriptFile.writeText(script)
+        try {
+            scriptFile.writeText(script)
+        } catch (error: java.io.IOException) {
+            // The tree still belongs to an earlier install of this app: root
+            // hands this folder over, and the write goes through.
+            ChrootRuntime.chownToApp(scriptFile.parentFile ?: scriptFile)
+            scriptFile.writeText(script)
+        }
         scriptFile.setExecutable(true)
 
         val phoneStorageMount = binds.any { it == "/storage" || it.endsWith(":/sdcard") }
