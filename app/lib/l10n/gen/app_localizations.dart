@@ -29222,6 +29222,24 @@ abstract class L10n {
   /// **'主机无法确认删除结果，请刷新后再决定是否重试。'**
   String get shellDeleteFailed;
 
+  /// No description provided for @shellDeleteRelatedTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'此对话有子代理工作'**
+  String get shellDeleteRelatedTitle;
+
+  /// No description provided for @shellDeleteRelatedAction.
+  ///
+  /// In zh, this message translates to:
+  /// **'删除该对话及其子代理对话'**
+  String get shellDeleteRelatedAction;
+
+  /// No description provided for @shellDeleteRelatedExplanation.
+  ///
+  /// In zh, this message translates to:
+  /// **'由它创建的子代理对话会一并删除，不会影响其他内容。'**
+  String get shellDeleteRelatedExplanation;
+
   /// No description provided for @setupAppearanceTitle.
   ///
   /// In zh, this message translates to:
