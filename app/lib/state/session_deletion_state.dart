@@ -16,7 +16,9 @@ import 'sessions_state.dart';
 /// direct phone filesystem access or archive as a substitute for deletion.
 abstract interface class SessionDeletionBackend {
   Future<bool> supported(DshClient client);
-  Future<void> delete(DshClient client, String sessionId, {bool cascade});
+
+  /// [cascade] removes the chat together with the subagent work it spawned.
+  Future<void> delete(DshClient client, String sessionId, {bool cascade = false});
 }
 
 class _HostSessionDeletion implements SessionDeletionBackend {
