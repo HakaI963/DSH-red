@@ -256,36 +256,36 @@
     },
     {
       "architecture": "arm64",
-      "filename": "pool/main/p/perl/perl_5.38.2-3.2ubuntu0.6_arm64.deb",
+      "filename": "pool/main/p/perl/perl_5.38.2-3.2ubuntu0.7_arm64.deb",
       "installedSize": 674,
       "neededBy": "git",
       "package": "perl",
-      "sha256": "c8997d0e440f8f220981e25af1f63d1ab6a86afba770218a240cd5f385585aee",
-      "size": 231438,
+      "sha256": "4dabac4e1ae4b7a42f501cb447cd19af678687d820c216c5a3c9a7edf3221df7",
+      "size": 231404,
       "upgradesBase": null,
-      "version": "5.38.2-3.2ubuntu0.6"
+      "version": "5.38.2-3.2ubuntu0.7"
     },
     {
       "architecture": "arm64",
-      "filename": "pool/main/p/perl/perl-base_5.38.2-3.2ubuntu0.6_arm64.deb",
+      "filename": "pool/main/p/perl/perl-base_5.38.2-3.2ubuntu0.7_arm64.deb",
       "installedSize": 8128,
       "neededBy": "perl",
       "package": "perl-base",
-      "sha256": "52ff69555911c8ef4350a80b12bbdc823b6c096cb15eb39c540cd84e6c726cc0",
-      "size": 1780386,
+      "sha256": "d47a8ae46f4bc0c81281b613fe6d6a7f334e6491ba1e8b563d35dd8e62442766",
+      "size": 1780284,
       "upgradesBase": "5.38.2-3.2ubuntu0.4",
-      "version": "5.38.2-3.2ubuntu0.6"
+      "version": "5.38.2-3.2ubuntu0.7"
     },
     {
       "architecture": "all",
-      "filename": "pool/main/p/perl/perl-modules-5.38_5.38.2-3.2ubuntu0.6_all.deb",
+      "filename": "pool/main/p/perl/perl-modules-5.38_5.38.2-3.2ubuntu0.7_all.deb",
       "installedSize": 19165,
       "neededBy": "perl",
       "package": "perl-modules-5.38",
-      "sha256": "9c4c90145209d4f85be9255417008e8decb9cd5d189f446fd39ad096e31199cf",
-      "size": 3110182,
+      "sha256": "8d2652aa897458aa2482be38d1d0fb26745e87450ab5b620b33180ab0078190c",
+      "size": 3109958,
       "upgradesBase": null,
-      "version": "5.38.2-3.2ubuntu0.6"
+      "version": "5.38.2-3.2ubuntu0.7"
     },
     {
       "architecture": "all",
