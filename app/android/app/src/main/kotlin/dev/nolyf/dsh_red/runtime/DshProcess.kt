@@ -193,6 +193,9 @@ class DshProcess(
         launchDiagnostics.spawned()
         val out = pump(p.inputStream.bufferedReader(), "stdout")
         val err = pump(p.errorStream.bufferedReader(), "stderr")
+        // The engine's own output lands in a file (the app may be frozen); tail it
+        // for the token and for the log view.
+        tailEngineLog()
         waiter = thread(name = "dsh-wait", isDaemon = true) {
             val code = try { p.waitFor() } catch (_: InterruptedException) { -1 }
             startupSignal.countDown()
@@ -363,6 +366,44 @@ class DshProcess(
         val current = RuntimeProcessOwnership.stat(File("/proc/${record.pid}/stat").readText())
         if (current?.second == record.started && Os.stat("/proc/${record.pid}").st_uid == AndroidProcess.myUid()) {
             Os.kill(record.pid, value)
+        }
+    }
+
+
+    /**
+     * Tails the engine's log file: the token line and the runtime log the app
+     * shows come from there, so a frozen app never blocks the engine.
+     */
+    private fun tailEngineLog() = thread(name = "dsh-engine-log", isDaemon = true) {
+        val file = File(rootfs, "root/.dsh/dsh-app/dsh-web.log")
+        var seen = 0L
+        while (!stopping) {
+            try {
+                if (file.isFile) {
+                    val length = file.length()
+                    if (length < seen) seen = 0
+                    if (length > seen) {
+                        val chunk = java.io.RandomAccessFile(file, "r").use { raf ->
+                            raf.seek(seen)
+                            val bytes = ByteArray((length - seen).coerceAtMost(64 * 1024).toInt())
+                            val read = raf.read(bytes)
+                            if (read <= 0) "" else String(bytes, 0, read)
+                        }
+                        seen += chunk.toByteArray().size
+                        for (line in chunk.split("\n")) {
+                            if (line.isEmpty()) continue
+                            listener.onLog(line, "stdout")
+                            if (!readyReported) detectToken(line)
+                        }
+                    }
+                }
+            } catch (_: Exception) {
+            }
+            try {
+                Thread.sleep(250)
+            } catch (_: InterruptedException) {
+                return@thread
+            }
         }
     }
 

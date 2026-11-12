@@ -118,7 +118,10 @@ object ChrootRuntime {
                 }
                 else -> {
                     val ro = if (readOnly) "-o ro" else ""
-                    "mount --bind $ro ${mount.source} $target 2>/dev/null || true"
+                    // --rbind: /dev/pts (the terminal's pty) and /storage/emulated
+                    // (sdcardfs) are separate mounts; a plain bind leaves them empty.
+                    "mount --rbind $ro ${mount.source} $target 2>/dev/null || true; " +
+                        "mount --make-rslave $target 2>/dev/null || true"
                 }
             }
         }
@@ -186,8 +189,10 @@ object ChrootRuntime {
         val su = suBinary() ?: return false
         val command = if (enabled) {
             "mkdir -p '$ROOT/sdcard' '$ROOT/storage' 2>/dev/null || true; " +
-                "mount --bind /sdcard '$ROOT/sdcard' 2>/dev/null || true; " +
-                "mount --bind /storage '$ROOT/storage' 2>/dev/null || true; true"
+                "mount --rbind /sdcard '$ROOT/sdcard' 2>/dev/null || true; " +
+                "mount --make-rslave '$ROOT/sdcard' 2>/dev/null || true; " +
+                "mount --rbind /storage '$ROOT/storage' 2>/dev/null || true; " +
+                "mount --make-rslave '$ROOT/storage' 2>/dev/null || true; true"
         } else {
             "umount '$ROOT/sdcard' 2>/dev/null || true; umount '$ROOT/storage' 2>/dev/null || true; true"
         }
@@ -226,6 +231,9 @@ object ChrootRuntime {
         }
         // The pid file in the chroot's own home is always visible to the app;
         // /tmp may be a tmpfs the app cannot see.
-        return "#!/bin/sh\necho \$\$ > /root/.dsh/dsh-app/dsh-web.pid\nexec " + parts.joinToString(" ") + "\n"
+        return "#!/bin/sh\necho \$\$ > /root/.dsh/dsh-app/dsh-web.pid\n" +
+            "# The engine's own output goes to a file: the app may be frozen or gone,\n" +
+            "# and a pipe it stops reading would block (or kill) the engine.\n" +
+            "exec " + parts.joinToString(" ") + " >> /root/.dsh/dsh-app/dsh-web.log 2>&1\n"
     }
 }
