@@ -66,6 +66,8 @@ class RuntimeInstaller(
         // /data/local still belongs to the old one: nothing could be written
         // into it. Root hands the tree over before the install touches it.
         ChrootRuntime.ensureTreeOwnership()
+        // Whether the Linux base itself is replaced in this install.
+        var rebased = false
         // A reset killed halfway finishes first, so what it keeps is in runtime-keep for the restore.
         settleReset(retiredDir, keepDir, dropKept)
         baseDir.mkdirs()
@@ -132,18 +134,27 @@ class RuntimeInstaller(
                 // in the chroot, not in the app's copy of the rootfs.
                 onLog("[dsh-app] the runtime's Linux base changed; rebuilding it and keeping your chats")
                 timed("rebase") { rebase() }
+                rebased = true
                 activateRuntimeUpdate(baseDir, manifest.runtimeVersion, manifest.abi, manifest.raw,
                     keepDir, dropKept, sync = { timed("sync") { sync() } }, onLog = onLog)
             }
         }
         // Into the chroot the engine runs in (needs root on the phone).
         timed("chroot") {
-            ChrootRuntime.install(rootfs, android.os.Process.myUid(), android.os.Process.myUid(), onLog)
-            // The home the live tree held goes back into the new one.
-            ChrootRuntime.root(
-                "cp -a '${ChrootRuntime.CARRY}/.' '${ChrootRuntime.ROOT}/root/' 2>/dev/null || true; " +
-                    "rm -rf '${ChrootRuntime.CARRY}'"
-            )
+            val uid = android.os.Process.myUid()
+            if (rebased) {
+                // The whole image is replaced: the live home goes with it and
+                // comes back.
+                ChrootRuntime.carryHome()
+                ChrootRuntime.install(rootfs, uid, uid, onLog)
+                ChrootRuntime.restoreHome()
+            } else if (ChrootRuntime.hasEngine()) {
+                // The tree is a runtime image, but the person's home lives in
+                // it. Only the engine's own files are replaced.
+                ChrootRuntime.installEngine(rootfs, uid, uid, onLog)
+            } else {
+                ChrootRuntime.install(rootfs, uid, uid, onLog)
+            }
             ChrootRuntime.writeVersion(manifest.runtimeVersion)
         }
     }
@@ -151,14 +162,10 @@ class RuntimeInstaller(
     /**
      * Replaces the app's copy of the Linux base.
      *
-     * The live home is carried aside first: it lives in the chroot, which the
-     * next install rebuilds from scratch.
+     * The live home is carried aside before the tree itself is replaced (see
+     * the chroot phase): it lives in the chroot, not in the app's copy.
      */
     private fun rebase() {
-        ChrootRuntime.root(
-            "rm -rf '${ChrootRuntime.CARRY}'; mkdir -p '${ChrootRuntime.CARRY}'; " +
-                "cp -a '${ChrootRuntime.ROOT}/root/.' '${ChrootRuntime.CARRY}/' 2>/dev/null || true"
-        )
         File(baseDir, "rootfs").deleteRecursivelySafely()
         File(baseDir, "rootfs.version").delete()
         File(baseDir, "rootfs.old").deleteRecursivelySafely()

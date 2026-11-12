@@ -129,6 +129,46 @@ object ChrootRuntime {
     }
 
     /**
+     * Replaces the engine's own parts of the live tree.
+     *
+     * The tree is a runtime image, but the person's home lives in it: the
+     * chats, the plugins, the settings and the workspace. An update must not
+     * take that with it, so only the paths the engine owns are replaced — the
+     * rest of the tree stays exactly as it is.
+     */
+    fun installEngine(stagedRoot: File, uid: Int, gid: Int, onLog: (String) -> Unit) {
+        val source = stagedRoot.canonicalPath
+        val lines = mutableListOf("set -e")
+        for (path in ENGINE_PATHS) {
+            val parent = path.substringBeforeLast('/', "")
+            if (parent.isNotEmpty()) lines += "mkdir -p '$ROOT/$parent'"
+            lines += "rm -rf '$ROOT/$path'"
+            lines += "cp -a '$source/$path' '$ROOT/$path'"
+        }
+        lines += "chown -R $uid:$gid '$ROOT/opt' '$ROOT/etc/dsh-app' 2>/dev/null || true"
+        root(lines.joinToString("\n") + "\n")
+        onLog("[dsh-app] chroot: the engine's own files are replaced; your chats and settings stay")
+    }
+
+    /** Whether the live tree already holds an engine. */
+    fun hasEngine(): Boolean = File(ROOT, "opt/dsh").isDirectory
+
+    /**
+     * Carries the live home aside while the image is replaced.
+     *
+     * The home holds the person's chats, plugins, settings and workspace. It
+     * lives in the tree that is about to be rebuilt, so it waits outside it.
+     */
+    fun carryHome() {
+        root("rm -rf '$CARRY'; mkdir -p '$CARRY'; cp -a '$ROOT/root/.' '$CARRY/' 2>/dev/null || true")
+    }
+
+    /** Puts the carried home back into the rebuilt tree. */
+    fun restoreHome() {
+        root("cp -a '$CARRY/.' '$ROOT/root/' 2>/dev/null || true; rm -rf '$CARRY'")
+    }
+
+    /**
      * Copies the freshly unpacked rootfs into the chroot and hands the tree to
      * the app's own uid, so the overlays the app writes (the DSH patch files,
      * the phone-control guest files) land in the live root without root.
