@@ -49,11 +49,11 @@ object ChrootRuntime {
         val uid = android.os.Process.myUid()
         val script = """
             marker='$ROOT/root/.dsh/dsh-app/owner'
-            current=`cat "$marker" 2>/dev/null`
+            current=`cat "${'$'}marker" 2>/dev/null`
             if [ "${'$'}current" = "$uid" ]; then echo owned; exit 0; fi
             chown -R $uid:$uid '$TREE' 2>/dev/null
             mkdir -p '$ROOT/root/.dsh/dsh-app' 2>/dev/null || true
-            echo "$uid" > "$marker" 2>/dev/null || true
+            echo "$uid" > "${'$'}marker" 2>/dev/null || true
             echo reowned
         """.trimIndent()
         val out = runCatching { runRootCommand(su, script, 600_000) }.getOrDefault("")
