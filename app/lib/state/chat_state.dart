@@ -1441,7 +1441,7 @@ class ChatController extends Notifier<ChatState> {
       for (final a in attachments)
         if (a.isImage) PromptImage.fromBytes(a.bytes, mediaType: a.mediaType!, name: a.name),
     ];
-    Future<void> prompt(List<PromptImage> images, ({List<String> receipts, List<String> paths}) files) async {
+    Future<void> prompt(List<PromptImage> images, ({List<String> receipts, List<String> paths}) files) {
       _requireCurrent(operation);
       if (deliveryAllowed != null && !deliveryAllowed()) {
         throw const DshClosedException('Prepared phone route source changed');
@@ -1450,39 +1450,16 @@ class ChatController extends Notifier<ChatState> {
       final content = paths.isEmpty
           ? text
           : [if (text.isNotEmpty) text, '${appL10n.stateWorkspaceFilesHint}\n$paths'].join('\n\n');
-      try {
-        await client.prompt(
-          sessionId,
-          content,
-          images: images,
-          fileReceiptIds: files.receipts,
-          requestId: requestId,
-          mode: mode,
-          // No clientTimeZone: DSH needs an IANA name, which Dart can't provide; the
-          // local process already runs with TZ set from the device (RuntimeController).
-        );
-      } on DshRemoteException catch (error) {
-        if (error.code != 'session/writer-held') rethrow;
-        // The Host still holds this chat's writer: a run that was stopped
-        // without releasing it. Cancelling frees a stuck turn, and the same
-        // message goes out once more. The Host answers "not found" when no
-        // turn is attached, so a healthy chat is never touched.
-        try {
-          await client.cancel(sessionId);
-        } on Object {
-          // Nothing to cancel: the writer belongs to another process.
-        }
-        await Future<void>.delayed(const Duration(milliseconds: 250));
-        _requireCurrent(operation);
-        await client.prompt(
-          sessionId,
-          content,
-          images: images,
-          fileReceiptIds: files.receipts,
-          requestId: requestId,
-          mode: mode,
-        );
-      }
+      return client.prompt(
+        sessionId,
+        content,
+        images: images,
+        fileReceiptIds: files.receipts,
+        requestId: requestId,
+        mode: mode,
+        // No clientTimeZone: DSH needs an IANA name, which Dart can't provide; the
+        // local process already runs with TZ set from the device (RuntimeController).
+      );
     }
 
     try {
