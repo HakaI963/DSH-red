@@ -10,7 +10,7 @@ import java.nio.file.StandardCopyOption.REPLACE_EXISTING
 import java.nio.file.StandardOpenOption
 
 /** An upgrade must never fall back to rebuilding an existing user system. */
-internal class RuntimeUpgradeBlocked(reason: String) : IllegalStateException("runtime_upgrade_blocked:$reason")
+internal class RuntimeUpgradeBlocked(val reason: String) : IllegalStateException("runtime_upgrade_blocked:$reason")
 
 internal val ENGINE_PATHS = listOf(
     "opt/dsh", "opt/node", "opt/dsh-go", "etc/dsh-app",

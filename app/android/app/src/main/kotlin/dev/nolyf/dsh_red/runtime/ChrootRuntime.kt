@@ -26,6 +26,9 @@ object ChrootRuntime {
     /** The tree this app owns, with the chroot inside it. */
     private const val TREE = "/data/local/DSH-red"
 
+    /** Where the live home waits while the tree is rebuilt. */
+    const val CARRY = "$TREE/home.carry"
+
     /**
      * A tmpfs is created with mode 0755, so every process that is not root
      * was denied its own temp folder inside the chroot (the tools and the
@@ -58,6 +61,26 @@ object ChrootRuntime {
         """.trimIndent()
         val out = runCatching { runRootCommand(su, script, 600_000) }.getOrDefault("")
         return out.contains("reowned")
+    }
+
+    /**
+     * Hands the app's own folders in the tree to this app's uid.
+     *
+     * The engine runs as root and creates what it needs there (its home, the
+     * app's folder inside it, the workspace). A folder that root created
+     * cannot be written by the app, and the app's launch script lives in one
+     * of them.
+     */
+    fun ensureAppFolders(rootfs: File): Boolean {
+        val su = suBinary() ?: return false
+        val uid = android.os.Process.myUid()
+        val script = """
+            for d in '${rootfs.path}/root/.dsh' '${rootfs.path}/root/.dsh/dsh-app' '${rootfs.path}/root/workspace' '${rootfs.path}/etc'; do
+              [ -d "${'$'}d" ] && chown $uid:$uid "${'$'}d" 2>/dev/null
+            done
+            echo done
+        """.trimIndent()
+        return runCatching { runRootCommand(su, script, 60_000) }.isSuccess
     }
 
     /**

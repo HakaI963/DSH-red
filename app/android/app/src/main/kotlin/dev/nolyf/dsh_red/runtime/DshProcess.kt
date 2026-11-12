@@ -122,6 +122,9 @@ class DshProcess(
         if (ChrootRuntime.ensureTreeOwnership()) {
             listener.onLog("[dsh-app] the runtime tree belonged to an earlier install; it is this app's again", "system")
         }
+        // The engine runs as root: the folders the app writes into are handed
+        // to the app, so a root-owned folder cannot refuse its files.
+        ChrootRuntime.ensureAppFolders(rootfs)
         // In the chroot the pid file lives in the tree the app owns: /tmp is a
         // root-owned tmpfs, and the app cannot delete a file it does not own.
         val pidFile = File(rootfs, "root/.dsh/dsh-app/dsh-web.pid")

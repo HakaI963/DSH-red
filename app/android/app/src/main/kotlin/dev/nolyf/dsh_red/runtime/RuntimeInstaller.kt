@@ -121,14 +121,48 @@ class RuntimeInstaller(
             (groupNames.skipped?.let { "skipped ($it)" } ?: "added ${groupNames.added}"))
 
         timed("activate") {
-            activateRuntimeUpdate(baseDir, manifest.runtimeVersion, manifest.abi, manifest.raw,
-                keepDir, dropKept, sync = { timed("sync") { sync() } }, onLog = onLog)
+            try {
+                activateRuntimeUpdate(baseDir, manifest.runtimeVersion, manifest.abi, manifest.raw,
+                    keepDir, dropKept, sync = { timed("sync") { sync() } }, onLog = onLog)
+            } catch (blocked: RuntimeUpgradeBlocked) {
+                if (blocked.reason != "base") throw blocked
+                // The Linux base itself changed (the upstream packages moved on),
+                // so it cannot be upgraded in place. Rebuild it, and carry the
+                // live home over: the chats, the plugins and the settings live
+                // in the chroot, not in the app's copy of the rootfs.
+                onLog("[dsh-app] the runtime's Linux base changed; rebuilding it and keeping your chats")
+                timed("rebase") { rebase() }
+                activateRuntimeUpdate(baseDir, manifest.runtimeVersion, manifest.abi, manifest.raw,
+                    keepDir, dropKept, sync = { timed("sync") { sync() } }, onLog = onLog)
+            }
         }
         // Into the chroot the engine runs in (needs root on the phone).
         timed("chroot") {
             ChrootRuntime.install(rootfs, android.os.Process.myUid(), android.os.Process.myUid(), onLog)
+            // The home the live tree held goes back into the new one.
+            ChrootRuntime.root(
+                "cp -a '${ChrootRuntime.CARRY}/.' '${ChrootRuntime.ROOT}/root/' 2>/dev/null || true; " +
+                    "rm -rf '${ChrootRuntime.CARRY}'"
+            )
             ChrootRuntime.writeVersion(manifest.runtimeVersion)
         }
+    }
+
+    /**
+     * Replaces the app's copy of the Linux base.
+     *
+     * The live home is carried aside first: it lives in the chroot, which the
+     * next install rebuilds from scratch.
+     */
+    private fun rebase() {
+        ChrootRuntime.root(
+            "rm -rf '${ChrootRuntime.CARRY}'; mkdir -p '${ChrootRuntime.CARRY}'; " +
+                "cp -a '${ChrootRuntime.ROOT}/root/.' '${ChrootRuntime.CARRY}/' 2>/dev/null || true"
+        )
+        File(baseDir, "rootfs").deleteRecursivelySafely()
+        File(baseDir, "rootfs.version").delete()
+        File(baseDir, "rootfs.old").deleteRecursivelySafely()
+        File(baseDir, "home.carry").deleteRecursivelySafely()
     }
 
     private inline fun <T> timed(phase: String, block: () -> T): T {
