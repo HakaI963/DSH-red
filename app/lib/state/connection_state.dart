@@ -59,6 +59,9 @@ final localClientConnectorProvider = Provider<LocalClientConnector>(
           DshClient.connect(baseUri: baseUri, token: token, backgroundLists: true, startMux: false),
 );
 
+/// When an engine that answers but does not serve was last restarted.
+DateTime? _lastEngineRestart;
+
 /// Connects to the local `dsh web` once the native runtime reports it running.
 class LocalConnectionController extends AsyncNotifier<HostConnection?> {
   @override
@@ -81,7 +84,19 @@ class LocalConnectionController extends AsyncNotifier<HostConnection?> {
     final (baseUrl, token) = endpoint;
     if (baseUrl == null || token == null) return null;
 
-    final client = await r.read(localClientConnectorProvider)(baseUri: Uri.parse(baseUrl), token: token);
+    final DshClient client;
+    try {
+      client = await r.read(localClientConnectorProvider)(baseUri: Uri.parse(baseUrl), token: token);
+    } on Object {
+      // The login itself failed: the engine may be serving with another token
+      // or another port than the one this attempt used — an engine that was
+      // restarted, or a leftover from an earlier run. The engine's own log is
+      // the truth, so the app asks it again; a changed endpoint starts a fresh
+      // attempt with the right one.
+      final changed = await _refreshEndpoint(r);
+      if (!changed) await _restartStuckEngine(r);
+      rethrow;
+    }
     if (!r.mounted) {
       await client.close();
       return null;
@@ -117,15 +132,8 @@ class LocalConnectionController extends AsyncNotifier<HostConnection?> {
     if (apiKey.isNotEmpty) await _pushKey(client, apiKey);
     if (!r.mounted) return null;
     if (readyFailure case final failure?) {
-      // The engine may be serving with another token or another port than the
-      // one this attempt used — an engine that was restarted, or a leftover
-      // from an earlier run. The engine's own log is the truth, so the app
-      // asks it again; a changed endpoint starts a fresh attempt.
-      try {
-        await r.read(runtimeBridgeProvider).refreshEngineEndpoint();
-      } on Object {
-        // The native side could not be asked; the failure stands.
-      }
+      // Same as above, for a session that never came up.
+      await _refreshEndpoint(r);
       Error.throwWithStackTrace(failure.$1, failure.$2);
     }
     final connection = HostConnection(client: client, isLocal: true);
@@ -146,6 +154,39 @@ class LocalConnectionController extends AsyncNotifier<HostConnection?> {
     unawaited(clearAutoDefaultPreset(r.container));
 
     return connection;
+  }
+
+  /// Asks the engine again which endpoint it serves on.
+  ///
+  /// The engine's own log is the truth about its token and its port; the app
+  /// re-reads it whenever a connection fails, so a stale endpoint cannot keep
+  /// it out.
+  ///
+  /// @return true when the engine serves on another endpoint than before.
+  Future<bool> _refreshEndpoint(Ref r) async {
+    try {
+      return await r.read(runtimeBridgeProvider).refreshEngineEndpoint();
+    } on Object {
+      // The native side could not be asked; the failure stands.
+      return false;
+    }
+  }
+
+  /// Restarts an engine that answers but does not serve.
+  ///
+  /// A fresh process gets a fresh token and a fresh port, and the app
+  /// reconnects to it. At most one restart every two minutes, so a broken
+  /// engine cannot make the app restart it over and over.
+  Future<void> _restartStuckEngine(Ref r) async {
+    final now = DateTime.now();
+    final last = _lastEngineRestart;
+    if (last != null && now.difference(last) < const Duration(minutes: 2)) return;
+    _lastEngineRestart = now;
+    try {
+      await r.read(localRuntimeProvider.notifier).restart();
+    } on Object {
+      // The engine could not be restarted; the failure stands.
+    }
   }
 
   Future<void> _pushKey(DshClient client, String key) async {

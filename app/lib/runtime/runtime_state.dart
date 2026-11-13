@@ -117,6 +117,15 @@ class LocalRuntimeController extends Notifier<LocalRuntimeState> {
 
   Future<void> stop() => _bridge.stop();
 
+  /// Stops the engine and starts it again.
+  ///
+  /// Used when the engine answers but does not serve: a fresh process gets a
+  /// fresh token and a fresh port, and the app reconnects to it.
+  Future<void> restart() async {
+    await _bridge.stop();
+    await _bridge.start();
+  }
+
   Future<void> reset() => resetKeeping(const ResetKeep());
 
   /// Resets the runtime; [keep] comes back with the next install.
