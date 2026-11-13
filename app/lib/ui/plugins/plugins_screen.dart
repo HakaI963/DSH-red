@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../l10n/l10n.dart';
 import '../../plugins/native/native_state.dart';
+import '../../state/connection_state.dart';
 import '../../state/hosts_state.dart';
 import '../../state/plugins_state.dart';
 import '../common/ask_ai.dart';
@@ -119,12 +120,24 @@ class _PluginsScreenState extends ConsumerState<PluginsScreen> {
         ),
         switch (_tab) {
           PluginsTab.installed when host == null && ref.watch(pluginListViewProvider).value == null =>
-            const SliverToBoxAdapter(child: _NotConnected()),
+            SliverToBoxAdapter(child: _NotConnected(reason: _connectionFailure(ref))),
           PluginsTab.installed => InstalledPluginsSliver(onBrowse: () => setState(() => _tab = PluginsTab.market)),
           PluginsTab.market => const MarketSliver(),
         },
       ],
     );
+  }
+
+  /// Why the engine could not be reached, in the words of the failure itself.
+  ///
+  /// The message names the step that failed (the token, the port, the
+  /// session), which is what a fault report needs.
+  String? _connectionFailure(WidgetRef ref) {
+    final connection = ref.watch(activeConnectionProvider);
+    if (!connection.hasError) return null;
+    final error = connection.error;
+    if (error == null) return null;
+    return '$error';
   }
 
   static String _subtitle(PluginHost? host) {
@@ -136,7 +149,10 @@ class _PluginsScreenState extends ConsumerState<PluginsScreen> {
 }
 
 class _NotConnected extends StatelessWidget {
-  const _NotConnected();
+  const _NotConnected({this.reason});
+
+  /// Why the engine could not be reached, in the words of the failure itself.
+  final String? reason;
 
   @override
   Widget build(BuildContext context) {
@@ -144,7 +160,7 @@ class _NotConnected extends StatelessWidget {
     return EmptyView(
       icon: AppIcons.disconnected,
       title: l10n.commonEngineUnreachable,
-      message: l10n.pluginsOfflineDescription,
+      message: [l10n.pluginsOfflineDescription, ?reason].join('\n\n'),
       padding: EdgeInsets.fromLTRB(32, 24, 32, 8),
     );
   }
