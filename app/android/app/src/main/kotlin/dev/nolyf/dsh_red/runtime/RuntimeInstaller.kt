@@ -122,7 +122,16 @@ class RuntimeInstaller(
         }
         // Into the chroot the engine runs in (needs root on the phone).
         timed("chroot") {
-            ChrootRuntime.install(rootfs, android.os.Process.myUid(), android.os.Process.myUid(), onLog)
+            val uid = android.os.Process.myUid()
+            if (ChrootRuntime.hasEngine()) {
+                // The tree is a runtime image, but the person's home lives in
+                // it: the chats, the plugins, the settings and the workspace.
+                // An update replaces the engine's own files and leaves the
+                // rest of the tree alone.
+                ChrootRuntime.installEngine(rootfs, uid, uid, onLog)
+            } else {
+                ChrootRuntime.install(rootfs, uid, uid, onLog)
+            }
             ChrootRuntime.writeVersion(manifest.runtimeVersion)
         }
     }

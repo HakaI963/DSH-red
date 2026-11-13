@@ -67,6 +67,85 @@ object ChrootRuntime {
         onLog("[dsh-app] chroot: runtime copied")
     }
 
+    /**
+     * Replaces the engine's own parts of the live tree.
+     *
+     * The tree is a runtime image, but the person's home lives in it: the
+     * chats, the plugins, the settings and the workspace. An update must not
+     * take that with it, so only the paths the engine owns are replaced and
+     * the rest of the tree stays exactly as it is.
+     */
+    fun installEngine(stagedRoot: File, uid: Int, gid: Int, onLog: (String) -> Unit) {
+        val source = stagedRoot.canonicalPath
+        val lines = mutableListOf("set -e")
+        for (path in ENGINE_PATHS) {
+            val parent = path.substringBeforeLast('/', "")
+            if (parent.isNotEmpty()) lines += "mkdir -p '$ROOT/$parent'"
+            lines += "rm -rf '$ROOT/$path'"
+            lines += "cp -a '$source/$path' '$ROOT/$path'"
+        }
+        lines += "chown -R $uid:$gid '$ROOT/opt' '$ROOT/etc/dsh-app' 2>/dev/null || true"
+        root(lines.joinToString("\n") + "\n")
+        onLog("[dsh-app] chroot: the engine's own files are replaced; your chats and settings stay")
+    }
+
+    /** Whether the live tree already holds an engine. */
+    fun hasEngine(): Boolean = File(ROOT, "opt/dsh").isDirectory
+
+    /**
+     * Ends every engine left over from an earlier run.
+     *
+     * In the chroot the engine runs as root: the app cannot signal it and
+     * cannot even read its /proc entries, so a leftover survives every
+     * cleanup the app can do on its own. It keeps the port and the write lock
+     * of the chats it had open, and the app then talks to an engine that is
+     * not its own. Only a process that runs from this chroot is touched.
+     */
+    fun killLeftoverEngines(): Int {
+        val su = suBinary() ?: return 0
+        val script = """
+            ended=0
+            for p in /proc/[0-9]*; do
+              pid=${'$'}{p#/proc/}
+              exe=`readlink "${'$'}p/exe" 2>/dev/null` || continue
+              case "${'$'}exe" in
+                "$ROOT"/*) kill -TERM "${'$'}pid" 2>/dev/null && ended=${'$'}((ended+1)) ;;
+              esac
+            done
+            sleep 1
+            for p in /proc/[0-9]*; do
+              pid=${'$'}{p#/proc/}
+              exe=`readlink "${'$'}p/exe" 2>/dev/null` || continue
+              case "${'$'}exe" in
+                "$ROOT"/*) kill -KILL "${'$'}pid" 2>/dev/null ;;
+              esac
+            done
+            echo "ended ${'$'}ended"
+        """.trimIndent()
+        val out = runCatching { runRootCommand(su, script, 60_000) }.getOrDefault("")
+        return Regex("ended (\\d+)").find(out)?.groupValues?.get(1)?.toIntOrNull() ?: 0
+    }
+
+    /**
+     * Hands the app's own folders in the tree to the app.
+     *
+     * The engine runs as root and creates what it needs there (its home, the
+     * app's folder inside it, the workspace). A folder that root created
+     * cannot be written by the app, and the app's launch script lives in one
+     * of them.
+     */
+    fun ensureAppFolders(rootfs: File): Boolean {
+        val su = suBinary() ?: return false
+        val uid = android.os.Process.myUid()
+        val script = """
+            for d in '${rootfs.path}/root/.dsh' '${rootfs.path}/root/.dsh/dsh-app' '${rootfs.path}/root/workspace' '${rootfs.path}/etc'; do
+              [ -d "${'$'}d" ] && chown $uid:$uid "${'$'}d" 2>/dev/null
+            done
+            echo done
+        """.trimIndent()
+        return runCatching { runRootCommand(su, script, 60_000) }.isSuccess
+    }
+
     /** Whether the chroot already holds this runtime version. */
     fun installedVersion(): String? {
         val marker = File(ROOT, "root/.dsh/dsh-app/runtime-version")
@@ -114,7 +193,7 @@ object ChrootRuntime {
                 "sysfs" -> "mount -t sysfs -o ro,nosuid,nodev sysfs $target 2>/dev/null || true"
                 "tmpfs" -> {
                     val size = if (mount.target.endsWith("shm")) "64m" else "512m"
-                    "mount -t tmpfs -o size=$size tmpfs $target 2>/dev/null || true"
+                    "mount -t tmpfs -o size=$size,mode=1777 tmpfs $target 2>/dev/null || true"
                 }
                 else -> {
                     val ro = if (readOnly) "-o ro" else ""
