@@ -437,6 +437,10 @@ class DshProcess(
         if (readyReported || stopping) return
         val match = TOKEN_URL.find(line) ?: return
         val url = match.value
+        // Only this run's line: a token from an earlier run names that run's
+        // port, and the engine would refuse every request with it.
+        val urlPort = TOKEN_PORT.find(url)?.groupValues?.get(1)?.toIntOrNull()
+        if (urlPort != null && urlPort != port) return
         val token = TOKEN_PARAM.find(url)?.groupValues?.get(1) ?: return
         readyReported = true
         startupSignal.countDown()
@@ -543,6 +547,7 @@ class DshProcess(
         private const val TOKEN_TIMEOUT_MS = 180_000L
         private val TOKEN_URL = Regex("""https?://[^\s'"]*[?&#]token=[A-Za-z0-9._~%-]+""")
         private val TOKEN_PARAM = Regex("""[?&#]token=([A-Za-z0-9._~%-]+)""")
+        private val TOKEN_PORT = Regex("""://[^/]*?:(\d+)""")
         private val SECRET_KEY = Regex("(?i)(key|token|secret|password)")
 
         fun canConnect(port: Int): Boolean = try {

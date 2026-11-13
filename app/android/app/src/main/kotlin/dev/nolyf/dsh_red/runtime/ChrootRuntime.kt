@@ -313,6 +313,8 @@ object ChrootRuntime {
         return "#!/bin/sh\necho \$\$ > /root/.dsh/dsh-app/dsh-web.pid\n" +
             "# The engine's own output goes to a file: the app may be frozen or gone,\n" +
             "# and a pipe it stops reading would block (or kill) the engine.\n" +
-            "exec " + parts.joinToString(" ") + " >> /root/.dsh/dsh-app/dsh-web.log 2>&1\n"
+            "# The log holds this run only: an older run's token line would be read\n" +
+            "# as this run's token, and the engine would refuse every request.\n" +
+            "exec " + parts.joinToString(" ") + " > /root/.dsh/dsh-app/dsh-web.log 2>&1\n"
     }
 }
