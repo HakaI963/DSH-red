@@ -72,6 +72,8 @@ class RuntimePlugin :
     override fun onMethodCall(call: MethodCall, result: MethodChannel.Result) {
         when (call.method) {
             "getStatus" -> result.success(controller.status())
+            // The app re-reads the engine's endpoint when a connection fails.
+            "refreshEndpoint" -> result.success(controller.refreshEndpoint())
             "publishDiagnostics" -> {
                 val markdown = call.argument<String>("markdown")
                 val manual = call.argument<Any?>("manual") == true

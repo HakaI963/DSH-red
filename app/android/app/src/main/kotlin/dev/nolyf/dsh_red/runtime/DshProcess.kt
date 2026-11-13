@@ -385,6 +385,32 @@ class DshProcess(
 
 
     /**
+     * The engine's endpoint, read from its own log.
+     *
+     * The log holds the token line of the run that is serving now; the last
+     * one in it is this engine's. The app asks for it again when a connection
+     * fails, so a token from an earlier run cannot keep the app out.
+     *
+     * @return the base URL and the token, or null when the engine wrote none.
+     */
+    fun currentEndpoint(): Pair<String, String>? {
+        val file = File(rootfs, "root/.dsh/dsh-app/dsh-web.log")
+        if (!file.isFile) return null
+        var found: Pair<String, String>? = null
+        try {
+            file.forEachLine { line ->
+                val match = TOKEN_URL.find(line) ?: return@forEachLine
+                val url = match.value
+                val port = TOKEN_PORT.find(url)?.groupValues?.get(1)?.toIntOrNull() ?: return@forEachLine
+                val token = TOKEN_PARAM.find(url)?.groupValues?.get(1) ?: return@forEachLine
+                found = "http://127.0.0.1:$port" to token
+            }
+        } catch (_: Exception) {
+        }
+        return found
+    }
+
+    /**
      * Tails the engine's log file: the token line and the runtime log the app
      * shows come from there, so a frozen app never blocks the engine.
      */

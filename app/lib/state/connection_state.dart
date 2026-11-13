@@ -116,7 +116,18 @@ class LocalConnectionController extends AsyncNotifier<HostConnection?> {
     final apiKey = r.read(settingsProvider).apiKey;
     if (apiKey.isNotEmpty) await _pushKey(client, apiKey);
     if (!r.mounted) return null;
-    if (readyFailure case final failure?) Error.throwWithStackTrace(failure.$1, failure.$2);
+    if (readyFailure case final failure?) {
+      // The engine may be serving with another token or another port than the
+      // one this attempt used — an engine that was restarted, or a leftover
+      // from an earlier run. The engine's own log is the truth, so the app
+      // asks it again; a changed endpoint starts a fresh attempt.
+      try {
+        await r.read(runtimeBridgeProvider).refreshEngineEndpoint();
+      } on Object {
+        // The native side could not be asked; the failure stands.
+      }
+      Error.throwWithStackTrace(failure.$1, failure.$2);
+    }
     final connection = HostConnection(client: client, isLocal: true);
     // HTTP is usable now; keep build pending so ready failures retain Riverpod's retry policy.
     state = AsyncData(connection);
