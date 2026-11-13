@@ -35,7 +35,7 @@ import '../../theme/app_icons.dart';
 import '../../theme/theme.dart';
 import '../../web/web_target.dart';
 import '../plugin_detail_sheet.dart' show showBundleSheet;
-import '../common/sheet_navigator.dart';
+import '../../common/sheet_navigator.dart';
 import '../seats/plugin_seat_page.dart';
 import '../seats/seat_links.dart' show seatBundleOf, seatEntryTitle, seatWebOpenerProvider, seatWebTarget;
 import '../seats/session_plugins_tab.dart' show sessionPluginPlanProvider;
