@@ -89,10 +89,10 @@ class LocalConnectionController extends AsyncNotifier<HostConnection?> {
       // The login itself failed: the engine may be serving with another token
       // or another port than the one this attempt used — an engine that was
       // restarted, or a leftover from an earlier run. The engine's own log is
-      // the truth, so the app asks it again; a changed endpoint starts a fresh
-      // attempt with the right one.
-      final changed = await _refreshEndpoint(r);
-      if (!changed) await _restartStuckEngine(r);
+      // the truth, so the app asks it again; an engine that answers but does
+      // not serve is restarted once. The failure is reported at once; the
+      // recovery runs beside it.
+      unawaited(_recoverAfterFailure(r, restart: true));
       rethrow;
     }
     if (!r.mounted) {
@@ -131,7 +131,7 @@ class LocalConnectionController extends AsyncNotifier<HostConnection?> {
     if (!r.mounted) return null;
     if (readyFailure case final failure?) {
       // Same as above, for a session that never came up.
-      await _refreshEndpoint(r);
+      unawaited(_recoverAfterFailure(r, restart: false));
       Error.throwWithStackTrace(failure.$1, failure.$2);
     }
     final connection = HostConnection(client: client, isLocal: true);
@@ -154,20 +154,25 @@ class LocalConnectionController extends AsyncNotifier<HostConnection?> {
     return connection;
   }
 
-  /// Asks the engine again which endpoint it serves on.
+  /// Reads the engine's endpoint again after a failed connection.
   ///
   /// The engine's own log is the truth about its token and its port; the app
   /// re-reads it whenever a connection fails, so a stale endpoint cannot keep
-  /// it out.
+  /// it out. A changed endpoint reaches the app as a new status, and the next
+  /// attempt uses it.
   ///
-  /// @return true when the engine serves on another endpoint than before.
-  Future<bool> _refreshEndpoint(Ref r) async {
+  /// [restart] also restarts an engine that answers but does not serve: a
+  /// fresh process gets a fresh token and a fresh port.
+  Future<void> _recoverAfterFailure(Ref r, {required bool restart}) async {
+    if (!r.mounted) return;
+    var changed = false;
     try {
-      return await r.read(runtimeBridgeProvider).refreshEngineEndpoint();
+      changed = await r.read(runtimeBridgeProvider).refreshEngineEndpoint();
     } on Object {
       // The native side could not be asked; the failure stands.
-      return false;
     }
+    if (!r.mounted) return;
+    if (restart && !changed) await _restartStuckEngine(r);
   }
 
   /// Restarts an engine that answers but does not serve.

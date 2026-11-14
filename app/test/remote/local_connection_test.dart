@@ -64,6 +64,15 @@ class _Settings extends SettingsController {
   AppSettings build() => const AppSettings(loaded: true);
 }
 
+/// Waits for something that runs beside the failure, not before it.
+Future<void> waitFor(bool Function() ok, {required String what}) async {
+  final deadline = DateTime.now().add(const Duration(seconds: 5));
+  while (!ok() && DateTime.now().isBefore(deadline)) {
+    await Future<void>.delayed(const Duration(milliseconds: 10));
+  }
+  expect(ok(), isTrue, reason: what);
+}
+
 class _Client extends DshClient {
   _Client() : super(DshConnection(Uri.parse('http://127.0.0.1:9')));
   final _readyMux = ReadyMux();
@@ -161,6 +170,7 @@ void main() {
     final sub = c.listen(localConnectionProvider, (_, _) {});
     addTearDown(sub.close);
     await until(c, localConnectionProvider, (s) => s.hasError, what: '本机连接失败');
+    await waitFor(() => bridge.refreshes > 0, what: '重新读取引擎的端点');
     expect(bridge.refreshes, greaterThanOrEqualTo(1));
   });
 
@@ -185,7 +195,9 @@ void main() {
     final sub = c.listen(localConnectionProvider, (_, _) {});
     addTearDown(sub.close);
     await until(c, localConnectionProvider, (s) => s.hasError, what: '本机连接失败');
+    await waitFor(() => bridge.refreshes > 0, what: '重新读取引擎的端点');
     expect(bridge.refreshes, greaterThanOrEqualTo(1));
+    await waitFor(() => runtime.starts > 0, what: '重启卡住的引擎');
     expect(runtime.starts, 1);
   });
 }
