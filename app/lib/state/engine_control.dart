@@ -6,6 +6,29 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../runtime/runtime_bridge.dart';
 import '../runtime/runtime_state.dart';
 
+/// Remembers when an engine that answered but did not serve was last
+/// restarted.
+///
+/// A broken engine must not make the app restart it over and over.
+class EngineRestartGuard extends Notifier<DateTime?> {
+  /// The shortest time between two restarts of the same engine.
+  static const interval = Duration(minutes: 2);
+
+  @override
+  DateTime? build() => null;
+
+  /// Whether a restart may happen now; remembers it when it may.
+  bool allow() {
+    final now = DateTime.now();
+    final last = state;
+    if (last != null && now.difference(last) < interval) return false;
+    state = now;
+    return true;
+  }
+}
+
+final engineRestartGuardProvider = NotifierProvider<EngineRestartGuard, DateTime?>(EngineRestartGuard.new);
+
 /// Multi-step engine actions built on [localRuntimeProvider].
 ///
 /// They take the [ProviderContainer] (not a WidgetRef) so they keep working after
@@ -16,6 +39,18 @@ abstract final class EngineControl {
   /// [mode] null keeps the current mode (a restart in safe mode stays in safe mode).
   /// Returns false when the stop did not finish, so no start was requested.
   static Future<bool> restart(ProviderContainer container, {EngineMode? mode}) => _restart(container, mode: mode);
+
+  /// Restarts an engine that answers but does not serve, at most once every
+  /// two minutes.
+  ///
+  /// A fresh process gets a fresh token and a fresh port, and the app
+  /// reconnects to it. A broken engine must not make the app restart it over
+  /// and over, so the second attempt within [EngineRestartGuard.interval] is
+  /// left to the engine's own recovery.
+  static Future<void> restartStuckEngine(ProviderContainer container) async {
+    if (!container.read(engineRestartGuardProvider.notifier).allow()) return;
+    await restart(container);
+  }
 
   static Future<bool> _restart(ProviderContainer container, {EngineMode? mode}) async {
     final runtime = container.read(localRuntimeProvider.notifier);

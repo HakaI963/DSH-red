@@ -117,31 +117,6 @@ class LocalRuntimeController extends Notifier<LocalRuntimeState> {
 
   Future<void> stop() => _bridge.stop();
 
-  /// Stops the engine and starts it again.
-  ///
-  /// Used when the engine answers but does not serve: a fresh process gets a
-  /// fresh token and a fresh port, and the app reconnects to it.
-  Future<void> restart() async {
-    final settings = ref.read(settingsProvider);
-    await _bridge.stop();
-    await _bridge.start(phoneStorage: settings.phoneStorage, visualReplies: settings.visualReplies);
-  }
-
-  /// When an engine that answered but did not serve was last restarted.
-  DateTime? _lastRestart;
-
-  /// Restarts an engine that answers but does not serve, at most once every
-  /// two minutes.
-  ///
-  /// A broken engine must not make the app restart it over and over.
-  Future<void> restartStuckEngine() async {
-    final now = DateTime.now();
-    final last = _lastRestart;
-    if (last != null && now.difference(last) < const Duration(minutes: 2)) return;
-    _lastRestart = now;
-    await restart();
-  }
-
   Future<void> reset() => resetKeeping(const ResetKeep());
 
   /// Resets the runtime; [keep] comes back with the next install.

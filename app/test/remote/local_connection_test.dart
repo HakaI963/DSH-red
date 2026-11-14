@@ -25,13 +25,22 @@ class _Runtime extends LocalRuntimeController {
   void replace(String token) => state = _running(token);
 }
 
-/// A runtime that records the restarts the connection path asks for.
+/// A runtime that records the restart the connection path asks for.
 class _RestartableRuntime extends _Runtime {
-  int restarts = 0;
+  int starts = 0;
 
   @override
-  Future<void> restart() async {
-    restarts++;
+  Future<void> stop() async {
+    // The engine is gone: the phase leaves "running", so the wait ends.
+    state = LocalRuntimeState(
+      loaded: true,
+      status: RuntimeStatus.fromMap({'phase': 'installed'}),
+    );
+  }
+
+  @override
+  Future<void> start() async {
+    starts++;
   }
 }
 
@@ -177,6 +186,6 @@ void main() {
     addTearDown(sub.close);
     await until(c, localConnectionProvider, (s) => s.hasError, what: '本机连接失败');
     expect(bridge.refreshes, greaterThanOrEqualTo(1));
-    expect(runtime.restarts, 1);
+    expect(runtime.starts, 1);
   });
 }

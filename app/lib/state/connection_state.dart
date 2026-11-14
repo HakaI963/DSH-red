@@ -12,6 +12,7 @@ import '../remote/ssh/ssh_link.dart';
 import '../remote/ssh/ssh_transport.dart';
 import '../runtime/runtime_bridge.dart';
 import '../runtime/runtime_state.dart';
+import 'engine_control.dart';
 import 'hosts_state.dart';
 import 'permission_default_repair.dart';
 import 'provider_backend.dart';
@@ -176,7 +177,7 @@ class LocalConnectionController extends AsyncNotifier<HostConnection?> {
   /// minutes, so a broken engine cannot make the app restart it over and over.
   Future<void> _restartStuckEngine(Ref r) async {
     try {
-      await r.read(localRuntimeProvider.notifier).restartStuckEngine();
+      await EngineControl.restartStuckEngine(r.container);
     } on Object {
       // The engine could not be restarted; the failure stands.
     }
