@@ -26,6 +26,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../l10n/l10n.dart';
 import '../../../plugins/native/native_model.dart';
 import '../../../plugins/native/native_state.dart';
+import '../../../plugins/native/native_icons.dart';
 import '../../../plugins/seams/seams.dart';
 import '../../../state/plugins_state.dart';
 import '../../common/app_sheet.dart';
@@ -34,6 +35,7 @@ import '../../theme/app_icons.dart';
 import '../../theme/theme.dart';
 import '../../web/web_target.dart';
 import '../plugin_detail_sheet.dart' show showBundleSheet;
+import '../../common/sheet_navigator.dart';
 import '../seats/plugin_seat_page.dart';
 import '../seats/seat_links.dart' show seatBundleOf, seatEntryTitle, seatWebOpenerProvider, seatWebTarget;
 import '../seats/session_plugins_tab.dart' show sessionPluginPlanProvider;
@@ -151,8 +153,13 @@ final chatSheetPagesProvider = Provider.autoDispose.family<List<SeatItem>, Strin
   return [...tabs.visible, ...views.visible];
 });
 
-Future<void> showChatPluginsSheet(BuildContext context, {required String sessionId}) =>
-    showAppSheet<void>(context, isScrollControlled: true, builder: (_) => ChatPluginsSheet(sessionId: sessionId));
+Future<void> showChatPluginsSheet(BuildContext context, {required String sessionId}) => showAppSheet<void>(
+      context,
+      isScrollControlled: true,
+      // The sheet owns its page stack: the plugin list is the root and each
+      // plugin's panel is pushed onto it, so Back returns to the list.
+      builder: (_) => SheetNavigator(root: (_) => ChatPluginsSheet(sessionId: sessionId)),
+    );
 
 class ChatPluginsSheet extends ConsumerWidget {
   const ChatPluginsSheet({super.key, required this.sessionId});
@@ -171,7 +178,38 @@ class ChatPluginsSheet extends ConsumerWidget {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (context.mounted) unawaited(Navigator.of(context).maybePop());
       });
+      return const SizedBox.shrink();
     }
+    // First step: the installed plugins, one row each — native panels by their
+    // own name, then the web plugins as one entry.
+    final rows = <Widget>[
+      for (final panel in native)
+        Builder(
+          key: ValueKey('chat-plugins-row|${panel.package}|${panel.id}'),
+          builder: (context) => ListPageRow(
+            icon: nativeIcon(panel.icon) ?? AppIcons.plugin,
+            title: panel.title,
+            meta: ref.watch(nativePluginTitleProvider(panel.package)),
+            chevron: true,
+            onTap: () => SheetNavigator.of(context).push(
+              (_) => _ChatPluginPanel(panel: panel, sessionId: sessionId),
+            ),
+          ),
+        ),
+      if (!web.isEmpty)
+        Builder(
+          key: const ValueKey('chat-plugins-row|web'),
+          builder: (context) => ListPageRow(
+            icon: AppIcons.webApp,
+            title: ref.watch(nativePluginTitleProvider(web.packages.first)),
+            meta: l10n.commonWeb,
+            chevron: true,
+            onTap: () => SheetNavigator.of(context).push(
+              (_) => _ChatWebPluginsPage(web: web, sessionId: sessionId),
+            ),
+          ),
+        ),
+    ];
     return DraggableScrollableSheet(
       expand: false,
       initialChildSize: ChatPluginsMetrics.initial,
@@ -188,22 +226,65 @@ class ChatPluginsSheet extends ConsumerWidget {
               controller: controller,
               padding: EdgeInsets.fromLTRB(ChatPluginsMetrics.side, 4, ChatPluginsMetrics.side, bottom + 24),
               children: [
-                for (final (i, panel) in native.indexed) ...[
-                  if (i > 0) const SizedBox(height: ChatPluginsMetrics.gap),
-                  KeyedSubtree(
-                    key: ValueKey('chat-plugins-native|${panel.package}|${panel.id}'),
-                    child: NativePanelView(panel: panel, sessionId: sessionId),
-                  ),
-                ],
-                if (!web.isEmpty) ...[
-                  if (native.isNotEmpty) const SizedBox(height: ChatPluginsMetrics.gap + 4),
-                  _WebPlugins(web: web, sessionId: sessionId),
-                ],
+                ListPageCard(margin: EdgeInsets.zero, children: rows),
               ],
             ),
           ),
         ],
       ),
+    );
+  }
+}
+
+/// One plugin's panel, pushed onto the sheet's stack: its own title and the
+/// panel's own view.
+class _ChatPluginPanel extends StatelessWidget {
+  const _ChatPluginPanel({required this.panel, required this.sessionId});
+
+  final NativePanel panel;
+  final String sessionId;
+
+  @override
+  Widget build(BuildContext context) {
+    final bottom = MediaQuery.paddingOf(context).bottom;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        SheetHeader(panel.title),
+        Expanded(
+          child: ListView(
+            key: ValueKey('chat-plugins-native|${panel.package}|${panel.id}'),
+            padding: EdgeInsets.fromLTRB(ChatPluginsMetrics.side, 4, ChatPluginsMetrics.side, bottom + 24),
+            children: [NativePanelView(panel: panel, sessionId: sessionId)],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+/// The web plugins' chat-page parts, pushed onto the sheet's stack.
+class _ChatWebPluginsPage extends ConsumerWidget {
+  const _ChatWebPluginsPage({required this.web, required this.sessionId});
+
+  final ChatWebPlugins web;
+  final String sessionId;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final bottom = MediaQuery.paddingOf(context).bottom;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        SheetHeader(ref.watch(nativePluginTitleProvider(web.packages.first))),
+        Expanded(
+          child: ListView(
+            key: const ValueKey('chat-plugins-web'),
+            padding: EdgeInsets.fromLTRB(ChatPluginsMetrics.side, 4, ChatPluginsMetrics.side, bottom + 24),
+            children: [_WebPlugins(web: web, sessionId: sessionId)],
+          ),
+        ),
+      ],
     );
   }
 }

@@ -269,17 +269,12 @@ class _ComposerCapsuleBarState extends ConsumerState<ComposerCapsuleBar> {
   Widget build(BuildContext context) {
     final quick = ref.watch(uiOverridesProvider.select((o) => o.config.quickActions)) ?? const <UiQuickAction>[];
     final plugins = ref.watch(nativeComposerActionsProvider);
-    final hidePluginCapsule = ref.watch(uiHiddenProvider(UiHideItem.pluginCapsule));
     final session = widget.sessionId;
+    // The chat-page Plugins entry is gone: the Chat details' Plugins tab
+    // (the side panel) and All features are the ways in, and the capsule row
+    // stays for plugin buttons only.
     final items = [
       ...composerCapsules(context, ref, sessionId: session, quick: quick, plugins: plugins),
-      if (!hidePluginCapsule && session != null && ref.watch(chatPluginsHaveContentProvider(session)))
-        CapsuleItem(
-          id: chatPluginsCapsuleId,
-          label: context.l10n.plugslotsChatEntry,
-          icon: AppIcons.plugin,
-          onTap: () => unawaited(showChatPluginsSheet(context, sessionId: session)),
-        ),
     ];
     final leading = widget.leading;
     final open = widget.visible && (items.isNotEmpty || leading != null);

@@ -1,11 +1,13 @@
 // The chat page's 「插件」 sheet (docs/design/plugin-ui-v3.md §3.4): the
 // entry is the last capsule above the composer (outside the eight), there
 // only while the conversation has native chat.panel panels or web plugins'
-// chat-page parts. Native panels come first, by plugin name; the web parts
-// are one panel island under a line naming whose they are. Every way the
-// island can't come up — the route guard off, no room, a part ui.json sends
-// to the web, no ready within 8 s, the page giving up — is one 「在网页版打开」
-// row, never an error. Geometry measured; goldens light and dark.
+// chat-page parts. It opens on the list of installed plugins — native panels
+// by plugin name, then the web plugins as one row — and each row pushes that
+// plugin's panel onto the sheet's own page stack, so Back returns to the
+// list. Every way the web island can't come up — the route guard off, no
+// room, a part ui.json sends to the web, no ready within 8 s, the page
+// giving up — is one 「在网页版打开」 row, never an error. Geometry
+// measured; goldens light and dark.
 // Regenerate with
 // `flutter test --update-goldens test/plugins/native/chat_plugins_sheet_test.dart`.
 
@@ -21,6 +23,7 @@ import 'package:dsh_app/ui/plugins/native/native_composer_bar.dart';
 import 'package:dsh_app/ui/plugins/seats/seat_links.dart' show seatWebOpenerProvider;
 import 'package:dsh_app/ui/plugins/view/plugin_view.dart';
 import 'package:dsh_app/ui/web/web_target.dart';
+import 'package:dsh_app/ui/theme/app_icons.dart';
 import 'package:dsh_app/ui_config/ui_config.dart';
 import 'package:dsh_client/dsh_client.dart';
 import 'package:flutter/material.dart';
@@ -165,9 +168,25 @@ List<String> _capsules(WidgetTester tester) => [
 
 Future<void> _openSheet(WidgetTester tester, List<Override> overrides) async {
   usePhoneView(tester);
-  await tester.pumpWidget(_bar(overrides));
+  // No chat-page entry any more, so the sheet is opened the way the side
+  // panel's Plugins tab reaches a plugin: a button that calls it.
+  await tester.pumpWidget(
+    testApp(
+      Builder(
+        builder: (context) => Scaffold(
+          body: Center(
+            child: TextButton(
+              onPressed: () => showChatPluginsSheet(context, sessionId: 's1'),
+              child: const Text('open'),
+            ),
+          ),
+        ),
+      ),
+      overrides: overrides,
+    ),
+  );
   await pumpFrames(tester);
-  await tester.tap(find.widgetWithText(ComposerCapsule, '插件'));
+  await tester.tap(find.text('open'));
   await pumpFrames(tester, 12);
 }
 
@@ -245,41 +264,17 @@ void main() {
   });
 
   group('entry', () {
-    for (final nativePanels in [false, true]) {
-      testWidgets('hide.pluginCapsule hides only the built-in entry and can be restored: native=$nativePanels', (
-        tester,
-      ) async {
-        usePhoneView(tester);
-        var hidden = false;
-        await tester.pumpWidget(
-          _bar([
-            ..._overrides(_bridge(panels: nativePanels, capsules: 1), web: _web),
-            uiHiddenProvider(UiHideItem.pluginCapsule).overrideWith((ref) => hidden),
-          ]),
-        );
-        await pumpFrames(tester);
-        expect(_capsules(tester), ['按钮0', '插件']);
-        final c = ProviderScope.containerOf(tester.element(find.byType(NativeComposerBar)));
-        hidden = true;
-        c.invalidate(uiHiddenProvider(UiHideItem.pluginCapsule));
-        await pumpFrames(tester, 12);
-        expect(_capsules(tester), ['按钮0']);
-        expect(
-          c.read(chatPluginsHaveContentProvider('s1')),
-          isTrue,
-          reason: 'hiding an entry does not disable plugins',
-        );
-        expect(c.read(chatWebPluginsProvider('s1')).packages, isNotEmpty);
-        hidden = false;
-        c.invalidate(uiHiddenProvider(UiHideItem.pluginCapsule));
-        await pumpFrames(tester);
-        expect(_capsules(tester), ['按钮0', '插件']);
-      });
-    }
+    testWidgets('no chat-page entry: the capsule row holds plugin buttons only', (tester) async {
+      usePhoneView(tester);
+      // Web parts and native panels used to add a 「插件」 capsule here; the side
+      // panel is the way in, so the row holds only the plugins' own buttons.
+      await tester.pumpWidget(_bar(_overrides(_bridge(panels: false, capsules: 1), web: _web)));
+      await pumpFrames(tester);
+      expect(_capsules(tester), ['按钮0']);
+      expect(find.byType(NativeComposerBar), findsOneWidget);
+    });
 
-    testWidgets('the last capsule, outside the eight; not without content; away while a reply generates', (
-      tester,
-    ) async {
+    testWidgets('the last capsule, outside the eight; away while a reply generates', (tester) async {
       usePhoneView(tester);
       await tester.pumpWidget(_bar(_overrides(_bridge(capsules: 9))));
       await pumpFrames(tester);
@@ -288,9 +283,8 @@ void main() {
       final container = ProviderScope.containerOf(tester.element(find.byType(NativeComposerBar)));
       expect(container.read(chatNativePanelsProvider).map((p) => p.id), ['usage', 'album']);
       final labels = _capsules(tester);
-      expect(labels, hasLength(9));
-      expect(labels.last, '插件');
-      expect(labels.where((l) => l.startsWith('按钮')), hasLength(8));
+      expect(labels, hasLength(8), reason: 'the eight plugin capsules; no built-in entry');
+      expect(labels, isNot(contains('插件')));
 
       await tester.pumpWidget(_bar(_overrides(_bridge(panels: false, capsules: 1))));
       await pumpFrames(tester);
@@ -303,13 +297,6 @@ void main() {
       await tester.pumpWidget(_bar(_overrides(_bridge()), visible: false));
       await pumpFrames(tester);
       expect(tester.getSize(find.byType(NativeComposerBar)).height, 0);
-    });
-
-    testWidgets('web parts alone bring the entry too', (tester) async {
-      usePhoneView(tester);
-      await tester.pumpWidget(_bar(_overrides(_bridge(panels: false), web: _web)));
-      await pumpFrames(tester);
-      expect(_capsules(tester), ['插件']);
     });
   });
 
@@ -353,32 +340,24 @@ void main() {
   });
 
   group('sheet', () {
-    testWidgets('native panels first, then whose the web parts are, then their island; 20 on both sides', (
-      tester,
-    ) async {
+    testWidgets('the installed plugins first, each panel behind its own row', (tester) async {
       await _openSheet(tester, _overrides(_bridge(), web: _web));
       expect(find.text('插件'), findsWidgets);
-      final frames = find.byType(PluginFrame);
-      expect(frames, findsNWidgets(2));
-      final names = [for (final f in tester.widgetList<PluginFrame>(frames)) f.pluginName];
-      expect(names, ['用量', '相册']);
-      final sources = tester.getRect(find.byKey(const ValueKey('chat-plugins-sources')));
-      final island = tester.getRect(find.byKey(const ValueKey('chat-plugins-island')));
-      final last = tester.getRect(frames.last);
-      expect(sources.top, greaterThan(last.bottom));
-      expect(island.top - sources.bottom, moreOrLessEquals(ChatPluginsMetrics.sourcesGap, epsilon: 0.5));
-      final width = tester.view.physicalSize.width / tester.view.devicePixelRatio;
-      for (final r in [tester.getRect(frames.first), last, island]) {
-        expect(r.left, moreOrLessEquals(ChatPluginsMetrics.side, epsilon: 0.5));
-        expect(width - r.right, moreOrLessEquals(ChatPluginsMetrics.side, epsilon: 0.5));
-      }
-      final spec = tester.widget<seats.FakeIsland>(find.byType(seats.FakeIsland)).spec;
-      expect(spec.slot, Slots.chatSheet);
-      expect(find.textContaining('网页插件'), findsOneWidget);
-      // The ways in sit under the island, DSH Web always last: a part that
-      // opens something the island never shows still has a way in.
-      expect(find.byKey(const ValueKey('chat-plugins-ways-in')), findsOneWidget);
-      expect(find.byKey(const ValueKey('chat-plugins-web-link')), findsOneWidget);
+      // The list, one row per installed plugin, nothing opened yet.
+      expect(find.byKey(const ValueKey('chat-plugins-row|dsh-go-example-usage|usage')), findsOneWidget);
+      expect(find.byKey(const ValueKey('chat-plugins-row|dsh-go-example-album|album')), findsOneWidget);
+      expect(find.byType(PluginFrame), findsNothing);
+      // Tapping a row opens that plugin's panel; the sheet's own stack goes
+      // with it, so the sheet stays open with a new title.
+      await tester.tap(find.byKey(const ValueKey('chat-plugins-row|dsh-go-example-usage|usage')));
+      await pumpFrames(tester);
+      expect(find.byType(PluginFrame), findsOneWidget);
+      expect(tester.widget<PluginFrame>(find.byType(PluginFrame)).pluginName, '用量');
+      // Back returns to the list.
+      await tester.tap(find.byIcon(AppIcons.back));
+      await pumpFrames(tester);
+      expect(find.byType(PluginFrame), findsNothing);
+      expect(find.byKey(const ValueKey('chat-plugins-row|dsh-go-example-usage|usage')), findsOneWidget);
     });
 
     testWidgets('an island that can\'t come up is one 在网页版打开 row into the conversation', (tester) async {
@@ -390,6 +369,11 @@ void main() {
           renderers: seats.testRenderers(island: (context, spec, items, fallback) => fallback(context)),
         ),
       );
+      await pumpFrames(tester);
+      // The web plugins are one row of their own; nothing of theirs is open.
+      expect(find.byKey(const ValueKey('chat-plugins-row|web')), findsOneWidget);
+      expect(find.byType(seats.FakeIsland), findsNothing);
+      await tester.tap(find.byKey(const ValueKey('chat-plugins-row|web')));
       await pumpFrames(tester);
       expect(find.byType(seats.FakeIsland), findsNothing);
       expect(find.byKey(const ValueKey('chat-plugins-web-link')), findsOneWidget);
