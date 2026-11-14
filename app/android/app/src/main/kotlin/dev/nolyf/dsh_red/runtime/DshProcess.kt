@@ -130,6 +130,17 @@ class DshProcess(
         val pidFile = File(rootfs, "root/.dsh/dsh-app/dsh-web.pid")
         pidFile.delete() // also removes a stale/dangling symlink; never reuse a previous run's PID
         check(!java.nio.file.Files.exists(pidFile.toPath(), java.nio.file.LinkOption.NOFOLLOW_LINKS)) { "cannot remove stale runtime pid file" }
+        // The engine's log holds this run only: an earlier run's token line
+        // would be read as this run's token (the port it names is the earlier
+        // one), and the engine would refuse every request with it.
+        val logFile = File(rootfs, "root/.dsh/dsh-app/dsh-web.log")
+        if (logFile.exists() && !logFile.delete()) {
+            // The folder still belongs to an earlier install: root hands it
+            // over, and the file goes with it. The launch script truncates the
+            // log anyway, so a file that stays is not a reason to give up.
+            ChrootRuntime.chownToApp(logFile.parentFile ?: logFile)
+            logFile.delete()
+        }
         port = pickPort()
         val tmp = File(context.cacheDir, "chroot-tmp").apply { mkdirs() }
         val vars = mapOf(
@@ -398,6 +409,17 @@ class DshProcess(
 
 
     /**
+     * The engine's endpoint, read from its own log.
+     *
+     * The log holds the token line of the run that is serving now; the last
+     * one in it is this engine's. The app asks for it again when a connection
+     * fails, so a token from an earlier run cannot keep the app out.
+     *
+     * @return the base URL and the token, or null when the engine wrote none.
+     */
+    fun currentEndpoint(): Pair<String, String>? = endpointFromLog(File(rootfs, "root/.dsh/dsh-app/dsh-web.log"))
+
+    /**
      * Tails the engine's log file: the token line and the runtime log the app
      * shows come from there, so a frozen app never blocks the engine.
      */
@@ -448,9 +470,10 @@ class DshProcess(
 
     @Synchronized private fun detectToken(line: String) {
         if (readyReported || stopping) return
-        val match = TOKEN_URL.find(line) ?: return
-        val url = match.value
-        val token = TOKEN_PARAM.find(url)?.groupValues?.get(1) ?: return
+        val (urlPort, token) = tokenLine(line) ?: return
+        // Only this run's line: a token from an earlier run names that run's
+        // port, and the engine would refuse every request with it.
+        if (urlPort != null && urlPort != port) return
         readyReported = true
         startupSignal.countDown()
         val base = "http://127.0.0.1:$port"
@@ -556,7 +579,43 @@ class DshProcess(
         private const val TOKEN_TIMEOUT_MS = 180_000L
         private val TOKEN_URL = Regex("""https?://[^\s'"]*[?&#]token=[A-Za-z0-9._~%-]+""")
         private val TOKEN_PARAM = Regex("""[?&#]token=([A-Za-z0-9._~%-]+)""")
+        private val TOKEN_PORT = Regex("""://[^/]*?:(\d+)""")
         private val SECRET_KEY = Regex("(?i)(key|token|secret|password)")
+
+        /**
+         * The port and the token a line of the engine's log names.
+         *
+         * The port is null when the line names no port; the token is never
+         * null when a token line was found.
+         */
+        internal fun tokenLine(line: String): Pair<Int?, String>? {
+            val match = TOKEN_URL.find(line) ?: return null
+            val url = match.value
+            val port = TOKEN_PORT.find(url)?.groupValues?.get(1)?.toIntOrNull()
+            val token = TOKEN_PARAM.find(url)?.groupValues?.get(1) ?: return null
+            return port to token
+        }
+
+        /**
+         * The endpoint the engine's own log names.
+         *
+         * The last token line in it is the run that is serving now. An earlier
+         * run's line is ignored: the app asks for the endpoint again when a
+         * connection fails, and a token from an earlier run keeps it out.
+         */
+        internal fun endpointFromLog(file: File): Pair<String, String>? {
+            if (!file.isFile) return null
+            var found: Pair<String, String>? = null
+            try {
+                file.forEachLine { line ->
+                    val (port, token) = tokenLine(line) ?: return@forEachLine
+                    if (port == null) return@forEachLine
+                    found = "http://127.0.0.1:$port" to token
+                }
+            } catch (_: Exception) {
+            }
+            return found
+        }
 
         fun canConnect(port: Int): Boolean = try {
             Socket().use { it.connect(InetSocketAddress("127.0.0.1", port), 500); true }

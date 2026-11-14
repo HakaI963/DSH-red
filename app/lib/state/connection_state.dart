@@ -12,6 +12,7 @@ import '../remote/ssh/ssh_link.dart';
 import '../remote/ssh/ssh_transport.dart';
 import '../runtime/runtime_bridge.dart';
 import '../runtime/runtime_state.dart';
+import 'engine_control.dart';
 import 'hosts_state.dart';
 import 'permission_default_repair.dart';
 import 'provider_backend.dart';
@@ -81,7 +82,19 @@ class LocalConnectionController extends AsyncNotifier<HostConnection?> {
     final (baseUrl, token) = endpoint;
     if (baseUrl == null || token == null) return null;
 
-    final client = await r.read(localClientConnectorProvider)(baseUri: Uri.parse(baseUrl), token: token);
+    final DshClient client;
+    try {
+      client = await r.read(localClientConnectorProvider)(baseUri: Uri.parse(baseUrl), token: token);
+    } on Object catch (error) {
+      // The login itself failed: the engine may be serving with another token
+      // or another port than the one this attempt used — an engine that was
+      // restarted, or a leftover from an earlier run. The engine's own log is
+      // the truth, so the app asks it again; an engine that refused the login
+      // is restarted, so it gets a fresh token and a fresh port. The failure
+      // is reported at once; the recovery runs beside it.
+      unawaited(_recoverAfterFailure(r, restart: _engineRefused(error)));
+      rethrow;
+    }
     if (!r.mounted) {
       await client.close();
       return null;
@@ -116,7 +129,11 @@ class LocalConnectionController extends AsyncNotifier<HostConnection?> {
     final apiKey = r.read(settingsProvider).apiKey;
     if (apiKey.isNotEmpty) await _pushKey(client, apiKey);
     if (!r.mounted) return null;
-    if (readyFailure case final failure?) Error.throwWithStackTrace(failure.$1, failure.$2);
+    if (readyFailure case final failure?) {
+      // Same as above, for a session that never came up.
+      unawaited(_recoverAfterFailure(r, restart: false));
+      Error.throwWithStackTrace(failure.$1, failure.$2);
+    }
     final connection = HostConnection(client: client, isLocal: true);
     // HTTP is usable now; keep build pending so ready failures retain Riverpod's retry policy.
     state = AsyncData(connection);
@@ -135,6 +152,49 @@ class LocalConnectionController extends AsyncNotifier<HostConnection?> {
     unawaited(clearAutoDefaultPreset(r.container));
 
     return connection;
+  }
+
+  /// Whether the engine refused the login.
+  ///
+  /// It answered and said no: the token or the port was not the one it serves
+  /// on. A fresh process gets a fresh token and a fresh port, so such an
+  /// engine is restarted. Every other failure — no answer at all, or a slow
+  /// boot — is left alone: the engine may still come up on its own.
+  static bool _engineRefused(Object error) =>
+      error is DshHttpException && (error.statusCode == 401 || error.statusCode == 403);
+
+  /// Reads the engine's endpoint again after a failed connection.
+  ///
+  /// The engine's own log is the truth about its token and its port; the app
+  /// re-reads it whenever a connection fails, so a stale endpoint cannot keep
+  /// it out. A changed endpoint reaches the app as a new status, and the next
+  /// attempt uses it.
+  ///
+  /// [restart] also restarts an engine that refused the login: a fresh
+  /// process gets a fresh token and a fresh port.
+  Future<void> _recoverAfterFailure(Ref r, {required bool restart}) async {
+    if (!r.mounted) return;
+    var changed = false;
+    try {
+      changed = await r.read(runtimeBridgeProvider).refreshEngineEndpoint();
+    } on Object {
+      // The native side could not be asked; the failure stands.
+    }
+    if (!r.mounted) return;
+    if (restart && !changed) await _restartStuckEngine(r);
+  }
+
+  /// Restarts an engine that answers but does not serve.
+  ///
+  /// A fresh process gets a fresh token and a fresh port, and the app
+  /// reconnects to it. The runtime restarts it at most once every two
+  /// minutes, so a broken engine cannot make the app restart it over and over.
+  Future<void> _restartStuckEngine(Ref r) async {
+    try {
+      await EngineControl.restartStuckEngine(r.container);
+    } on Object {
+      // The engine could not be restarted; the failure stands.
+    }
   }
 
   Future<void> _pushKey(DshClient client, String key) async {

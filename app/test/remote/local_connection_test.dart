@@ -5,6 +5,7 @@ import 'package:dsh_app/runtime/runtime_state.dart';
 import 'package:dsh_app/state/connection_state.dart';
 import 'package:dsh_app/state/settings_state.dart';
 import 'package:dsh_client/dsh_client.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -24,9 +25,40 @@ class _Runtime extends LocalRuntimeController {
   void replace(String token) => state = _running(token);
 }
 
+/// A native side that answers "the engine serves on another endpoint".
+class _Bridge extends RuntimeBridge {
+  _Bridge({this.changed = true}) : super(methods: const MethodChannel('dsh/runtime-test'));
+
+  /// What `refreshEndpoint` reports: true when the endpoint changed.
+  final bool changed;
+  int refreshes = 0;
+  int restarts = 0;
+
+  @override
+  Future<bool> refreshEngineEndpoint() async {
+    refreshes++;
+    return changed;
+  }
+
+  @override
+  Future<bool> restartEngine() async {
+    restarts++;
+    return true;
+  }
+}
+
 class _Settings extends SettingsController {
   @override
   AppSettings build() => const AppSettings(loaded: true);
+}
+
+/// Waits for something that runs beside the failure, not before it.
+Future<void> waitFor(bool Function() ok, {required String what}) async {
+  final deadline = DateTime.now().add(const Duration(seconds: 5));
+  while (!ok() && DateTime.now().isBefore(deadline)) {
+    await Future<void>.delayed(const Duration(milliseconds: 10));
+  }
+  expect(ok(), isTrue, reason: what);
 }
 
 class _Client extends DshClient {
@@ -88,6 +120,7 @@ void main() {
       overrides: [
         settingsProvider.overrideWith(_Settings.new),
         localRuntimeProvider.overrideWith(_Runtime.new),
+        runtimeBridgeProvider.overrideWithValue(_Bridge()),
         networkKicksProvider.overrideWithValue(kicks.stream),
         localClientConnectorProvider.overrideWithValue(({required baseUri, required token}) async {
           attempts++;
@@ -103,5 +136,77 @@ void main() {
     kicks.add(null);
     await until(c, localConnectionProvider, (s) => s.value != null, what: '网络恢复后连接');
     expect(attempts, 2);
+  });
+
+  test('a refused login asks the engine again for its endpoint', () async {
+    // The engine may serve with another token or another port than the one the
+    // app used: the engine's own log is the truth, so the app asks it again.
+    final bridge = _Bridge();
+    final c = ProviderContainer(
+      retry: (_, _) => null,
+      overrides: [
+        settingsProvider.overrideWith(_Settings.new),
+        localRuntimeProvider.overrideWith(_Runtime.new),
+        runtimeBridgeProvider.overrideWithValue(bridge),
+        networkKicksProvider.overrideWithValue(const Stream.empty()),
+        localClientConnectorProvider.overrideWithValue(({required baseUri, required token}) async {
+          throw const DshHttpException(401, 'launch token rejected');
+        }),
+      ],
+    );
+    addTearDown(c.dispose);
+    final sub = c.listen(localConnectionProvider, (_, _) {});
+    addTearDown(sub.close);
+    await until(c, localConnectionProvider, (s) => s.hasError, what: '本机连接失败');
+    await waitFor(() => bridge.refreshes > 0, what: '重新读取引擎的端点');
+    expect(bridge.refreshes, greaterThanOrEqualTo(1));
+  });
+
+  test('an engine that refuses every login is restarted once', () async {
+    // The engine answers but refuses: a fresh process gets a fresh token and a
+    // fresh port, and the app reconnects to it.
+    final bridge = _Bridge(changed: false);
+    final c = ProviderContainer(
+      retry: (_, _) => null,
+      overrides: [
+        settingsProvider.overrideWith(_Settings.new),
+        localRuntimeProvider.overrideWith(_Runtime.new),
+        runtimeBridgeProvider.overrideWithValue(bridge),
+        networkKicksProvider.overrideWithValue(const Stream.empty()),
+        localClientConnectorProvider.overrideWithValue(({required baseUri, required token}) async {
+          throw const DshHttpException(401, 'launch token rejected');
+        }),
+      ],
+    );
+    addTearDown(c.dispose);
+    final sub = c.listen(localConnectionProvider, (_, _) {});
+    addTearDown(sub.close);
+    await until(c, localConnectionProvider, (s) => s.hasError, what: '本机连接失败');
+    await waitFor(() => bridge.restarts > 0, what: '重启不服务的引擎');
+    expect(bridge.restarts, 1);
+  });
+
+  test('an engine that does not answer is left alone', () async {
+    // No answer at all is not a refusal: the engine may still be booting, and
+    // a restart would only make it later.
+    final bridge = _Bridge(changed: false);
+    final c = ProviderContainer(
+      retry: (_, _) => null,
+      overrides: [
+        settingsProvider.overrideWith(_Settings.new),
+        localRuntimeProvider.overrideWith(_Runtime.new),
+        runtimeBridgeProvider.overrideWithValue(bridge),
+        networkKicksProvider.overrideWithValue(const Stream.empty()),
+        localClientConnectorProvider.overrideWithValue(({required baseUri, required token}) async {
+          throw const DshTransportException('no answer');
+        }),
+      ],
+    );
+    addTearDown(c.dispose);
+    final sub = c.listen(localConnectionProvider, (_, _) {});
+    addTearDown(sub.close);
+    await until(c, localConnectionProvider, (s) => s.hasError, what: '本机连接失败');
+    await waitFor(() => bridge.refreshes > 0, what: '重新读取引擎的端点');
+    expect(bridge.restarts, 0);
   });
 }
