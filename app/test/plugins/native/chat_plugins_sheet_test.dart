@@ -168,9 +168,25 @@ List<String> _capsules(WidgetTester tester) => [
 
 Future<void> _openSheet(WidgetTester tester, List<Override> overrides) async {
   usePhoneView(tester);
-  await tester.pumpWidget(_bar(overrides));
+  // No chat-page entry any more, so the sheet is opened the way the side
+  // panel's Plugins tab reaches a plugin: a button that calls it.
+  await tester.pumpWidget(
+    testApp(
+      Builder(
+        builder: (context) => Scaffold(
+          body: Center(
+            child: TextButton(
+              onPressed: () => showChatPluginsSheet(context, sessionId: 's1'),
+              child: const Text('open'),
+            ),
+          ),
+        ),
+      ),
+      overrides: overrides,
+    ),
+  );
   await pumpFrames(tester);
-  await tester.tap(find.widgetWithText(ComposerCapsule, '插件'));
+  await tester.tap(find.text('open'));
   await pumpFrames(tester, 12);
 }
 
@@ -267,8 +283,7 @@ void main() {
       final container = ProviderScope.containerOf(tester.element(find.byType(NativeComposerBar)));
       expect(container.read(chatNativePanelsProvider).map((p) => p.id), ['usage', 'album']);
       final labels = _capsules(tester);
-      expect(labels, hasLength(9));
-      expect(labels.where((l) => l.startsWith('按钮')), hasLength(9));
+      expect(labels, hasLength(8), reason: 'the eight plugin capsules; no built-in entry');
       expect(labels, isNot(contains('插件')));
 
       await tester.pumpWidget(_bar(_overrides(_bridge(panels: false, capsules: 1))));
