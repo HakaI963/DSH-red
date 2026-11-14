@@ -8,6 +8,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../l10n/l10n.dart';
 import '../../state/quick_panel_state.dart';
 import '../common/segmented_pill.dart';
+import '../common/list_page_row.dart';
 import '../shell/drawer/drawer_destination.dart';
 import '../shell/quick_panel.dart';
 import '../theme/app_icons.dart';
@@ -29,7 +30,7 @@ class ConversationPluginController extends Notifier<String?> {
   @override
   String? build() => null;
 
-  void select(String id) => state = id;
+  void select(String? id) => state = id;
 }
 
 final conversationPluginProvider = NotifierProvider<ConversationPluginController, String?>(
@@ -149,81 +150,50 @@ class _Plugins extends ConsumerWidget {
       );
     }
     final picked = ref.watch(conversationPluginProvider);
-    final pane = panes.where((p) => p.id == picked).firstOrNull ?? panes.first;
-    final body = KeyedSubtree(key: ValueKey('$sessionId/${pane.id}'), child: pane.build(sessionId));
-    if (panes.length == 1) return body;
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
-          child: Row(
+    final pane = panes.where((p) => p.id == picked).firstOrNull;
+    // First step: the installed plugins, one row each. Nothing is chosen
+    // until the person taps one, so opening Plugins shows the list instead
+    // of dropping them inside the first plugin's panel.
+    if (pane == null) {
+      return ListView(
+        key: const ValueKey('pane-plugin-list'),
+        padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
+        children: [
+          ListPageCard(
             children: [
-              for (final p in panes) ...[
-                _Chip(
-                  key: ValueKey('pane-${p.id}'),
+              for (final p in panes)
+                ListPageRow(
+                  key: ValueKey('pane-row-${p.id}'),
                   icon: p.icon,
-                  label: p.label(),
-                  selected: p.id == pane.id,
+                  title: p.label(),
+                  chevron: true,
                   onTap: () {
                     HapticFeedback.selectionClick();
                     ref.read(conversationPluginProvider.notifier).select(p.id);
                   },
                 ),
-                if (p != panes.last) const SizedBox(width: 6),
-              ],
             ],
           ),
+        ],
+      );
+    }
+    // Second step: the chosen plugin's panel, the way back at the top.
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        ListPageRow(
+          key: const ValueKey('pane-plugin-back'),
+          icon: AppIcons.back,
+          title: l10n.commonBack,
+          onTap: () => ref.read(conversationPluginProvider.notifier).select(null),
         ),
-        Expanded(child: body),
+        Expanded(
+          child: KeyedSubtree(
+            key: ValueKey('$sessionId/${pane.id}'),
+            child: pane.build(sessionId),
+          ),
+        ),
       ],
-    );
-  }
-}
-
-class _Chip extends StatelessWidget {
-  const _Chip({super.key, required this.icon, required this.label, required this.selected, required this.onTap});
-
-  final IconData icon;
-  final String label;
-  final bool selected;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final colors = theme.colorScheme;
-    final content = selected ? colors.onSurface : colors.onSurfaceVariant;
-    return Semantics(
-      button: true,
-      selected: selected,
-      label: label,
-      excludeSemantics: true,
-      onTap: onTap,
-      child: InkResponse(
-        onTap: onTap,
-        highlightShape: BoxShape.rectangle,
-        borderRadius: BorderRadius.circular(16),
-        child: AnimatedContainer(
-          duration: AppMotion.of(context, AppMotion.quick),
-          curve: AppMotion.std,
-          height: 32,
-          padding: const EdgeInsets.symmetric(horizontal: 10),
-          decoration: ShapeDecoration(
-            color: colors.onSurface.withValues(alpha: selected ? 0.1 : 0.04),
-            shape: const StadiumBorder(),
-          ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(icon, size: 16, color: content),
-              const SizedBox(width: 5),
-              Text(label, maxLines: 1, style: theme.textTheme.labelMedium?.copyWith(color: content)),
-            ],
-          ),
-        ),
-      ),
     );
   }
 }
