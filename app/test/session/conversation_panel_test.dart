@@ -478,16 +478,19 @@ void main() {
         NativePanel(package: 'a', id: 'tab', title: '统计', placement: {DshGoPanel.sessionTab}),
         NativePanel(package: 'b', id: 'all', title: '大全', placement: {DshGoPanel.features}),
       ]);
-      expect(find.byKey(const ValueKey('pane-native|a|chat')), findsOneWidget);
-      expect(find.byKey(const ValueKey('pane-native|a|tab')), findsOneWidget);
-      expect(find.byKey(const ValueKey('pane-native|b|all')), findsOneWidget);
+      // The list comes first: one row per panel, and no panel until one is picked.
+      expect(find.byKey(const ValueKey('pane-row-native|a|chat')), findsOneWidget);
+      expect(find.byKey(const ValueKey('pane-row-native|a|tab')), findsOneWidget);
+      expect(find.byKey(const ValueKey('pane-row-native|b|all')), findsOneWidget);
+      expect(find.byKey(const ValueKey('pane-plugin-back')), findsNothing);
     });
 
-    testWidgets('one plugin panel fills it, no row', (tester) async {
+    testWidgets('one plugin panel is a row too, and its panel waits for the tap', (tester) async {
       await withPanels(tester, const [
         NativePanel(package: 'a', id: 'chat', title: '工具', placement: {DshGoPanel.chatPanel}),
       ]);
-      expect(find.byKey(const ValueKey('pane-native|a|chat')), findsNothing);
+      expect(find.byKey(const ValueKey('pane-row-native|a|chat')), findsOneWidget);
+      expect(find.byKey(const ValueKey('pane-plugin-back')), findsNothing);
       expect(find.text('这段对话还没有插件面板'), findsNothing);
     });
 
