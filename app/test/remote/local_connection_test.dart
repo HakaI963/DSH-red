@@ -25,25 +25,6 @@ class _Runtime extends LocalRuntimeController {
   void replace(String token) => state = _running(token);
 }
 
-/// A runtime that records the restart the connection path asks for.
-class _RestartableRuntime extends _Runtime {
-  int starts = 0;
-
-  @override
-  Future<void> stop() async {
-    // The engine is gone: the phase leaves "running", so the wait ends.
-    state = LocalRuntimeState(
-      loaded: true,
-      status: RuntimeStatus.fromMap({'phase': 'installed'}),
-    );
-  }
-
-  @override
-  Future<void> start() async {
-    starts++;
-  }
-}
-
 /// A native side that answers "the engine serves on another endpoint".
 class _Bridge extends RuntimeBridge {
   _Bridge({this.changed = true}) : super(methods: const MethodChannel('dsh/runtime-test'));
@@ -51,11 +32,18 @@ class _Bridge extends RuntimeBridge {
   /// What `refreshEndpoint` reports: true when the endpoint changed.
   final bool changed;
   int refreshes = 0;
+  int restarts = 0;
 
   @override
   Future<bool> refreshEngineEndpoint() async {
     refreshes++;
     return changed;
+  }
+
+  @override
+  Future<bool> restartEngine() async {
+    restarts++;
+    return true;
   }
 }
 
@@ -175,15 +163,14 @@ void main() {
   });
 
   test('an engine that refuses every login is restarted once', () async {
-    // The engine answers but does not serve: a fresh process gets a fresh
-    // token and a fresh port, and the app reconnects to it.
-    final runtime = _RestartableRuntime();
+    // The engine answers but refuses: a fresh process gets a fresh token and a
+    // fresh port, and the app reconnects to it.
     final bridge = _Bridge(changed: false);
     final c = ProviderContainer(
       retry: (_, _) => null,
       overrides: [
         settingsProvider.overrideWith(_Settings.new),
-        localRuntimeProvider.overrideWith(() => runtime),
+        localRuntimeProvider.overrideWith(_Runtime.new),
         runtimeBridgeProvider.overrideWithValue(bridge),
         networkKicksProvider.overrideWithValue(const Stream.empty()),
         localClientConnectorProvider.overrideWithValue(({required baseUri, required token}) async {
@@ -195,9 +182,31 @@ void main() {
     final sub = c.listen(localConnectionProvider, (_, _) {});
     addTearDown(sub.close);
     await until(c, localConnectionProvider, (s) => s.hasError, what: '本机连接失败');
+    await waitFor(() => bridge.restarts > 0, what: '重启不服务的引擎');
+    expect(bridge.restarts, 1);
+  });
+
+  test('an engine that does not answer is left alone', () async {
+    // No answer at all is not a refusal: the engine may still be booting, and
+    // a restart would only make it later.
+    final bridge = _Bridge(changed: false);
+    final c = ProviderContainer(
+      retry: (_, _) => null,
+      overrides: [
+        settingsProvider.overrideWith(_Settings.new),
+        localRuntimeProvider.overrideWith(_Runtime.new),
+        runtimeBridgeProvider.overrideWithValue(bridge),
+        networkKicksProvider.overrideWithValue(const Stream.empty()),
+        localClientConnectorProvider.overrideWithValue(({required baseUri, required token}) async {
+          throw const DshTransportException('no answer');
+        }),
+      ],
+    );
+    addTearDown(c.dispose);
+    final sub = c.listen(localConnectionProvider, (_, _) {});
+    addTearDown(sub.close);
+    await until(c, localConnectionProvider, (s) => s.hasError, what: '本机连接失败');
     await waitFor(() => bridge.refreshes > 0, what: '重新读取引擎的端点');
-    expect(bridge.refreshes, greaterThanOrEqualTo(1));
-    await waitFor(() => runtime.starts > 0, what: '重启卡住的引擎');
-    expect(runtime.starts, 1);
+    expect(bridge.restarts, 0);
   });
 }

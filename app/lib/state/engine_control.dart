@@ -43,13 +43,18 @@ abstract final class EngineControl {
   /// Restarts an engine that answers but does not serve, at most once every
   /// two minutes.
   ///
-  /// A fresh process gets a fresh token and a fresh port, and the app
-  /// reconnects to it. A broken engine must not make the app restart it over
-  /// and over, so the second attempt within [EngineRestartGuard.interval] is
-  /// left to the engine's own recovery.
+  /// The engine is stopped and started again by the side that owns it: a fresh
+  /// process gets a fresh token and a fresh port, and the app reconnects to
+  /// it. A broken engine must not make the app restart it over and over, so
+  /// the second attempt within [EngineRestartGuard.interval] is left to the
+  /// engine's own recovery.
   static Future<void> restartStuckEngine(ProviderContainer container) async {
     if (!container.read(engineRestartGuardProvider.notifier).allow()) return;
-    await restart(container);
+    try {
+      await container.read(runtimeBridgeProvider).restartEngine();
+    } on Object {
+      // The native side could not be asked; the failure stands.
+    }
   }
 
   static Future<bool> _restart(ProviderContainer container, {EngineMode? mode}) async {

@@ -58,6 +58,9 @@ class RuntimeController private constructor(private val app: Context) : DshProce
     /** The start in progress is turning PRoot's fake hard links into real files (see [L2sMigration]). */
     @Volatile private var tidyingFiles = false
 
+    /** A restart the app asked for: the engine is stopped and started again. */
+    @Volatile private var restartRequested = false
+
     @Volatile var phase: Phase = Phase.NOT_INSTALLED
         private set
     @Volatile private var baseUrl: String? = null
@@ -283,8 +286,19 @@ class RuntimeController private constructor(private val app: Context) : DshProce
         null
     }
 
-    fun stop() {
-        synchronized(this) { phoneSkillStoppedGeneration = maxOf(phoneSkillStoppedGeneration, runGen) }
+    fun stop() = stopEngine(restart = false)
+
+    /**
+     * Stops the engine, and starts it again when it is gone.
+     *
+     * A restart the person asked for wins over a pending one: the engine
+     * stays stopped.
+     */
+    private fun stopEngine(restart: Boolean) {
+        synchronized(this) {
+            restartRequested = restart
+            phoneSkillStoppedGeneration = maxOf(phoneSkillStoppedGeneration, runGen)
+        }
         managedSkillGate.stop(runGen)
         val intent = Intent(app, DshService::class.java).setAction(DshService.ACTION_STOP)
         app.startService(intent)
@@ -985,6 +999,23 @@ class RuntimeController private constructor(private val app: Context) : DshProce
         return true
     }
 
+    /**
+     * Restarts the engine: it answers but does not serve.
+     *
+     * A fresh process gets a fresh token and a fresh port, and the app
+     * reconnects to it. The engine is stopped now and started again when it
+     * is gone; the service that owns it does the stopping.
+     *
+     * @return true when a restart was started.
+     */
+    @Synchronized fun restart(): Boolean {
+        if (phase != Phase.RUNNING && phase != Phase.STARTING) return false
+        if (restartRequested) return false
+        log("[dsh-app] the engine answers but does not serve; it is restarted", "system")
+        stopEngine(restart = true)
+        return true
+    }
+
     @Synchronized override fun onReady(source: DshProcess, baseUrl: String, token: String) {
         // A late report from a stopped or replaced process.
         if (source !== process || phase == Phase.STOPPING || source.startupError != null ||
@@ -1018,6 +1049,8 @@ class RuntimeController private constructor(private val app: Context) : DshProce
 
     @Synchronized override fun onExit(source: DshProcess, code: Int, expected: Boolean) {
         if (source !== process) return
+        val restart = restartRequested
+        restartRequested = false
         try {
             if (source.startupError != null) source.launchDiagnostics.failed("startFailed")
             else if (!expected && stopGen < runGen) source.launchDiagnostics.failed("exit:$code")
@@ -1042,6 +1075,13 @@ class RuntimeController private constructor(private val app: Context) : DshProce
                 return
             }
             if (expected || stopGen >= runGen) {
+                if (restart && !resetting) {
+                    // The engine is gone: a fresh one gets a fresh token and a
+                    // fresh port, and the app reconnects to it.
+                    setPhase(Phase.INSTALLED)
+                    main.post { start(pendingEnv, pendingPhoneStorage) }
+                    return
+                }
                 if (!resetting && phase == Phase.STOPPING) setPhase(Phase.INSTALLED)
                 DshService.stopSelfIfRunning(app, runGen)
                 return

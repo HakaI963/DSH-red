@@ -619,6 +619,13 @@ class RuntimeBridge {
   Future<bool> refreshEngineEndpoint() async =>
       await _methods.invokeMethod<bool>('refreshEndpoint') ?? false;
 
+  /// Restarts the engine: it answers but does not serve.
+  ///
+  /// The engine is stopped now and started again when it is gone, by the side
+  /// that owns it. A fresh process gets a fresh token and a fresh port, and
+  /// the app reconnects to it.
+  Future<bool> restartEngine() async => await _methods.invokeMethod<bool>('restartEngine') ?? false;
+
   Future<void> setAutoSafe(bool enabled) => _methods.invokeMethod<void>('setAutoSafe', {'enabled': enabled});
 
   /// Selects the local workspace index for subsequent starts. Native code

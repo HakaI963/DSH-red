@@ -85,14 +85,14 @@ class LocalConnectionController extends AsyncNotifier<HostConnection?> {
     final DshClient client;
     try {
       client = await r.read(localClientConnectorProvider)(baseUri: Uri.parse(baseUrl), token: token);
-    } on Object {
+    } on Object catch (error) {
       // The login itself failed: the engine may be serving with another token
       // or another port than the one this attempt used — an engine that was
       // restarted, or a leftover from an earlier run. The engine's own log is
-      // the truth, so the app asks it again; an engine that answers but does
-      // not serve is restarted once. The failure is reported at once; the
-      // recovery runs beside it.
-      unawaited(_recoverAfterFailure(r, restart: true));
+      // the truth, so the app asks it again; an engine that refused the login
+      // is restarted, so it gets a fresh token and a fresh port. The failure
+      // is reported at once; the recovery runs beside it.
+      unawaited(_recoverAfterFailure(r, restart: _engineRefused(error)));
       rethrow;
     }
     if (!r.mounted) {
@@ -154,6 +154,15 @@ class LocalConnectionController extends AsyncNotifier<HostConnection?> {
     return connection;
   }
 
+  /// Whether the engine refused the login.
+  ///
+  /// It answered and said no: the token or the port was not the one it serves
+  /// on. A fresh process gets a fresh token and a fresh port, so such an
+  /// engine is restarted. Every other failure — no answer at all, or a slow
+  /// boot — is left alone: the engine may still come up on its own.
+  static bool _engineRefused(Object error) =>
+      error is DshHttpException && (error.statusCode == 401 || error.statusCode == 403);
+
   /// Reads the engine's endpoint again after a failed connection.
   ///
   /// The engine's own log is the truth about its token and its port; the app
@@ -161,8 +170,8 @@ class LocalConnectionController extends AsyncNotifier<HostConnection?> {
   /// it out. A changed endpoint reaches the app as a new status, and the next
   /// attempt uses it.
   ///
-  /// [restart] also restarts an engine that answers but does not serve: a
-  /// fresh process gets a fresh token and a fresh port.
+  /// [restart] also restarts an engine that refused the login: a fresh
+  /// process gets a fresh token and a fresh port.
   Future<void> _recoverAfterFailure(Ref r, {required bool restart}) async {
     if (!r.mounted) return;
     var changed = false;
