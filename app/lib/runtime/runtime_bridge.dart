@@ -610,6 +610,15 @@ class RuntimeBridge {
 
   Future<void> clearFailure() => _methods.invokeMethod<void>('clearFailure');
 
+  /// Re-reads the engine's endpoint (its base URL and token) from the engine's
+  /// own log.
+  ///
+  /// A token or a port from an earlier run keeps the app from reaching an
+  /// engine that is running perfectly well. The engine's log is the truth, so
+  /// the app asks it again when a connection fails.
+  Future<bool> refreshEngineEndpoint() async =>
+      await _methods.invokeMethod<bool>('refreshEndpoint') ?? false;
+
   Future<void> setAutoSafe(bool enabled) => _methods.invokeMethod<void>('setAutoSafe', {'enabled': enabled});
 
   /// Selects the local workspace index for subsequent starts. Native code

@@ -965,6 +965,26 @@ class RuntimeController private constructor(private val app: Context) : DshProce
         return true
     }
 
+    /**
+     * Re-reads the engine's endpoint from its own log.
+     *
+     * The app asks for it again when a connection fails: a token or a port
+     * from an earlier run keeps the app from reaching an engine that is
+     * running perfectly well. The engine's own log is the truth.
+     *
+     * @return true when a new endpoint was published.
+     */
+    @Synchronized fun refreshEndpoint(): Boolean {
+        val source = process ?: return false
+        val endpoint = source.currentEndpoint() ?: return false
+        val (base, token) = endpoint
+        if (base == baseUrl && token == this.token) return false
+        this.baseUrl = base
+        this.token = token
+        emitStatus()
+        return true
+    }
+
     @Synchronized override fun onReady(source: DshProcess, baseUrl: String, token: String) {
         // A late report from a stopped or replaced process.
         if (source !== process || phase == Phase.STOPPING || source.startupError != null ||
