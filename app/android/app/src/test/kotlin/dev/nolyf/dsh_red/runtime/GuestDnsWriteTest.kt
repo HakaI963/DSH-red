@@ -108,20 +108,21 @@ class GuestDnsWriteTest {
         assertEquals("keep me", etc.readText())
     }
 
-    @Test fun unreadableCurrentFileReportsReadFailure() {
+    @Test fun unreadableCurrentFileIsReplacedAnyway() {
         val root = temporary.newFolder()
         val target = existing(root)
         assertTrue(target.setReadable(false, false))
+        lateinit var outcome: DnsConfigOutcome
         try {
             assumeFalse("This permission case requires an unprivileged test process", target.canRead())
-            val report = GuestSetup.writeResolvConf(root, servers) { _, _ -> fail("Cannot read current file") }
-            assertEquals(DnsConfigOutcome.FAILED, report.outcome)
-            assertEquals(DnsConfigStage.READ, report.stage)
-            assertEquals(DnsConfigError.IO, report.error)
+            // Reading first is only an optimisation: an unreadable file (root-owned
+            // or a dangling link) must not stop the atomic replacement.
+            outcome = GuestSetup.writeResolvConf(root, servers, ::replace).outcome
         } finally {
             assertTrue(target.setReadable(true, true))
         }
-        assertEquals("old configuration\n", target.readText())
+        assertEquals(DnsConfigOutcome.WRITTEN, outcome)
+        assertEquals(expected, target.readText())
     }
 
     @Test fun networkReadFailureStillWritesFallbackAndIsVisible() {
