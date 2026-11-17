@@ -62,6 +62,12 @@ class RuntimeInstaller(
      * whatever cannot and installs anyway.
      */
     fun install(dropKept: Boolean = false, onProgress: (Long, Long) -> Unit) {
+        // A reinstall gives the app a new uid while the tree under
+        // /data/local still belongs to the old one: nothing could be written
+        // into it. Root hands the tree over before the install touches it.
+        ChrootRuntime.ensureTreeOwnership()
+        // Whether the Linux base itself is replaced in this install.
+        var rebased = false
         // A reset killed halfway finishes first, so what it keeps is in runtime-keep for the restore.
         settleReset(retiredDir, keepDir, dropKept)
         baseDir.mkdirs()
@@ -117,23 +123,53 @@ class RuntimeInstaller(
             (groupNames.skipped?.let { "skipped ($it)" } ?: "added ${groupNames.added}"))
 
         timed("activate") {
-            activateRuntimeUpdate(baseDir, manifest.runtimeVersion, manifest.abi, manifest.raw,
-                keepDir, dropKept, sync = { timed("sync") { sync() } }, onLog = onLog)
+            try {
+                activateRuntimeUpdate(baseDir, manifest.runtimeVersion, manifest.abi, manifest.raw,
+                    keepDir, dropKept, sync = { timed("sync") { sync() } }, onLog = onLog)
+            } catch (blocked: RuntimeUpgradeBlocked) {
+                if (blocked.reason != "base") throw blocked
+                // The Linux base itself changed (the upstream packages moved on),
+                // so it cannot be upgraded in place. Rebuild it, and carry the
+                // live home over: the chats, the plugins and the settings live
+                // in the chroot, not in the app's copy of the rootfs.
+                onLog("[dsh-app] the runtime's Linux base changed; rebuilding it and keeping your chats")
+                timed("rebase") { rebase() }
+                rebased = true
+                activateRuntimeUpdate(baseDir, manifest.runtimeVersion, manifest.abi, manifest.raw,
+                    keepDir, dropKept, sync = { timed("sync") { sync() } }, onLog = onLog)
+            }
         }
         // Into the chroot the engine runs in (needs root on the phone).
         timed("chroot") {
             val uid = android.os.Process.myUid()
-            if (ChrootRuntime.hasEngine()) {
+            if (rebased) {
+                // The whole image is replaced: the live home goes with it and
+                // comes back.
+                ChrootRuntime.carryHome()
+                ChrootRuntime.install(rootfs, uid, uid, onLog)
+                ChrootRuntime.restoreHome()
+            } else if (ChrootRuntime.hasEngine()) {
                 // The tree is a runtime image, but the person's home lives in
-                // it: the chats, the plugins, the settings and the workspace.
-                // An update replaces the engine's own files and leaves the
-                // rest of the tree alone.
+                // it. Only the engine's own files are replaced.
                 ChrootRuntime.installEngine(rootfs, uid, uid, onLog)
             } else {
                 ChrootRuntime.install(rootfs, uid, uid, onLog)
             }
             ChrootRuntime.writeVersion(manifest.runtimeVersion)
         }
+    }
+
+    /**
+     * Replaces the app's copy of the Linux base.
+     *
+     * The live home is carried aside before the tree itself is replaced (see
+     * the chroot phase): it lives in the chroot, not in the app's copy.
+     */
+    private fun rebase() {
+        File(baseDir, "rootfs").deleteRecursivelySafely()
+        File(baseDir, "rootfs.version").delete()
+        File(baseDir, "rootfs.old").deleteRecursivelySafely()
+        File(baseDir, "home.carry").deleteRecursivelySafely()
     }
 
     private inline fun <T> timed(phase: String, block: () -> T): T {

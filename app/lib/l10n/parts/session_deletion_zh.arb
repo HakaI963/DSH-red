@@ -32,5 +32,8 @@
   "shellDeleteInventoryChanged": "对话列表已变化，请刷新后重新选择。",
   "shellDeleteProtocolError": "删除结果未确认，请刷新对话列表后再操作。",
   "shellDeleteNotAttempted": "未执行，请核对对话列表后重试。",
-  "shellDeleteFailed": "主机无法确认删除结果，请刷新后再决定是否重试。"
+  "shellDeleteFailed": "主机无法确认删除结果，请刷新后再决定是否重试。",
+  "shellDeleteRelatedTitle": "此对话有子代理工作",
+  "shellDeleteRelatedAction": "删除该对话及其子代理对话",
+  "shellDeleteRelatedExplanation": "由它创建的子代理对话会一并删除，不会影响其他内容。"
 }

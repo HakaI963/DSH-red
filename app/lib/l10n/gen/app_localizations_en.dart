@@ -16826,6 +16826,16 @@ class L10nEn extends L10n {
   String get shellDeleteFailed => 'The host could not confirm deletion. Refresh before retrying.';
 
   @override
+  String get shellDeleteRelatedTitle => 'This chat has subagent work';
+
+  @override
+  String get shellDeleteRelatedAction => 'Delete the chat and its subagent chats';
+
+  @override
+  String get shellDeleteRelatedExplanation =>
+      'The chats this one started are removed with it. Nothing else is touched.';
+
+  @override
   String get setupAppearanceTitle => 'Choose a look';
 
   @override

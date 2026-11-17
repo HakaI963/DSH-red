@@ -217,30 +217,95 @@ Future<void> deleteSessionsFlow(
         ?.showSnackBar(SnackBar(content: Text(context.l10n.shellChatsDeleted(deleted.length)), persist: false));
     return;
   }
-  await showAppDialog<void>(
-    context: context,
-    builder: (dialog) => AlertDialog(
-      key: const ValueKey('session-delete-failures'),
-      title: Text(context.l10n.shellDeletePartial(deleted.length, failures.length)),
-      content: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            for (final entry in failures.entries)
-              Padding(
-                padding: const EdgeInsets.only(bottom: 12),
-                child: Text(
-                  '${titles[entry.key] ?? entry.key}\n${entry.key}\n${sessionDeletionFailureText(context, entry.value)} (${entry.value})',
-                ),
+  // The host refused because the chat started subagent work. That is the
+  // person's call: the second answer removes the chat together with the
+  // subagent chats it started, and nothing else.
+  final related = [for (final entry in failures.entries) if (entry.value == 'session-related') entry.key];
+  final cascade = related.isEmpty
+      ? false
+      : await showAppDialog<bool>(
+          context: context,
+          builder: (dialog) => AlertDialog(
+            key: const ValueKey('session-delete-failures'),
+            title: Text(context.l10n.shellDeletePartial(deleted.length, failures.length)),
+            content: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(context.l10n.shellDeleteRelatedTitle, style: Theme.of(context).textTheme.titleMedium),
+                  const SizedBox(height: 4),
+                  Text(context.l10n.shellDeleteRelatedExplanation),
+                  const SizedBox(height: 12),
+                  for (final entry in failures.entries)
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 12),
+                      child: Text(
+                        '${titles[entry.key] ?? entry.key}\n${entry.key}\n${sessionDeletionFailureText(context, entry.value)} (${entry.value})',
+                      ),
+                    ),
+                ],
               ),
-          ],
-        ),
-      ),
-      actions: [TextButton(onPressed: () => Navigator.pop(dialog), child: Text(context.l10n.commonDone))],
-    ),
-  );
+            ),
+            actions: [
+              TextButton(onPressed: () => Navigator.pop(dialog, false), child: Text(context.l10n.commonCancel)),
+              FilledButton(
+                key: const ValueKey('session-delete-cascade'),
+                style: FilledButton.styleFrom(backgroundColor: Theme.of(context).colorScheme.error),
+                onPressed: () => Navigator.pop(dialog, true),
+                child: Text(context.l10n.shellDeleteRelatedAction),
+              ),
+            ],
+          ),
+        ) ??
+          false;
+  if (!cascade || !context.mounted || !owner.isCurrent(ref)) {
+    if (related.isEmpty && context.mounted) {
+      await _showDeletionFailures(context, deleted.length, failures, titles);
+    }
+    return;
+  }
+  // The person answered: the chat goes with the subagent work it started.
+  final result = await ref.read(sessionDeletionProvider.notifier).delete(related, owner: owner, cascade: true);
+  if (!context.mounted || !owner.isCurrent(ref)) return;
+  if (result.failures.isEmpty) {
+    ScaffoldMessenger.maybeOf(context)
+        ?.showSnackBar(SnackBar(content: Text(context.l10n.shellChatsDeleted(result.deleted.length)), persist: false));
+    return;
+  }
+  await _showDeletionFailures(context, result.deleted.length, result.failures, titles);
 }
+
+/// The refusals the host reported, one line per chat, with its stable code.
+Future<void> _showDeletionFailures(
+  BuildContext context,
+  int deleted,
+  Map<String, String> failures,
+  Map<String, String> titles,
+) =>
+    showAppDialog<void>(
+      context: context,
+      builder: (dialog) => AlertDialog(
+        key: const ValueKey('session-delete-failures'),
+        title: Text(context.l10n.shellDeletePartial(deleted, failures.length)),
+        content: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              for (final entry in failures.entries)
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 12),
+                  child: Text(
+                    '${titles[entry.key] ?? entry.key}\n${entry.key}\n${sessionDeletionFailureText(context, entry.value)} (${entry.value})',
+                  ),
+                ),
+            ],
+          ),
+        ),
+        actions: [TextButton(onPressed: () => Navigator.pop(dialog), child: Text(context.l10n.commonDone))],
+      ),
+    );
 
 String sessionDeletionFailureText(BuildContext context, String code) => switch (code) {
   'session-active' => context.l10n.shellDeleteRunning,

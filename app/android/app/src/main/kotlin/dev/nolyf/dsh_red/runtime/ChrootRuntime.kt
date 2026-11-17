@@ -23,6 +23,79 @@ object ChrootRuntime {
     /** Where the app's own copy of the rootfs waits until it is copied into place. */
     const val STAGING = "/data/local/DSH-red/staging"
 
+    /** The tree this app owns, with the chroot inside it. */
+    private const val TREE = "/data/local/DSH-red"
+
+    /** Where the live home waits while the tree is rebuilt. */
+    const val CARRY = "$TREE/home.carry"
+
+    /**
+     * A tmpfs is created with mode 0755, so every process that is not root
+     * was denied its own temp folder inside the chroot (the tools and the
+     * spill files live there). A normal Linux /tmp is 1777.
+     */
+    private const val TMPFS_MODE = "mode=1777"
+
+    /**
+     * Hands the tree to this app's uid when the last install had another one.
+     *
+     * Android gives an app a new uid when it is uninstalled and installed
+     * again. The tree under /data/local keeps the old owner, and the app can
+     * then write nothing into it any more — not even its own launch script.
+     * Root repairs the ownership once per uid change; the marker says which
+     * uid owns the tree now.
+     *
+     * @return true when the tree had to be handed over.
+     */
+    fun ensureTreeOwnership(): Boolean {
+        val su = suBinary() ?: return false
+        val uid = android.os.Process.myUid()
+        val script = """
+            marker='$ROOT/root/.dsh/dsh-app/owner'
+            current=`cat "${'$'}marker" 2>/dev/null`
+            if [ "${'$'}current" = "$uid" ]; then echo owned; exit 0; fi
+            chown -R $uid:$uid '$TREE' 2>/dev/null
+            mkdir -p '$ROOT/root/.dsh/dsh-app' 2>/dev/null || true
+            echo "$uid" > "${'$'}marker" 2>/dev/null || true
+            echo reowned
+        """.trimIndent()
+        val out = runCatching { runRootCommand(su, script, 600_000) }.getOrDefault("")
+        return out.contains("reowned")
+    }
+
+    /**
+     * Hands the app's own folders in the tree to this app's uid.
+     *
+     * The engine runs as root and creates what it needs there (its home, the
+     * app's folder inside it, the workspace). A folder that root created
+     * cannot be written by the app, and the app's launch script lives in one
+     * of them.
+     */
+    fun ensureAppFolders(rootfs: File): Boolean {
+        val su = suBinary() ?: return false
+        val uid = android.os.Process.myUid()
+        val script = """
+            for d in '${rootfs.path}/root/.dsh' '${rootfs.path}/root/.dsh/dsh-app' '${rootfs.path}/root/workspace' '${rootfs.path}/etc'; do
+              [ -d "${'$'}d" ] && chown $uid:$uid "${'$'}d" 2>/dev/null
+            done
+            echo done
+        """.trimIndent()
+        return runCatching { runRootCommand(su, script, 60_000) }.isSuccess
+    }
+
+    /**
+     * Hands one path of the tree to this app's uid.
+     *
+     * The fallback for a write that was refused: the folder still belongs to
+     * an earlier install of this app.
+     */
+    fun chownToApp(path: File): Boolean {
+        val su = suBinary() ?: return false
+        val uid = android.os.Process.myUid()
+        val script = "chown -R $uid:$uid '${path.absolutePath}' 2>/dev/null; echo done"
+        return runCatching { runRootCommand(su, script, 120_000) }.isSuccess
+    }
+
     private val suCandidates = listOf(
         "/system/xbin/su",
         "/system/bin/su",
@@ -53,6 +126,46 @@ object ChrootRuntime {
     fun root(command: String, timeoutMs: Long = 600_000): String {
         val su = suBinary() ?: throw IllegalStateException("no root on this phone: the engine needs a rooted device (Magisk) to run in a chroot")
         return runRootCommand(su, command, timeoutMs)
+    }
+
+    /**
+     * Replaces the engine's own parts of the live tree.
+     *
+     * The tree is a runtime image, but the person's home lives in it: the
+     * chats, the plugins, the settings and the workspace. An update must not
+     * take that with it, so only the paths the engine owns are replaced — the
+     * rest of the tree stays exactly as it is.
+     */
+    fun installEngine(stagedRoot: File, uid: Int, gid: Int, onLog: (String) -> Unit) {
+        val source = stagedRoot.canonicalPath
+        val lines = mutableListOf("set -e")
+        for (path in ENGINE_PATHS) {
+            val parent = path.substringBeforeLast('/', "")
+            if (parent.isNotEmpty()) lines += "mkdir -p '$ROOT/$parent'"
+            lines += "rm -rf '$ROOT/$path'"
+            lines += "cp -a '$source/$path' '$ROOT/$path'"
+        }
+        lines += "chown -R $uid:$gid '$ROOT/opt' '$ROOT/etc/dsh-app' 2>/dev/null || true"
+        root(lines.joinToString("\n") + "\n")
+        onLog("[dsh-app] chroot: the engine's own files are replaced; your chats and settings stay")
+    }
+
+    /** Whether the live tree already holds an engine. */
+    fun hasEngine(): Boolean = File(ROOT, "opt/dsh").isDirectory
+
+    /**
+     * Carries the live home aside while the image is replaced.
+     *
+     * The home holds the person's chats, plugins, settings and workspace. It
+     * lives in the tree that is about to be rebuilt, so it waits outside it.
+     */
+    fun carryHome() {
+        root("rm -rf '$CARRY'; mkdir -p '$CARRY'; cp -a '$ROOT/root/.' '$CARRY/' 2>/dev/null || true")
+    }
+
+    /** Puts the carried home back into the rebuilt tree. */
+    fun restoreHome() {
+        root("cp -a '$CARRY/.' '$ROOT/root/' 2>/dev/null || true; rm -rf '$CARRY'")
     }
 
     /**
@@ -160,11 +273,6 @@ object ChrootRuntime {
     }
 
     /**
-     * The mounts the chroot needs: the phone's own kernels interfaces, its
-     * userspace (/data, /storage, /sdcard) and a couple of small tmpfs.
-     * Everything that is already mounted is left alone, so a restart is cheap.
-     */
-    /**
      * The mounts the chroot needs, from the person's list (prefs): the phone's
      * own kernels interfaces, its userspace (/data, /storage, /sdcard) and
      * whatever they added. Off mounts are left out; "ask each time" mounts go
@@ -193,7 +301,7 @@ object ChrootRuntime {
                 "sysfs" -> "mount -t sysfs -o ro,nosuid,nodev sysfs $target 2>/dev/null || true"
                 "tmpfs" -> {
                     val size = if (mount.target.endsWith("shm")) "64m" else "512m"
-                    "mount -t tmpfs -o size=$size,mode=1777 tmpfs $target 2>/dev/null || true"
+                    "mount -t tmpfs -o size=$size,$TMPFS_MODE tmpfs $target 2>/dev/null || true"
                 }
                 else -> {
                     val ro = if (readOnly) "-o ro" else ""
@@ -205,6 +313,10 @@ object ChrootRuntime {
             }
         }
         lines += "mkdir -p ${ROOT}/root/.dsh/dsh-app 2>/dev/null || true"
+        // The engine runs as root, so the files it leaves in the app's own
+        // folder (the log, the pid file) belong to root and the app could not
+        // replace them. The app owns this folder.
+        lines += "chown -R ${android.os.Process.myUid()}:${android.os.Process.myUid()} ${ROOT}/root/.dsh/dsh-app 2>/dev/null || true"
         return lines.joinToString("\n") + "\n"
     }
 
@@ -280,6 +392,42 @@ object ChrootRuntime {
 
     /** Single-quotes [value] for the shell. */
     fun shellQuote(value: String): String = "'" + value.replace("'", "'\\''") + "'"
+
+    /**
+     * Ends every engine left over from an earlier run.
+     *
+     * In the chroot the engine runs as root: the app cannot signal it and
+     * cannot even read its /proc entries, so a leftover survives every cleanup
+     * the app can do on its own. It keeps the write lock of the chats it had
+     * open ("this chat is in use elsewhere"), and a second engine starts next
+     * to it. Only a process that runs from this chroot is touched.
+     *
+     * @return how many processes were asked to stop.
+     */
+    fun killLeftoverEngines(): Int {
+        val su = suBinary() ?: return 0
+        val script = """
+            ended=0
+            for p in /proc/[0-9]*; do
+              pid=${'$'}{p#/proc/}
+              exe=`readlink "${'$'}p/exe" 2>/dev/null` || continue
+              case "${'$'}exe" in
+                "$ROOT"/*) kill -TERM "${'$'}pid" 2>/dev/null && ended=${'$'}((ended+1)) ;;
+              esac
+            done
+            sleep 1
+            for p in /proc/[0-9]*; do
+              pid=${'$'}{p#/proc/}
+              exe=`readlink "${'$'}p/exe" 2>/dev/null` || continue
+              case "${'$'}exe" in
+                "$ROOT"/*) kill -KILL "${'$'}pid" 2>/dev/null ;;
+              esac
+            done
+            echo "ended ${'$'}ended"
+        """.trimIndent()
+        val out = runCatching { runRootCommand(su, script, 60_000) }.getOrDefault("")
+        return Regex("ended (\\d+)").find(out)?.groupValues?.get(1)?.toIntOrNull() ?: 0
+    }
 
     /**
      * The launch script: the guest command from the runtime manifest with the

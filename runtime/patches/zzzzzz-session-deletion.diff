@@ -149,10 +149,10 @@
  	* @returns the initialized Agent and its shared disposer.
  	*/
 +	dshGoDeletionVersion = 1;
-+	async dshGoDisposeForDeletion(id) {
++	async dshGoDisposeForDeletion(id, options) {
 +		const agent = this.runtime.ctx.agents.get(id);
 +		if (agent === void 0) return;
-+		if (agent.session.header.origin === "subagent" || (agent.session.header.delegationDepth ?? 0) > 0)
++		if (options?.allowSubagent !== true && (agent.session.header.origin === "subagent" || (agent.session.header.delegationDepth ?? 0) > 0))
 +			throw Object.assign(new Error("related agent"), { code: "session-related" });
 +		if (agent.phase?.kind !== "idle")
 +			throw Object.assign(new Error("active agent"), { code: "session-active" });

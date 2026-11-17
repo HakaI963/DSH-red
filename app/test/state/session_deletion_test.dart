@@ -27,6 +27,7 @@ class _Backend implements SessionDeletionBackend {
   bool support = true;
   int supportCalls = 0;
   final calls = <String>[];
+  final cascades = <String>[];
   final failures = <String, Object>{};
   final gates = <String, Completer<void>>{};
   void Function(String)? afterDelete;
@@ -37,8 +38,9 @@ class _Backend implements SessionDeletionBackend {
     return support;
   }
   @override
-  Future<void> delete(DshClient client, String sessionId) async {
+  Future<void> delete(DshClient client, String sessionId, {bool cascade = false}) async {
     calls.add(sessionId);
+    if (cascade) cascades.add(sessionId);
     if (gates[sessionId] case final gate?) await gate.future;
     if (failures[sessionId] case final error?) throw error;
     afterDelete?.call(sessionId);
@@ -103,6 +105,18 @@ void main() {
     expect(container.read(composerQuoteProvider).containsKey('s1'), isFalse);
     expect(container.read(drawerViewProvider).folders.single.sessionIds, ['s2']);
     expect(container.read(sessionDeletionBusyProvider), isFalse);
+  });
+
+  test('a cascade delete is the person\'s second answer and only then', () async {
+    final (container, _, backend) = await start();
+    final result = await container.read(sessionDeletionProvider.notifier).delete(
+      ['s1'],
+      owner: owner(container),
+      cascade: true,
+    );
+    expect(result.deleted, ['s1']);
+    expect(result.failures, isEmpty);
+    expect(backend.cascades, ['s1']);
   });
 
   test('running row and pending archive never reach destructive backend', () async {

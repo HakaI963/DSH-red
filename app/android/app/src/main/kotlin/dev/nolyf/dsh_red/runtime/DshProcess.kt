@@ -109,12 +109,18 @@ class DshProcess(
         if (!cleanup.complete) listener.onLog("[dsh-app] starting the engine with incomplete process observation", "system")
         // An engine from an earlier run is still there when the app was killed
         // or the phone rebooted the service. It runs as root, so the app can
-        // neither see nor stop it: it keeps the port and the write lock of the
-        // chats it had open, and the app then talks to an engine that is not
-        // its own. Root ends it before this launch.
+        // neither see nor stop it, and it keeps the write lock of every chat
+        // it had open: a second engine then finds those chats "in use
+        // elsewhere". Root ends it before this launch.
         val leftovers = ChrootRuntime.killLeftoverEngines()
         if (leftovers > 0) {
             listener.onLog("[dsh-app] stopped $leftovers engine process(es) left over from an earlier run", "system")
+        }
+        // The tree belongs to this app's uid. A reinstall gives the app a new
+        // one, and until the tree is handed over the app cannot write its own
+        // launch script into it.
+        if (ChrootRuntime.ensureTreeOwnership()) {
+            listener.onLog("[dsh-app] the runtime tree belonged to an earlier install; it is this app's again", "system")
         }
         // The engine runs as root: the folders the app writes into are handed
         // to the app, so a root-owned folder cannot refuse its files.
@@ -178,7 +184,14 @@ class DshProcess(
         val script = ChrootRuntime.launchScript(argv.map { expand(it) }, emptyMap(), port)
         val scriptFile = File(rootfs, ChrootRuntime.LAUNCH_SCRIPT.removePrefix("/"))
         scriptFile.parentFile?.mkdirs()
-        scriptFile.writeText(script)
+        try {
+            scriptFile.writeText(script)
+        } catch (error: java.io.IOException) {
+            // The tree still belongs to an earlier install of this app: root
+            // hands this folder over, and the write goes through.
+            ChrootRuntime.chownToApp(scriptFile.parentFile ?: scriptFile)
+            scriptFile.writeText(script)
+        }
         scriptFile.setExecutable(true)
 
         val phoneStorageMount = binds.any { it == "/storage" || it.endsWith(":/sdcard") }

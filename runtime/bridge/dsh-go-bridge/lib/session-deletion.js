@@ -52,23 +52,32 @@ export function createSessionDeletion(ctx, { readBody, send }) {
         return true;
       }
       let id;
+      let cascade = false;
       try {
         const body = JSON.parse((await readBody(req, 4096)).toString("utf8"));
         if (body === null || typeof body !== "object" || Array.isArray(body)
-          || Object.keys(body).length !== 1 || typeof body.sessionId !== "string"
+          || !Object.keys(body).every((key) => key === "sessionId" || key === "cascade")
+          || typeof body.sessionId !== "string"
           || body.sessionId.length === 0 || body.sessionId.length > 256
           || /[\u0000-\u001f\u007f]/.test(body.sessionId)) throw new Error("Invalid sessionId.");
         id = body.sessionId;
+        // A cascade delete removes the chat together with the subagent work it
+        // spawned. It is the person's explicit second answer to the same
+        // request, never a default.
+        if (Object.hasOwn(body, "cascade")) {
+          if (body.cascade !== true && body.cascade !== false) throw new Error("Invalid cascade.");
+          cascade = body.cascade;
+        }
       } catch (error) {
         send(res, error?.status === 413 ? 413 : 400, errorBody("failed", "Expected {sessionId: string}."));
         return true;
       }
       try {
-        await services.persistence.dshGoDeletion.delete(id, {
+        const hooks = {
           prepare: async () => {
             const activity = await ctx.waterfall("workspace/session-activity", { sessionId: id }, () => Promise.resolve([]));
             if (activity.length) throw Object.assign(new Error("Session has active work."), { code: "session-active" });
-            await services.lifecycle.dshGoDisposeForDeletion(id);
+            await services.lifecycle.dshGoDisposeForDeletion(id, { allowSubagent: cascade });
           },
           inspectTasks: () => services.schedule.dshGoInspectDeletion(id),
           cleanup: async () => {
@@ -76,8 +85,14 @@ export function createSessionDeletion(ctx, { readBody, send }) {
             await services.query.dshGoForget(id);
             await services.workspace.dshGoForget(id);
           },
-        });
-        send(res, 200, { deleted: true, sessionId: id });
+        };
+        if (cascade) {
+          const result = await services.persistence.dshGoDeletion.deleteTree(id, hooks);
+          send(res, 200, { deleted: true, sessionId: id, deletedIds: result.deleted });
+        } else {
+          await services.persistence.dshGoDeletion.delete(id, hooks);
+          send(res, 200, { deleted: true, sessionId: id });
+        }
       } catch (error) {
         const code = Object.hasOwn(STATUS, error?.code) ? error.code
           : error?.name === "SessionAlreadyOwnedError" ? "writer-held" : "failed";

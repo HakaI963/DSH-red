@@ -15988,6 +15988,15 @@ class L10nZh extends L10n {
   String get shellDeleteFailed => '主机无法确认删除结果，请刷新后再决定是否重试。';
 
   @override
+  String get shellDeleteRelatedTitle => '此对话有子代理工作';
+
+  @override
+  String get shellDeleteRelatedAction => '删除该对话及其子代理对话';
+
+  @override
+  String get shellDeleteRelatedExplanation => '由它创建的子代理对话会一并删除，不会影响其他内容。';
+
+  @override
   String get setupAppearanceTitle => '选择外观';
 
   @override

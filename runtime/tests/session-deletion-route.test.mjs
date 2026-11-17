@@ -27,12 +27,20 @@ function harness({ active = [], fail, scheduleOk = true } = {}) {
           if (await hooks.inspectTasks()) throw Object.assign(new Error('tasks'), { code: 'session-related' });
           await hooks.cleanup();
         },
+        async deleteTree(id, hooks) {
+          calls.push(['deleteTree', id, hooks]);
+          if (fail) throw fail;
+          await hooks.prepare();
+          if (await hooks.inspectTasks()) throw Object.assign(new Error('tasks'), { code: 'session-related' });
+          await hooks.cleanup();
+          return { deleted: [id, 'kid'] };
+        },
       },
     },
     agentLoop: {
       dshGoDeletionVersion: 1,
-      async dshGoDisposeForDeletion(id) {
-        calls.push(['dispose', id]);
+      async dshGoDisposeForDeletion(id, options) {
+        calls.push(['dispose', id, options]);
       },
     },
     sessionProjectionCache: { dshGoDeletionVersion: 1, async dshGoForget(id) { calls.push(['cache', id]); } },
@@ -177,4 +185,32 @@ test('the capability probe awaits the seam instead of reporting a pending promis
   // throw for a present one; both show up as a non-object body or a rejection.
   const { last } = await h.request('GET', CAP);
   assert.deepEqual(last, [200, { supported: true, version: 1 }]);
+});
+
+test('a cascade delete removes the subagent tree and says which ids went', async () => {
+  const h = harness();
+  const { last } = await h.request('POST', DEL, { body: JSON.stringify({ sessionId: 's', cascade: true }) });
+  assert.equal(last[0], 200);
+  assert.deepEqual(last[1], { deleted: true, sessionId: 's', deletedIds: ['s', 'kid'] });
+  assert.deepEqual(h.calls.filter(([kind]) => kind === 'deleteTree'), [['deleteTree', 's', h.calls.at(0)[2]]]);
+  // The subagent child is allowed to go with the chat it belongs to.
+  assert.deepEqual(h.calls.filter(([kind]) => kind === 'dispose'), [['dispose', 's', { allowSubagent: true }]]);
+});
+
+test('a plain delete never cascades and never allows a subagent agent to go', async () => {
+  const h = harness();
+  const { last } = await h.request('POST', DEL, { body: JSON.stringify({ sessionId: 's' }) });
+  assert.equal(last[0], 200);
+  assert.deepEqual(h.calls.filter(([kind]) => kind === 'deleteTree'), []);
+  assert.deepEqual(h.calls.filter(([kind]) => kind === 'dispose'), [['dispose', 's', { allowSubagent: false }]]);
+});
+
+test('a cascade flag that is not a boolean is refused', async () => {
+  const h = harness();
+  for (const body of ['{"sessionId":"s","cascade":"yes"}', '{"sessionId":"s","cascade":1}']) {
+    const { last } = await h.request('POST', DEL, { body });
+    assert.equal(last[0], 400, body);
+    assert.equal(last[1].error.code, 'failed');
+  }
+  assert.deepEqual(h.calls.filter(([kind]) => kind === 'delete' || kind === 'deleteTree'), []);
 });
