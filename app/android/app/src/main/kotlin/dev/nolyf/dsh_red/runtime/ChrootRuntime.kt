@@ -69,13 +69,15 @@ object ChrootRuntime {
      * The engine runs as root and creates what it needs there (its home, the
      * app's folder inside it, the workspace). A folder that root created
      * cannot be written by the app, and the app's launch script lives in one
-     * of them.
+     * of them. /opt/dsh-app holds the per-launch overlays (phone control,
+     * message search, subscription sign-in, voice input): when the engine left
+     * it root-owned, none of those could be written.
      */
     fun ensureAppFolders(rootfs: File): Boolean {
         val su = suBinary() ?: return false
         val uid = android.os.Process.myUid()
         val script = """
-            for d in '${rootfs.path}/root/.dsh' '${rootfs.path}/root/.dsh/dsh-app' '${rootfs.path}/root/workspace' '${rootfs.path}/etc'; do
+            for d in '${rootfs.path}/root/.dsh' '${rootfs.path}/root/.dsh/dsh-app' '${rootfs.path}/root/workspace' '${rootfs.path}/etc' '${rootfs.path}/opt' '${rootfs.path}/opt/dsh-app'; do
               [ -d "${'$'}d" ] && chown $uid:$uid "${'$'}d" 2>/dev/null
             done
             echo done
@@ -181,31 +183,6 @@ object ChrootRuntime {
     }
 
     /**
-     * Replaces the engine's own parts of the live tree.
-     *
-     * The tree is a runtime image, but the person's home lives in it: the
-     * chats, the plugins, the settings and the workspace. An update must not
-     * take that with it, so only the paths the engine owns are replaced and
-     * the rest of the tree stays exactly as it is.
-     */
-    fun installEngine(stagedRoot: File, uid: Int, gid: Int, onLog: (String) -> Unit) {
-        val source = stagedRoot.canonicalPath
-        val lines = mutableListOf("set -e")
-        for (path in ENGINE_PATHS) {
-            val parent = path.substringBeforeLast('/', "")
-            if (parent.isNotEmpty()) lines += "mkdir -p '$ROOT/$parent'"
-            lines += "rm -rf '$ROOT/$path'"
-            lines += "cp -a '$source/$path' '$ROOT/$path'"
-        }
-        lines += "chown -R $uid:$gid '$ROOT/opt' '$ROOT/etc/dsh-app' 2>/dev/null || true"
-        root(lines.joinToString("\n") + "\n")
-        onLog("[dsh-app] chroot: the engine's own files are replaced; your chats and settings stay")
-    }
-
-    /** Whether the live tree already holds an engine. */
-    fun hasEngine(): Boolean = File(ROOT, "opt/dsh").isDirectory
-
-    /**
      * Ends every engine left over from an earlier run.
      *
      * In the chroot the engine runs as root: the app cannot signal it and
@@ -237,26 +214,6 @@ object ChrootRuntime {
         """.trimIndent()
         val out = runCatching { runRootCommand(su, script, 60_000) }.getOrDefault("")
         return Regex("ended (\\d+)").find(out)?.groupValues?.get(1)?.toIntOrNull() ?: 0
-    }
-
-    /**
-     * Hands the app's own folders in the tree to the app.
-     *
-     * The engine runs as root and creates what it needs there (its home, the
-     * app's folder inside it, the workspace). A folder that root created
-     * cannot be written by the app, and the app's launch script lives in one
-     * of them.
-     */
-    fun ensureAppFolders(rootfs: File): Boolean {
-        val su = suBinary() ?: return false
-        val uid = android.os.Process.myUid()
-        val script = """
-            for d in '${rootfs.path}/root/.dsh' '${rootfs.path}/root/.dsh/dsh-app' '${rootfs.path}/root/workspace' '${rootfs.path}/etc'; do
-              [ -d "${'$'}d" ] && chown $uid:$uid "${'$'}d" 2>/dev/null
-            done
-            echo done
-        """.trimIndent()
-        return runCatching { runRootCommand(su, script, 60_000) }.isSuccess
     }
 
     /** Whether the chroot already holds this runtime version. */
@@ -340,7 +297,11 @@ object ChrootRuntime {
                     access = item.optString("access", "readOnly"),
                 )
             }
-            if (out.isEmpty()) defaultMounts(false) else out
+            if (out.isEmpty()) return defaultMounts(false)
+            // A list saved before the built-ins were expanded must still gain
+            // the new ones; keep the person's choices for what is already there.
+            val targets = out.map { it.target }.toSet()
+            out + defaultMounts(false).filter { it.target !in targets }
         } catch (_: Exception) {
             defaultMounts(false)
         }
@@ -353,7 +314,21 @@ object ChrootRuntime {
         Mount("/data", "/data", true, "readWrite"),
         Mount("/system", "/system", true, "readOnly"),
         Mount("/apex", "/apex", true, "readOnly"),
+        // The rest of the Android userspace lives on separate mounts (dynamic
+        // partitions are not under /system). Bind them all read-only so the
+        // engine's AI agent can see the whole phone filesystem.
+        Mount("/vendor", "/vendor", true, "readOnly"),
+        Mount("/product", "/product", true, "readOnly"),
+        Mount("/system_ext", "/system_ext", true, "readOnly"),
+        Mount("/odm", "/odm", true, "readOnly"),
+        Mount("/oem", "/oem", true, "readOnly"),
+        Mount("/cache", "/cache", true, "readOnly"),
+        Mount("/metadata", "/metadata", true, "readOnly"),
+        Mount("/persist", "/persist", true, "readOnly"),
+        Mount("/mnt", "/mnt", true, "readOnly"),
         Mount("/mnt/user", "/mnt/user", true, "readOnly"),
+        Mount("/acct", "/acct", true, "readOnly"),
+        Mount("/config", "/config", true, "readOnly"),
         Mount("proc", "/proc", true, "readOnly"),
         Mount("sysfs", "/sys", true, "readOnly"),
         Mount("/dev", "/dev", true, "readOnly"),
@@ -392,42 +367,6 @@ object ChrootRuntime {
 
     /** Single-quotes [value] for the shell. */
     fun shellQuote(value: String): String = "'" + value.replace("'", "'\\''") + "'"
-
-    /**
-     * Ends every engine left over from an earlier run.
-     *
-     * In the chroot the engine runs as root: the app cannot signal it and
-     * cannot even read its /proc entries, so a leftover survives every cleanup
-     * the app can do on its own. It keeps the write lock of the chats it had
-     * open ("this chat is in use elsewhere"), and a second engine starts next
-     * to it. Only a process that runs from this chroot is touched.
-     *
-     * @return how many processes were asked to stop.
-     */
-    fun killLeftoverEngines(): Int {
-        val su = suBinary() ?: return 0
-        val script = """
-            ended=0
-            for p in /proc/[0-9]*; do
-              pid=${'$'}{p#/proc/}
-              exe=`readlink "${'$'}p/exe" 2>/dev/null` || continue
-              case "${'$'}exe" in
-                "$ROOT"/*) kill -TERM "${'$'}pid" 2>/dev/null && ended=${'$'}((ended+1)) ;;
-              esac
-            done
-            sleep 1
-            for p in /proc/[0-9]*; do
-              pid=${'$'}{p#/proc/}
-              exe=`readlink "${'$'}p/exe" 2>/dev/null` || continue
-              case "${'$'}exe" in
-                "$ROOT"/*) kill -KILL "${'$'}pid" 2>/dev/null ;;
-              esac
-            done
-            echo "ended ${'$'}ended"
-        """.trimIndent()
-        val out = runCatching { runRootCommand(su, script, 60_000) }.getOrDefault("")
-        return Regex("ended (\\d+)").find(out)?.groupValues?.get(1)?.toIntOrNull() ?: 0
-    }
 
     /**
      * The launch script: the guest command from the runtime manifest with the

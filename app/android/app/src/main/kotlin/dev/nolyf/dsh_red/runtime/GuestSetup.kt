@@ -209,7 +209,15 @@ object GuestSetup {
             if (!etc.isDirectory && !etc.mkdirs() && !etc.isDirectory) throw IOException("Cannot prepare resolver directory")
             val target = File(etc, "resolv.conf")
             stage = DnsConfigStage.READ
-            if (target.isFile && target.readText() == text) return DnsConfigReport(DnsConfigOutcome.UNCHANGED, requested)
+            // Reading first is only an optimisation: a resolv.conf left root-owned
+            // or as a dangling symlink by an earlier run must not stop the write —
+            // the whole file is replaced below anyway.
+            val unchanged = try {
+                target.isFile && target.readText() == text
+            } catch (_: Exception) {
+                false
+            }
+            if (unchanged) return DnsConfigReport(DnsConfigOutcome.UNCHANGED, requested)
             // Swapped in whole while DSH runs; also replaces a symlink (e.g. to systemd-resolved) with a plain file.
             val temp = File(etc, ".resolv.conf.dsh-tmp")
             stage = DnsConfigStage.WRITE

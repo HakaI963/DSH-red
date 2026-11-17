@@ -109,7 +109,21 @@ List<ChrootMount> defaultChrootMounts() => const [
   ChrootMount(id: 'data', label: 'App and system data', source: '/data', target: '/data', access: MountAccess.readWrite),
   ChrootMount(id: 'system', label: 'Android system', source: '/system', target: '/system'),
   ChrootMount(id: 'apex', label: 'Android apex', source: '/apex', target: '/apex'),
+  // Dynamic partitions and the rest of Android's userspace are separate
+  // mounts, not under /system: bind them read-only so the engine's agent can
+  // see the whole phone filesystem.
+  ChrootMount(id: 'vendor', label: 'Android vendor', source: '/vendor', target: '/vendor'),
+  ChrootMount(id: 'product', label: 'Android product', source: '/product', target: '/product'),
+  ChrootMount(id: 'system_ext', label: 'Android system extensions', source: '/system_ext', target: '/system_ext'),
+  ChrootMount(id: 'odm', label: 'ODM partition', source: '/odm', target: '/odm'),
+  ChrootMount(id: 'oem', label: 'OEM partition', source: '/oem', target: '/oem'),
+  ChrootMount(id: 'cache', label: 'Cache', source: '/cache', target: '/cache'),
+  ChrootMount(id: 'metadata', label: 'Metadata', source: '/metadata', target: '/metadata'),
+  ChrootMount(id: 'persist', label: 'Persistent calibration', source: '/persist', target: '/persist'),
+  ChrootMount(id: 'mnt', label: 'Mount points', source: '/mnt', target: '/mnt'),
   ChrootMount(id: 'mntuser', label: 'User storage (old Android)', source: '/mnt/user', target: '/mnt/user'),
+  ChrootMount(id: 'acct', label: 'Control groups', source: '/acct', target: '/acct'),
+  ChrootMount(id: 'config', label: 'Config filesystem', source: '/config', target: '/config'),
   ChrootMount(id: 'proc', label: 'Processes', source: 'proc', target: '/proc'),
   ChrootMount(id: 'sys', label: 'Kernel state', source: 'sysfs', target: '/sys'),
   ChrootMount(id: 'dev', label: 'Devices', source: '/dev', target: '/dev'),
@@ -163,6 +177,13 @@ class ChrootMountsController extends Notifier<List<ChrootMount>> {
   }
 }
 
+/// Adds built-ins introduced in a later version to a list saved before they
+/// existed, without undoing the person's own on/off and read-write choices.
+List<ChrootMount> _withNewBuiltins(List<ChrootMount> saved) {
+  final ids = saved.map((m) => m.id).toSet();
+  return [...saved, ...defaultChrootMounts().where((m) => !ids.contains(m.id))];
+}
+
 /// The stored mounts, loaded once.
 final chrootMountsPrefsProvider = FutureProvider<List<ChrootMount>>((ref) async {
   final prefs = await SharedPreferences.getInstance();
@@ -171,7 +192,9 @@ final chrootMountsPrefsProvider = FutureProvider<List<ChrootMount>>((ref) async 
   try {
     final decoded = jsonDecode(raw);
     if (decoded is! List) return defaultChrootMounts();
-    return [for (final item in decoded) ChrootMount.fromJson((item as Map).cast<String, Object?>())];
+    return _withNewBuiltins([
+      for (final item in decoded) ChrootMount.fromJson((item as Map).cast<String, Object?>()),
+    ]);
   } catch (_) {
     return defaultChrootMounts();
   }
