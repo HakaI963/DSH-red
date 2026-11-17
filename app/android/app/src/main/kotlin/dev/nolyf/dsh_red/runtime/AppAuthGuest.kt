@@ -56,11 +56,23 @@ object AppAuthGuest {
     fun writeFiles(context: Context, rootfs: File): Boolean = try {
         // Written as root: the app cannot count on being able to create files
         // under /data/local on every ROM, whatever the folder's owner is.
+        if (ChrootRuntime.suBinary() != null) {
+            for (name in MODULES) {
+                val bytes = context.assets.open("$ASSET_DIR/$name").use { it.readBytes() }
+                if (!ChrootRuntime.writeBytes(rootfs, "$GUEST_DIR/$name", bytes, "600")) return false
+            }
+            return ChrootRuntime.writeText(rootfs, PATCH, PATCH_YAML, "600")
+        }
+        // No root (desktop JVM tests): keep the plain write so the helper stays testable.
+        val dir = File(rootfs, GUEST_DIR.removePrefix("/"))
+        if (Files.isSymbolicLink(dir.toPath()) || (dir.exists() && !dir.isDirectory)) dir.delete()
+        if (!dir.isDirectory && !dir.mkdirs()) throw IOException("could not create ${dir.path}")
         for (name in MODULES) {
             val bytes = context.assets.open("$ASSET_DIR/$name").use { it.readBytes() }
-            if (!ChrootRuntime.writeBytes(rootfs, "$GUEST_DIR/$name", bytes, "600")) return false
+            writeIfChanged(File(dir, name), bytes)
         }
-        ChrootRuntime.writeText(rootfs, PATCH, PATCH_YAML, "600")
+        writeIfChanged(file(rootfs), PATCH_YAML.toByteArray())
+        true
     } catch (_: Exception) {
         runCatching { file(rootfs).delete() }
         false

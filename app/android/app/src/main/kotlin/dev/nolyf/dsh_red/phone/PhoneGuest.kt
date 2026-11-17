@@ -94,8 +94,15 @@ object PhoneGuest {
 
     /** Writes the relay and the overlay as root (world-readable, no secrets). */
     fun writeFiles(rootfs: File) {
-        ChrootRuntime.writeText(rootfs, RELAY, RELAY_JS)
-        ChrootRuntime.writeText(rootfs, PATCH, patchYaml(rootfs))
+        if (ChrootRuntime.suBinary() != null) {
+            ChrootRuntime.writeText(rootfs, RELAY, RELAY_JS)
+            ChrootRuntime.writeText(rootfs, PATCH, patchYaml(rootfs))
+            return
+        }
+        // No root (desktop JVM tests): keep the plain write so the helper stays testable.
+        val dir = realDir(guestFile(rootfs, GUEST_DIR), ownerOnly = false)
+        writeAtomic(File(dir, "relay.cjs"), RELAY_JS, ownerOnly = false)
+        writeAtomic(File(dir, "phone.patch.yml"), patchYaml(rootfs), ownerOnly = false)
     }
 
     internal fun patchYaml(rootfs: File): String {
@@ -106,11 +113,18 @@ object PhoneGuest {
 
     /** Writes this launch's socket name and token as root, owner-only. */
     fun writeConfig(rootfs: File, endpoint: Endpoint) {
-        ChrootRuntime.writeText(rootfs, CONFIG, config(endpoint), "600")
+        if (ChrootRuntime.suBinary() != null) {
+            ChrootRuntime.writeText(rootfs, CONFIG, config(endpoint), "600")
+            return
+        }
+        // No root (desktop JVM tests): keep the plain write so the helper stays testable.
+        val dir = realDir(guestFile(rootfs, STATE_DIR), ownerOnly = true)
+        writeAtomic(File(dir, "bridge.json"), config(endpoint), ownerOnly = true)
     }
 
     fun clearConfig(rootfs: File) {
-        ChrootRuntime.delete(rootfs, CONFIG)
+        if (ChrootRuntime.suBinary() != null) ChrootRuntime.delete(rootfs, CONFIG)
+        else runCatching { guestFile(rootfs, CONFIG).delete() }
     }
 
     fun guestFile(rootfs: File, guestPath: String): File = File(rootfs, guestPath.removePrefix("/"))
