@@ -53,22 +53,17 @@ object AppAuthGuest {
      * Copies the bridge modules, then writes the overlay; files already up to date are left alone.
      * False when anything could not be written, so this launch leaves it out; cleanup is best effort.
      */
-    fun writeFiles(context: Context, rootfs: File): Boolean {
-        val patch = file(rootfs)
-        return try {
-            val dir = File(rootfs, GUEST_DIR.removePrefix("/"))
-            if (Files.isSymbolicLink(dir.toPath()) || (dir.exists() && !dir.isDirectory)) dir.delete()
-            if (!dir.isDirectory && !dir.mkdirs()) throw IOException("could not create ${dir.path}")
-            for (name in MODULES) {
-                val bytes = context.assets.open("$ASSET_DIR/$name").use { it.readBytes() }
-                writeIfChanged(File(dir, name), bytes)
-            }
-            writeIfChanged(patch, PATCH_YAML.toByteArray())
-            true
-        } catch (_: Exception) {
-            patch.delete()
-            false
+    fun writeFiles(context: Context, rootfs: File): Boolean = try {
+        // Written as root: the app cannot count on being able to create files
+        // under /data/local on every ROM, whatever the folder's owner is.
+        for (name in MODULES) {
+            val bytes = context.assets.open("$ASSET_DIR/$name").use { it.readBytes() }
+            if (!ChrootRuntime.writeBytes(rootfs, "$GUEST_DIR/$name", bytes, "600")) return false
         }
+        ChrootRuntime.writeText(rootfs, PATCH, PATCH_YAML, "600")
+    } catch (_: Exception) {
+        runCatching { file(rootfs).delete() }
+        false
     }
 
     /** Sibling temp file renamed over [target]; only a regular file is compared (never a link or FIFO). */

@@ -89,14 +89,9 @@ object GuestSetup {
         val path = if (safe) "${SafeMode.HOME.removePrefix("/")}/dsh-app/diagnostics.md" else DIAGNOSTICS_FILE
         val main = File(rootfs, path)
         val dir = main.parentFile ?: throw IOException("no diagnostics directory")
-        if (!dir.isDirectory && !dir.mkdirs()) throw IOException("cannot create ${dir.path}")
         val file = if (manual) File(dir, "diagnostics-manual.md") else main
-        val temp = File(dir, ".${file.name}.dsh-tmp")
-        try {
-            temp.writeText(markdown)
-            if (!temp.renameTo(file)) throw IOException("cannot replace ${file.path}")
-        } finally {
-            temp.delete()
+        if (!ChrootRuntime.writeText(rootfs, file.relativeTo(rootfs).path, markdown)) {
+            throw IOException("cannot write ${file.path}")
         }
         return file
     }
@@ -153,8 +148,7 @@ object GuestSetup {
                     if (directEngine) "${rootfs.canonicalPath}/root/.dsh/dsh-app/diagnostics.md"
                     else "\$DSH_HOME/dsh-app/diagnostics.md",
                 )
-            file.parentFile?.mkdirs()
-            if (!file.exists() || file.readText() != text) file.writeText(text)
+            ChrootRuntime.writeText(rootfs, file.relativeTo(rootfs).path, text)
         } catch (_: Exception) {
         }
     }
@@ -205,6 +199,11 @@ object GuestSetup {
         }
         var stage = DnsConfigStage.PREPARE
         try {
+            // Root owns the whole chroot, so go through su: a direct app write
+            // under /data/local is refused on some ROMs whatever the uid is.
+            if (ChrootRuntime.writeText(rootfs, "etc/resolv.conf", text)) {
+                return DnsConfigReport(DnsConfigOutcome.WRITTEN, requested)
+            }
             val etc = File(rootfs, "etc")
             if (!etc.isDirectory && !etc.mkdirs() && !etc.isDirectory) throw IOException("Cannot prepare resolver directory")
             val target = File(etc, "resolv.conf")

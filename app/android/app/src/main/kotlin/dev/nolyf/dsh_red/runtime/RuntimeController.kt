@@ -464,11 +464,11 @@ class RuntimeController private constructor(private val app: Context) : DshProce
                         "this phone has no root: the engine runs in a chroot and needs Magisk (or a rooted ROM)"
                     )
                 }
-                // The guest files below are written before DshProcess starts (and
-                // before its own ownership repair). A reinstall or a root-owned
-                // folder left by an earlier run must be handed back first, or the
-                // DNS file and every overlay silently fail to be written.
-                ChrootRuntime.ensureTreeOwnership()
+                // The guest files below are written before DshProcess starts.
+                // Hand the bounded app folders back (a whole-tree chown could
+                // walk a /data bind mount left by a still-running engine); the
+                // writes themselves go through root, so ownership is not a
+                // prerequisite for them to succeed.
                 ChrootRuntime.ensureAppFolders(installer.chrootRoot)
                 noteDns(GuestSetup.writeResolvConf(app, installer.chrootRoot), DnsConfigSource.START)
                 val storage = pendingPhoneStorage && PhoneStorage.isGranted(app) && PhoneStorage.binds().isNotEmpty()

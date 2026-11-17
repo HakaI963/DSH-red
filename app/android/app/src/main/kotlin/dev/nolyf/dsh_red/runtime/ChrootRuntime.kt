@@ -78,7 +78,10 @@ object ChrootRuntime {
         val uid = android.os.Process.myUid()
         val script = """
             for d in '${rootfs.path}/root/.dsh' '${rootfs.path}/root/.dsh/dsh-app' '${rootfs.path}/root/workspace' '${rootfs.path}/etc' '${rootfs.path}/opt' '${rootfs.path}/opt/dsh-app'; do
-              [ -d "${'$'}d" ] && chown $uid:$uid "${'$'}d" 2>/dev/null
+              if [ -d "${'$'}d" ]; then
+                chown -R $uid:$uid "${'$'}d" 2>/dev/null || true
+                chmod -R u+rwX "${'$'}d" 2>/dev/null || true
+              fi
             done
             echo done
         """.trimIndent()
@@ -96,6 +99,56 @@ object ChrootRuntime {
         val uid = android.os.Process.myUid()
         val script = "chown -R $uid:$uid '${path.absolutePath}' 2>/dev/null; echo done"
         return runCatching { runRootCommand(su, script, 120_000) }.isSuccess
+    }
+
+    /**
+     * Writes a file inside the chroot as root, then hands it to the app's uid.
+     *
+     * The app cannot rely on writing under /data/local itself: SELinux can
+     * refuse untrusted_app access to that label whatever the uid owner is, and
+     * an engine that ran as root leaves root-owned folders behind. Every guest
+     * file the app prepares at each launch (the launch script, the DNS file and
+     * the phone/search/auth/voice overlays) goes through here instead, so it
+     * works on any rooted phone rather than only on permissive ROMs.
+     *
+     * Base64 carries the bytes: no shell quoting of the file's content, and no
+     * need for a Context or an app-writable staging path.
+     */
+    fun writeText(rootfs: File, guestPath: String, text: String, mode: String = "644"): Boolean =
+        writeBytes(rootfs, guestPath, text.toByteArray(Charsets.UTF_8), mode)
+
+    /** Binary counterpart of [writeText]. */
+    fun writeBytes(rootfs: File, guestPath: String, bytes: ByteArray, mode: String = "644"): Boolean {
+        val su = suBinary() ?: return false
+        val dest = File(rootfs, guestPath.removePrefix("/")).absolutePath
+        val b64 = java.util.Base64.getEncoder().encodeToString(bytes)
+        val uid = android.os.Process.myUid()
+        val script = """
+            mkdir -p '${File(dest).parent}' 2>/dev/null || exit 1
+            printf '%s' '$b64' | base64 -d > '$dest.dsh-tmp' 2>/dev/null || exit 1
+            chmod $mode '$dest.dsh-tmp' 2>/dev/null || exit 1
+            chown $uid:$uid '$dest.dsh-tmp' 2>/dev/null || true
+            mv -f '$dest.dsh-tmp' '$dest' 2>/dev/null || exit 1
+            exit 0
+        """.trimIndent()
+        return runCatching { runRootCommand(su, script, 60_000) }.isSuccess
+    }
+
+    /** Removes a path inside the chroot as root (including a dangling link). */
+    fun delete(rootfs: File, guestPath: String): Boolean {
+        val su = suBinary() ?: return false
+        val dest = File(rootfs, guestPath.removePrefix("/")).absolutePath
+        return runCatching { runRootCommand(su, "rm -f '$dest'; true", 60_000) }.isSuccess
+    }
+
+    /** Whether a path (including a link) exists inside the chroot, checked as root. */
+    fun exists(rootfs: File, guestPath: String): Boolean {
+        val su = suBinary() ?: return false
+        val dest = File(rootfs, guestPath.removePrefix("/")).absolutePath
+        val out = runCatching {
+            runRootCommand(su, "if [ -e '$dest' ] || [ -L '$dest' ]; then echo yes; fi", 20_000)
+        }.getOrDefault("")
+        return out.contains("yes")
     }
 
     private val suCandidates = listOf(

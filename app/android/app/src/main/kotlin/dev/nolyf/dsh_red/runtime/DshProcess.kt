@@ -125,11 +125,10 @@ class DshProcess(
         // The engine runs as root: the folders the app writes into are handed
         // to the app, so a root-owned folder cannot refuse its files.
         ChrootRuntime.ensureAppFolders(rootfs)
-        // In the chroot the pid file lives in the tree the app owns: /tmp is a
-        // root-owned tmpfs, and the app cannot delete a file it does not own.
-        val pidFile = File(rootfs, "root/.dsh/dsh-app/dsh-web.pid")
-        pidFile.delete() // also removes a stale/dangling symlink; never reuse a previous run's PID
-        check(!java.nio.file.Files.exists(pidFile.toPath(), java.nio.file.LinkOption.NOFOLLOW_LINKS)) { "cannot remove stale runtime pid file" }
+        // The pid file is removed as root: /tmp is a root-owned tmpfs and a
+        // previous run may have left a stale or dangling link behind there.
+        ChrootRuntime.delete(rootfs, "root/.dsh/dsh-app/dsh-web.pid")
+        check(!ChrootRuntime.exists(rootfs, "root/.dsh/dsh-app/dsh-web.pid")) { "cannot remove stale runtime pid file" }
         port = pickPort()
         val tmp = File(context.cacheDir, "chroot-tmp").apply { mkdirs() }
         val vars = mapOf(
@@ -182,17 +181,12 @@ class DshProcess(
         // The guest command runs from a script inside the chroot: no quoting
         // problems with the engine's own arguments.
         val script = ChrootRuntime.launchScript(argv.map { expand(it) }, emptyMap(), port)
-        val scriptFile = File(rootfs, ChrootRuntime.LAUNCH_SCRIPT.removePrefix("/"))
-        scriptFile.parentFile?.mkdirs()
-        try {
-            scriptFile.writeText(script)
-        } catch (error: java.io.IOException) {
-            // The tree still belongs to an earlier install of this app: root
-            // hands this folder over, and the write goes through.
-            ChrootRuntime.chownToApp(scriptFile.parentFile ?: scriptFile)
-            scriptFile.writeText(script)
+        // Install the script as root: an app write under /data/local can be
+        // refused by SELinux whatever the uid owner is, and that was the
+        // restart failure ("launch.sh: open failed: EACCES").
+        check(ChrootRuntime.writeText(rootfs, ChrootRuntime.LAUNCH_SCRIPT, script, "755")) {
+            "cannot write the launch script into the chroot"
         }
-        scriptFile.setExecutable(true)
 
         val phoneStorageMount = binds.any { it == "/storage" || it.endsWith(":/sdcard") }
         val builder = ProcessBuilder(ChrootRuntime.launchCommand(context, phoneStorageMount)).directory(context.filesDir)

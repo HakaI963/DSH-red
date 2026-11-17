@@ -43,26 +43,10 @@ object SpeechGuest {
 
     fun file(rootfs: File) = File(rootfs, PATCH.removePrefix("/"))
 
-    /** Writes the overlay; false when it could not be written, so this launch leaves it out. Cleanup is best effort. */
+    /** Writes the overlay as root; false when it could not be written, so this launch leaves it out. */
     fun writeFiles(rootfs: File): Boolean {
-        val target = file(rootfs)
-        return try {
-            val dir = target.parentFile ?: throw IOException("no parent for ${target.path}")
-            if (!dir.isDirectory && !dir.mkdirs()) throw IOException("could not create ${dir.path}")
-            if (!target.exists() || target.readText() != PATCH_YAML) {
-                val tmp = File(dir, ".${target.name}.dsh-app-${System.nanoTime()}.tmp")
-                try {
-                    tmp.writeText(PATCH_YAML)
-                    tmp.setReadable(true, false)
-                    if (!tmp.renameTo(target)) throw IOException("could not replace ${target.path}")
-                } finally {
-                    if (tmp.exists()) tmp.delete()
-                }
-            }
-            true
-        } catch (_: Exception) {
-            target.delete()
-            false
-        }
+        val ok = ChrootRuntime.writeText(rootfs, PATCH, PATCH_YAML)
+        if (!ok) runCatching { file(rootfs).delete() }
+        return ok
     }
 }

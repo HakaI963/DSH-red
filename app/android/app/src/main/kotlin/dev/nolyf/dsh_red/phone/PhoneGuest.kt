@@ -1,5 +1,6 @@
 package dev.nolyf.dsh_red.phone
 
+import dev.nolyf.dsh_red.runtime.ChrootRuntime
 import java.io.File
 import java.io.IOException
 import java.nio.file.Files
@@ -91,11 +92,10 @@ object PhoneGuest {
         ),
     ) + "\n"
 
-    /** Writes the relay and the overlay (world-readable, no secrets). */
+    /** Writes the relay and the overlay as root (world-readable, no secrets). */
     fun writeFiles(rootfs: File) {
-        val dir = realDir(guestFile(rootfs, GUEST_DIR), ownerOnly = false)
-        writeAtomic(File(dir, "relay.cjs"), RELAY_JS, ownerOnly = false)
-        writeAtomic(File(dir, "phone.patch.yml"), patchYaml(rootfs), ownerOnly = false)
+        ChrootRuntime.writeText(rootfs, RELAY, RELAY_JS)
+        ChrootRuntime.writeText(rootfs, PATCH, patchYaml(rootfs))
     }
 
     internal fun patchYaml(rootfs: File): String {
@@ -104,17 +104,13 @@ object PhoneGuest {
         return PATCH_YAML + if (supported) "        dshGoPhoneCaller: true\n" else ""
     }
 
-    /** Writes this launch's socket name and token, owner-only. */
+    /** Writes this launch's socket name and token as root, owner-only. */
     fun writeConfig(rootfs: File, endpoint: Endpoint) {
-        val dir = realDir(guestFile(rootfs, STATE_DIR), ownerOnly = true)
-        writeAtomic(File(dir, "bridge.json"), config(endpoint), ownerOnly = true)
+        ChrootRuntime.writeText(rootfs, CONFIG, config(endpoint), "600")
     }
 
     fun clearConfig(rootfs: File) {
-        try {
-            guestFile(rootfs, CONFIG).delete()
-        } catch (_: Exception) {
-        }
+        ChrootRuntime.delete(rootfs, CONFIG)
     }
 
     fun guestFile(rootfs: File, guestPath: String): File = File(rootfs, guestPath.removePrefix("/"))
