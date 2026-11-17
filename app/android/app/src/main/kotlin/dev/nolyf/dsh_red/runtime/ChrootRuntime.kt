@@ -450,7 +450,8 @@ object ChrootRuntime {
         }
         // The pid file in the chroot's own home is always visible to the app;
         // /tmp may be a tmpfs the app cannot see.
-        return "#!/bin/sh\necho \$\$ > /root/.dsh/dsh-app/dsh-web.pid\n" +
+        return "#!/bin/sh\numask 022\n" +
+            "echo \$\$ > /root/.dsh/dsh-app/dsh-web.pid\n" +
             "# The engine's own output goes to a file: the app may be frozen or gone,\n" +
             "# and a pipe it stops reading would block (or kill) the engine.\n" +
             "# The log holds this run only: an older run's token line would be read\n" +

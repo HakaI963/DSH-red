@@ -187,6 +187,11 @@ class DshProcess(
         check(ChrootRuntime.writeText(rootfs, ChrootRuntime.LAUNCH_SCRIPT, script, "755")) {
             "cannot write the launch script into the chroot"
         }
+        // Create the engine's log as an app-readable file before root's shell
+        // truncates it: a root-created log under a restrictive umask would hide
+        // the startup token from the app's tailer, which then times out even
+        // though the engine is running fine.
+        ChrootRuntime.writeText(rootfs, "root/.dsh/dsh-app/dsh-web.log", "", "644")
 
         val phoneStorageMount = binds.any { it == "/storage" || it.endsWith(":/sdcard") }
         val builder = ProcessBuilder(ChrootRuntime.launchCommand(context, phoneStorageMount)).directory(context.filesDir)
@@ -241,8 +246,18 @@ class DshProcess(
             synchronized(this) {
                 // Token detection and stop share this lock; a late deadline cannot retire either.
                 if (process === p && p.isAlive && !readyReported && !stopping) {
-                    startupTokenTimedOut = true
-                    failStart("no startup token received within ${TOKEN_TIMEOUT_MS / 1000}s")
+                    // The log is written by root inside the chroot; on a ROM
+                    // where the app's tailer cannot read it, ask root for the
+                    // token line before giving up on an engine that is healthy.
+                    val logPath = "${ChrootRuntime.ROOT}/root/.dsh/dsh-app/dsh-web.log"
+                    val tokenLine = runCatching {
+                        ChrootRuntime.root("grep -m1 -E 'token=' '$logPath' 2>/dev/null || true", 20_000).trim()
+                    }.getOrDefault("")
+                    if (tokenLine.isNotEmpty()) detectToken(tokenLine)
+                    if (!readyReported) {
+                        startupTokenTimedOut = true
+                        failStart("no startup token received within ${TOKEN_TIMEOUT_MS / 1000}s")
+                    }
                 }
             }
         }
